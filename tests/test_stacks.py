@@ -50,6 +50,27 @@ def test_workflow_actions_are_pinned_to_major_versions(tmp_path, name: str) -> N
 
 
 @pytest.mark.parametrize("name", STACK_NAMES)
+def test_action_refs_are_resolvable_style(tmp_path, name: str) -> None:
+    """Moving major tags are fine for actions/*, but setup-uv publishes exact tags only."""
+    from newstack.cli import build_context_for_check
+    from newstack.registry import get_stack
+    from newstack.render import generate
+
+    stack = get_stack(name)
+    context = build_context_for_check(stack, "sample-app")
+    generate(stack.template_dir, tmp_path, context)
+
+    for workflow in tmp_path.glob(".github/workflows/*.y*ml"):
+        for ref in USES_RE.findall(workflow.read_text(encoding="utf-8")):
+            if ref.startswith("astral-sh/setup-uv@"):
+                tag = ref.split("@", 1)[1]
+                assert re.fullmatch(r"v\d+\.\d+\.\d+", tag), (
+                    f"{workflow.name}: setup-uv has no moving major tag, pin the patch "
+                    f"version (got {tag!r})"
+                )
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
 def test_stack_manifest_is_consistent(name: str) -> None:
     from newstack.registry import get_stack
 

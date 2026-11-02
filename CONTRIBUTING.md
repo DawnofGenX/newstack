@@ -51,6 +51,13 @@ Two escapes exist so that templating does not fight the code you generate:
 - `uv run ruff check .` and `uv run pytest` must be clean.
 - New CLI behaviour needs a test that fails without the change.
 
+## GitHub Actions refs in templates
+
+Pin actions to a tag that actually resolves. `actions/*` publish moving major tags
+(`@v7`), so those are fine. `astral-sh/setup-uv` publishes **only exact tags** — use
+`@v10.3.3`, never `@v10`; an unresolvable ref fails the whole job at "Set up job".
+`tests/test_stacks.py` enforces this.
+
 ## Reporting problems
 
 Open an issue with the output of `newstack doctor` and `newstack check <stack> --verbose`.
