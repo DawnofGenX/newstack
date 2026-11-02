@@ -34,4 +34,10 @@ addopts = "-q"
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# migrations are generated code: their module-level lists trip RUF012
 extend-exclude = ["*/migrations/*"]
+
+[tool.ruff.lint]
+# Pin the rule set: ruff's defaults shift between releases, which makes the same
+# template lint clean in one environment and dirty in another.
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]

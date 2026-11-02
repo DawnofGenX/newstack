@@ -2,7 +2,7 @@ import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	plugins: [
 		sveltekit({
 			compilerOptions: {
@@ -14,11 +14,13 @@ export default defineConfig({
 			adapter: adapter()
 		})
 	],
-	// Resolve browser entry points when running under vitest, so `mount` works (jsdom, not node/ssr).
-	resolve: process.env.VITEST ? { conditions: ['browser'] } : undefined,
+	// Vitest runs with mode === 'test'. Resolve browser entry points there so `mount`
+	// works against jsdom instead of Node/SSR. Reading `process.env` here would need
+	// Node's types in a file that is type-checked by svelte-check, which is not guaranteed.
+	resolve: mode === 'test' ? { conditions: ['browser'] } : undefined,
 	test: {
 		environment: 'jsdom',
 		include: ['src/**/*.test.ts'],
 		setupFiles: ['src/vitest-setup.ts']
 	}
-});
+}));
