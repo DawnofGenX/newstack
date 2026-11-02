@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node (used when checking the node stacks locally)
+node_modules/
+
+# tooling
+.DS_Store
+.idea/
+.vscode/

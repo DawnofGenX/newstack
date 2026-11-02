@@ -1,0 +1,14 @@
+{
+  "name": "static-site",
+  "title": "Static site",
+  "language": "html",
+  "blurb": "HTML + CSS + JS landing page: node:test suite, GitHub Pages deploy",
+  "requires": ["node", "git"],
+  "default_description": "A static website.",
+  "next_steps": ["cd {path}", "node --test \"tests/**/*.test.mjs\"", "python3 -m http.server 8000"],
+  "verify": [
+    {"name": "test", "cmd": "node --test \"tests/**/*.test.mjs\"", "tools": ["node"], "timeout": 120},
+    {"name": "js-syntax", "cmd": "node --check main.js", "tools": ["node"], "timeout": 120},
+    {"name": "assets", "cmd": "test -f index.html && test -f styles.css && test -f main.js", "tools": [], "timeout": 60}
+  ]
+}

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ title }}</title>
+    <meta name="description" content="{{ description }}" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>{{ title }}</h1>
+      <p>{{ description }}</p>
+      <a class="cta" href="#learn-more">Get started</a>
+    </header>
+
+    <main id="learn-more">
+      <section>
+        <h2>Fast by default</h2>
+        <p>No build step, no dependencies, no framework. Just files.</p>
+      </section>
+      <section>
+        <h2>Deploy on push</h2>
+        <p>The included workflow publishes this page to GitHub Pages.</p>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; <span id="year"></span> {{ author }}</p>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+</html>

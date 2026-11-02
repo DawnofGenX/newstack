@@ -1,0 +1,14 @@
+{
+  "name": "node-express-ts",
+  "title": "Express + TypeScript API",
+  "language": "node",
+  "blurb": "HTTP API: Express 5, typed handlers, supertest tests, CI",
+  "requires": ["node", "npm", "git"],
+  "default_description": "An Express API.",
+  "next_steps": ["cd {path}", "npm install", "npm run dev"],
+  "verify": [
+    {"name": "install", "cmd": "npm install --no-audit --no-fund --silent", "tools": ["npm"], "timeout": 900},
+    {"name": "typecheck", "cmd": "npm run typecheck", "tools": ["npm"], "timeout": 300},
+    {"name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 300}
+  ]
+}

@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: unit tests (py ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install
+        run: uv sync --group dev
+      - name: Lint
+        run: uv run ruff check .
+      - name: Test
+        run: uv run pytest
+
+  stacks:
+    name: stack ${{ matrix.stack }} is green
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stack:
+          - python-lib
+          - python-cli
+          - fastapi
+          - node-express-ts
+          - react-vite-ts
+          - static-site
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Install newstack
+        run: uv sync --group dev
+      - name: Generate and verify the stack
+        run: uv run newstack check ${{ matrix.stack }} --verbose
+
+  package:
+    name: wheel ships the stacks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10
+        with:
+          enable-cache: true
+      - name: Build
+        run: uv build
+      - name: Install the wheel into a clean environment
+        run: |
+          uv venv /tmp/pkg --python 3.12
+          uv pip install --python /tmp/pkg/bin/python dist/*.whl
+      - name: List stacks from the installed wheel
+        run: /tmp/pkg/bin/newstack list
+      - name: Generate a project with the installed wheel
+        run: |
+          /tmp/pkg/bin/newstack new python-lib /tmp/smoke-lib --name smoke_lib --no-git
+          test -f /tmp/smoke-lib/src/smoke_lib/core.py
+          test -f /tmp/smoke-lib/.github/workflows/ci.yml
+      - name: The generated project passes its own tests
+        run: |
+          uv venv /tmp/smoke-env --python 3.12
+          uv pip install --python /tmp/smoke-env/bin/python -e /tmp/smoke-lib pytest
+          cd /tmp/smoke-lib && /tmp/smoke-env/bin/python -m pytest -q
