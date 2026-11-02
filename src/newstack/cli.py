@@ -8,7 +8,7 @@ import re
 import shutil
 import subprocess
 import sys
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from . import __version__
@@ -76,7 +76,7 @@ def build_context(stack: Stack, destination: Path, args: argparse.Namespace) -> 
     project_name = args.name or destination.name
     author = args.author or _git_config("user.name") or "Your Name"
     email = args.email or _git_config("user.email") or "noreply@example.com"
-    today = datetime.now(UTC).date()
+    today = datetime.now(timezone.utc).date()
     return {
         "project_name": project_name,
         "package_name": _package_name(project_name),

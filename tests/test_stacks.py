@@ -71,6 +71,20 @@ def test_action_refs_are_resolvable_style(tmp_path, name: str) -> None:
 
 
 @pytest.mark.parametrize("name", STACK_NAMES)
+def test_uv_pip_installs_target_the_generated_venv(name: str) -> None:
+    """`uv run` exports VIRTUAL_ENV, so a bare `uv pip install` would fill the wrong venv."""
+    from newstack.registry import get_stack
+
+    stack = get_stack(name)
+    for step in stack.verify:
+        if "uv pip install" in step.cmd:
+            assert "--python .venv/bin/python" in step.cmd, (
+                f"{name}: '{step.name}' must pin --python .venv/bin/python "
+                "(otherwise uv installs into an inherited VIRTUAL_ENV)"
+            )
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
 def test_stack_manifest_is_consistent(name: str) -> None:
     from newstack.registry import get_stack
 

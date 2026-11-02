@@ -37,10 +37,12 @@ first day of work.
 
 ## Install
 
+Not on PyPI yet — install straight from the repository:
+
 ```bash
-uvx newstack list          # run without installing
-uv tool install newstack   # or install it on your PATH
-pipx install newstack      # any of the usual runners works
+uv tool install git+https://github.com/DawnofGenX/newstack
+# or, without installing:
+uvx --from git+https://github.com/DawnofGenX/newstack newstack list
 ```
 
 From a clone:

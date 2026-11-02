@@ -3,13 +3,48 @@
   "title": "Python CLI",
   "language": "python",
   "blurb": "Console command on argparse: zero runtime deps, tested entry point",
-  "requires": ["uv", "git"],
+  "requires": [
+    "uv",
+    "git"
+  ],
   "default_description": "A command line tool.",
-  "next_steps": ["cd {path}", "uv sync", "uv run {npm_name} greet --name you"],
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} greet --name you"
+  ],
   "verify": [
-    {"name": "install", "cmd": "uv venv -q .venv && uv pip install -q -e . pytest ruff", "tools": ["uv"], "timeout": 900},
-    {"name": "ruff", "cmd": ".venv/bin/ruff check .", "tools": ["uv"], "timeout": 300},
-    {"name": "pytest", "cmd": ".venv/bin/python -m pytest -q", "tools": ["uv"], "timeout": 300},
-    {"name": "run", "cmd": ".venv/bin/{{ npm_name }} greet --name newstack", "tools": ["uv"], "timeout": 120}
+    {
+      "name": "install",
+      "cmd": "uv venv -q .venv && uv pip install -q --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "ruff",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "pytest",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "run",
+      "cmd": ".venv/bin/{{ npm_name }} greet --name newstack",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    }
   ]
 }
