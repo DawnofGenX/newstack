@@ -76,9 +76,13 @@ directory to CI-ready project.
 | `python-lib` | src layout, hatchling build, pytest, ruff, 4-version CI matrix | `uv` |
 | `python-cli` | console entry point on argparse, zero runtime deps, tested CLI | `uv` |
 | `fastapi` | typed JSON API, pydantic models, TestClient tests, Dockerfile | `uv` |
+| `django` | Django 6.1 app: config/core split, SQLite, pytest-django, migration drift check | `uv` |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm` |
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm` |
-| `static-site` | HTML/CSS/JS page with a GitHub Pages deploy workflow | `node` |
+| `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm` |
+| `go-cli` | stdlib-only Go CLI: `flag` parsing, table tests, vet/test/build gates | `go` |
+| `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
+| `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, an MIT licence and a `.gitignore`.
@@ -90,12 +94,16 @@ verification as a first-class command:
 
 ```console
 $ newstack check --all
-  fastapi          PASS    1.0s  3 step(s)
-  node-express-ts  PASS    2.2s  3 step(s)
+  django           PASS    1.5s  5 step(s)
+  fastapi          PASS    1.4s  3 step(s)
+  go-cli           PASS    0.3s  3 step(s)
+  node-express-ts  PASS    6.1s  3 step(s)
   python-cli       PASS    0.5s  4 step(s)
-  python-lib       PASS    0.4s  3 step(s)
-  react-vite-ts    PASS    3.2s  4 step(s)
+  python-lib       PASS    0.5s  3 step(s)
+  react-vite-ts    PASS    5.5s  4 step(s)
+  rust-cli         PASS    0.5s  4 step(s)
   static-site      PASS    0.1s  3 step(s)
+  svelte-kit-ts    PASS    7.1s  4 step(s)
 ```
 
 (Real timings from a warm package cache — a cold run takes about a minute because
@@ -164,7 +172,7 @@ manifest format, no fork required.
 ## Roadmap
 
 - `newstack update` — re-apply upstream template changes to an existing project.
-- More stacks: Go service, Rust CLI, Django, Vue, SvelteKit.
+- More stacks: Vue, Next.js, Flask.
 - `--license apache-2.0|bsd-3` and other variable choices beyond the current defaults.
 
 ## Licence

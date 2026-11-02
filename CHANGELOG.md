@@ -6,6 +6,25 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-02
+
+### Added
+
+- Four new stacks, all verified the same way as the original six:
+  - `go-cli` — stdlib `flag` parsing, table tests, vet/test/build gates.
+  - `rust-cli` — std-only parsing, lib+bin split, fmt/clippy/test/release gates.
+  - `django` — Django 6.1, config/core split, SQLite, pytest-django, and a
+    migration-drift step that fails when a model changes without a migration.
+  - `svelte-kit-ts` — SvelteKit 3 with Svelte 5 runes, Vitest, static adapter build.
+- CI runs one job per stack (ten in total), with Go and Rust toolchains installed only
+  for the jobs that need them.
+- Docs drift tests: the README table and the CI matrix must both list every registered
+  stack, and the README may not hardcode a stack count.
+
+### Changed
+
+- Install instructions now point at PyPI (`uvx newstack`, `uv tool install newstack`).
+
 ## [0.1.0] - 2026-11-02
 
 ### Added
