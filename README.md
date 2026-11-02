@@ -1,6 +1,7 @@
 # newstack
 
 [![CI](https://github.com/DawnofGenX/newstack/actions/workflows/ci.yml/badge.svg)](https://github.com/DawnofGenX/newstack/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/newstack)](https://pypi.org/project/newstack/)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![dependencies](https://img.shields.io/badge/runtime%20dependencies-0-brightgreen)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
@@ -37,12 +38,10 @@ first day of work.
 
 ## Install
 
-Not on PyPI yet — install straight from the repository:
-
 ```bash
-uv tool install git+https://github.com/DawnofGenX/newstack
-# or, without installing:
-uvx --from git+https://github.com/DawnofGenX/newstack newstack list
+uvx newstack list          # run without installing
+uv tool install newstack   # or put it on your PATH
+pipx install newstack      # any of the usual runners works
 ```
 
 From a clone:
