@@ -38,5 +38,20 @@
       ],
       "timeout": 300
     }
+  ],
+  "detect": [
+    {
+      "file": "pyproject.toml",
+      "contains": "fastapi"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Dockerfile"
+  ],
+  "adopt_tests": [
+    "tests/test_api.py"
   ]
 }

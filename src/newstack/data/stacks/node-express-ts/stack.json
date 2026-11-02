@@ -10,5 +10,20 @@
     {"name": "install", "cmd": "npm install --no-audit --no-fund --silent", "tools": ["npm"], "timeout": 900},
     {"name": "typecheck", "cmd": "npm run typecheck", "tools": ["npm"], "timeout": 300},
     {"name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 300}
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"express\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json"
+  ],
+  "adopt_tests": [
+    "tests/app.test.ts"
   ]
 }

@@ -11,5 +11,21 @@
     {"name": "typecheck", "cmd": "npm run typecheck", "tools": ["npm"], "timeout": 300},
     {"name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 300},
     {"name": "build", "cmd": "npm run build", "tools": ["npm"], "timeout": 300}
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"react\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "vite.config.ts"
+  ],
+  "adopt_tests": [
+    "src/App.test.tsx"
   ]
 }

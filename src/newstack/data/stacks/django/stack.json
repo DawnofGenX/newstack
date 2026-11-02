@@ -55,5 +55,23 @@
       ],
       "timeout": 600
     }
+  ],
+  "detect": [
+    {
+      "file": "manage.py"
+    },
+    {
+      "file": "pyproject.toml",
+      "contains": "django"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_views.py",
+    "tests/test_models.py"
   ]
 }

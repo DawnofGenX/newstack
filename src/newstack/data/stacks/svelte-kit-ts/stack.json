@@ -11,5 +11,21 @@
     {"name": "check", "cmd": "npm run check", "tools": ["npm"], "timeout": 600},
     {"name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 600},
     {"name": "build", "cmd": "npm run build", "tools": ["npm"], "timeout": 600}
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "@sveltejs/kit"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "vite.config.ts"
+  ],
+  "adopt_tests": [
+    "src/lib/Counter.test.ts"
   ]
 }

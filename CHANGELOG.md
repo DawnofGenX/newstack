@@ -6,6 +6,28 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-02
+
+### Added
+
+- **`newstack adopt <dir>`** — retrofit a stack's infrastructure onto a project that already
+  has code. Additive by construction: an existing file is never opened for writing, and any
+  change that would need a merge inside a file is reported as a manual step instead.
+  - Auto-detects the stack from the project's own markers (`go.mod`, `Cargo.toml`,
+    `manage.py`, `pyproject.toml`/`package.json` contents, a bare `index.html`); ambiguous
+    matches print candidates and exit 2; `--stack` overrides.
+  - Copies infrastructure only — workflows, `.gitignore`, lint/type config — never a
+    README, LICENSE, `pyproject.toml`, `package.json`, `go.mod` or source file.
+  - `--dry-run` reports without writing; re-running is a no-op; `--json` for scripting.
+  - `--with-tests` (experimental) also copies the stack's starter tests.
+- Manifest keys `detect`, `detect_fallback`, `adopt` and `adopt_tests`, validated by the
+  registry and by tests that require every adoptable path to exist and to be infrastructure.
+
+### Changed
+
+- `newstack new` and `adopt` share one step formatter, so an unknown `{placeholder}` in a
+  manifest's `next_steps` prints literally instead of raising `KeyError`.
+
 ## [0.2.0] - 2026-11-02
 
 ### Added

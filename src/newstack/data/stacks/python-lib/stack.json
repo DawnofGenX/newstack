@@ -38,5 +38,18 @@
       ],
       "timeout": 300
     }
+  ],
+  "detect": [
+    {
+      "file": "pyproject.toml"
+    }
+  ],
+  "detect_fallback": true,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_core.py"
   ]
 }

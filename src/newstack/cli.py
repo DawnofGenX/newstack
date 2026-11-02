@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import __version__
+from .adopt import apply_plan, detect_stacks, plan_adoption
 from .registry import RegistryError, Stack, get_stack, load_stacks
 from .render import TemplateError, generate
 from .verify import check_stack, missing_tools
@@ -70,6 +71,24 @@ def _git_config(key: str) -> str:
     except OSError:
         return ""
     return value
+
+
+class _SafeDict(dict):
+    """format_map target that leaves unknown keys visible instead of raising."""
+
+    def __missing__(self, key: str) -> str:
+        return "{" + key + "}"
+
+
+def _format_step(step: str, context: dict, path: Path) -> str:
+    return step.format_map(
+        _SafeDict(
+            path=path,
+            project_name=context["project_name"],
+            package_name=context["package_name"],
+            npm_name=context["npm_name"],
+        )
+    )
 
 
 def build_context(stack: Stack, destination: Path, args: argparse.Namespace) -> dict:
@@ -200,18 +219,77 @@ def _print_new_report(
         print(f"  {'github':<13} {report['github']}")
 
     if stack.next_steps:
-        steps = [
-            step.format(
-                path=destination,
-                package_name=context["package_name"],
-                npm_name=context["npm_name"],
-                project_name=context["project_name"],
-            )
-            for step in stack.next_steps
-        ]
         print("\n  next:")
-        for step in steps:
-            print(f"    {step}")
+        for step in stack.next_steps:
+            print(f"    {_format_step(step, context, destination)}")
+    print()
+
+
+def cmd_adopt(args: argparse.Namespace) -> int:
+    root = Path(args.path).expanduser().resolve()
+    if not root.is_dir():
+        raise TemplateError(f"not a directory: {root}")
+
+    if args.stack:
+        stack = get_stack(args.stack)
+        detected = False
+    else:
+        candidates = detect_stacks(root)
+        if not candidates:
+            raise TemplateError(
+                "could not recognise this project's stack — pass --stack "
+                "(see `newstack list`)"
+            )
+        if len(candidates) > 1:
+            names = ", ".join(candidate.name for candidate in candidates)
+            print(f"newstack: this directory matches more than one stack: {names}", file=sys.stderr)
+            print("newstack: pass --stack <name> to choose one", file=sys.stderr)
+            return 2
+        stack = candidates[0]
+        detected = True
+
+    context = build_context(stack, root, args)
+    plan = plan_adoption(
+        stack, root, context, with_tests=args.with_tests, detected=detected
+    )
+
+    if not args.dry_run:
+        apply_plan(plan)
+
+    if args.json:
+        payload = plan.as_dict()
+        payload["dry_run"] = args.dry_run
+        print(json.dumps(payload, indent=2))
+        return 0
+
+    _print_adopt_report(plan, context, dry_run=args.dry_run)
+    return 0
+
+
+def _print_adopt_report(plan, context: dict, *, dry_run: bool) -> None:
+    print(f"\nnewstack {__version__}  ·  adopt  →  {plan.root}\n")
+    how = "auto-detected" if plan.detected else "--stack"
+    print(f"  {'stack':<12} {plan.stack.name} ({how})")
+    verb = "would add" if dry_run else "added"
+    print(f"  {verb:<12} {len(plan.add)} files")
+    for item in plan.add:
+        print(f"      + {item.rel}")
+    if plan.keep:
+        print(f"  {'kept':<12} {len(plan.keep)} existing files, left untouched")
+        for rel in plan.keep:
+            print(f"      = {rel}")
+    if plan.manual:
+        print(f"  {'manual':<12} {plan.manual[0]}")
+        for extra in plan.manual[1:]:
+            print(f"  {'':<12} {extra}")
+    if not plan.add:
+        print(f"  {'nothing':<12} the infrastructure files are already present")
+    if not plan.tests_available and plan.stack.adopt_tests:
+        print(f"  {'tests':<12} not copied — rerun with --with-tests if you want starter tests")
+    if plan.stack.next_steps:
+        print("\n  next:")
+        print(f"    review the additions:  git -C {plan.root} status --short")
+        print("    checks run on push:    the workflow above is the only thing that changed")
     print()
 
 
@@ -348,6 +426,20 @@ def build_parser() -> argparse.ArgumentParser:
     new.add_argument("--private", action="store_true", help="make the GitHub repo private")
     new.add_argument("--json", action="store_true", help="machine readable output")
     new.set_defaults(handler=cmd_new)
+
+    adopt = sub.add_parser(
+        "adopt", help="retrofit a stack's CI/lint files onto an existing project"
+    )
+    adopt.add_argument("path", help="directory of the existing project")
+    adopt.add_argument("--stack", help="force a stack instead of auto-detecting")
+    adopt.add_argument(
+        "--with-tests", action="store_true", help="also copy the stack's starter tests"
+    )
+    adopt.add_argument("--dry-run", action="store_true", help="report without writing anything")
+    adopt.add_argument("--author", help="author name for rendered files")
+    adopt.add_argument("--email", help="author email for rendered files")
+    adopt.add_argument("--json", action="store_true", help="machine readable output")
+    adopt.set_defaults(handler=cmd_adopt, name=None, description=None)
 
     lst = sub.add_parser("list", help="list available stacks")
     lst.add_argument("--json", action="store_true")

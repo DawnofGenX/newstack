@@ -34,7 +34,10 @@ red template is a red build.
    The `name` field must match the directory name.
 3. Put the files in `template/`. Use `{{ variable }}` placeholders.
 4. Add verification steps to `stack.json` — at minimum install and test.
-5. `uv run newstack check my-stack` until it is green.
+5. Add the `adopt` allow-list (and optional `detect` rules) so `newstack adopt` knows what
+   infrastructure this stack owns. Adopt lists may contain only infra paths that exist in
+   `template/`; identity files are rejected by a test.
+6. `uv run newstack check my-stack` until it is green.
 
 Available template variables: `project_name`, `package_name` (python-safe, `snake_case`),
 `npm_name` (npm-safe, `kebab-case`), `title`, `description`, `author`, `email`, `year`,

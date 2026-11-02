@@ -113,6 +113,18 @@ def _collect(template_dir: Path, context: dict) -> tuple[list[_Entry], list[str]
     return entries, directories
 
 
+def render_tree(
+    template_dir: Path | str, context: dict
+) -> tuple[list[tuple[str, bytes, bool]], list[str]]:
+    """Render a template in memory: ``[(relpath, payload, executable)], [dirs]``.
+
+    Used by ``adopt``, which needs to inspect rendered content before deciding whether
+    to write anything. Raises :class:`TemplateError` on unknown variables.
+    """
+    entries, directories = _collect(Path(template_dir), context)
+    return [(entry.rel, entry.payload, entry.executable) for entry in entries], directories
+
+
 def generate(
     template_dir: Path | str,
     destination: Path | str,

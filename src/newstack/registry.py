@@ -26,6 +26,29 @@ class VerifyStep:
 
 
 @dataclass(frozen=True)
+class DetectRule:
+    """A marker that says "this directory looks like <stack>".
+
+    ``contains`` makes the rule content-aware: the file must exist *and* contain the
+    substring, which is how a Django project is told apart from any other pyproject.
+    """
+
+    file: str
+    contains: str | None = None
+
+    def matches(self, directory: Path) -> bool:
+        target = directory / self.file
+        if not target.is_file():
+            return False
+        if self.contains is None:
+            return True
+        try:
+            return self.contains in target.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            return False
+
+
+@dataclass(frozen=True)
 class Stack:
     name: str
     title: str
@@ -36,6 +59,10 @@ class Stack:
     default_description: str
     next_steps: tuple[str, ...]
     directory: Path
+    detect: tuple[DetectRule, ...] = ()
+    detect_fallback: bool = False
+    adopt: tuple[str, ...] = ()
+    adopt_tests: tuple[str, ...] = ()
 
     @property
     def template_dir(self) -> Path:
@@ -44,6 +71,9 @@ class Stack:
     @property
     def docs_url(self) -> str:
         return f"https://github.com/DawnofGenX/newstack/tree/main/src/newstack/data/stacks/{self.name}"
+
+    def matches(self, directory: Path) -> bool:
+        return any(rule.matches(directory) for rule in self.detect)
 
 
 def _as_tuple(value: object, field: str, where: Path) -> tuple[str, ...]:
@@ -93,6 +123,22 @@ def load_stack(directory: Path) -> Stack:
     if not (directory / "template").is_dir():
         raise RegistryError(f"{directory}: missing template/ directory")
 
+    rules: list[DetectRule] = []
+    raw_detect = data.get("detect", [])
+    if not isinstance(raw_detect, list):
+        raise RegistryError(f"{manifest}: 'detect' must be a list")
+    for index, item in enumerate(raw_detect):
+        if not isinstance(item, dict) or not isinstance(item.get("file"), str):
+            raise RegistryError(f"{manifest}: detect[{index}] needs a 'file' string")
+        contains = item.get("contains")
+        if contains is not None and not isinstance(contains, str):
+            raise RegistryError(f"{manifest}: detect[{index}].contains must be a string")
+        rules.append(DetectRule(file=item["file"], contains=contains))
+
+    fallback = data.get("detect_fallback", False)
+    if not isinstance(fallback, bool):
+        raise RegistryError(f"{manifest}: 'detect_fallback' must be a boolean")
+
     return Stack(
         name=data["name"],
         title=data["title"],
@@ -103,6 +149,10 @@ def load_stack(directory: Path) -> Stack:
         default_description=str(data.get("default_description") or f"A {data['title']} project."),
         next_steps=_as_tuple(data.get("next_steps"), "next_steps", manifest),
         directory=directory,
+        detect=tuple(rules),
+        detect_fallback=fallback,
+        adopt=_as_tuple(data.get("adopt"), "adopt", manifest),
+        adopt_tests=_as_tuple(data.get("adopt_tests"), "adopt_tests", manifest),
     )
 
 

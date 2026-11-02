@@ -59,6 +59,7 @@ newstack new react-vite-ts ~/code/app
 newstack new fastapi ~/code/api -d "Billing service" --author "Your Name"
 newstack new python-lib ~/code/lib --dry-run     # preview, write nothing
 newstack new python-cli ~/code/tool --github     # create the repo and push it too
+newstack adopt ~/code/old-project --dry-run    # retrofit CI/lint onto existing code
 newstack check --all                # prove every stack on this machine
 newstack doctor                     # which toolchains do I have?
 ```
@@ -86,6 +87,35 @@ directory to CI-ready project.
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, an MIT licence and a `.gitignore`.
+
+## Adopting an existing project
+
+Most projects do not start from a scaffold. `adopt` retrofits a stack's *infrastructure*
+onto a directory that already has code — and it is additive by construction: **an existing
+file is never opened for writing.**
+
+```console
+$ newstack adopt ~/sites/analytics-dashboard
+newstack 0.3.0  ·  adopt  →  /home/you/sites/analytics-dashboard
+
+  stack        static-site (auto-detected)
+  added        2 files
+      + .github/workflows/deploy-pages.yml
+      + .gitignore
+  tests        not copied — rerun with --with-tests if you want starter tests
+```
+
+- **Detection** reads the project's own markers (`go.mod`, `Cargo.toml`, `manage.py`, the
+  dependencies in `pyproject.toml` / `package.json`, a bare `index.html`). If two stacks
+  match, it prints the candidates and exits 2 rather than guessing; `--stack` overrides.
+- **Scope**: workflows, `.gitignore`, and per-stack lint/type config only. It will not copy
+  a README, a LICENSE, a `pyproject.toml`, or source files — those carry your project's
+  identity, not infrastructure.
+- **Merges are reported, not attempted.** If your `pyproject.toml` needs the stack's
+  `[tool.ruff]` block, adopt says so and leaves the file alone.
+- `--dry-run` prints the same report without writing. Re-running is a no-op.
+- `--with-tests` additionally copies the stack's *starter* tests — experimental, because
+  those tests import the sample module and usually need adapting to your code.
 
 ## The green guarantee
 
@@ -130,7 +160,10 @@ without maintaining one template per stack.
 
 ## Adding a stack
 
-A stack is a directory with a manifest and a template tree:
+A stack is a directory with a manifest and a template tree. The manifest carries four
+optional keys beyond the basics — `detect` (how a directory is recognised as this stack),
+`detect_fallback` (a generic stack that must lose to a specific match), and the `adopt` /
+`adopt_tests` allow-lists used by `newstack adopt`:
 
 ```text
 src/newstack/data/stacks/my-stack/
@@ -152,10 +185,16 @@ src/newstack/data/stacks/my-stack/
   "next_steps": ["cd {path}", "uv run pytest"],
   "verify": [
     {"name": "test", "cmd": "uv run pytest", "tools": ["uv"], "timeout": 600}
-  ]
+  ],
+  "detect": [{"file": "pyproject.toml", "contains": "my-framework"}],
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["tests/test_smoke.py"]
 }
 ```
 
+`adopt` entries must exist in the template and must never be an identity file
+(`README.md`, `LICENSE`, `pyproject.toml`, `package.json`, `go.mod`, `Cargo.toml`) — a
+test enforces both rules.<br>
 `{{!` escapes a literal `{{`, and `${{ ... }}` (GitHub Actions) is left untouched.
 Point `NEWSTACK_STACKS` at a directory of your own stacks to use private ones — same
 manifest format, no fork required.

@@ -10,5 +10,18 @@
     {"name": "test", "cmd": "node --test \"tests/**/*.test.mjs\"", "tools": ["node"], "timeout": 120},
     {"name": "js-syntax", "cmd": "node --check main.js", "tools": ["node"], "timeout": 120},
     {"name": "assets", "cmd": "test -f index.html && test -f styles.css && test -f main.js", "tools": [], "timeout": 60}
+  ],
+  "detect": [
+    {
+      "file": "index.html"
+    }
+  ],
+  "detect_fallback": true,
+  "adopt": [
+    ".github/workflows/deploy-pages.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/site.test.mjs"
   ]
 }
