@@ -21,6 +21,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
-      - run: npm ci
+      # no lockfile is shipped yet: run `npm install` once locally and commit
+      # package-lock.json, then switch this to `npm ci` for reproducible installs
+      - run: npm install --no-audit --no-fund
       - run: npm run typecheck
       - run: npm test

@@ -85,6 +85,26 @@ def test_uv_pip_installs_target_the_generated_venv(name: str) -> None:
 
 
 @pytest.mark.parametrize("name", STACK_NAMES)
+def test_npm_ci_requires_a_committed_lockfile(tmp_path, name: str) -> None:
+    """`npm ci` fails without package-lock.json, which a fresh scaffold does not have."""
+    from newstack.cli import build_context_for_check
+    from newstack.registry import get_stack
+    from newstack.render import generate
+
+    stack = get_stack(name)
+    context = build_context_for_check(stack, "sample-app")
+    generate(stack.template_dir, tmp_path, context)
+
+    for workflow in tmp_path.glob(".github/workflows/*.y*ml"):
+        text = workflow.read_text(encoding="utf-8")
+        if "npm ci" in text:
+            assert (tmp_path / "package-lock.json").is_file(), (
+                f"{name}/{workflow.name} runs `npm ci` but the template ships no "
+                "package-lock.json, so the generated project's first CI run would fail"
+            )
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
 def test_stack_manifest_is_consistent(name: str) -> None:
     from newstack.registry import get_stack
 

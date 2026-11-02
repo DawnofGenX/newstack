@@ -19,4 +19,7 @@ npm test            # vitest run
 npm run build       # production bundle in dist/
 ```
 
+After the first `npm install`, commit `package-lock.json` and switch CI's install step
+to `npm ci` for reproducible installs.
+
 Generated with [newstack](https://github.com/DawnofGenX/newstack).
