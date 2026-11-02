@@ -96,8 +96,11 @@ def test_npm_ci_requires_a_committed_lockfile(tmp_path, name: str) -> None:
     generate(stack.template_dir, tmp_path, context)
 
     for workflow in tmp_path.glob(".github/workflows/*.y*ml"):
-        text = workflow.read_text(encoding="utf-8")
-        if "npm ci" in text:
+        lines = [
+            line for line in workflow.read_text(encoding="utf-8").splitlines()
+            if not line.lstrip().startswith("#")
+        ]
+        if any("npm ci" in line for line in lines):
             assert (tmp_path / "package-lock.json").is_file(), (
                 f"{name}/{workflow.name} runs `npm ci` but the template ships no "
                 "package-lock.json, so the generated project's first CI run would fail"
