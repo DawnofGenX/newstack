@@ -1,0 +1,42 @@
+{
+  "name": "go-cli",
+  "title": "Go CLI",
+  "language": "go",
+  "blurb": "Stdlib-only Go command with flag parsing, table tests and CI",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "A Go command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "go run . greet --name you",
+    "go test ./..."
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/app .",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    }
+  ]
+}

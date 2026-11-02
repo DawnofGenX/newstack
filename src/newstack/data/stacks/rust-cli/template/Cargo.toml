@@ -1,0 +1,17 @@
+[package]
+name = "{{ npm_name }}"
+version = "0.1.0"
+edition = "2024"
+description = "{{ description }}"
+license = "MIT"
+authors = ["{{ author }} <{{ email }}>"]
+
+[lib]
+name = "{{ package_name }}"
+path = "src/lib.rs"
+
+[[bin]]
+name = "{{ npm_name }}"
+path = "src/main.rs"
+
+[dependencies]

@@ -1,0 +1,15 @@
+# build output
+bin/
+dist/
+
+# test and coverage artifacts
+*.test
+*.out
+coverage.txt
+
+# editor and OS noise
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store

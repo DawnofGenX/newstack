@@ -1,0 +1,50 @@
+{
+  "name": "rust-cli",
+  "title": "Rust CLI",
+  "language": "rust",
+  "blurb": "Rust binary: std-only arg parsing, lib+bin split, fmt/clippy/CI gates",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "cargo test",
+    "cargo run -- greet --name you"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 900
+    }
+  ]
+}
