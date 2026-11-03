@@ -51,6 +51,28 @@ def test_generic_python_fallback_is_suppressed_by_a_specific_match(tmp_path) -> 
     assert names == ["django"], "python-lib must not compete with the specific match"
 
 
+def test_kotlin_pom_is_not_claimed_by_the_java_fallback(tmp_path) -> None:
+    """A pom.xml that mentions kotlin must resolve to kotlin-cli alone.
+
+    java-maven-cli detects a bare pom.xml, which would otherwise make every Kotlin/Maven
+    project ambiguous; it is a fallback, so a more specific rule wins.
+    """
+
+    pom = (
+        "<project><artifactId>k</artifactId>"
+        "<dependency>kotlin-stdlib</dependency></project>"
+    )
+    make_repo(tmp_path, {"pom.xml": pom})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["kotlin-cli"], "java-maven-cli must not compete with the specific match"
+
+
+def test_plain_maven_pom_still_resolves_to_the_java_stack(tmp_path) -> None:
+    make_repo(tmp_path, {"pom.xml": "<project><artifactId>plain</artifactId></project>"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["java-maven-cli"], "the java fallback must still catch a plain pom.xml"
+
+
 def test_unrecognised_directory_yields_no_candidates(tmp_path) -> None:
     (tmp_path / "notes.txt").write_text("nothing here")
     assert detect_stacks(tmp_path) == []

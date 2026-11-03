@@ -1,0 +1,22 @@
+.{
+    // Package identity. Zig 0.17 rejects a `.name` whose `fingerprint` does not
+    // match crc32(name) in the high 32 bits, and the fingerprint embeds the
+    // absolute path, so a generated project cannot compute it at scaffold time.
+    // This starter therefore ships one fixed identity (`.textstat`) for every
+    // project it generates. If you fork or publish this package under your own
+    // name, change `.name`, delete `.fingerprint`, run `zig build`, and paste
+    // the suggested value back in.
+    .name = .textstat,
+    .version = "0.1.0",
+    .fingerprint = 0x7e69cadf4b1e2d37, // crc32("textstat") << 32; never edit in place.
+    .minimum_zig_version = "0.17.0",
+    .dependencies = .{},
+    // Files that make up the package: everything needed to build it, plus docs.
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "README.md",
+        "LICENSE",
+    },
+}

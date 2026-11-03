@@ -1,0 +1,69 @@
+{
+  "name": "zig-cli",
+  "title": "Zig CLI",
+  "language": "zig",
+  "blurb": "Zig 0.17 CLI that counts lines, words and bytes: zig build ships the binary, zig build test runs the suite",
+  "requires": [
+    "zig"
+  ],
+  "default_description": "A Zig command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "zig build",
+    "./zig-out/bin/{package_name} --help",
+    "zig build test"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "zig build test",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "zig build",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "./zig-out/bin/{{ package_name }} --help",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./zig-out/bin/{{ package_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./zig-out/bin/{{ package_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "build.zig.zon"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

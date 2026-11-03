@@ -99,6 +99,8 @@ directory to CI-ready project.
 | `csharp-cli` | C# 12 CLI on .NET 8: pure counting library, xUnit suite, exit codes as a contract | `dotnet` |
 | `elixir-mix-cli` | Elixir CLI on Mix: pure counting module, ExUnit suite, escript binary | `elixir`, `mix` |
 | `dart-cli` | Dart 3 CLI: pub package with a pure counting library, package:test suite and zero runtime dependencies | `dart` |
+| `kotlin-cli` | Kotlin CLI on Maven (no Gradle wrapper to ship): pure counting core, JUnit 5 suite, shaded runnable jar | `java`, `mvn` |
+| `zig-cli` | Zig 0.17 CLI: counting module with in-source test blocks, `zig build test`, no runtime | `zig` |
 | `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a

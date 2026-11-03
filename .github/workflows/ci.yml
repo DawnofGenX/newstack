@@ -67,6 +67,8 @@ jobs:
           - csharp-cli
           - elixir-mix-cli
           - dart-cli
+          - kotlin-cli
+          - zig-cli
           - static-site
     steps:
       - uses: actions/checkout@v7
@@ -102,7 +104,7 @@ jobs:
           ruby-version: "3.2"
           bundler-cache: true
       - name: Set up Java
-        if: matrix.stack == 'java-maven-cli'
+        if: contains(fromJSON('["java-maven-cli","kotlin-cli"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -131,6 +133,11 @@ jobs:
         uses: dart-lang/setup-dart@v1
         with:
           sdk: "3.13.7"
+      - name: Set up Zig
+        if: matrix.stack == 'zig-cli'
+        uses: mlugg/setup-zig@v2
+        with:
+          version: "0.17.0"
       - name: Install newstack
         run: uv sync --group dev
       - name: Generate and verify the stack
