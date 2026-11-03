@@ -14,7 +14,11 @@ defmodule Textstat.CLI do
   @program "{{ npm_name }}"
 
   @type io_map :: %{
-          read_stdin: (() -> {:ok, binary()} | {:error, term()}),
+          # A precise spec here would be `(() -> {:ok, binary()} | {:error, term()})`, but
+          # Elixir 1.14 and 1.18 disagree on how to format a zero-arity fun type: each
+          # rewrites the other's spelling, so `mix format --check-formatted` would fail on
+          # one of them. `fun()` formats identically everywhere.
+          read_stdin: fun(),
           read_file: (String.t() -> {:ok, binary()} | {:error, term()}),
           out: (String.t() -> any()),
           err: (String.t() -> any())

@@ -130,7 +130,7 @@ jobs:
         if: matrix.stack == 'dart-cli'
         uses: dart-lang/setup-dart@v1
         with:
-          sdk: "3.13.x"
+          sdk: "3.13.7"
       - name: Install newstack
         run: uv sync --group dev
       - name: Generate and verify the stack
