@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # ubuntu-latest does not ship OCaml. This is the official OCaml action:
+      # it installs the pinned compiler and a matching dune. The project is a
+      # plain dune workspace (no .opam file), so `dune build` works directly —
+      # no `opam pin` step is needed.
+      - name: Install OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 4.14.1
+      - name: Build
+        run: dune build @all
+      - name: Test
+        run: dune runtest

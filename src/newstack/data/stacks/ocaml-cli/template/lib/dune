@@ -1,0 +1,4 @@
+(library
+ (name textstat)
+ (wrapped false)
+ (synopsis "wc-style line, word and byte counting"))

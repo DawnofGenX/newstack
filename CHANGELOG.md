@@ -40,6 +40,12 @@ All notable changes to this project are documented here. The format follows
   detects `bin/console`, which a plain Composer package does not have, so the generic
   `php-composer-cli` rule became a `detect_fallback:` — a specific marker now wins and a
   bare `composer.json` still resolves to the CLI stack, with both directions tested.
+- **`ocaml-cli` stack** — OCaml 4.14 on dune 3.14 with no opam packages at all: pure
+  `Counts`/`Options`/`Runner` modules (`(wrapped false)`, no `open` boilerplate in the
+  tests), a stdlib-only harness that prints a pass/fail tally and exits non-zero, and a
+  shell wrapper around the dune executable so the dashed project name survives dune's
+  "executable name must be a module identifier" rule. Verified against `wc -l -w -c` on
+  plain, no-trailing-newline, multibyte-UTF-8, empty and control-character files.
 - **Shipped workflows no longer fail their own exit-code steps.** A `run:` step executes
   as `bash -e`, so `./bin/app --bogus …; test $? -eq 2` killed the step on the first
   command and reported the very behaviour the CLI gets right as a failure. The argument

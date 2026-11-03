@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# User-facing entry point. The dune executable is named `main` because a dashed
+# project name is not a valid OCaml module identifier; this wrapper builds and
+# runs it from the project root and passes the exit code through unchanged.
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd) || exit 1
+cd "$root" || exit 1
+exec dune exec ./bin/main.exe -- "$@"

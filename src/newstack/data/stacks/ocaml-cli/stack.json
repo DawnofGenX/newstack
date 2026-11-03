@@ -1,0 +1,78 @@
+{
+  "name": "ocaml-cli",
+  "title": "OCaml CLI",
+  "language": "ocaml",
+  "blurb": "OCaml 4.14+ CLI: a pure counting library, a hand-written option parser, a stdlib test suite and a dune workspace with zero dependencies",
+  "requires": [
+    "ocaml",
+    "dune"
+  ],
+  "default_description": "An OCaml command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "dune build @all",
+    "dune runtest",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "dune build @all",
+      "tools": [
+        "dune"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "dune runtest",
+      "tools": [
+        "dune"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "dune"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "dune"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "dune"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "parity",
+      "cmd": "printf 'alpha beta\\ngamma delta\\n' > .p1.txt && printf 'no trailing newline' > .p2.txt && printf 'h\\303\\251llo w\\303\\266rld\\n' > .p3.txt && : > .p4.txt && for f in .p1.txt .p2.txt .p3.txt .p4.txt; do ours=$(./bin/{{ npm_name }} -l -w -c \"$f\" | awk '{print $1, $2, $3}'); theirs=$(wc -l -w -c \"$f\" | awk '{print $1, $2, $3}'); if [ \"$ours\" != \"$theirs\" ]; then echo \"MISMATCH $f: ours=[$ours] theirs=[$theirs]\"; exit 1; fi; done && rm -f .p1.txt .p2.txt .p3.txt .p4.txt && echo \"parity ok\"",
+      "tools": [
+        "dune"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "dune-project"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

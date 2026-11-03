@@ -112,6 +112,7 @@ directory to CI-ready project.
 | `crystal-cli` | Crystal CLI: stdlib-only modules, `crystal spec` suite, compiled binary with a 0/2/1 exit contract | `crystal` |
 | `bun-cli` | Bun CLI: pure counting module, hand-written option parser, zero-dependency `bun:test` suite | `bun` |
 | `r-cli` | R CLI on base R only: pure counting function, hand-written option parser, dependency-free test harness | `Rscript` |
+| `ocaml-cli` | OCaml CLI on dune: pure counting library, hand-written option parser, stdlib-only test harness, zero opam dependencies | `ocaml`, `dune` |
 | `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
@@ -301,7 +302,7 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More stacks: OCaml.
+- More stacks: Gleam, Haskell, Scala.
 - `--license apache-2.0|bsd-3` and other variable choices beyond the current defaults.
 
 ## Licence
