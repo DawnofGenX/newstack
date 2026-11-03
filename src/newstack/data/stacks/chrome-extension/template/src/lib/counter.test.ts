@@ -39,6 +39,6 @@ describe("formatCount", () => {
 
 describe("storage key", () => {
   it("is stable", () => {
-    expect(COUNT_STORAGE_KEY).toBe("count");
+    expect(COUNT_STORAGE_KEY).toBe("newstack:counter");
   });
 });

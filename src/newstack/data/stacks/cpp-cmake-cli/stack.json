@@ -1,0 +1,56 @@
+{
+  "name": "cpp-cmake-cli",
+  "title": "C++ CMake CLI",
+  "language": "cpp",
+  "blurb": "C++20 CLI: CMake lib+bin split, CTest suite, hand-rolled args, no third-party deps",
+  "requires": [
+    "cmake",
+    "g++"
+  ],
+  "default_description": "A C++ command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+    "cmake --build build --parallel",
+    "ctest --test-dir build --output-on-failure",
+    "./build/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "configure",
+      "cmd": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release",
+      "tools": [
+        "cmake"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "build",
+      "cmd": "cmake --build build --parallel",
+      "tools": [
+        "cmake"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "ctest --test-dir build --output-on-failure",
+      "tools": [
+        "ctest"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "CMakeLists.txt"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".clang-format"
+  ],
+  "adopt_tests": []
+}

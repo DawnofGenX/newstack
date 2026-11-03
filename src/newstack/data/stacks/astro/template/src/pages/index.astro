@@ -1,0 +1,90 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { formatCount, type Feature } from "../lib/content";
+
+const title = "{{ title }}";
+const description = "{{ description }}";
+
+const features: Feature[] = [
+  {
+    title: "Typed frontmatter",
+    summary: "The page declares its content as a Feature[], so a mistyped field is a build error.",
+  },
+  {
+    title: "One layout component",
+    summary: "src/layouts/BaseLayout.astro owns the document shell that every page reuses.",
+  },
+  {
+    title: "Tested helper module",
+    summary: "src/lib/content.ts is plain TypeScript and is covered by a Vitest unit test.",
+  },
+];
+
+const count = formatCount(features.length, "feature");
+---
+
+<BaseLayout title={title} description={description}>
+  <h1>{title}</h1>
+  <p>
+    {description} Every page is rendered to static HTML at build time, so this site ships
+    no client-side JavaScript.
+  </p>
+  <p>This landing page describes {count} that come with the template.</p>
+
+  <section aria-labelledby="features-heading">
+    <h2 id="features-heading">What ships</h2>
+    <ul class="features">
+      {
+        features.map((feature) => (
+          <li>
+            <h3>{feature.title}</h3>
+            <p>{feature.summary}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <footer>
+    <p>
+      Built with <a href="https://astro.build">Astro</a>. Edit
+      <code>src/pages/index.astro</code> and run <code>npm run dev</code>.
+    </p>
+  </footer>
+</BaseLayout>
+
+<style>
+  .features {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    list-style: none;
+    margin: 1.5rem 0 2.5rem;
+    padding: 0;
+  }
+
+  .features li {
+    border-left: 3px solid var(--accent);
+    padding-left: 1rem;
+  }
+
+  .features h3 {
+    font-size: 1rem;
+    margin: 0 0 0.35rem;
+  }
+
+  .features p,
+  footer p {
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  footer {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.25rem;
+  }
+
+  a {
+    color: var(--accent);
+  }
+</style>

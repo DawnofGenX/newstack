@@ -1,4 +1,4 @@
-export const COUNT_STORAGE_KEY = "count";
+export const COUNT_STORAGE_KEY = "newstack:counter";
 
 /**
  * Pure counter logic. No chrome.* access here so it can be unit tested in

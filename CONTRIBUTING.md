@@ -65,3 +65,17 @@ Pin actions to a tag that actually resolves. `actions/*` publish moving major ta
 
 Open an issue with the output of `newstack doctor` and `newstack check <stack> --verbose`.
 That usually contains everything needed to reproduce.
+
+## Demo conventions
+
+Every user-facing stack ships a small demo so a fresh project proves itself on first run.
+Two rules keep those demos from drifting apart:
+
+- **Counter demos persist.** If a stack shows a counter, it stores the value under the
+  single key `newstack:counter`, clamps stored values to a non-negative integer, and
+  restores after mount when the framework renders on the server. `chrome-extension` uses
+  `chrome.storage.local` with the same key and the same clamping. `tests/test_stacks.py`
+  enforces the key.
+- **State is never the label.** A control says what it *does* ("Increment"); the current
+  value lives in a separate element with `role="status"` so a screen reader hears the
+  change rather than a button renaming itself.

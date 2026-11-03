@@ -184,3 +184,32 @@ def test_shipped_ci_matrix_satisfies_requires_python(name: str) -> None:
         f"{name}: shipped CI tests Python {', '.join(too_old)} but requires-python is "
         f"{spec.group(1)} — those jobs cannot install the package"
     )
+
+
+COUNTER_STACKS = (
+    "react-vite-ts",
+    "vue-vite-ts",
+    "svelte-kit-ts",
+    "next-app-ts",
+    "chrome-extension",
+)
+
+
+def test_every_counter_demo_persists_under_one_key() -> None:
+    """One idea, five stacks: the demo counter survives a reload the same way everywhere.
+
+    The key is the contract. If a stack drifts to its own storage key, a reader who learns
+    the pattern in one starter is misled in the next.
+    """
+    stacks = load_stacks()
+    suffixes = {".ts", ".tsx", ".svelte", ".vue"}
+    for name in COUNTER_STACKS:
+        root = stacks[name].template_dir
+        hits = [
+            path
+            for path in root.rglob("*")
+            if path.is_file()
+            and path.suffix in suffixes
+            and "newstack:counter" in path.read_text(encoding="utf-8", errors="ignore")
+        ]
+        assert hits, f"{name} ships a counter that does not persist under the shared key"

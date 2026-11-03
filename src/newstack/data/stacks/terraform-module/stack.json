@@ -1,0 +1,54 @@
+{
+  "name": "terraform-module",
+  "title": "Terraform module",
+  "language": "hcl",
+  "blurb": "Reusable Terraform module: validated inputs, computed tags, native terraform test, fmt/validate gates",
+  "requires": [
+    "terraform"
+  ],
+  "default_description": "A reusable Terraform module with validated inputs and terraform test coverage",
+  "next_steps": [
+    "terraform init -backend=false",
+    "terraform fmt -check -recursive",
+    "terraform validate",
+    "terraform test"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "terraform fmt -check -recursive",
+      "tools": [
+        "terraform"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "validate",
+      "cmd": "terraform init -backend=false -input=false && terraform validate",
+      "tools": [
+        "terraform"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "terraform test",
+      "tools": [
+        "terraform"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "main.tf"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".tflint.hcl"
+  ],
+  "adopt_tests": []
+}

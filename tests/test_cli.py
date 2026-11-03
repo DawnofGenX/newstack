@@ -104,3 +104,44 @@ def test_generated_project_has_no_unresolved_placeholders(tmp_path) -> None:
             if path.is_file():
                 text = path.read_text(encoding="utf-8", errors="ignore")
                 assert not re.search(r"(?<!\$)\{\{", text), f"{stack}:{path}"
+
+
+def _half_built_stack(tmp_path, monkeypatch):
+    root = tmp_path / "stacks"
+    broken = root / "half-built"
+    broken.mkdir(parents=True)
+    (broken / "stack.json").write_text(
+        '{"name": "half-built", "title": "Half", "language": "go", "blurb": "wip"}',
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("NEWSTACK_STACKS", str(root))
+    return broken
+
+
+def test_list_survives_a_half_built_stack(tmp_path, monkeypatch, capsys) -> None:
+    _half_built_stack(tmp_path, monkeypatch)
+    assert main(["list"]) == 0
+    captured = capsys.readouterr()
+    assert "half-built" in captured.err
+    assert "missing template/" in captured.err
+    assert "stacks available" in captured.out
+
+
+def test_check_all_fails_on_an_unusable_stack_directory(tmp_path, monkeypatch, capsys) -> None:
+    _half_built_stack(tmp_path, monkeypatch)
+
+    class _Pass:
+        ok = True
+        seconds = 0.0
+        outcomes: list = []
+        directory = None
+
+        def as_dict(self):
+            return {}
+
+    monkeypatch.setattr("newstack.cli.check_stack", lambda *a, **k: _Pass())
+    monkeypatch.setattr("newstack.cli.missing_tools", lambda stack: [])
+
+    assert main(["check", "--all"]) == 1
+    out = capsys.readouterr().out
+    assert "half-built" in out and "unusable" in out

@@ -166,16 +166,43 @@ def search_roots() -> list[Path]:
     return roots
 
 
+@dataclass(frozen=True)
+class Catalog:
+    """Every stack that loaded, plus the ones that did not.
+
+    A stack directory is under construction for as long as a subagent is writing it:
+    ``stack.json`` lands first, ``template/`` last. Loading must therefore be able to
+    report a broken stack without taking the whole catalog down with it — otherwise a
+    half-written stack makes ``list`` and ``check --all`` unusable for every other stack.
+    """
+
+    stacks: dict[str, Stack]
+    errors: dict[str, str]
+
+
 def load_stacks() -> dict[str, Stack]:
+    return load_catalog(allow_partial=False).stacks
+
+
+def load_catalog(allow_partial: bool = True) -> Catalog:
     stacks: dict[str, Stack] = {}
+    errors: dict[str, str] = {}
     for root in search_roots():
         if not root.is_dir():
             continue
         for directory in sorted(p for p in root.iterdir() if p.is_dir()):
-            if (directory / "stack.json").is_file():
+            if not (directory / "stack.json").is_file():
+                continue
+            try:
                 stack = load_stack(directory)
-                stacks[stack.name] = stack
-    return dict(sorted(stacks.items()))
+            except RegistryError as exc:
+                if not allow_partial:
+                    raise
+                errors[directory.name] = str(exc)
+                continue
+            stacks[stack.name] = stack
+    return Catalog(dict(sorted(stacks.items())), dict(sorted(errors.items())))
+
 
 
 def get_stack(name: str) -> Stack:

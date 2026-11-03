@@ -53,11 +53,14 @@ jobs:
           - vue-vite-ts
           - next-app-ts
           - chrome-extension
+          - astro
           - svelte-kit-ts
           - go-cli
           - go-http
           - rust-cli
           - rust-axum
+          - cpp-cmake-cli
+          - terraform-module
           - static-site
     steps:
       - uses: actions/checkout@v7
@@ -81,6 +84,11 @@ jobs:
         with:
           toolchain: stable
           components: rustfmt, clippy
+      - name: Set up Terraform
+        if: matrix.stack == 'terraform-module'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.17.1"
       - name: Install newstack
         run: uv sync --group dev
       - name: Generate and verify the stack

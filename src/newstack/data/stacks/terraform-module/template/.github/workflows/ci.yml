@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  terraform:
+    name: terraform ${{ matrix.check }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        check: [fmt, validate, test]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.17.1"
+      - name: fmt
+        if: matrix.check == 'fmt'
+        run: terraform fmt -check -recursive
+      - name: init
+        if: matrix.check != 'fmt'
+        run: terraform init -backend=false -input=false
+      - name: validate
+        if: matrix.check == 'validate'
+        run: terraform validate
+      - name: test
+        if: matrix.check == 'test'
+        run: terraform test

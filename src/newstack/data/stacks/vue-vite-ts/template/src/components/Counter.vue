@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { readCounter, writeCounter } from '../lib/counter-store'
 
-const count = ref(0)
+const count = ref(readCounter())
 
 function increment() {
   count.value += 1
+  writeCounter(count.value)
 }
 </script>
 

@@ -5,7 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from newstack.registry import RegistryError, get_stack, load_stack, load_stacks
+from newstack.registry import (
+    RegistryError,
+    get_stack,
+    load_catalog,
+    load_stack,
+    load_stacks,
+)
 
 
 def test_every_builtin_stack_loads() -> None:
@@ -84,3 +90,26 @@ def test_env_var_adds_stacks(tmp_path, monkeypatch) -> None:
     stacks = load_stacks()
     assert "demo" in stacks
     assert "python-lib" in stacks
+
+
+def test_broken_stack_does_not_take_the_catalog_down(tmp_path, monkeypatch) -> None:
+    """A stack is manifest-first, template-last — so mid-build it is unusable.
+
+    That must cost only that stack: catalog commands keep working, and only the strict
+    loader (used when you name a specific stack) refuses.
+    """
+    root = tmp_path / "stacks"
+    broken = root / "half-built"
+    broken.mkdir(parents=True)
+    (broken / "stack.json").write_text(
+        json.dumps({**BASE, "name": "half-built"}), encoding="utf-8"
+    )
+    monkeypatch.setenv("NEWSTACK_STACKS", str(root))
+
+    catalog = load_catalog()
+    assert "half-built" in catalog.errors
+    assert "missing template/" in catalog.errors["half-built"]
+    assert "python-lib" in catalog.stacks
+
+    with pytest.raises(RegistryError, match="missing template/"):
+        load_stacks()

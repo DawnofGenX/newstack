@@ -1,0 +1,67 @@
+{
+  "name": "astro",
+  "title": "Astro + TypeScript",
+  "language": "node",
+  "blurb": "Static content site with a typed page, Vitest unit tests, astro check, CI",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "default_description": "A static content site built with Astro.",
+  "next_steps": [
+    "cd {path}",
+    "npm install",
+    "npm run dev"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"astro\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "astro.config.mjs"
+  ],
+  "adopt_tests": [
+    "src/lib/content.test.ts"
+  ]
+}

@@ -1,0 +1,78 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main class="page">
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: light dark;
+    --ink: #1c1b1a;
+    --muted: #55524e;
+    --paper: #fdfbf7;
+    --accent: #9a3412;
+    --rule: #e7e0d5;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #f4efe6;
+      --muted: #c3bcb0;
+      --paper: #1a1917;
+      --accent: #fdba74;
+      --rule: #34302a;
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font: 1rem/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .page {
+    margin: 0 auto;
+    max-width: 44rem;
+    padding: 4rem 1.5rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.1;
+    margin: 0 0 1rem;
+  }
+
+  p {
+    color: var(--muted);
+    max-width: 36rem;
+  }
+
+  code {
+    background: var(--rule);
+    border-radius: 0.25rem;
+    padding: 0.1rem 0.35rem;
+  }
+</style>

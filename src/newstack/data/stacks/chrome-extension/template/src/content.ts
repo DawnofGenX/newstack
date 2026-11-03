@@ -3,6 +3,8 @@
  * Guarded so importing this file outside a page context is harmless.
  */
 
+import { PING_MESSAGE, PING_REPLY } from "./lib/activity";
+
 export const MARKER_ATTRIBUTE = "data-newstack-extension";
 
 export function markDocument(doc: Document | undefined): boolean {
@@ -17,4 +19,15 @@ if (typeof document !== "undefined") {
   } else {
     document.addEventListener("DOMContentLoaded", () => markDocument(document), { once: true });
   }
+}
+
+// The popup asks "are you there?" so it can state the page state instead of guessing.
+if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
+  chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
+    const type = (message as { type?: string } | null)?.type;
+    if (type === PING_MESSAGE) {
+      sendResponse(PING_REPLY);
+    }
+    return false;
+  });
 }

@@ -1,11 +1,25 @@
 <script lang="ts">
+	import { onMount } from "svelte";
+
+	import { readCounter, writeCounter } from "./counter-store";
+
 	let { step = 1 }: { step?: number } = $props();
 
 	let count = $state(0);
+
+	// Restore after mount: the server has no storage, so the first paint must be 0.
+	onMount(() => {
+		count = readCounter();
+	});
+
+	function increment() {
+		count += step;
+		writeCounter(count);
+	}
 </script>
 
 <p class="count" role="status" aria-live="polite">Count: {count}</p>
-<button type="button" onclick={() => (count += step)}>Increment</button>
+<button type="button" onclick={increment}>Increment</button>
 
 <style>
   button {

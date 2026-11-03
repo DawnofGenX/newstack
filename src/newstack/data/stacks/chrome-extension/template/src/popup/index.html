@@ -29,7 +29,12 @@
       #count {
         font-size: 13px;
         font-variant-numeric: tabular-nums;
-        margin: 0 0 8px;
+        margin: 0 0 4px;
+      }
+      #status {
+        font-size: 12px;
+        margin: 0 0 12px;
+        opacity: 0.75;
       }
       .actions {
         display: flex;
@@ -52,6 +57,7 @@
       <h1>{{ title }}</h1>
       <p class="description">{{ description }}</p>
       <p id="count" aria-live="polite">Popup clicks: 0</p>
+      <p id="status" aria-live="polite">Checking this page\u2026</p>
       <div class="actions">
         <button id="increment" type="button">Increment</button>
         <button id="reset" type="button">Reset</button>

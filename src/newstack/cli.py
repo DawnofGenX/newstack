@@ -13,7 +13,7 @@ from pathlib import Path
 
 from . import __version__
 from .adopt import apply_plan, detect_stacks, plan_adoption
-from .registry import RegistryError, Stack, get_stack, load_stacks
+from .registry import RegistryError, Stack, get_stack, load_catalog
 from .render import TemplateError, generate
 from .verify import check_stack, missing_tools
 
@@ -294,7 +294,10 @@ def _print_adopt_report(plan, context: dict, *, dry_run: bool) -> None:
 
 
 def cmd_list(args: argparse.Namespace) -> int:
-    stacks = load_stacks()
+    catalog = load_catalog()
+    stacks = catalog.stacks
+    for name, reason in catalog.errors.items():
+        print(f"  ! {name}: not loaded — {reason}", file=sys.stderr)
     if args.json:
         print(
             json.dumps(
@@ -316,7 +319,8 @@ def cmd_list(args: argparse.Namespace) -> int:
         return 0
 
     width = max((len(s.name) for s in stacks.values()), default=8)
-    print(f"\n{len(stacks)} stacks available\n")
+    note = f" ({len(catalog.errors)} unusable)" if catalog.errors else ""
+    print(f"\n{len(stacks)} stacks available{note}\n")
     for stack in stacks.values():
         absent = missing_tools(stack)
         flag = "" if not absent else f"  (needs {', '.join(absent)})"
@@ -327,14 +331,20 @@ def cmd_list(args: argparse.Namespace) -> int:
 
 def cmd_check(args: argparse.Namespace) -> int:
     names = list(args.stacks or [])
+    broken: dict[str, str] = {}
     if args.all:
-        names = list(load_stacks())
+        catalog = load_catalog()
+        available = catalog.stacks
+        names = list(available)
+        broken = catalog.errors
+    else:
+        available = {name: get_stack(name) for name in names}
     if not names:
         raise RegistryError("name at least one stack, or pass --all")
 
     results = []
     for name in names:
-        stack = get_stack(name)
+        stack = available[name]
         context = build_context_for_check(stack, args.name)
         absent = missing_tools(stack)
         if absent and not args.force:
@@ -359,9 +369,14 @@ def cmd_check(args: argparse.Namespace) -> int:
         if args.keep:
             print(f"      generated project kept at {result.directory}")
 
+    if broken:
+        for name, reason in broken.items():
+            print(f"  {name:<16} FAIL  stack directory is unusable: {reason}")
+
     if args.json:
         print(json.dumps([r.as_dict() for r in results], indent=2))
-    return 0 if results and all(r.ok for r in results) else 1
+    green = bool(results) and all(r.ok for r in results) and not broken
+    return 0 if green else 1
 
 
 def build_context_for_check(stack: Stack, name: str | None) -> dict:
@@ -377,7 +392,10 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         path = shutil.which(tool)
         mark = "✓" if path else "·"
         print(f"  {mark} {tool:<8} {label:<28} {path or 'not found'}")
-    stacks = load_stacks()
+    catalog = load_catalog()
+    stacks = catalog.stacks
+    for name, reason in catalog.errors.items():
+        print(f"    ! {name}: unusable — {reason}")
     ready = [s.name for s in stacks.values() if not missing_tools(s)]
     blocked = {s.name: missing_tools(s) for s in stacks.values() if missing_tools(s)}
     print(f"\n  {len(ready)}/{len(stacks)} stacks can be verified on this machine")
