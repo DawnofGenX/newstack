@@ -98,6 +98,7 @@ directory to CI-ready project.
 | `ruby-sinatra` | Sinatra JSON API: modular app, RSpec + rack-test suite, RuboCop, committed lockfile | `ruby`, `bundle` |
 | `java-maven-cli` | Java 21 CLI on Maven: pure counting logic, 21 JUnit 5 tests, runnable jar | `java`, `mvn` |
 | `php-composer-cli` | PHP 8.3 CLI on Composer: PSR-4 autoloading, a PHPUnit 11 suite, and a wc-style text counter | `php`, `composer` |
+| `symfony-app` | Symfony 7 web app on PHP 8.3: a JSON route wired to a pure service, kernel-level PHPUnit test, working `bin/console` | `php`, `composer` |
 | `csharp-cli` | C# 12 CLI on .NET 8: pure counting library, xUnit suite, exit codes as a contract | `dotnet` |
 | `elixir-mix-cli` | Elixir CLI on Mix: pure counting module, ExUnit suite, escript binary | `elixir`, `mix` |
 | `dart-cli` | Dart 3 CLI: pub package with a pure counting library, package:test suite and zero runtime dependencies | `dart` |
@@ -300,7 +301,7 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More stacks: Symfony, OCaml.
+- More stacks: OCaml.
 - `--license apache-2.0|bsd-3` and other variable choices beyond the current defaults.
 
 ## Licence

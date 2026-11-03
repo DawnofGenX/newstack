@@ -1,0 +1,21 @@
+# dependencies
+/vendor/
+
+# Symfony runtime and local overrides
+/var/
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+
+# phpunit cache
+/.phpunit.cache/
+/.phpunit.result.cache
+
+# editor and OS noise
+/.idea/
+/.vscode/
+*.swp
+*~
+.DS_Store

@@ -27,9 +27,19 @@ All notable changes to this project are documented here. The format follows
   assertion harness and `Rscript` as the entry point. Both follow the counting-library +
   thin-CLI split and the 0/2/1 exit contract, and both are verified line-for-line against
   real `wc -l -w -c`.
+- **`symfony-app` stack** — a Symfony 7 web application on PHP 8.3 + Composer, not a
+  console toy: a real kernel with `config/` bundles and routes, a `GET /` route returning
+  JSON from an injected pure `TextStats` service, a kernel-booting PHPUnit 11 functional
+  test next to the unit test, a working `bin/console`, and a shipped CI workflow with
+  PHPUnit plus a console smoke step. Autowiring means the service needs no container
+  configuration.
 
 ### Fixed
 
+- **`adopt` no longer dead-ends on every Composer and Symfony project.** `symfony-app`
+  detects `bin/console`, which a plain Composer package does not have, so the generic
+  `php-composer-cli` rule became a `detect_fallback:` — a specific marker now wins and a
+  bare `composer.json` still resolves to the CLI stack, with both directions tested.
 - **Shipped workflows no longer fail their own exit-code steps.** A `run:` step executes
   as `bash -e`, so `./bin/app --bogus …; test $? -eq 2` killed the step on the first
   command and reported the very behaviour the CLI gets right as a failure. The argument

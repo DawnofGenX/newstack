@@ -64,6 +64,7 @@ jobs:
           - ruby-sinatra
           - java-maven-cli
           - php-composer-cli
+          - symfony-app
           - csharp-cli
           - elixir-mix-cli
           - dart-cli
@@ -119,11 +120,11 @@ jobs:
           java-version: "21"
           cache: maven
       - name: Set up PHP
-        if: matrix.stack == 'php-composer-cli'
+        if: contains(fromJSON('["php-composer-cli","symfony-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
-          extensions: mbstring, xml
+          extensions: ctype, mbstring, xml
           coverage: none
       - name: Set up .NET
         if: contains(fromJSON('["csharp-cli","fsharp-cli"]'), matrix.stack)
