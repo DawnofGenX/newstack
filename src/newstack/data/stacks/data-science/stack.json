@@ -1,0 +1,56 @@
+{
+  "name": "data-science",
+  "title": "Data science (pandas)",
+  "language": "python",
+  "blurb": "pandas workspace with typed DataFrame helpers and pytest",
+  "requires": [
+    "uv",
+    "git"
+  ],
+  "default_description": "A pandas data-science workspace.",
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run jupyter lab notebooks/"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "runner": "uv",
+      "timeout": 900,
+      "cmd": "uv venv -q .venv && uv pip install -q --python .venv/bin/python -e . pytest ruff"
+    },
+    {
+      "name": "ruff",
+      "runner": "uv",
+      "timeout": 300,
+      "cmd": ".venv/bin/ruff check ."
+    },
+    {
+      "name": "pytest",
+      "runner": "uv",
+      "timeout": 600,
+      "cmd": ".venv/bin/python -m pytest -q"
+    },
+    {
+      "name": "notebook",
+      "runner": "uv",
+      "timeout": 120,
+      "cmd": ".venv/bin/python -c \"import json,pathlib; d=json.loads(pathlib.Path('notebooks/explore.ipynb').read_text()); assert d['nbformat']==4; print('notebook ok')\""
+    }
+  ],
+  "detect": [
+    {
+      "file": "pyproject.toml",
+      "contains": "pandas"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_data.py"
+  ]
+}

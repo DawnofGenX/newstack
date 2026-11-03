@@ -1,0 +1,75 @@
+{
+  "name": "chrome-extension",
+  "title": "Chrome extension (MV3)",
+  "language": "node",
+  "blurb": "MV3 extension: popup, service worker, content script, Vite + Vitest",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "default_description": "A Chrome extension.",
+  "next_steps": [
+    "cd {path}",
+    "npm install",
+    "npm run dev"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "pack",
+      "cmd": "npm run pack && test -f extension.zip",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "manifest.json",
+      "contains": "\"manifest_version\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "vite.config.ts"
+  ],
+  "adopt_tests": [
+    "src/lib/counter.test.ts"
+  ]
+}

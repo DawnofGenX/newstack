@@ -47,10 +47,12 @@ jobs:
           - fastapi
           - django
           - flask
+          - data-science
           - node-express-ts
           - react-vite-ts
           - vue-vite-ts
           - next-app-ts
+          - chrome-extension
           - svelte-kit-ts
           - go-cli
           - rust-cli
