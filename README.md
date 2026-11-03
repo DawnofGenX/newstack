@@ -81,6 +81,7 @@ directory to CI-ready project.
 | `flask` | Flask app factory: JSON routes, pytest fixtures, ruff, CI | `uv` |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm` |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm` |
+| `next-app-ts` | Next.js App Router + TS + Tailwind 4, Vitest + Testing Library | `node`, `npm` |
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm` |
 | `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm` |
 | `go-cli` | stdlib-only Go CLI: `flag` parsing, table tests, vet/test/build gates | `go` |

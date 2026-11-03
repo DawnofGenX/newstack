@@ -1,0 +1,68 @@
+{
+  "name": "next-app-ts",
+  "title": "Next.js App Router",
+  "language": "node",
+  "blurb": "Next.js 16 App Router: TypeScript, Tailwind 4, Vitest, CI",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "default_description": "A Next.js application.",
+  "next_steps": [
+    "cd {path}",
+    "npm install",
+    "npm run dev"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"next\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "next.config.ts",
+    "eslint.config.mjs"
+  ],
+  "adopt_tests": [
+    "app/page.test.tsx"
+  ]
+}

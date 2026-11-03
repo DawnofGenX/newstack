@@ -6,6 +6,30 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-03
+
+### Added
+
+- Three new stacks, each with `detect` + `adopt` metadata like the rest of the registry:
+  - `flask` — app factory + blueprint, JSON routes, pytest fixtures, ruff with a pinned
+    rule set.
+  - `vue-vite-ts` — Vue 3 + Vite + TypeScript from `create-vue`, Vitest +
+    `@vue/test-utils`, real typecheck (`vue-tsc -p tsconfig.app.json`; plain `--noEmit`
+    on a solution-style root would check nothing).
+  - `next-app-ts` — Next 16 App Router + TypeScript + Tailwind 4 from
+    `create-next-app`, with the Vitest + Testing Library test and `tsc --noEmit`
+    scripts that the generator does not provide.
+- CI matrix grows to thirteen stack jobs; each new stack's own workflow was also proven
+  green in a throwaway repository.
+
+### Changed
+
+- Node stacks install with `npm install --no-audit --no-fund` again — `--silent` was
+  hiding npm's error output, so a failed install reported an empty reason.
+- `vue-vite-ts` pins `vitest ^5.1.0`: with `^4.x`, npm 10 (Node 22, the CI runner)
+  crashes inside arborist's peer resolution with `Cannot read properties of null
+  (reading 'edgesOut')`, while npm 11 resolves it fine.
+
 ## [0.3.0] - 2026-11-02
 
 ### Added

@@ -3,14 +3,50 @@
   "title": "SvelteKit + TypeScript",
   "language": "node",
   "blurb": "SvelteKit 3 + TypeScript with Vitest and static prerendering",
-  "requires": ["node", "npm", "git"],
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
   "default_description": "A SvelteKit application.",
-  "next_steps": ["cd {path}", "npm install", "npm run dev"],
+  "next_steps": [
+    "cd {path}",
+    "npm install",
+    "npm run dev"
+  ],
   "verify": [
-    {"name": "install", "cmd": "npm install --no-audit --no-fund --silent", "tools": ["npm"], "timeout": 900},
-    {"name": "check", "cmd": "npm run check", "tools": ["npm"], "timeout": 600},
-    {"name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 600},
-    {"name": "build", "cmd": "npm run build", "tools": ["npm"], "timeout": 600}
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "check",
+      "cmd": "npm run check",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    }
   ],
   "detect": [
     {

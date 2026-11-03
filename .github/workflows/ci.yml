@@ -50,6 +50,7 @@ jobs:
           - node-express-ts
           - react-vite-ts
           - vue-vite-ts
+          - next-app-ts
           - svelte-kit-ts
           - go-cli
           - rust-cli
