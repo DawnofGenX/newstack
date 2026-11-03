@@ -10,8 +10,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
-- **Sixteen new stacks**, every one shipped with `detect` + `adopt` metadata so
-  `newstack adopt` recognises it too. The registry is at 26 stacks.
+- **Twenty-four new stacks**, every one shipped with `detect` + `adopt` metadata so
+  `newstack adopt` recognises it too. The registry is at 34 stacks.
   - `flask`, `vue-vite-ts`, `next-app-ts` — the web tier: app factory + blueprint,
     Vue 3 + Vite + TypeScript, Next 16 App Router with Tailwind 4.
   - `chrome-extension` — MV3 extension with a Vite build and `npm run pack`.
@@ -26,6 +26,10 @@ All notable changes to this project are documented here. The format follows
     package manager between them: Kotlin on Maven (Gradle's wrapper jar cannot be
     templated), Zig with in-source test blocks, Julia on stdlib `Test`, and Nim on
     `unittest`.
+  - `perl-cli`, `lua-cli`, `fsharp-cli`, `crystal-cli` — four ecosystems that gate with
+    no package install at all: Perl on core-module `Makefile.PL`, Lua 5.4 with a
+    hand-rolled spec harness, F# on .NET 8 with a discriminated-union parser, and Crystal
+    with `crystal spec` and zero shards.
 - **One counter-persistence contract** across the five user-facing JS stacks: state is
   stored under the key `newstack:counter`, clamped to a non-negative integer, and a
   storage failure degrades to memory. Svelte and Next restore in `onMount`/`useEffect`
@@ -45,6 +49,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- Shipped Crystal workflows pin `crystal-lang/install-crystal@v1.9.5` instead of `@v1`:
+  that action publishes exact tags only, so a moving major resolved to nothing and the
+  job died before its first step. The bare-major guard in the test suite now covers every
+  action known to be in that category instead of `astral-sh/setup-uv` alone.
 - Shipped Node workflows no longer use `actions/setup-node` with `cache: npm` while the
   template has no lockfile — that fails inside the setup action before any install runs,
   and only a real runner proved it. A regression test now fails if any shipped workflow
