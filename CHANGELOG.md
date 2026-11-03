@@ -20,6 +20,22 @@ All notable changes to this project are documented here. The format follows
   recorded files the template has moved past, which files it now adds, and which local
   edits will conflict. Never writes; exits 1 when there is something to pull, so a CI job
   or pre-commit hook can ask "is this project still current?".
+- **Two stacks: `bun-cli` and `r-cli`** — `bun-cli` is a zero-dependency Bun +
+  TypeScript CLI whose whole test suite is the built-in `bun:test` runner, so a fresh
+  clone runs `bun test` offline with no `node_modules` at all; `r-cli` is the same
+  wc-style tool in **base R only** (no testthat, no CRAN, no renv) with a hand-rolled
+  assertion harness and `Rscript` as the entry point. Both follow the counting-library +
+  thin-CLI split and the 0/2/1 exit contract, and both are verified line-for-line against
+  real `wc -l -w -c`.
+
+### Fixed
+
+- **Shipped workflows no longer fail their own exit-code steps.** A `run:` step executes
+  as `bash -e`, so `./bin/app --bogus …; test $? -eq 2` killed the step on the first
+  command and reported the very behaviour the CLI gets right as a failure. The argument
+  and missing-file steps in `bun-cli`, `lua-cli` and `r-cli` now capture `$?` under
+  `set +e` before asserting it, and a structural test rejects the broken shape across
+  every stack.
 
 ## [0.4.0] - 2026-11-03
 

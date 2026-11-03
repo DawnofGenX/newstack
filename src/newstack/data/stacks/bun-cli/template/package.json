@@ -1,0 +1,13 @@
+{
+  "name": "{{ npm_name }}",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "{{ description }}",
+  "bin": {
+    "{{ npm_name }}": "bin/{{ npm_name }}"
+  },
+  "scripts": {
+    "test": "bun test"
+  }
+}

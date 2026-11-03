@@ -1,0 +1,63 @@
+{
+  "name": "bun-cli",
+  "title": "Bun CLI",
+  "language": "bun",
+  "blurb": "Bun CLI that counts lines, words and bytes: pure counting module, hand-written option parser, zero-dependency bun:test suite",
+  "requires": [
+    "bun"
+  ],
+  "default_description": "A Bun command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "bun test",
+    "bun run bin/{npm_name} --help",
+    "bun run bin/{npm_name} README.md"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "bun test",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": ".bunfig.toml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".bunfig.toml",
+    "tsconfig.json"
+  ],
+  "adopt_tests": []
+}

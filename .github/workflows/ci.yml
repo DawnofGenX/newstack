@@ -75,6 +75,8 @@ jobs:
           - lua-cli
           - fsharp-cli
           - crystal-cli
+          - bun-cli
+          - r-cli
           - static-site
     steps:
       - uses: actions/checkout@v7
@@ -165,6 +167,17 @@ jobs:
         uses: crystal-lang/install-crystal@v1.9.5
         with:
           crystal: "1.11"
+      - name: Set up Bun
+        if: matrix.stack == 'bun-cli'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Install R
+        if: matrix.stack == 'r-cli'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends r-base-core
+          Rscript --version
       - name: Install newstack
         run: uv sync --group dev
       - name: Generate and verify the stack

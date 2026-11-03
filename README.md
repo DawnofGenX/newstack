@@ -109,6 +109,8 @@ directory to CI-ready project.
 | `lua-cli` | Lua 5.4 CLI: stdlib-only modules, a hand-rolled spec harness, zero luarocks dependencies | `lua5.4` |
 | `fsharp-cli` | F# on .NET 8: pure counting core, `Mode` discriminated union parser, xUnit suite that launches the binary for its exit codes | `dotnet` |
 | `crystal-cli` | Crystal CLI: stdlib-only modules, `crystal spec` suite, compiled binary with a 0/2/1 exit contract | `crystal` |
+| `bun-cli` | Bun CLI: pure counting module, hand-written option parser, zero-dependency `bun:test` suite | `bun` |
+| `r-cli` | R CLI on base R only: pure counting function, hand-written option parser, dependency-free test harness | `Rscript` |
 | `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
@@ -298,7 +300,7 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More stacks: Symfony, OCaml, R.
+- More stacks: Symfony, OCaml.
 - `--license apache-2.0|bsd-3` and other variable choices beyond the current defaults.
 
 ## Licence

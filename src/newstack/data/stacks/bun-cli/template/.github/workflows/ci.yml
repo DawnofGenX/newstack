@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - name: Show version
+        run: bun --version
+      - name: Test
+        run: bun test
+      - name: Help
+        run: ./bin/{{ npm_name }} --help
+      - name: Usage error exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: Missing file exits 1
+        run: |
+          set +e
+          ./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1

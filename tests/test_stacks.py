@@ -50,6 +50,30 @@ def test_workflow_actions_are_pinned_to_major_versions(tmp_path, name: str) -> N
             assert ACTION_REF_RE.match(ref), f"{workflow.name}: unpinned or odd action ref {ref!r}"
 
 
+# Every `run:` step executes as `bash -e {0}`, so `cmd; test $? -eq 2` kills the step on
+# `cmd` itself — the assertion never runs and the job fails exactly when the CLI is right.
+# Capture the status first (`set +e ... status=$? ... test "$status" -eq 2`).
+SET_E_ASSERTION_RE = re.compile(r";\s*test\s+\"?\$\?\"?\s+-eq")
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_workflow_exit_code_assertions_survive_bash_e(tmp_path, name: str) -> None:
+    from newstack.cli import build_context_for_check
+    from newstack.registry import get_stack
+    from newstack.render import generate
+
+    stack = get_stack(name)
+    context = build_context_for_check(stack, "sample-app")
+    generate(stack.template_dir, tmp_path, context)
+
+    for workflow in tmp_path.glob(".github/workflows/*.y*ml"):
+        for lineno, line in enumerate(workflow.read_text(encoding="utf-8").splitlines(), 1):
+            assert not SET_E_ASSERTION_RE.search(line), (
+                f"{name}/{workflow.name}:{lineno}: `$?` is tested after `;` — under "
+                f"`bash -e` the step dies before the test runs: {line.strip()!r}"
+            )
+
+
 # Actions that ship exact tags but no moving major tag: `@v1` resolves to nothing and the
 # job dies before its first step. Verified against `git ls-remote --tags` for each repo.
 ACTIONS_WITHOUT_MOVING_MAJOR = ("astral-sh/setup-uv", "crystal-lang/install-crystal")

@@ -1,0 +1,96 @@
+#!/usr/bin/env Rscript
+# Thin entry point: owns argv, stdout, stderr and the exit code. All counting
+# and all argument parsing live in R/ so they can be unit tested without a
+# subprocess. This file is the only place quit() is called.
+
+# Locate the project root from the --file= argument Rscript passes, so the
+# library files are found no matter where the binary is invoked from.
+find_script_path <- function() {
+  args <- commandArgs(trailingOnly = FALSE)
+  file_arg <- grep("^--file=", args, value = TRUE)
+  if (length(file_arg) >= 1) {
+    return(sub("^--file=", "", file_arg[1]))
+  }
+  for (a in args) {
+    if (file.exists(a)) return(a)
+  }
+  args[2]
+}
+
+script_path <- normalizePath(find_script_path(), mustWork = FALSE)
+root <- normalizePath(file.path(dirname(script_path), ".."), mustWork = FALSE)
+
+source(file.path(root, "R", "counts.R"))
+source(file.path(root, "R", "options.R"))
+
+program <- basename(script_path)
+argv <- commandArgs(trailingOnly = TRUE)
+
+parsed <- textstat_parse_args(argv)
+if (!parsed$ok) {
+  cat(textstat_usage(program), file = stderr())
+  cat(paste0(program, ": ", parsed$reason, "\n"), file = stderr())
+  quit(status = 2L)
+}
+
+options <- parsed$options
+
+if (options$status == "help") {
+  cat(textstat_usage(program))
+  quit(status = 0L)
+}
+if (options$status == "version") {
+  cat(paste0(program, " ", textstat_version, "\n"))
+  quit(status = 0L)
+}
+
+# Read each file as raw bytes so the byte count is exact. A missing or
+# unreadable file is a read error (exit 1), not a usage error.
+read_file <- function(path) {
+  if (!file.exists(path)) {
+    cat(paste0(program, ": ", path, ": No such file or directory\n"), file = stderr())
+    quit(status = 1L)
+  }
+  readBin(path, what = "raw", n = file.size(path))
+}
+
+# Print one row of counts, wc-style: right-aligned numbers then the label.
+print_counts <- function(counts, label, mode) {
+  fields <- c(
+    lines = counts$lines,
+    words = counts$words,
+    bytes = counts$bytes
+  )
+  if (mode != "all") {
+    fields <- fields[mode]
+  }
+  nums <- vapply(fields, function(x) sprintf("%8d", x), character(1))
+  line <- paste(nums, collapse = "")
+  if (label != "") {
+    line <- paste0(line, " ", label)
+  }
+  cat(paste0(line, "\n"))
+}
+
+files <- options$files
+if (length(files) == 0L) {
+  # No file argument: read standard input.
+  data <- readBin("stdin", what = "raw", n = 1048576)
+  counts <- textstat_counts(data)
+  print_counts(counts, "", options$mode)
+  quit(status = 0L)
+}
+
+total <- list(lines = 0L, words = 0L, bytes = 0L)
+for (path in files) {
+  data <- read_file(path)
+  counts <- textstat_counts(data)
+  print_counts(counts, path, options$mode)
+  total <- textstat_add(total, counts)
+}
+
+if (length(files) > 1L) {
+  print_counts(total, "total", options$mode)
+}
+
+quit(status = 0L)

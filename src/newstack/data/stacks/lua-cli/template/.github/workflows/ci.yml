@@ -23,6 +23,16 @@ jobs:
       - name: Help
         run: ./bin/{{ npm_name }} --help
       - name: Usage error exits 2
-        run: ./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
       - name: Missing file exits 1
-        run: ./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1
+        run: |
+          set +e
+          ./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1

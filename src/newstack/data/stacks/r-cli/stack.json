@@ -1,0 +1,62 @@
+{
+  "name": "r-cli",
+  "title": "R CLI",
+  "language": "R",
+  "blurb": "R CLI that counts lines, words and bytes: pure counting function, hand-written option parser, base-R test harness",
+  "requires": [
+    "Rscript"
+  ],
+  "default_description": "An R command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "Rscript tests/run.R",
+    "Rscript bin/{npm_name} --help",
+    "Rscript bin/{npm_name} README.md"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "Rscript tests/run.R",
+      "tools": [
+        "Rscript"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "help",
+      "cmd": "Rscript bin/{{ npm_name }} --help",
+      "tools": [
+        "Rscript"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "usage-error",
+      "cmd": "Rscript bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "Rscript"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "missing-file",
+      "cmd": "Rscript bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "Rscript"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "DESCRIPTION",
+      "contains": "Package: "
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}
