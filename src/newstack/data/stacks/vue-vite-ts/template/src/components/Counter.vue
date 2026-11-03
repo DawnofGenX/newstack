@@ -10,8 +10,8 @@ function increment() {
 
 <template>
   <div class="counter">
-    <button type="button" @click="increment">count is {{! count }}</button>
-    <p class="hint">Edit <code>src/components/Counter.vue</code> and save to test HMR.</p>
+    <p class="count" role="status" aria-live="polite">Count: {{! count }}</p>
+    <button type="button" @click="increment">Increment</button>
   </div>
 </template>
 
@@ -37,8 +37,12 @@ button:hover {
   border-color: hsla(160, 100%, 37%, 1);
 }
 
+button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 .hint {
   font-size: 0.85rem;
-  opacity: 0.75;
 }
 </style>

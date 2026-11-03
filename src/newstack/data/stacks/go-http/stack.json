@@ -1,0 +1,55 @@
+{
+  "name": "go-http",
+  "title": "Go HTTP service",
+  "language": "go",
+  "blurb": "Stdlib Go HTTP service with JSON endpoints and graceful shutdown",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "A Go HTTP service.",
+  "next_steps": [
+    "cd {path}",
+    "go run .",
+    "curl localhost:8080/health"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/server .",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "go.mod"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "internal/api/api_test.go"
+  ]
+}

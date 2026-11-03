@@ -6,7 +6,7 @@ export default function App() {
   return (
     <main className="app">
       <h1>{{ title }}</h1>
-      <p>Count: {count}</p>
+      <p role="status" aria-live="polite">Count: {count}</p>
       <button type="button" onClick={() => setCount((value) => value + 1)}>
         Increment
       </button>

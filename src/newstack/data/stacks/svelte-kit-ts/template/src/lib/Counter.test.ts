@@ -5,13 +5,13 @@ import Counter from './Counter.svelte';
 describe('Counter', () => {
 	it('renders the initial count', () => {
 		render(Counter);
-		expect(screen.getByRole('button').textContent).toContain('Count is 0');
+		expect(screen.getByRole('status').textContent).toContain('Count: 0');
 	});
 
 	it('increments the count when clicked', async () => {
 		render(Counter);
 		const button = screen.getByRole('button');
 		await fireEvent.click(button);
-		expect(button.textContent).toContain('Count is 1');
+		expect(screen.getByRole('status').textContent).toContain('Count: 1');
 	});
 });

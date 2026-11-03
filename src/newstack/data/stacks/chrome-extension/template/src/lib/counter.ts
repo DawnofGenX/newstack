@@ -16,8 +16,8 @@ export function resetCount(): number {
   return 0;
 }
 
-/** Human readable label, e.g. 1 -> "Clicks: 1". */
+/** Human readable label, e.g. 1 -> "Popup clicks: 1". */
 export function formatCount(count: number): string {
   const safe = Number.isFinite(count) ? Math.max(0, Math.trunc(count)) : 0;
-  return `Clicks: ${safe}`;
+  return `Popup clicks: ${safe}`;
 }

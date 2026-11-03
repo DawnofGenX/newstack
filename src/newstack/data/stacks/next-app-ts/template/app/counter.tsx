@@ -14,7 +14,7 @@ export default function Counter() {
       >
         Increment
       </button>
-      <span data-testid="count" className="text-sm text-zinc-600 dark:text-zinc-400">
+      <span role="status" aria-live="polite" data-testid="count" className="text-sm text-zinc-600 dark:text-zinc-400">
         Count: {count}
       </span>
     </div>

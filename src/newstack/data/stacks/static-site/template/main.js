@@ -10,6 +10,7 @@ for (const link of document.querySelectorAll('a[href^="#"]')) {
     const target = document.querySelector(targetId);
     if (!target) return;
     event.preventDefault();
+    target.focus({ preventScroll: true });
     target.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 }

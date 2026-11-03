@@ -27,13 +27,13 @@ describe("resetCount", () => {
 
 describe("formatCount", () => {
   it("renders a label", () => {
-    expect(formatCount(0)).toBe("Clicks: 0");
-    expect(formatCount(7)).toBe("Clicks: 7");
+    expect(formatCount(0)).toBe("Popup clicks: 0");
+    expect(formatCount(7)).toBe("Popup clicks: 7");
   });
 
   it("never renders negative or NaN values", () => {
-    expect(formatCount(-3)).toBe("Clicks: 0");
-    expect(formatCount(Number.NaN)).toBe("Clicks: 0");
+    expect(formatCount(-3)).toBe("Popup clicks: 0");
+    expect(formatCount(Number.NaN)).toBe("Popup clicks: 0");
   });
 });
 

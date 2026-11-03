@@ -5,6 +5,8 @@ const incrementBtn = document.querySelector<HTMLButtonElement>("#increment");
 const resetBtn = document.querySelector<HTMLButtonElement>("#reset");
 
 let count = 0;
+// A storage read is async: never let its callback clobber a click the user made first.
+let userInteracted = false;
 
 function render(): void {
   if (countEl) countEl.textContent = formatCount(count);
@@ -25,7 +27,7 @@ function restore(): void {
   try {
     chrome.storage.local.get(COUNT_STORAGE_KEY, (items) => {
       const stored = items?.[COUNT_STORAGE_KEY];
-      if (typeof stored === "number") {
+      if (typeof stored === "number" && !userInteracted) {
         count = Number.isFinite(stored) ? Math.max(0, Math.trunc(stored)) : 0;
         render();
       }
@@ -36,12 +38,14 @@ function restore(): void {
 }
 
 incrementBtn?.addEventListener("click", () => {
+  userInteracted = true;
   count = nextCount(count);
   render();
   persist(count);
 });
 
 resetBtn?.addEventListener("click", () => {
+  userInteracted = true;
   count = resetCount();
   render();
   persist(count);

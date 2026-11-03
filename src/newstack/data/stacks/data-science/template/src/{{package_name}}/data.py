@@ -17,20 +17,20 @@ def _snake_case(name: str) -> str:
     return text.lower()
 
 
-def summarize(frame: pd.DataFrame) -> dict[str, float]:
-    """Return row/column counts and summary statistics for numeric columns.
+def summarize(frame: pd.DataFrame) -> dict[str, object]:
+    """Return row/column counts and a mean *per numeric column*.
 
-    The result is always a flat ``dict`` of floats so it can be logged,
-    serialised, or compared in tests without touching pandas internals.
+    Deliberately per column: averaging every numeric column together mixes units
+    (a count of 12 and a revenue of 120.5) and produces a number with no meaning.
     """
     numeric = frame.select_dtypes(include="number")
-    numeric_columns = numeric.shape[1]
-    numeric_mean = float(numeric.to_numpy().mean()) if numeric.size else 0.0
     return {
         "rows": float(frame.shape[0]),
         "columns": float(frame.shape[1]),
-        "numeric_columns": float(numeric_columns),
-        "numeric_mean": numeric_mean,
+        "numeric_columns": float(numeric.shape[1]),
+        "numeric_means": {
+            str(column): float(numeric[column].mean()) for column in numeric.columns
+        },
     }
 
 

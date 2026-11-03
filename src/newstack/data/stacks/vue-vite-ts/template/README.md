@@ -3,7 +3,7 @@
 {{ description }}
 
 Vue 3 + Vite + TypeScript single page application, scaffolded by
-[newstack](https://github.com/nousresearch/newstack). Unit tests run on
+[newstack](https://github.com/DawnofGenX/newstack). Unit tests run on
 [Vitest](https://vitest.dev) with [@vue/test-utils](https://test-utils.vuejs.org).
 
 ## Requirements

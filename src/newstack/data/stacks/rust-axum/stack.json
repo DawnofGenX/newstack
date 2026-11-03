@@ -1,0 +1,63 @@
+{
+  "name": "rust-axum",
+  "title": "Rust axum service",
+  "language": "rust",
+  "blurb": "Rust HTTP service: typed routes, shared state, oneshot tests, graceful shutdown",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust HTTP service.",
+  "next_steps": [
+    "cd {path}",
+    "cargo run",
+    "curl localhost:3000/health"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/api.rs"
+  ]
+}

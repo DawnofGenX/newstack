@@ -11,15 +11,18 @@
       }
       body {
         margin: 0;
-        min-width: 260px;
+        width: 350px;
+        max-width: 100%;
         padding: 16px;
+        font-size: 14px;
       }
       h1 {
-        font-size: 15px;
+        font-size: 18px;
+        font-weight: 600;
         margin: 0 0 4px;
       }
       p.description {
-        font-size: 12px;
+        font-size: 13px;
         margin: 0 0 12px;
         opacity: 0.75;
       }
@@ -27,6 +30,14 @@
         font-size: 13px;
         font-variant-numeric: tabular-nums;
         margin: 0 0 8px;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+      button:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
       }
       button {
         border-radius: 6px;
@@ -37,11 +48,15 @@
     </style>
   </head>
   <body>
-    <h1>{{ title }}</h1>
-    <p class="description">{{ description }}</p>
-    <p id="count" aria-live="polite">Clicks: 0</p>
-    <button id="increment" type="button">Increment</button>
-    <button id="reset" type="button">Reset</button>
+    <main>
+      <h1>{{ title }}</h1>
+      <p class="description">{{ description }}</p>
+      <p id="count" aria-live="polite">Popup clicks: 0</p>
+      <div class="actions">
+        <button id="increment" type="button">Increment</button>
+        <button id="reset" type="button">Reset</button>
+      </div>
+    </main>
     <script type="module" src="./main.ts"></script>
   </body>
 </html>
