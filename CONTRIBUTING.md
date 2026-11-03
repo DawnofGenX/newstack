@@ -39,6 +39,11 @@ red template is a red build.
    `template/`; identity files are rejected by a test.
 6. `uv run newstack check my-stack` until it is green.
 
+Templates are also the input to `newstack update`, which re-renders them into projects
+users already generated. So keep a template free of state that only makes sense once —
+`newstack new` records what it wrote, and every later run of that template is merged
+against the record, file by file.
+
 Available template variables: `project_name`, `package_name` (python-safe, `snake_case`),
 `npm_name` (npm-safe, `kebab-case`), `title`, `description`, `author`, `email`, `year`,
 `date`, `stack`, `stack_title`, `newstack_version`.

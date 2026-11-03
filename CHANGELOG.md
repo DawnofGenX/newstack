@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **`newstack update`** — re-apply a stack's current template to a project `newstack new`
+  generated, without losing local edits. `new` now writes a `.newstack.json` record (the
+  render context plus a sha256 per file); `update` re-renders the current template with
+  the recorded context and merges per file: untouched files are refreshed, edited files
+  are reported as conflicts and left alone (exit 1) until you pass `--force`, new
+  template files are added, and files the template dropped are reported and only deleted
+  with `--prune` — and only while they still match what newstack wrote. `--dry-run` and
+  `--json` included. Closes the first roadmap item.
+
 ## [0.4.0] - 2026-11-03
 
 ### Added
