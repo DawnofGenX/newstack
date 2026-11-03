@@ -10,25 +10,47 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
-- Three new stacks, each with `detect` + `adopt` metadata like the rest of the registry:
-  - `flask` — app factory + blueprint, JSON routes, pytest fixtures, ruff with a pinned
-    rule set.
-  - `vue-vite-ts` — Vue 3 + Vite + TypeScript from `create-vue`, Vitest +
-    `@vue/test-utils`, real typecheck (`vue-tsc -p tsconfig.app.json`; plain `--noEmit`
-    on a solution-style root would check nothing).
-  - `next-app-ts` — Next 16 App Router + TypeScript + Tailwind 4 from
-    `create-next-app`, with the Vitest + Testing Library test and `tsc --noEmit`
-    scripts that the generator does not provide.
-- CI matrix grows to thirteen stack jobs; each new stack's own workflow was also proven
-  green in a throwaway repository.
+- **Sixteen new stacks**, every one shipped with `detect` + `adopt` metadata so
+  `newstack adopt` recognises it too. The registry is at 26 stacks.
+  - `flask`, `vue-vite-ts`, `next-app-ts` — the web tier: app factory + blueprint,
+    Vue 3 + Vite + TypeScript, Next 16 App Router with Tailwind 4.
+  - `chrome-extension` — MV3 extension with a Vite build and `npm run pack`.
+  - `data-science` — uv + pandas, summarise/clean helpers over in-memory frames.
+  - `go-http`, `rust-axum` — real HTTP services with table tests and graceful shutdown.
+  - `astro`, `cpp-cmake-cli`, `terraform-module` — static site, C++20 + CMake + CTest,
+    and a validated Terraform module whose `terraform test` cases fail on bad input.
+  - `ruby-sinatra`, `java-maven-cli`, `php-composer-cli`, `csharp-cli`,
+    `elixir-mix-cli`, `dart-cli` — JSON API on Sinatra, and five CLI stacks spanning
+    Maven, Composer, .NET, Mix and pub.
+- **One counter-persistence contract** across the five user-facing JS stacks: state is
+  stored under the key `newstack:counter`, clamped to a non-negative integer, and a
+  storage failure degrades to memory. Svelte and Next restore in `onMount`/`useEffect`
+  so server rendering cannot produce a hydration mismatch.
+- **The Chrome extension reports whether it is active on the current page**, instead of
+  leaving the user to guess.
+- `newstack adopt` guides the user to review a diff instead of printing scaffold
+  next-steps that would run the demo.
 
 ### Changed
 
-- Node stacks install with `npm install --no-audit --no-fund` again — `--silent` was
-  hiding npm's error output, so a failed install reported an empty reason.
-- `vue-vite-ts` pins `vitest ^5.1.0`: with `^4.x`, npm 10 (Node 22, the CI runner)
-  crashes inside arborist's peer resolution with `Cannot read properties of null
-  (reading 'edgesOut')`, while npm 11 resolves it fine.
+- Template rendering happens fully in memory first, so a template error writes nothing.
+- `--name` is now sanitised against Java's reserved words as well as Python's: `--name
+  static` used to render `package static;`, which no Java compiler accepts.
+- The registry no longer validates every stack on load: a half-built stack directory is
+  reported by `list` and `check --all` instead of breaking them.
+
+### Fixed
+
+- Shipped Node workflows no longer use `actions/setup-node` with `cache: npm` while the
+  template has no lockfile — that fails inside the setup action before any install runs,
+  and only a real runner proved it. A regression test now fails if any shipped workflow
+  needs a file the template does not ship.
+- `data-science` summarised across mixed units (counts and revenue averaged together);
+  it now reports per-column means, and the tests assert the meaningful number.
+- Accessibility and copy pass over the six user-facing templates: focus moves to the
+  target of an in-page scroll, counters are announced through `role="status"`, controls
+  name their action rather than their state, and `:focus-visible` is styled everywhere.
+
 
 ## [0.3.0] - 2026-11-02
 

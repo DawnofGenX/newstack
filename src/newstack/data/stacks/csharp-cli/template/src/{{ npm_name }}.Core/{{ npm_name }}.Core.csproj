@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>{{ npm_name }}.Core</AssemblyName>
+    <RootNamespace>{{ package_name }}</RootNamespace>
+  </PropertyGroup>
+
+</Project>

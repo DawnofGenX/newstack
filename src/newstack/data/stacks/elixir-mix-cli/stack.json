@@ -1,0 +1,78 @@
+{
+  "name": "elixir-mix-cli",
+  "title": "Elixir Mix CLI",
+  "language": "elixir",
+  "blurb": "Elixir CLI on Mix: pure counting module, ExUnit suite, escript binary",
+  "requires": [
+    "elixir",
+    "mix"
+  ],
+  "default_description": "An Elixir command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "mix deps.get",
+    "mix test",
+    "MIX_ENV=prod mix escript.build && ./{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "deps",
+      "cmd": "mix deps.get",
+      "tools": [
+        "mix"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "format",
+      "cmd": "mix format --check-formatted",
+      "tools": [
+        "mix"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "mix test",
+      "tools": [
+        "mix"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "escript",
+      "cmd": "MIX_ENV=prod mix escript.build && ./{{ npm_name }} --help >/dev/null",
+      "tools": [
+        "mix"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "mix"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "mix"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "mix.exs"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

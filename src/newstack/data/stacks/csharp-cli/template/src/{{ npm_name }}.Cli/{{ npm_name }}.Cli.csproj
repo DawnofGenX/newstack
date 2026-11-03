@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>{{ npm_name }}</AssemblyName>
+    <RootNamespace>{{ package_name }}</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\{{ npm_name }}.Core\{{ npm_name }}.Core.csproj" />
+  </ItemGroup>
+
+</Project>

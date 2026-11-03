@@ -1,0 +1,69 @@
+{
+  "name": "csharp-cli",
+  "title": "C# CLI",
+  "language": "csharp",
+  "blurb": "C# 12 CLI on .NET 8: pure counting library, xUnit suite, exit codes as a contract",
+  "requires": [
+    "dotnet"
+  ],
+  "default_description": "A C# command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "dotnet test --nologo",
+    "dotnet run --project src/{npm_name}.Cli -- --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "dotnet test --nologo",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "dotnet src/{{ npm_name }}.Cli/bin/Debug/net8.0/{{ npm_name }}.dll --help >/dev/null",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "dotnet src/{{ npm_name }}.Cli/bin/Debug/net8.0/{{ npm_name }}.dll --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "dotnet src/{{ npm_name }}.Cli/bin/Debug/net8.0/{{ npm_name }}.dll does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "word-count",
+      "cmd": "printf 'one two\\nthree\\n' > sample.txt && dotnet src/{{ npm_name }}.Cli/bin/Debug/net8.0/{{ npm_name }}.dll sample.txt | grep -Eq '^ *2 +3 +14 +sample\\.txt$'",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "Directory.Build.props",
+      "contains": "net8.0"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

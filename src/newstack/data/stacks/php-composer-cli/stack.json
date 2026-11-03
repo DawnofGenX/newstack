@@ -1,0 +1,63 @@
+{
+  "name": "php-composer-cli",
+  "title": "PHP Composer CLI",
+  "language": "php",
+  "blurb": "PHP 8.3 CLI on Composer: PSR-4 autoloading, a PHPUnit 11 suite, and a wc-style text counter",
+  "requires": [
+    "php",
+    "composer"
+  ],
+  "default_description": "A PHP command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "vendor/bin/phpunit",
+    "php bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction --prefer-dist && vendor/bin/phpunit",
+      "tools": [
+        "composer",
+        "php"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "php bin/{{ npm_name }} --help",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "php bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "php bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "composer.json"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

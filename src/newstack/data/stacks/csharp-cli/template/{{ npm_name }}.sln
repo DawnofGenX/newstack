@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "{{ npm_name }}.Core", "src\{{ npm_name }}.Core\{{ npm_name }}.Core.csproj", "{5FA85A3A-63A9-48AB-BE24-9DD851A1E511}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "{{ npm_name }}.Cli", "src\{{ npm_name }}.Cli\{{ npm_name }}.Cli.csproj", "{642F32D4-5DD1-4FE3-B5AE-B6390E60F794}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "{{ npm_name }}.Tests", "tests\{{ npm_name }}.Tests\{{ npm_name }}.Tests.csproj", "{F72D3148-47E2-461E-8C65-63B05186E2FC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5FA85A3A-63A9-48AB-BE24-9DD851A1E511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FA85A3A-63A9-48AB-BE24-9DD851A1E511}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FA85A3A-63A9-48AB-BE24-9DD851A1E511}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FA85A3A-63A9-48AB-BE24-9DD851A1E511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{642F32D4-5DD1-4FE3-B5AE-B6390E60F794}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{642F32D4-5DD1-4FE3-B5AE-B6390E60F794}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{642F32D4-5DD1-4FE3-B5AE-B6390E60F794}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{642F32D4-5DD1-4FE3-B5AE-B6390E60F794}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F72D3148-47E2-461E-8C65-63B05186E2FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F72D3148-47E2-461E-8C65-63B05186E2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F72D3148-47E2-461E-8C65-63B05186E2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F72D3148-47E2-461E-8C65-63B05186E2FC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

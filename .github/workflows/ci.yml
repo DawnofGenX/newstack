@@ -63,6 +63,10 @@ jobs:
           - terraform-module
           - ruby-sinatra
           - java-maven-cli
+          - php-composer-cli
+          - csharp-cli
+          - elixir-mix-cli
+          - dart-cli
           - static-site
     steps:
       - uses: actions/checkout@v7
@@ -104,6 +108,29 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
+      - name: Set up PHP
+        if: matrix.stack == 'php-composer-cli'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, xml
+          coverage: none
+      - name: Set up .NET
+        if: matrix.stack == 'csharp-cli'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Set up Elixir
+        if: matrix.stack == 'elixir-mix-cli'
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.18"
+          otp-version: "27"
+      - name: Set up Dart
+        if: matrix.stack == 'dart-cli'
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: "3.13.x"
       - name: Install newstack
         run: uv sync --group dev
       - name: Generate and verify the stack
