@@ -192,3 +192,46 @@ def test_update_without_a_record_adds_missing_files(tmp_path, monkeypatch) -> No
         '"""plain"""\n'
     )
     assert not (dest / RECORD_NAME).exists(), "no record to merge against"
+
+
+def test_outdated_is_quiet_on_a_fresh_project(tmp_path, monkeypatch, capsys) -> None:
+    _, dest = _project(tmp_path, monkeypatch)
+
+    assert main(["outdated", str(dest)]) == 0
+    assert "up to date" in capsys.readouterr().out
+
+
+def test_outdated_reports_what_update_would_do(tmp_path, monkeypatch, capsys) -> None:
+    template, dest = _project(tmp_path, monkeypatch)
+    (template / "README.md").write_text("# newer upstream\n", encoding="utf-8")
+    (template / "extra.txt").write_text("new\n", encoding="utf-8")
+    (dest / "src" / "proj" / "__init__.py").write_text("edited\n", encoding="utf-8")
+
+    assert main(["outdated", str(dest)]) == 1
+    out = capsys.readouterr().out
+    assert "behind" in out and "README.md" in out
+    assert "missing" in out and "extra.txt" in out
+    assert "modified" in out and "src/proj/__init__.py" in out
+    assert (dest / "README.md").read_text(encoding="utf-8").startswith("# Proj")
+    assert not (dest / "extra.txt").exists(), "outdated must never write"
+
+
+def test_outdated_json_is_scriptable(tmp_path, monkeypatch, capsys) -> None:
+    template, dest = _project(tmp_path, monkeypatch)
+    capsys.readouterr()  # drop the `new` report so only the JSON is parsed
+    (template / "README.md").write_text("# newer upstream\n", encoding="utf-8")
+
+    assert main(["outdated", str(dest), "--json"]) == 1
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["updates_available"] is True
+    assert payload["behind"] == ["README.md"]
+    assert payload["missing"] == []
+
+
+def test_outdated_needs_a_record(tmp_path, monkeypatch, capsys) -> None:
+    _stack(tmp_path, monkeypatch)
+    dest = tmp_path / "plain"
+    dest.mkdir()
+
+    assert main(["outdated", str(dest)]) == 1
+    assert "no .newstack.json" in capsys.readouterr().err

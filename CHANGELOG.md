@@ -16,6 +16,10 @@ All notable changes to this project are documented here. The format follows
   template files are added, and files the template dropped are reported and only deleted
   with `--prune` — and only while they still match what newstack wrote. `--dry-run` and
   `--json` included. Closes the first roadmap item.
+- **`newstack outdated`** — the read-only half of the same comparison: reports which
+  recorded files the template has moved past, which files it now adds, and which local
+  edits will conflict. Never writes; exits 1 when there is something to pull, so a CI job
+  or pre-commit hook can ask "is this project still current?".
 
 ## [0.4.0] - 2026-11-03
 
