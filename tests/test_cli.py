@@ -145,3 +145,34 @@ def test_check_all_fails_on_an_unusable_stack_directory(tmp_path, monkeypatch, c
     assert main(["check", "--all"]) == 1
     out = capsys.readouterr().out
     assert "half-built" in out and "unusable" in out
+
+
+def test_package_name_is_never_a_reserved_word() -> None:
+    """`package static;` and `package class` do not compile in the languages we ship."""
+    import keyword
+
+    from newstack.cli import JAVA_RESERVED, _package_name
+
+    for name in ("class", "static", "package", "import", "interface", "void", "try", "my-app"):
+        slug = _package_name(name)
+        assert slug not in keyword.kwlist, f"{name!r} rendered as Python keyword {slug!r}"
+        assert slug not in JAVA_RESERVED, f"{name!r} rendered as Java keyword {slug!r}"
+        assert slug.isidentifier() or "_" in slug
+
+
+def test_java_stack_builds_a_legal_package_from_a_reserved_name(tmp_path) -> None:
+    """Prove it end to end: the generated sources must not declare `package static;`."""
+    from newstack.cli import build_context_for_check
+    from newstack.registry import get_stack
+    from newstack.render import generate
+
+    stack = get_stack("java-maven-cli")
+    generate(stack.template_dir, tmp_path, build_context_for_check(stack, "static"))
+
+    sources = list((tmp_path / "src").rglob("*.java"))
+    assert sources, "the java stack generated no sources"
+    for source in sources:
+        text = source.read_text(encoding="utf-8")
+        assert "package static;" not in text, f"{source} declares an illegal package"
+        assert "package static_app;" in text, f"{source} does not use the sanitised package"
+    assert (tmp_path / "src/main/java/static_app").is_dir()

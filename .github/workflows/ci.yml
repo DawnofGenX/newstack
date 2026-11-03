@@ -61,6 +61,8 @@ jobs:
           - rust-axum
           - cpp-cmake-cli
           - terraform-module
+          - ruby-sinatra
+          - java-maven-cli
           - static-site
     steps:
       - uses: actions/checkout@v7
@@ -89,6 +91,19 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.17.1"
+      - name: Set up Ruby
+        if: matrix.stack == 'ruby-sinatra'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+      - name: Set up Java
+        if: matrix.stack == 'java-maven-cli'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
       - name: Install newstack
         run: uv sync --group dev
       - name: Generate and verify the stack

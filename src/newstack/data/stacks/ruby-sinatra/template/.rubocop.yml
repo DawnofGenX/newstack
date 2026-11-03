@@ -1,0 +1,14 @@
+# RuboCop is a style gate, not a lint religion: keep it strict, and keep the
+# exceptions here so CI and local runs share one source of truth.
+AllCops:
+  TargetRubyVersion: 3.2
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - 'vendor/**/*'
+    - 'Gemfile.lock'
+
+# The RSpec DSL is not part of the production code being measured here.
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*.rb'

@@ -85,7 +85,7 @@ def test_uv_pip_installs_target_the_generated_venv(name: str) -> None:
 
 
 @pytest.mark.parametrize("name", STACK_NAMES)
-def test_npm_ci_requires_a_committed_lockfile(tmp_path, name: str) -> None:
+def test_node_workflow_never_needs_a_missing_lockfile(tmp_path, name: str) -> None:
     """`npm ci` fails without package-lock.json, which a fresh scaffold does not have."""
     from newstack.cli import build_context_for_check
     from newstack.registry import get_stack
@@ -100,10 +100,12 @@ def test_npm_ci_requires_a_committed_lockfile(tmp_path, name: str) -> None:
             line for line in workflow.read_text(encoding="utf-8").splitlines()
             if not line.lstrip().startswith("#")
         ]
-        if any("npm ci" in line for line in lines):
+        needs_lockfile = [line for line in lines if "npm ci" in line or "cache: npm" in line]
+        if needs_lockfile:
             assert (tmp_path / "package-lock.json").is_file(), (
-                f"{name}/{workflow.name} runs `npm ci` but the template ships no "
-                "package-lock.json, so the generated project's first CI run would fail"
+                f"{name}/{workflow.name} uses {needs_lockfile[0].strip()!r} but the template "
+                "ships no package-lock.json, so the generated project's first CI run fails "
+                "in actions/setup-node before any install happens"
             )
 
 

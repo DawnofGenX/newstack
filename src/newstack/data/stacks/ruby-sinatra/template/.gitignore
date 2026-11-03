@@ -1,0 +1,8 @@
+# Gems live in vendor/bundle (see .bundle/config), so nothing is installed
+# system-wide. .bundle/config itself is committed on purpose; the rest is not.
+/.bundle/*
+!/.bundle/config
+/vendor/bundle/
+/coverage/
+/.rspec_status
+*.gem

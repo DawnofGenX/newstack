@@ -20,9 +20,10 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
-          cache: npm
-      # no lockfile is shipped yet: run `npm install` once locally and commit
-      # package-lock.json, then switch this to `npm ci` for reproducible installs
+      # No lockfile is shipped with a fresh scaffold, so `cache: npm` and `npm ci`
+      # would both fail here: they require a committed package-lock.json. Run
+      # `npm install` once and commit the lockfile, then you can switch to `npm ci`
+      # and re-add `cache: npm` for reproducible, cached installs.
       - run: npm install --no-audit --no-fund
       - run: npm run typecheck
       - run: npm test

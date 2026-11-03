@@ -1,0 +1,56 @@
+{
+  "name": "ruby-sinatra",
+  "title": "Ruby Sinatra API",
+  "language": "ruby",
+  "blurb": "Sinatra JSON API: modular app, RSpec + rack-test, RuboCop and CI",
+  "requires": [
+    "ruby",
+    "bundle"
+  ],
+  "default_description": "A Sinatra JSON API.",
+  "next_steps": [
+    "cd {path}",
+    "bundle install",
+    "bundle exec rspec",
+    "bundle exec puma -p 4567"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "bundle install",
+      "tools": [
+        "bundle"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "rubocop",
+      "cmd": "bundle exec rubocop",
+      "tools": [
+        "bundle"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "bundle exec rspec",
+      "tools": [
+        "bundle"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "Gemfile",
+      "contains": "sinatra"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".rubocop.yml"
+  ],
+  "adopt_tests": []
+}

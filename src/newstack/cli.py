@@ -42,13 +42,30 @@ NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 # --------------------------------------------------------------------------- helpers
 
 
+# Reserved words in the languages that consume ``package_name``. A generated
+# `package static;` (Java) or `package class` (Python) does not build, so the
+# sanitiser has to know about both, not just Python's keyword list.
+JAVA_RESERVED = frozenset({
+    "abstract", "assert", "boolean", "break", "byte", "case",
+    "catch", "char", "class", "const", "continue", "default",
+    "do", "double", "else", "enum", "extends", "final",
+    "finally", "float", "for", "goto", "if", "implements",
+    "import", "instanceof", "int", "interface", "long", "native",
+    "new", "package", "private", "protected", "public", "return",
+    "short", "static", "strictfp", "super", "switch", "synchronized",
+    "this", "throw", "throws", "transient", "try", "void",
+    "volatile", "while", "true", "false", "null", "var",
+    "record", "sealed", "permits", "yield",
+})
+
+
 def _package_name(name: str) -> str:
     slug = re.sub(r"[^0-9A-Za-z]+", "_", name).strip("_").lower()
     if not slug:
         slug = "app"
     if slug[0].isdigit():
         slug = f"app_{slug}"
-    if slug in PY_RESERVED:
+    if slug in PY_RESERVED or slug in JAVA_RESERVED:
         slug = f"{slug}_app"
     return slug
 
