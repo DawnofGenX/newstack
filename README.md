@@ -87,7 +87,9 @@ directory to CI-ready project.
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm` |
 | `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm` |
 | `go-cli` | stdlib-only Go CLI: `flag` parsing, table tests, vet/test/build gates | `go` |
+| `go-http` | Go HTTP service on `net/http`: JSON routes, `httptest` suite, graceful shutdown | `go` |
 | `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
+| `rust-axum` | axum service: typed routes, shared state, `tower` oneshot tests, fmt/clippy | `cargo` |
 | `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a

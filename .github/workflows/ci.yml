@@ -55,7 +55,9 @@ jobs:
           - chrome-extension
           - svelte-kit-ts
           - go-cli
+          - go-http
           - rust-cli
+          - rust-axum
           - static-site
     steps:
       - uses: actions/checkout@v7

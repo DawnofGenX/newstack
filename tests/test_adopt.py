@@ -27,8 +27,10 @@ def make_repo(root, files: dict[str, str]):
 @pytest.mark.parametrize(
     ("files", "expected"),
     [
-        ({"go.mod": "module x\n\ngo 1.24\n"}, "go-cli"),
-        ({"Cargo.toml": '[package]\nname = "x"\n'}, "rust-cli"),
+        # go.mod and Cargo.toml each match TWO stacks by design (cli + service), so
+        # adopt on a real Go/Rust repo must ask for --stack rather than guess.
+        ({"go.mod": "module x\n\ngo 1.24\n"}, ["go-cli", "go-http"]),
+        ({"Cargo.toml": '[package]\nname = "x"\n'}, ["rust-cli", "rust-axum"]),
         ({"manage.py": "#!/usr/bin/env python\n", "pyproject.toml": "[project]\n"}, "django"),
         ({"pyproject.toml": 'dependencies = ["fastapi"]\n'}, "fastapi"),
         ({"package.json": '{"dependencies": {"express": "^5"}}'}, "node-express-ts"),
@@ -39,7 +41,8 @@ def make_repo(root, files: dict[str, str]):
 )
 def test_detects_each_stack(tmp_path, files, expected) -> None:
     make_repo(tmp_path, files)
-    assert [stack.name for stack in detect_stacks(tmp_path)] == [expected]
+    found = sorted(stack.name for stack in detect_stacks(tmp_path))
+    assert found == sorted([expected] if isinstance(expected, str) else expected)
 
 
 def test_generic_python_fallback_is_suppressed_by_a_specific_match(tmp_path) -> None:
@@ -130,25 +133,25 @@ def test_stack_without_adoptables_is_rejected(tmp_path) -> None:
 
 
 def test_cli_adopt_detects_and_adds(tmp_path, capsys) -> None:
-    make_repo(tmp_path, {"go.mod": "module demo\n"})
+    make_repo(tmp_path, {"index.html": "<!doctype html><html></html>"})
     assert main(["adopt", str(tmp_path)]) == 0
     out = capsys.readouterr().out
-    assert "go-cli (auto-detected)" in out
-    assert (tmp_path / ".github/workflows/ci.yml").is_file()
+    assert "static-site (auto-detected)" in out
+    assert (tmp_path / ".github/workflows/deploy-pages.yml").is_file()
 
 
 def test_cli_adopt_dry_run_writes_nothing(tmp_path, capsys) -> None:
-    make_repo(tmp_path, {"go.mod": "module demo\n"})
+    make_repo(tmp_path, {"index.html": "<!doctype html><html></html>"})
     assert main(["adopt", str(tmp_path), "--dry-run"]) == 0
     assert "would add" in capsys.readouterr().out
     assert not (tmp_path / ".github").exists()
 
 
 def test_cli_adopt_json_schema(tmp_path, capsys) -> None:
-    make_repo(tmp_path, {"go.mod": "module demo\n"})
+    make_repo(tmp_path, {"index.html": "<!doctype html><html></html>"})
     assert main(["adopt", str(tmp_path), "--json"]) == 0
     payload = json.loads(capsys.readouterr().out)
-    assert payload["stack"] == "go-cli"
+    assert payload["stack"] == "static-site"
     assert payload["added"]
     assert payload["dry_run"] is False
 
@@ -172,21 +175,29 @@ def test_cli_adopt_stack_override_works_without_markers(tmp_path, capsys) -> Non
 
 
 def test_cli_adopt_with_tests_copies_starter_tests(tmp_path) -> None:
-    make_repo(tmp_path, {"go.mod": "module demo\n"})
+    make_repo(tmp_path, {"index.html": "<!doctype html><html></html>"})
     assert main(["adopt", str(tmp_path), "--with-tests"]) == 0
-    assert (tmp_path / "internal/app/app_test.go").is_file()
+    assert (tmp_path / "tests/site.test.mjs").is_file()
 
 
 def test_cli_adopt_without_flag_skips_tests(tmp_path) -> None:
-    make_repo(tmp_path, {"go.mod": "module demo\n"})
+    make_repo(tmp_path, {"index.html": "<!doctype html><html></html>"})
     assert main(["adopt", str(tmp_path)]) == 0
-    assert not (tmp_path / "internal/app/app_test.go").exists()
+    assert not (tmp_path / "tests/site.test.mjs").exists()
 
 
 def test_cli_adopt_is_idempotent(tmp_path, capsys) -> None:
-    make_repo(tmp_path, {"go.mod": "module demo\n"})
+    make_repo(tmp_path, {"index.html": "<!doctype html><html></html>"})
     assert main(["adopt", str(tmp_path)]) == 0
-    first = (tmp_path / ".github/workflows/ci.yml").read_bytes()
+    first = (tmp_path / ".github/workflows/deploy-pages.yml").read_bytes()
     assert main(["adopt", str(tmp_path)]) == 0
     assert "the infrastructure files are already present" in capsys.readouterr().out
-    assert (tmp_path / ".github/workflows/ci.yml").read_bytes() == first
+    assert (tmp_path / ".github/workflows/deploy-pages.yml").read_bytes() == first
+
+
+def test_cli_adopt_go_repo_asks_for_stack(tmp_path, capsys) -> None:
+    """A Go repo matches both go-cli and go-http: adopt must ask, never guess."""
+    make_repo(tmp_path, {"go.mod": "module demo\n"})
+    assert main(["adopt", str(tmp_path)]) == 2
+    err = capsys.readouterr().err
+    assert "go-cli" in err and "go-http" in err
