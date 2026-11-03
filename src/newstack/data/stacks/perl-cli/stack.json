@@ -1,0 +1,64 @@
+{
+  "name": "perl-cli",
+  "title": "Perl CLI",
+  "language": "perl",
+  "blurb": "Perl 5 CLI on ExtUtils::MakeMaker: pure counting module, Test::More suite, wc-style counter",
+  "requires": [
+    "perl",
+    "make"
+  ],
+  "default_description": "A Perl command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "perl Makefile.PL",
+    "make test",
+    "perl bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "perl Makefile.PL >/dev/null && make test",
+      "tools": [
+        "perl",
+        "make"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "perl bin/{{ npm_name }} --help",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "perl bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "perl bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "Makefile.PL",
+      "contains": "WriteMakefile"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

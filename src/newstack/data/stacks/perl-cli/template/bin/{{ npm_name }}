@@ -1,0 +1,97 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use File::Basename qw(basename);
+use lib "$FindBin::Bin/../lib";
+
+use Textstat;
+use Textstat::Options;
+
+# The only place that owns output and exit codes: 0 success, 1 unreadable
+# input, 2 bad usage.
+my $program = basename($0);
+my $options = Textstat::Options::parse(@ARGV);
+
+if ($options->{status} eq 'help') {
+    print Textstat::Options::usage($program);
+    exit 0;
+}
+
+if ($options->{status} eq 'version') {
+    print Textstat::Options::version(), "\n";
+    exit 0;
+}
+
+if ($options->{status} eq 'error') {
+    print STDERR "error: $options->{error}\n\n";
+    print STDERR Textstat::Options::usage($program);
+    exit 2;
+}
+
+my @files = @{$options->{files}};
+
+if (!@files) {
+    my ($text, $error) = read_source('-');
+    if (!defined $text) {
+        print STDERR "error: cannot read standard input: $error\n";
+        exit 1;
+    }
+    print figures($options->{mode}, Textstat::count_text($text), '');
+    exit 0;
+}
+
+my $total = Textstat::Counts->new();
+my $failed = 0;
+
+for my $path (@files) {
+    my ($text, $error) = read_source($path);
+
+    if (!defined $text) {
+        print STDERR "error: cannot open '$path': $error\n";
+        $failed = 1;
+        next;
+    }
+
+    my $counts = Textstat::count_text($text);
+    $total = $total->plus($counts);
+    print figures($options->{mode}, $counts, $path eq '-' ? '' : $path);
+}
+
+print figures($options->{mode}, $total, 'total') if @files > 1;
+
+exit($failed ? 1 : 0);
+
+sub read_source {
+    my ($path) = @_;
+
+    if ($path eq '-') {
+        binmode STDIN;
+        local $/;
+        my $text = <STDIN>;
+        return (defined $text ? $text : '', undef);
+    }
+
+    open my $handle, '<:raw', $path or return (undef, "$!");
+    local $/;
+    my $text = <$handle>;
+    close $handle;
+
+    return (defined $text ? $text : '', undef);
+}
+
+sub figures {
+    my ($mode, $counts, $label) = @_;
+
+    my @selected;
+    push @selected, $counts->lines if $mode eq 'all' || $mode eq 'lines';
+    push @selected, $counts->words if $mode eq 'all' || $mode eq 'words';
+    push @selected, $counts->bytes if $mode eq 'all' || $mode eq 'bytes';
+
+    my $line = join '', map { sprintf '%8d', $_ } @selected;
+    $line .= " $label" if length $label;
+
+    return "$line\n";
+}

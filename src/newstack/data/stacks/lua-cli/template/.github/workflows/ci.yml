@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Lua 5.4
+        run: sudo apt-get update && sudo apt-get install -y lua5.4
+      - name: Show version
+        run: lua5.4 -v
+      - name: Test
+        run: lua5.4 spec/run.lua
+      - name: Help
+        run: ./bin/{{ npm_name }} --help
+      - name: Usage error exits 2
+        run: ./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2
+      - name: Missing file exits 1
+        run: ./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1

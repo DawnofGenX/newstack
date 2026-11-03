@@ -1,0 +1,104 @@
+#!/usr/bin/env lua5.4
+-- Entry point: the only file that owns argv, stdout/stderr and the exit code.
+-- Counting and parsing live in src/textstat/ so tests can drive them directly.
+
+local script_path = (arg and arg[0]) or "{{ npm_name }}"
+local program = script_path:match("([^/\\]+)$") or "{{ npm_name }}"
+local script_dir = script_path:match("^(.*)[/\\][^/\\]*$") or "."
+
+package.path = script_dir .. "/../src/?.lua;"
+  .. script_dir .. "/../src/?/init.lua;"
+  .. package.path
+
+local textstat = require("textstat")
+
+--- Prints the requested figures right-aligned like `wc`, then the label.
+local function print_counts(counts, mode, label)
+  local fields = {}
+  if mode == "all" or mode == "lines" then
+    fields[#fields + 1] = string.format("%8d", counts.lines)
+  end
+  if mode == "all" or mode == "words" then
+    fields[#fields + 1] = string.format("%8d", counts.words)
+  end
+  if mode == "all" or mode == "bytes" then
+    fields[#fields + 1] = string.format("%8d", counts.bytes)
+  end
+  local line = table.concat(fields)
+  if label ~= "" then
+    line = line .. " " .. label
+  end
+  io.stdout:write(line .. "\n")
+end
+
+--- Reads a whole stream; nil means the read failed (a directory, for example).
+local function read_stream(handle)
+  return handle:read("*a")
+end
+
+--- Turns argv into output and an exit code: 0 success, 1 unreadable file,
+--- 2 bad usage. Nothing here calls os.exit, so `run` stays testable.
+local function run(argv)
+  local options = textstat.parse(argv)
+
+  if options.status == "help" then
+    io.stdout:write(textstat.usage(program))
+    return 0
+  elseif options.status == "version" then
+    io.stdout:write(textstat.version .. "\n")
+    return 0
+  elseif options.status == "usage" then
+    io.stderr:write("error: " .. options.message .. "\n\n")
+    io.stderr:write(textstat.usage(program))
+    return 2
+  end
+
+  if #options.files == 0 then
+    print_counts(textstat.count(read_stream(io.stdin) or ""), options.mode, "")
+    return 0
+  end
+
+  local total = { lines = 0, words = 0, bytes = 0 }
+  local failed = false
+
+  for _, path in ipairs(options.files) do
+    if path == "-" then
+      local counts = textstat.count(read_stream(io.stdin) or "")
+      print_counts(counts, options.mode, "")
+      total = textstat.add(total, counts)
+    else
+      local handle = io.open(path, "rb")
+      if not handle then
+        io.stderr:write("error: cannot open '" .. path .. "'\n")
+        failed = true
+      else
+        local data = read_stream(handle)
+        handle:close()
+        if not data then
+          io.stderr:write("error: cannot read '" .. path .. "'\n")
+          failed = true
+        else
+          local counts = textstat.count(data)
+          print_counts(counts, options.mode, path)
+          total = textstat.add(total, counts)
+        end
+      end
+    end
+  end
+
+  if #options.files > 1 then
+    print_counts(total, options.mode, "total")
+  end
+
+  if failed then
+    return 1
+  end
+  return 0
+end
+
+local argv = {}
+for index = 1, #arg do
+  argv[index] = arg[index]
+end
+
+os.exit(run(argv))
