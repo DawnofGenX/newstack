@@ -73,6 +73,8 @@ jobs:
           - nim-cli
           - perl-cli
           - lua-cli
+          - fsharp-cli
+          - crystal-cli
           - static-site
     steps:
       - uses: actions/checkout@v7
@@ -122,7 +124,7 @@ jobs:
           extensions: mbstring, xml
           coverage: none
       - name: Set up .NET
-        if: matrix.stack == 'csharp-cli'
+        if: contains(fromJSON('["csharp-cli","fsharp-cli"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -158,6 +160,11 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq lua5.4
           lua5.4 -v
+      - name: Install Crystal
+        if: matrix.stack == 'crystal-cli'
+        uses: crystal-lang/install-crystal@v1.9.5
+        with:
+          crystal: "1.11"
       - name: Install newstack
         run: uv sync --group dev
       - name: Generate and verify the stack

@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # ubuntu-latest does not ship Crystal. This is the official Crystal
+      # action: it adds the Crystal apt repository and installs the latest
+      # patch release of the 1.11 series (shard.yml requires >= 1.11.0).
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1.9.5
+        with:
+          crystal: "1.11"
+      - name: Spec
+        run: crystal spec
+      - name: Build
+        run: |
+          mkdir -p bin
+          crystal build --release -o bin/{{ npm_name }} src/textstat.cr

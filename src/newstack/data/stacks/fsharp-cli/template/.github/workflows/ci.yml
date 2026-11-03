@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Restore
+        run: dotnet restore App.fsproj --nologo
+      - name: Build
+        run: dotnet build App.fsproj --nologo --no-restore
+      - name: Test
+        run: dotnet test Tests/Tests.fsproj --nologo
+      - name: CLI smoke
+        run: dotnet run --project App.fsproj --no-build -- --help

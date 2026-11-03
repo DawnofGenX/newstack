@@ -1,0 +1,18 @@
+name: {{ npm_name }}
+version: 0.1.0
+
+authors:
+  - {{ author }} <{{ email }}>
+
+description: |
+  {{ description }}
+
+# The library is pure Crystal stdlib: no `dependencies:` block on purpose, so
+# `crystal spec` and `crystal build` work offline with no `shards install`.
+crystal: ">= 1.11.0"
+
+license: MIT
+
+targets:
+  {{ npm_name }}:
+    main: src/textstat.cr

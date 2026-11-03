@@ -50,6 +50,11 @@ def test_workflow_actions_are_pinned_to_major_versions(tmp_path, name: str) -> N
             assert ACTION_REF_RE.match(ref), f"{workflow.name}: unpinned or odd action ref {ref!r}"
 
 
+# Actions that ship exact tags but no moving major tag: `@v1` resolves to nothing and the
+# job dies before its first step. Verified against `git ls-remote --tags` for each repo.
+ACTIONS_WITHOUT_MOVING_MAJOR = ("astral-sh/setup-uv", "crystal-lang/install-crystal")
+
+
 @pytest.mark.parametrize("name", STACK_NAMES)
 def test_action_refs_are_resolvable_style(tmp_path, name: str) -> None:
     """Moving major tags are fine for actions/*, but setup-uv publishes exact tags only."""
@@ -63,11 +68,12 @@ def test_action_refs_are_resolvable_style(tmp_path, name: str) -> None:
 
     for workflow in tmp_path.glob(".github/workflows/*.y*ml"):
         for ref in USES_RE.findall(workflow.read_text(encoding="utf-8")):
-            if ref.startswith("astral-sh/setup-uv@"):
+            action = ref.split("@", 1)[0]
+            if action in ACTIONS_WITHOUT_MOVING_MAJOR:
                 tag = ref.split("@", 1)[1]
                 assert re.fullmatch(r"v\d+\.\d+\.\d+", tag), (
-                    f"{workflow.name}: setup-uv has no moving major tag, pin the patch "
-                    f"version (got {tag!r})"
+                    f"{workflow.name}: {action} publishes no moving major tag, pin the "
+                    f"patch version (got {tag!r})"
                 )
 
 

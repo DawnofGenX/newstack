@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>{{ npm_name }}.Core</AssemblyName>
+    <RootNamespace>{{ package_name }}</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Counts.fs" />
+    <Compile Include="Options.fs" />
+  </ItemGroup>
+
+</Project>
