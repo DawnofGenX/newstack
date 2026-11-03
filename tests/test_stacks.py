@@ -10,6 +10,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -215,3 +216,34 @@ def test_every_counter_demo_persists_under_one_key() -> None:
             and "newstack:counter" in path.read_text(encoding="utf-8", errors="ignore")
         ]
         assert hits, f"{name} ships a counter that does not persist under the shared key"
+
+
+def test_every_template_file_is_tracked_by_git() -> None:
+    """A template's own .gitignore also applies to the template tree in THIS repo.
+
+    An unanchored rule such as `{{ package_name }}` therefore hides a template
+    directory from git, and the CI checkout - the install path that actually
+    matters - is missing files that exist on the maintainer's disk. That is how
+    nim-cli first shipped without src/<package>/counting.nim.
+    """
+    root = Path(__file__).resolve().parents[1]
+    if not (root / ".git").exists():
+        pytest.skip("not a git checkout")
+    listed = subprocess.run(
+        ["git", "ls-files", "-z"], cwd=root, capture_output=True, text=True, check=False
+    )
+    if listed.returncode != 0:
+        pytest.skip("git ls-files is unavailable")
+    tracked = {item for item in listed.stdout.split("\0") if item}
+    missing = []
+    for stack in load_stacks().values():
+        for path in sorted(stack.template_dir.rglob("*")):
+            if not path.is_file():
+                continue
+            relative = path.relative_to(root).as_posix()
+            if relative not in tracked:
+                missing.append(relative)
+    assert not missing, (
+        "template files ignored by git, so CI checkouts lack them "
+        f"(anchor the offending .gitignore rule): {missing}"
+    )

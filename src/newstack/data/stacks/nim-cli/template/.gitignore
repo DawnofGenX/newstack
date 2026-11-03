@@ -1,3 +1,6 @@
 nimcache/
 tests/test_all
-{{ package_name }}
+# Anchored on purpose: unanchored, this rule also matches src/<package>/, and
+# because this .gitignore ships inside the template it would hide the template's own
+# module directory from the newstack repo. See tests/test_stacks.py.
+/{{ package_name }}
