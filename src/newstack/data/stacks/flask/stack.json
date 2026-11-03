@@ -1,0 +1,18 @@
+{
+  "name": "flask",
+  "title": "Flask app",
+  "language": "python",
+  "blurb": "Flask app factory: JSON routes, pytest fixtures, ruff, CI",
+  "requires": ["uv", "git"],
+  "default_description": "A Flask web application.",
+  "next_steps": ["cd {path}", "uv sync", "uv run flask --app app run --debug"],
+  "verify": [
+    {"name": "install", "cmd": "uv venv -q .venv && uv pip install -q --python .venv/bin/python -e . pytest ruff", "tools": ["uv"], "timeout": 900},
+    {"name": "ruff", "cmd": ".venv/bin/ruff check .", "tools": ["uv"], "timeout": 300},
+    {"name": "pytest", "cmd": ".venv/bin/python -m pytest -q", "tools": ["uv"], "timeout": 300}
+  ],
+  "detect": [{"file": "pyproject.toml", "contains": "flask"}, {"file": "app.py"}],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["tests/test_routes.py"]
+}

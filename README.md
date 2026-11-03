@@ -78,7 +78,9 @@ directory to CI-ready project.
 | `python-cli` | console entry point on argparse, zero runtime deps, tested CLI | `uv` |
 | `fastapi` | typed JSON API, pydantic models, TestClient tests, Dockerfile | `uv` |
 | `django` | Django 6.1 app: config/core split, SQLite, pytest-django, migration drift check | `uv` |
+| `flask` | Flask app factory: JSON routes, pytest fixtures, ruff, CI | `uv` |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm` |
+| `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm` |
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm` |
 | `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm` |
 | `go-cli` | stdlib-only Go CLI: `flag` parsing, table tests, vet/test/build gates | `go` |

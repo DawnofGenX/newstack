@@ -1,0 +1,31 @@
+{
+  "name": "vue-vite-ts",
+  "title": "Vue + Vite + TypeScript",
+  "language": "node",
+  "blurb": "Vue 3 SPA with Vitest + @vue/test-utils, typed build, CI",
+  "requires": ["node", "npm", "git"],
+  "default_description": "A Vue single page application.",
+  "next_steps": ["cd {path}", "npm install", "npm run dev"],
+  "verify": [
+    {"name": "install", "cmd": "npm install --no-audit --no-fund --silent", "tools": ["npm"], "timeout": 900},
+    {"name": "typecheck", "cmd": "npm run typecheck", "tools": ["npm"], "timeout": 300},
+    {"name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 300},
+    {"name": "build", "cmd": "npm run build", "tools": ["npm"], "timeout": 300}
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"vue\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "vite.config.ts"
+  ],
+  "adopt_tests": [
+    "src/components/Counter.test.ts"
+  ]
+}

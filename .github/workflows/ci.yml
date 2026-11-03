@@ -46,8 +46,10 @@ jobs:
           - python-cli
           - fastapi
           - django
+          - flask
           - node-express-ts
           - react-vite-ts
+          - vue-vite-ts
           - svelte-kit-ts
           - go-cli
           - rust-cli

@@ -1,0 +1,17 @@
+"""HTTP routes for {{ title }}."""
+
+from __future__ import annotations
+
+from flask import Blueprint, jsonify
+
+bp = Blueprint("main", __name__)
+
+
+@bp.get("/health")
+def health():
+    return jsonify(status="ok")
+
+
+@bp.get("/items")
+def items():
+    return jsonify([])
