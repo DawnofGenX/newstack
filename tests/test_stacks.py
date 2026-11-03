@@ -150,3 +150,37 @@ def test_no_stack_leaks_a_local_checkout_path() -> None:
                 text = path.read_text(encoding="utf-8", errors="ignore")
                 assert "/home/hermes" not in text, path
                 assert str(shutil.os.getcwd()) not in text, path
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_shipped_ci_matrix_satisfies_requires_python(name: str) -> None:
+    """A shipped workflow must not test a Python the package refuses to install on.
+
+    Copying one stack's workflow into another is the easy way to inherit a matrix that
+    includes versions below the new stack's requires-python floor.
+    """
+    from newstack.registry import get_stack
+
+    stack = get_stack(name)
+    pyproject = stack.template_dir / "pyproject.toml"
+    workflow = stack.template_dir / ".github" / "workflows" / "ci.yml"
+    if not pyproject.is_file() or not workflow.is_file():
+        pytest.skip("not a Python stack")
+
+    spec = re.search(r'requires-python\s*=\s*"([^"]+)"', pyproject.read_text(encoding="utf-8"))
+    matrix = re.search(r"python-version:\s*\[([^\]]+)\]", workflow.read_text(encoding="utf-8"))
+    if not spec or not matrix:
+        pytest.skip("no requires-python or no matrix")
+
+    floor_match = re.search(r">=\s*(\d+)\.(\d+)", spec.group(1))
+    assert floor_match, f"{name}: cannot parse requires-python {spec.group(1)!r}"
+    floor = (int(floor_match.group(1)), int(floor_match.group(2)))
+    versions = [
+        tuple(int(part) for part in item.strip().strip('"').strip("'").split("."))
+        for item in matrix.group(1).split(",")
+    ]
+    too_old = [f"{v[0]}.{v[1]}" for v in versions if v < floor]
+    assert not too_old, (
+        f"{name}: shipped CI tests Python {', '.join(too_old)} but requires-python is "
+        f"{spec.group(1)} — those jobs cannot install the package"
+    )
