@@ -1,0 +1,3 @@
+nimcache/
+tests/test_all
+{{ package_name }}

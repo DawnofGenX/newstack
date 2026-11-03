@@ -1,0 +1,70 @@
+{
+  "name": "julia-cli",
+  "title": "Julia CLI",
+  "language": "julia",
+  "blurb": "Julia 1.13 CLI package: pure counting module, Test stdlib suite, zero dependencies",
+  "requires": [
+    "julia"
+  ],
+  "default_description": "A Julia command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'",
+    "julia --project=. bin/textstat.jl --help",
+    "julia --project=. test/runtests.jl"
+  ],
+  "verify": [
+    {
+      "name": "instantiate",
+      "cmd": "JULIA_PKG_OFFLINE=true julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "julia --project=. test/runtests.jl",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "julia --project=. bin/textstat.jl --help >/dev/null; test $? -eq 0",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "usage-error",
+      "cmd": "julia --project=. bin/textstat.jl --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "missing-file",
+      "cmd": "julia --project=. bin/textstat.jl does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Project.toml",
+      "contains": "julia"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

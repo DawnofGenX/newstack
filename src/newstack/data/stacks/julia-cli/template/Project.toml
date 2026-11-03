@@ -1,0 +1,14 @@
+# The package name must be a Julia identifier, so it is fixed here and the
+# module in src/Textstat.jl keeps the same spelling. Renaming it, and the UUID
+# below, is documented in README.md.
+name = "Textstat"
+uuid = "d36a8a28-d2b8-4622-b65b-476e69fa9790"
+authors = ["{{ author }} <{{ email }}>"]
+version = "0.1.0"
+
+# No dependencies at all: counting, argv parsing and the test suite all use the
+# Julia standard library.
+[deps]
+
+[compat]
+julia = "1.6"

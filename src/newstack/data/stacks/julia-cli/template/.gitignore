@@ -1,0 +1,6 @@
+/Manifest.toml
+/.julia/
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+/coverage/

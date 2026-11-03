@@ -22,6 +22,10 @@ All notable changes to this project are documented here. The format follows
   - `ruby-sinatra`, `java-maven-cli`, `php-composer-cli`, `csharp-cli`,
     `elixir-mix-cli`, `dart-cli` — JSON API on Sinatra, and five CLI stacks spanning
     Maven, Composer, .NET, Mix and pub.
+  - `kotlin-cli`, `zig-cli`, `julia-cli`, `nim-cli` — four more ecosystems with no
+    package manager between them: Kotlin on Maven (Gradle's wrapper jar cannot be
+    templated), Zig with in-source test blocks, Julia on stdlib `Test`, and Nim on
+    `unittest`.
 - **One counter-persistence contract** across the five user-facing JS stacks: state is
   stored under the key `newstack:counter`, clamped to a non-negative integer, and a
   storage failure degrades to memory. Svelte and Next restore in `onMount`/`useEffect`

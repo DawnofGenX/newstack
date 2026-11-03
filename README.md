@@ -101,6 +101,8 @@ directory to CI-ready project.
 | `dart-cli` | Dart 3 CLI: pub package with a pure counting library, package:test suite and zero runtime dependencies | `dart` |
 | `kotlin-cli` | Kotlin CLI on Maven (no Gradle wrapper to ship): pure counting core, JUnit 5 suite, shaded runnable jar | `java`, `mvn` |
 | `zig-cli` | Zig 0.17 CLI: counting module with in-source test blocks, `zig build test`, no runtime | `zig` |
+| `julia-cli` | Julia CLI: pure counting module, `Test` stdlib suite, zero external packages | `julia` |
+| `nim-cli` | Nim CLI: pure counting module, `unittest` suite that also checks exit codes, `nimble build` binary | `nim`, `nimble` |
 | `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a

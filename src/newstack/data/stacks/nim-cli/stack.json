@@ -1,0 +1,75 @@
+{
+  "name": "nim-cli",
+  "title": "Nim CLI",
+  "language": "nim",
+  "blurb": "Nim 1.6+ CLI: a pure counting module, a hand-written option parser, a unittest suite and nimble build/test",
+  "requires": [
+    "nim",
+    "nimble"
+  ],
+  "default_description": "A Nim command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "nimble build",
+    "./{package_name} --help",
+    "nimble test"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "nimble test",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "nimble build",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "./{{ package_name }} --help",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./{{ package_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./{{ package_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "nim.cfg"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}
