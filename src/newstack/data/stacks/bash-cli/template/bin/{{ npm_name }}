@@ -1,0 +1,6 @@
+#!/bin/sh
+# Wrapper so the counter can be run from anywhere: it finds the project root,
+# then hands control to the bash entry point with the real argv.
+set -eu
+root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+exec bash "$root/main.sh" "$@"

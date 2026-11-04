@@ -1,0 +1,62 @@
+{
+  "name": "bash-cli",
+  "title": "Bash CLI",
+  "language": "shell",
+  "blurb": "Bash CLI: byte counting with no external tools, a hand-rolled argv parser, four swappable I/O functions, assertion suite with no framework",
+  "requires": [
+    "bash",
+    "shellcheck"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "bash tests/run_tests.sh",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "lint",
+      "cmd": "shellcheck -x main.sh lib/*.sh bin/* tests/*.sh",
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "bash tests/run_tests.sh",
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage: {{ npm_name }} [OPTION]... [FILE]...'",
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} --bogus >/dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 2",
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.txt >/dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 1",
+      "timeout": 120
+    },
+    {
+      "name": "stdin",
+      "cmd": "set +e; implicit=$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w); a=$?; explicit=$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w -); b=$?; echo \"exit status: $a $b\"; test \"$a\" -eq 0; test \"$b\" -eq 0; test \"$implicit\" = '3'; test \"$explicit\" = '3 -'",
+      "timeout": 120
+    },
+    {
+      "name": "parity",
+      "cmd": "set -eu; mkdir -p .parity; printf 'alpha beta\\ngamma delta\\n' > .parity/p1.txt; printf 'alpha\\nbeta\\ngamma' > .parity/p2.txt; printf 'h\\303\\251llo w\\303\\266rld\\n' > .parity/p3.txt; : > .parity/p4.txt; printf 'a\\tb\\vc\\fd\\r e\\n' > .parity/p5.txt; for sample in .parity/p1.txt .parity/p2.txt .parity/p3.txt .parity/p4.txt .parity/p5.txt; do ours=$(./bin/{{ npm_name }} \"$sample\"); theirs=$(wc -l -w -c \"$sample\"); test \"$ours\" = \"$theirs\"; done; echo 'parity ok'",
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "main.sh"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

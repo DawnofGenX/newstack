@@ -8,6 +8,15 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`bash-cli`**: a word-count CLI written in bash itself — no `wc`, no `awk`, no `od`.
+  `lib/counts.sh` counts newlines by substitution, words by a `read -a` split on the
+  shell's own whitespace set, and bytes by `${#data}`; `lib/io.sh` is the only file that
+  touches the process, and it keeps trailing newlines intact with a sentinel. The runner
+  reproduces `wc`'s padding rule (one figure from one operand is never padded, a pipe
+  widens every column to seven, otherwise the width is the digits of the bytes read) and
+  its labelling rule: a row read from standard input with no operand carries no name,
+  while an explicit `-` does. 94 assertions through a hand-rolled harness, `shellcheck -x`
+  clean, and the same five-fixture `wc` parity step every CLI stack ships.
 - **`hugo-site`**: a Hugo content site rather than a CLI — hand-written `layouts/` and
   partials, no theme and no JavaScript, TOML front matter, a `{{< note >}}` shortcode, and a
   stylesheet that is minified and fingerprinted (with subresource integrity) by Hugo's asset

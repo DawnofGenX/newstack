@@ -1,0 +1,4 @@
+# The library files are sourced into one bash program, so shellcheck cannot see
+# which globals they consume (SC2034/SC2154) or follow the sources at all
+# (SC1091). Everything else stays on.
+disable=SC1091,SC2034,SC2154

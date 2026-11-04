@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends shellcheck
+          shellcheck --version | head -2
+
+      - name: Lint
+        run: shellcheck -x main.sh lib/*.sh bin/* tests/*.sh
+
+      - name: Test
+        run: bash tests/run_tests.sh
+
+      - name: Help
+        run: './bin/{{ npm_name }} --help | grep -qF "Usage: {{ npm_name }} [OPTION]... [FILE]..."'
+
+      - name: Usage errors
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+
+      - name: Read stdin
+        run: |
+          set +e
+          implicit=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w)
+          first=$?
+          explicit=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w -)
+          second=$?
+          echo "exit status: $first $second"
+          test "$first" -eq 0
+          test "$second" -eq 0
+          test "$implicit" = "3"
+          test "$explicit" = "3 -"
+
+      - name: Matches wc on every input
+        run: |
+          set -eu
+          mkdir -p .parity
+          printf 'alpha beta\ngamma delta\n' > .parity/p1.txt
+          printf 'alpha\nbeta\ngamma' > .parity/p2.txt
+          printf 'h\303\251llo w\303\266rld\n' > .parity/p3.txt
+          : > .parity/p4.txt
+          printf 'a\tb\vc\fd\r e\n' > .parity/p5.txt
+          for sample in .parity/p1.txt .parity/p2.txt .parity/p3.txt .parity/p4.txt .parity/p5.txt; do
+            ours=$(./bin/{{ npm_name }} "$sample")
+            theirs=$(wc -l -w -c "$sample")
+            test "$ours" = "$theirs"
+          done
+          echo "parity ok"
