@@ -20,14 +20,16 @@ jobs:
         with:
           node-version: "{{ node_version }}"
 
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: {{ package_manager_install }}
 
       - name: Type check
-        run: npm run typecheck
+        run: {{ package_manager_run }} typecheck
 
       - name: Test
-        run: npm test
+        run: {{ package_manager_test }}
 
       - name: Build
-        run: npm run build
+        run: {{ package_manager_run }} build

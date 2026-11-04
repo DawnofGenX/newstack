@@ -20,11 +20,14 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
-      # No lockfile is shipped with a fresh scaffold, so `cache: npm` and `npm ci`
-      # would both fail here: they require a committed package-lock.json. Run
-      # `npm install` once and commit the lockfile, then you can switch to `npm ci`
-      # and re-add `cache: npm` for reproducible, cached installs.
-      - run: npm install --no-audit --no-fund
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
+      # No lockfile is shipped with a fresh scaffold, so `cache: {{ package_manager }}`
+      # and `{{ package_manager_ci }}` would both fail here: they require a committed
+      # {{ package_manager_lock }}. Run `{{ package_manager_install }}` once and commit
+      # the lockfile, then you can switch to `{{ package_manager_ci }}` and re-add
+      # `cache: {{ package_manager }}` for reproducible, cached installs.
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - run: {{ package_manager_run }} typecheck
+      - run: {{ package_manager_test }}
+      - run: {{ package_manager_run }} build

@@ -21,11 +21,13 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: {{ package_manager_install }}
       - name: Type check
-        run: npm run check
+        run: {{ package_manager_run }} check
       - name: Test
-        run: npm test
+        run: {{ package_manager_test }}
       - name: Build
-        run: npm run build
+        run: {{ package_manager_run }} build

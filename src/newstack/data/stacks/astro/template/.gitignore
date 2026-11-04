@@ -5,4 +5,4 @@ dist/
 coverage/
 *.local
 .DS_Store
-npm-debug.log*
+{{ package_manager_ignore }}

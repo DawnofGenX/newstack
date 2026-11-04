@@ -13,36 +13,36 @@ a content script, a Vite build and Vitest tests over the pure logic.
 
 ## Requirements
 
-- Node.js {{ node_version }} or newer, npm.
+- Node.js {{ node_version }} or newer, {{ package_manager_prereq }}.
 - Chrome (or any Chromium browser) to load the unpacked build.
 
 ## Install
 
 ```sh
-npm install
+{{ package_manager_install }}
 ```
 
 ## Develop
 
 ```sh
-npm run dev
+{{ package_manager_run }} dev
 ```
 
 `vite` rebuilds on save. For a live extension, load `dist/` as an unpacked
-extension (see below) while `npm run dev` is running, then reload the
+extension (see below) while `{{ package_manager_run }} dev` is running, then reload the
 extension after changes.
 
 ## Test
 
 ```sh
-npm test         # vitest run (jsdom)
-npm run typecheck
+{{ package_manager_test }}         # vitest run (jsdom)
+{{ package_manager_run }} typecheck
 ```
 
 ## Build
 
 ```sh
-npm run build
+{{ package_manager_run }} build
 ```
 
 Output lands in `dist/`: `manifest.json`, `background.js`, `content.js` and the
@@ -51,7 +51,7 @@ popup assets.
 ## Pack
 
 ```sh
-npm run pack
+{{ package_manager_run }} pack
 ```
 
 Builds and writes `extension.zip` from the contents of `dist/` (the manifest

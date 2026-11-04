@@ -11,7 +11,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import __version__, licenses, nodeversions, pythonversions, sources
+from . import __version__, licenses, nodeversions, packagemanager, pythonversions, sources
 from .adopt import apply_plan, detect_stacks, plan_adoption
 from .registry import RegistryError, Stack, get_stack, load_catalog
 from .render import TemplateError, generate
@@ -124,14 +124,15 @@ class _SafeDict(dict):
 
 
 def _format_step(step: str, context: dict, path: Path) -> str:
-    return step.format_map(
-        _SafeDict(
-            path=path,
-            project_name=context["project_name"],
-            package_name=context["package_name"],
-            npm_name=context["npm_name"],
-        )
-    )
+    known = {
+        "path": path,
+        "project_name": context["project_name"],
+        "package_name": context["package_name"],
+        "npm_name": context["npm_name"],
+    }
+    # a JavaScript stack's next steps may name the manager it was generated with
+    known.update({key: context[key] for key in packagemanager.KEYS if key in context})
+    return step.format_map(_SafeDict(known))
 
 
 def build_context(stack: Stack, destination: Path, args: argparse.Namespace) -> dict:
@@ -161,7 +162,8 @@ def build_context(stack: Stack, destination: Path, args: argparse.Namespace) -> 
     # only stacks that declare `python`/`node` in their manifest get these keys,
     # so a template that does not use them is unaffected by --python / --node
     context = pythonversions.apply(stack, context, getattr(args, "python", None))
-    return nodeversions.apply(stack, context, getattr(args, "node", None))
+    context = nodeversions.apply(stack, context, getattr(args, "node", None))
+    return packagemanager.apply(stack, context, getattr(args, "package_manager", None))
 
 
 def _count(number: int, word: str = "file") -> str:
@@ -226,6 +228,7 @@ def cmd_new(args: argparse.Namespace) -> int:
         "license": context.get("license"),
         "python": context.get("python_version"),
         "node": context.get("node_version"),
+        "package_manager": context.get("package_manager"),
         "files": result.files,
         "overwritten": result.overwritten,
         "git": None,
@@ -395,9 +398,10 @@ def cmd_update(args: argparse.Namespace) -> int:
         context["description"] = args.description
     if getattr(args, "license", None):
         context["license"] = args.license
-    # keeps the floor the project was generated with unless --python/--node moves it
+    # keeps the version and manager the project was generated with unless a flag moves it
     context = pythonversions.apply(stack, context, getattr(args, "python", None))
     context = nodeversions.apply(stack, context, getattr(args, "node", None))
+    context = packagemanager.apply(stack, context, getattr(args, "package_manager", None))
 
     plan = plan_update(
         stack, root, record=record, context=context, force=args.force, prune=args.prune
@@ -757,6 +761,7 @@ def build_context_for_check(stack: Stack, name: str | None) -> dict:
         email=None,
         license=licenses.DEFAULT,
         node=None,
+        package_manager=None,
     )
     return build_context(stack, Path(args.name), args)
 
@@ -837,6 +842,12 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="MAJOR",
         help="Node major floor for the JavaScript stacks (default: the stack's minimum)",
     )
+    new.add_argument(
+        "--package-manager",
+        dest="package_manager",
+        metavar="NAME",
+        help="package manager for the JavaScript stacks (default: the stack's own)",
+    )
     new.add_argument("--private", action="store_true", help="make the GitHub repo private")
     new.add_argument("--json", action="store_true", help="machine readable output")
     new.set_defaults(handler=cmd_new)
@@ -878,6 +889,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--node",
         metavar="MAJOR",
         help="move the Node major floor recorded for this project",
+    )
+    update.add_argument(
+        "--package-manager",
+        dest="package_manager",
+        metavar="NAME",
+        help="switch this project to another package manager the stack supports",
     )
     update.add_argument(
         "--force", action="store_true", help="overwrite files you edited locally"

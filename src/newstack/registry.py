@@ -81,6 +81,7 @@ class Stack:
     python_versions: tuple[str, ...] = ()
     node_minimum: str | None = None
     node_versions: tuple[str, ...] = ()
+    package_managers: tuple[str, ...] = ()
 
     @property
     def is_python(self) -> bool:
@@ -89,6 +90,10 @@ class Stack:
     @property
     def is_node(self) -> bool:
         return bool(self.node_versions)
+
+    @property
+    def chooses_package_manager(self) -> bool:
+        return bool(self.package_managers)
 
     @property
     def template_dir(self) -> Path:
@@ -159,6 +164,28 @@ def _node_versions(value: object, where: Path) -> tuple[str | None, tuple[str, .
     return _versions_block(value, where, "node", NODE_KEY_RE, "22")
 
 
+#: Package managers a JavaScript template may be proven with, most preferred
+#: first. ``packagemanager`` owns the commands; this is the manifest's vocabulary.
+PACKAGE_MANAGER_NAMES = ("npm", "pnpm", "yarn")
+
+
+def _package_managers(value: object, where: Path) -> tuple[str, ...]:
+    """The ``package_manager`` manifest key: the managers this template supports."""
+    if value is None:
+        return ()
+    if not isinstance(value, list) or not value or not all(isinstance(item, str) for item in value):
+        raise RegistryError(f"{where}: 'package_manager' must be a non-empty list of strings")
+    unknown = [item for item in value if item not in PACKAGE_MANAGER_NAMES]
+    if unknown:
+        raise RegistryError(
+            f"{where}: 'package_manager' has an unknown entry: {', '.join(unknown)} "
+            f"(known: {', '.join(PACKAGE_MANAGER_NAMES)})"
+        )
+    if len(set(value)) != len(value):
+        raise RegistryError(f"{where}: 'package_manager' lists a manager twice")
+    return tuple(value)
+
+
 def load_stack(directory: Path) -> Stack:
     manifest = directory / "stack.json"
     if not manifest.is_file():
@@ -216,6 +243,7 @@ def load_stack(directory: Path) -> Stack:
 
     minimum, versions = _python_versions(data.get("python"), manifest)
     node_minimum, node_versions = _node_versions(data.get("node"), manifest)
+    package_managers = _package_managers(data.get("package_manager"), manifest)
 
     return Stack(
         name=data["name"],
@@ -235,6 +263,7 @@ def load_stack(directory: Path) -> Stack:
         python_versions=versions,
         node_minimum=node_minimum,
         node_versions=node_versions,
+        package_managers=package_managers,
     )
 
 

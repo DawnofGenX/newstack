@@ -61,6 +61,7 @@ newstack new python-lib ~/code/lib --dry-run     # preview, write nothing
 newstack new python-cli ~/code/tool --github     # create the repo and push it too
 newstack new fastapi ~/code/api --python 3.12    # raise a Python stack's floor
 newstack new react-vite-ts ~/web --node 24       # and a JavaScript stack's
+newstack new react-vite-ts ~/web --package-manager pnpm  # npm (default), pnpm, yarn
 newstack stacks outdated            # which installed stacks moved upstream
 newstack stacks update              # re-pull every stack you installed from a repo
 newstack new python-lib ~/code/lib --license apache-2.0   # mit (default), apache-2.0, bsd-3, none
@@ -145,6 +146,43 @@ As with `--python`, the floor can only go up, `newstack update` keeps the one
 your project declares, and `newstack update --node 22` moves it back down only
 if the stack still supports that major.
 
+### Choosing the package manager
+
+The JavaScript stacks declare the managers they have been proven with, and
+`--package-manager` writes that manager into every command the project carries:
+
+```console
+$ newstack new react-vite-ts ~/code/web --package-manager pnpm
+...
+  next:
+    cd /home/you/code/web
+    pnpm install
+    pnpm run dev
+
+$ grep -E "Prepare|run: pnpm" ~/code/web/.github/workflows/ci.yml
+      - name: Prepare pnpm
+        run: npm install -g pnpm@10 && pnpm --version
+      - run: pnpm install
+      - run: pnpm run typecheck
+      - run: pnpm test
+      - run: pnpm run build
+```
+
+One value writes the install, the test, the run and the build lines in the
+workflow and the README, the lockfile the README tells you to commit
+(`pnpm-lock.yaml`), the `cache:` hint for the CI setup step, the `Prepare ...`
+step that installs the manager itself before it is used, and — where the template
+ignores one — the manager's debug log in `.gitignore`. Nothing in the template
+hard-codes `npm` any more, so a project cannot end up half-migrated with an `npm`
+command in a `pnpm` workflow.
+
+Only the managers a stack was proven with are accepted: `--package-manager bun`
+on `react-vite-ts` and any `--package-manager` on a non-JavaScript stack are
+refused before anything is written. The choice is recorded in `.newstack.json`,
+so `newstack update` keeps the manager your project uses, and
+`newstack update --package-manager yarn` switches it later — install, test,
+build, lockfile name and README all move together.
+
 ### Stacks from outside this repository
 
 The stacks that ship in this repository are the ones CI proves. `stacks add`
@@ -214,14 +252,14 @@ $ newstack stacks outdated
 | `fastapi` | typed JSON API, pydantic models, TestClient tests, Dockerfile | `uv` |
 | `django` | Django 6.1 app: config/core split, SQLite, pytest-django, migration drift check | `uv` |
 | `flask` | Flask app factory: JSON routes, pytest fixtures, ruff, CI | `uv` |
-| `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm` |
-| `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm` |
-| `next-app-ts` | Next.js App Router + TS + Tailwind 4, Vitest + Testing Library | `node`, `npm` |
-| `chrome-extension` | MV3 extension: popup + service worker + content script, `npm run pack` → extension.zip | `node`, `npm` |
-| `astro` | Astro + TS content site: typed frontmatter, Vitest unit tests, `astro check` + static build | `node`, `npm` |
+| `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `next-app-ts` | Next.js App Router + TS + Tailwind 4, Vitest + Testing Library | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `chrome-extension` | MV3 extension: popup + service worker + content script, `npm run pack` → extension.zip | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `astro` | Astro + TS content site: typed frontmatter, Vitest unit tests, `astro check` + static build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `data-science` | pandas workspace: testable DataFrame helpers, pytest, sample notebook | `uv` |
-| `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm` |
-| `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm` |
+| `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `go-cli` | stdlib-only Go CLI: `flag` parsing, table tests, vet/test/build gates | `go` |
 | `go-http` | Go HTTP service on `net/http`: JSON routes, `httptest` suite, graceful shutdown | `go` |
 | `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
@@ -258,7 +296,9 @@ $ newstack stacks outdated
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python
-and JavaScript stacks (`--python 3.13`, `--node 24`), a `.gitignore`, and a
+and JavaScript stacks (`--python 3.13`, `--node 24`), the package manager a
+JavaScript stack's commands are written for (`--package-manager pnpm`), a
+`.gitignore`, and a
 `.newstack.json` record that `newstack update` uses to re-apply later template changes.
 
 ## Adopting an existing project
@@ -443,8 +483,10 @@ manifest format, no fork required.
   choice rather than a deleted file.
 - **A version is written once.** `--python` fills `requires-python`, the ruff target, the
   classifiers, the CI matrix and the Docker tag; `--node` fills `engines` and the JS CI
-  matrix. One value per ecosystem, so a project cannot claim support for a version its own
-  CI never runs.
+  matrix; `--package-manager` fills every install/test/run command, the lockfile name and
+  the step that installs the manager itself. One value per decision, so a project cannot
+  claim support for a version its own CI never runs, or carry an `npm` command in a `pnpm`
+  workflow.
 - **Updates are a hash comparison, not a diff dance.** `.newstack.json` records what
   newstack wrote; a file counts as yours only once it stops matching that hash, so
   `update` never has to guess whose change it is looking at.
@@ -454,7 +496,7 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More variable choices beyond the current defaults (package manager).
+- Nothing queued — open an issue with the stack or flag you want next.
 
 ## Licence
 

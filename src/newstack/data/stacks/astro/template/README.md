@@ -12,17 +12,17 @@ its CI runs every major in the same list.
 ## Develop
 
 ```bash
-npm install
-npm run dev      # http://localhost:4321
+{{ package_manager_install }}
+{{ package_manager_run }} dev      # http://localhost:4321
 ```
 
 ## Check
 
 ```bash
-npm run typecheck   # astro check (@astrojs/check + typescript)
-npm test            # vitest run
-npm run build       # static output in dist/
-npm run preview     # serve dist/ locally
+{{ package_manager_run }} typecheck   # astro check (@astrojs/check + typescript)
+{{ package_manager_test }}            # vitest run
+{{ package_manager_run }} build       # static output in dist/
+{{ package_manager_run }} preview     # serve dist/ locally
 ```
 
 ## Layout
@@ -31,7 +31,7 @@ npm run preview     # serve dist/ locally
 - `src/layouts/BaseLayout.astro` — document shell and global styles.
 - `src/lib/content.ts` — plain TypeScript helper, covered by `src/lib/content.test.ts`.
 
-After the first `npm install`, commit `package-lock.json` and switch CI's install step
-to `npm ci` for reproducible installs.
+After the first `{{ package_manager_install }}`, commit `{{ package_manager_lock }}` and switch
+CI's install step to `{{ package_manager_ci }}` for reproducible installs.
 
 Generated with [newstack](https://github.com/DawnofGenX/newstack).

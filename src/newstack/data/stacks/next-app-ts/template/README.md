@@ -7,8 +7,8 @@ A [Next.js](https://nextjs.org) app using the App Router, TypeScript, Tailwind C
 ## Getting started
 
 ```bash
-npm install
-npm run dev
+{{ package_manager_install }}
+{{ package_manager_run }} dev
 ```
 
 Open http://localhost:3000 to view the app.
@@ -17,19 +17,19 @@ Open http://localhost:3000 to view the app.
 
 | Command | Description |
 | --- | --- |
-| `npm run dev` | Start the development server |
-| `npm run build` | Create a production build |
-| `npm run start` | Serve the production build |
-| `npm run lint` | Run ESLint |
-| `npm run typecheck` | Type-check with `tsc --noEmit` |
-| `npm test` | Run the component tests once with Vitest |
+| `{{ package_manager_run }} dev` | Start the development server |
+| `{{ package_manager_run }} build` | Create a production build |
+| `{{ package_manager_run }} start` | Serve the production build |
+| `{{ package_manager_run }} lint` | Run ESLint |
+| `{{ package_manager_run }} typecheck` | Type-check with `tsc --noEmit` |
+| `{{ package_manager_test }}` | Run the component tests once with Vitest |
 
 ## Checks
 
 ```bash
-npm run typecheck
-npm test
-npm run build
+{{ package_manager_run }} typecheck
+{{ package_manager_test }}
+{{ package_manager_run }} build
 ```
 
 ## Layout

@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`--package-manager NAME`** — the JavaScript stacks declare the managers they are proven
+  with (`"package_manager": ["npm", "pnpm", "yarn"]`, npm first) and one value writes every
+  command in the project: the install, test, run and build lines in the generated workflow
+  and the README, the lockfile name the README asks you to commit, the `cache:` hint for the
+  CI setup step, a `Prepare <manager>` step that installs the manager itself, and the
+  manager's debug log in `.gitignore`. A manager the stack was not proven with is refused
+  before anything is written, and `newstack update --package-manager` moves a project to a
+  different one with all of those following.
 - **`--node MAJOR`** — the JavaScript stacks declare the majors they are proven on
   (`"node": {"minimum": "22", "versions": ["22", "24"]}`) and one value writes every place a
   version appears: `engines` in `package.json`, the `node-version` matrix in the generated
@@ -146,6 +154,15 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- **The JavaScript stacks pass their tests under yarn, and install under pnpm.** npm and
+  pnpm install the peer dependencies a package asks for, yarn 1 does not, so `yarn test`
+  failed with `Cannot find module '@testing-library/dom'` (`react-vite-ts`) and with
+  `Cannot find package 'vite'` (`next-app-ts`, `node-express-ts`) — projects that were green
+  on two managers and broken on the third the new flag offers. Those dependencies are now
+  pinned in `devDependencies`, `node-express-ts` allows pnpm to build esbuild
+  (`pnpm.onlyBuiltDependencies`), and the pnpm the projects are proven with is pinned to 10 —
+  the version CI installs — because pnpm 12 reads build approval from `pnpm-workspace.yaml`
+  instead and fails such an install with `ERR_PNPM_IGNORED_BUILDS`.
 - **`scala-cli` no longer fails on a cold-cache Maven Central hiccup.** scala-cli resolves the
   pinned Scala version against Maven Central metadata while its cache is empty, and a transient
   failure there is reported as `Cannot find matching Scala version for '3.3.6'` — a version

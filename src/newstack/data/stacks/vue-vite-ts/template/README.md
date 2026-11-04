@@ -9,13 +9,13 @@ Vue 3 + Vite + TypeScript single page application, scaffolded by
 ## Requirements
 
 - Node.js {{ node_version }} or newer
-- npm 10+
+- {{ package_manager_prereq }}
 
 ## Getting started
 
 ```bash
-npm install
-npm run dev
+{{ package_manager_install }}
+{{ package_manager_run }} dev
 ```
 
 Vite serves the app on <http://localhost:5173> with hot module replacement.
@@ -24,11 +24,11 @@ Vite serves the app on <http://localhost:5173> with hot module replacement.
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Start the Vite dev server with HMR |
-| `npm run typecheck` | Type-check the app with `vue-tsc --noEmit` |
-| `npm test` | Run the Vitest unit tests once |
-| `npm run build` | Type-check and build for production into `dist/` |
-| `npm run preview` | Serve the production build locally |
+| `{{ package_manager_run }} dev` | Start the Vite dev server with HMR |
+| `{{ package_manager_run }} typecheck` | Type-check the app with `vue-tsc --noEmit` |
+| `{{ package_manager_test }}` | Run the Vitest unit tests once |
+| `{{ package_manager_run }} build` | Type-check and build for production into `dist/` |
+| `{{ package_manager_run }} preview` | Serve the production build locally |
 
 ## Project layout
 
@@ -44,16 +44,16 @@ src/
 ## Testing
 
 Tests live next to the code as `*.test.ts` and run in a jsdom environment
-configured in `vite.config.ts`. Run them once with `npm test`, or in watch
+configured in `vite.config.ts`. Run them once with `{{ package_manager_test }}`, or in watch
 mode with `npx vitest`.
 
 ## Continuous integration
 
 `.github/workflows/ci.yml` installs dependencies, type-checks, tests and builds
 on Node.js {{ node_list }} for every push to `main` and every pull request. It uses
-`npm install` (not the lockfile-strict `npm clean-install`) so it works in a
-fresh project with no lockfile committed yet. Commit `package-lock.json` once
-you have generated it to get reproducible CI installs.
+`{{ package_manager_install }}` (not the lockfile-strict `{{ package_manager_ci }}`) so it
+works in a fresh project with no lockfile committed yet. Commit
+`{{ package_manager_lock }}` once you have generated it to get reproducible CI installs.
 
 ## License
 

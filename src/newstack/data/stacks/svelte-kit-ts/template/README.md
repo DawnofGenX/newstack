@@ -8,18 +8,18 @@ runes-based component, unit tests, and static site generation via `@sveltejs/ada
 ## Requirements
 
 - Node.js {{ node_version }} or newer
-- npm 11 or newer
+- {{ package_manager_prereq }}
 
 ## Setup
 
 ```sh
-npm install
+{{ package_manager_install }}
 ```
 
 ## Development
 
 ```sh
-npm run dev
+{{ package_manager_run }} dev
 ```
 
 Then open the printed URL (usually <http://localhost:5173>).
@@ -27,7 +27,7 @@ Then open the printed URL (usually <http://localhost:5173>).
 ## Type checking
 
 ```sh
-npm run check
+{{ package_manager_run }} check
 ```
 
 This runs `svelte-kit sync` followed by `svelte-check` against `tsconfig.json`.
@@ -35,21 +35,21 @@ This runs `svelte-kit sync` followed by `svelte-check` against `tsconfig.json`.
 ## Tests
 
 ```sh
-npm test
+{{ package_manager_test }}
 ```
 
 Component tests use [Vitest](https://vitest.dev) with `jsdom` and
 [`@testing-library/svelte`](https://github.com/testing-library/svelte-testing-library).
-Run them in watch mode with `npm run test:watch`.
+Run them in watch mode with `{{ package_manager_run }} test:watch`.
 
 ## Build
 
 ```sh
-npm run build
-npm run preview
+{{ package_manager_run }} build
+{{ package_manager_run }} preview
 ```
 
-`npm run build` prerenders the app into static HTML in `build/`. Because no server is
+`{{ package_manager_run }} build` prerenders the app into static HTML in `build/`. Because no server is
 required, the whole folder can be served by any static host.
 
 ## Project layout
