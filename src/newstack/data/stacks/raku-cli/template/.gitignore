@@ -1,0 +1,5 @@
+# Raku leaves precompiled modules here when a module is installed with zef.
+.precomp/
+
+# Scratch space for the parity check.
+/.parity/

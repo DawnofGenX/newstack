@@ -106,6 +106,7 @@ jobs:
           - bash-cli
           - cobol-cli
           - guile-cli
+          - raku-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -265,6 +266,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends guile-3.0
           guile --version | head -1
+
+      - name: Install Rakudo
+        if: matrix.stack == 'raku-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends rakudo
+          raku --version
 
       - name: Install GNUCOBOL
         if: matrix.stack == 'cobol-cli'

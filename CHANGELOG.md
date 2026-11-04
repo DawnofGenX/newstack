@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`raku-cli`**: a word-count CLI in Raku. Reading is `Buf`-based, so the
+  counting core works on bytes rather than characters; the runner takes the four
+  side effects as closures, so a formatting slip fails without spawning a
+  process. 82 assertions and a five-fixture diff against `wc`.
 - **`guile-cli`**: a word-count CLI in Scheme. Guile's `read-bytevector` is not
   there and `get-bytevector-all` hands back a bytevector, so the counting core
   works on bytes with `bytevector-u8-ref`; the runner takes a record of four
