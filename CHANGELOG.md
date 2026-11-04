@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`awk-cli`**: a word-count CLI in `gawk` and nothing else. `RS="\0"` makes
+  each file a single record, so `length()` is the byte count and two `gsub`
+  passes give the line and word counts. The runner fills a report and `main.awk`
+  prints it, which lets 69 assertions cover the whole CLI in one process; the
+  `stdin` step proves the one path a suite cannot fake, and every row — label,
+  padding and `total` — matches `wc` byte for byte, including the seven-column
+  pad a pipe gets.
 - **`groovy-cli`**: a word-count CLI in Groovy, no build step and no dependency.
   The counting core walks a `byte[]`, the argv parser is a plain list walk, and
   the runner takes its four side effects as closures so the suite drives the real

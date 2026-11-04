@@ -1,0 +1,14 @@
+#!/bin/sh
+# Byte counting needs the C locale (length() counts bytes there) and RS="\0"
+# (one record per file). The wrapper resolves its own root, so it works from
+# any directory.
+set -eu
+root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+export LC_ALL=C
+exec gawk \
+    -f "$root/lib/counts.awk" \
+    -f "$root/lib/options.awk" \
+    -f "$root/lib/runner.awk" \
+    -f "$root/main.awk" \
+    -v program="{{ npm_name }}" \
+    -- "$@"

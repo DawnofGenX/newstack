@@ -108,6 +108,7 @@ jobs:
           - guile-cli
           - raku-cli
           - groovy-cli
+          - awk-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -274,6 +275,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends rakudo
           raku --version
+
+      - name: Install gawk
+        if: matrix.stack == 'awk-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gawk
+          gawk --version | head -1
 
       - name: Install Groovy
         if: matrix.stack == 'groovy-cli'

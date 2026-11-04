@@ -1,0 +1,47 @@
+{
+  "name": "awk-cli",
+  "title": "awk CLI",
+  "language": "awk",
+  "blurb": "awk CLI on gawk: byte-exact counting with RS=\"\\0\", hand-rolled argv parser, dependency-free harness, the report built before anything is printed",
+  "requires": ["gawk"],
+  "next_steps": [
+    "cd {path}",
+    "./bin/{npm_name} --help",
+    "LC_ALL=C gawk -f lib/counts.awk -f lib/options.awk -f lib/runner.awk -f tests/harness.awk -f tests/run_tests.awk"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "LC_ALL=C gawk -f lib/counts.awk -f lib/options.awk -f lib/runner.awk -f tests/harness.awk -f tests/run_tests.awk",
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage: {{ npm_name }} [OPTION]... [FILE]...'"
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./bin/{{ npm_name }} --bogus >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2"
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e\n./bin/{{ npm_name }} /nonexistent/file.txt >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 1"
+    },
+    {
+      "name": "stdin",
+      "cmd": "test \"$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w)\" = '3' && test \"$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w -)\" = '3 -' && test \"$(printf 'alpha beta\\ngamma delta\\n' | ./bin/{{ npm_name }})\" = '      2       4      23'"
+    },
+    {
+      "name": "parity",
+      "cmd": "mkdir -p .parity\nprintf 'alpha beta\\ngamma delta\\n' > .parity/p1.txt\nprintf 'alpha beta\\ngamma' > .parity/p2.txt\nprintf 'h\\303\\251llo w\\303\\266rld\\n' > .parity/p3.txt\n: > .parity/p4.txt\nprintf 'a\\tb\\vc\\fd\\n' > .parity/p5.txt\nfor file in .parity/p*.txt; do\n  ours=$(./bin/{{ npm_name }} \"$file\" | awk '{print $1, $2, $3}')\n  theirs=$(wc -l -w -c < \"$file\" | awk '{print $1, $2, $3}')\n  echo \"$file ours=[$ours] wc=[$theirs]\"\n  test \"$ours\" = \"$theirs\"\ndone",
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "main.awk"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"]
+}
