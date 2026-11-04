@@ -8,6 +8,15 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`newstack --python 3.12`** — pick the interpreter floor for the Python stacks, and let
+  one value write every line that names a version: `requires-python`, the ruff target, the
+  trove classifiers, the `python-version` matrix in the generated workflow, the
+  `FROM python:` Docker tag and the README's requires line. Each Python stack declares the
+  versions it has been proven on (`python` in `stack.json`); the floor can only move up,
+  and only to one of them, so `--python 3.9` on `python-cli` or `--python 3.10` on `django`
+  is refused before anything is written. Non-Python stacks say the choice does not apply.
+  The floor is recorded in `.newstack.json`, so `update` keeps it and `update --python 3.13`
+  moves it, rewriting every affected file.
 - **`newstack stacks add <git-url>`** — install a stack from any git repository, so a team
   can keep its own starters without forking newstack. `add` clones shallowly, validates
   every stack in the repository (one at the root, one per directory, or under `stacks/`;

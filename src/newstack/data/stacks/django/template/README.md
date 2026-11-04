@@ -7,7 +7,7 @@ storage, pytest-django tests and ruff linting.
 
 ## Requirements
 
-- Python 3.12+
+- Python {{ python_version }}+
 - [uv](https://docs.astral.sh/uv/)
 
 ## Setup
@@ -59,8 +59,8 @@ manage.py          Django management entry point
 
 ## CI
 
-`.github/workflows/ci.yml` runs lint, a migration-drift check and the test suite on Python 3.12
-and 3.13 for every push to `main` and every pull request.
+`.github/workflows/ci.yml` runs lint, a migration-drift check and the test suite on every interpreter in its
+matrix for every push to `main` and every pull request.
 
 ## License
 

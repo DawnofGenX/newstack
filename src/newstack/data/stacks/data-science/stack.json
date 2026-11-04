@@ -7,6 +7,10 @@
     "uv",
     "git"
   ],
+  "python": {
+    "minimum": "3.12",
+    "versions": ["3.12", "3.13"]
+  },
   "default_description": "A pandas data-science workspace.",
   "next_steps": [
     "cd {path}",

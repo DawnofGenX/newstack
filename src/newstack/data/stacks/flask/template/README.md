@@ -8,7 +8,7 @@ sharing one global instance.
 
 ## Requirements
 
-- Python 3.10+
+- Python {{ python_version }}+
 - [uv](https://docs.astral.sh/uv/)
 
 ## Setup

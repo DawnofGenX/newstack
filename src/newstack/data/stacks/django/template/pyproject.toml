@@ -7,7 +7,7 @@ name = "{{ npm_name }}"
 version = "0.1.0"
 description = "{{ description }}"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">={{ python_version }}"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "{{ author }}", email = "{{ email }}" }]
@@ -15,8 +15,7 @@ dependencies = ["django>=6.1"]
 classifiers = [
     "Framework :: Django",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
+{{ python_classifiers }},
 ]
 
 [dependency-groups]
@@ -33,7 +32,7 @@ addopts = "-q"
 
 [tool.ruff]
 line-length = 100
-target-version = "py312"
+target-version = "py{{ python_tag }}"
 # migrations are generated code: their module-level lists trip RUF012
 extend-exclude = ["*/migrations/*"]
 

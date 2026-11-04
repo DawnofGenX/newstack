@@ -4,6 +4,10 @@
   "language": "python",
   "blurb": "Flask app factory: JSON routes, pytest fixtures, ruff, CI",
   "requires": ["uv", "git"],
+  "python": {
+    "minimum": "3.10",
+    "versions": ["3.10", "3.11", "3.12", "3.13"]
+  },
   "default_description": "A Flask web application.",
   "next_steps": ["cd {path}", "uv sync", "uv run flask --app app run --debug"],
   "verify": [

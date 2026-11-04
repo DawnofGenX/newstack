@@ -11,7 +11,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import __version__, licenses, sources
+from . import __version__, licenses, pythonversions, sources
 from .adopt import apply_plan, detect_stacks, plan_adoption
 from .registry import RegistryError, Stack, get_stack, load_catalog
 from .render import TemplateError, generate
@@ -139,7 +139,7 @@ def build_context(stack: Stack, destination: Path, args: argparse.Namespace) -> 
     author = args.author or _git_config("user.name") or "Your Name"
     email = args.email or _git_config("user.email") or "noreply@example.com"
     today = datetime.now(timezone.utc).date()
-    return {
+    context = {
         "project_name": project_name,
         "package_name": _package_name(project_name),
         "npm_name": _npm_name(project_name),
@@ -158,6 +158,9 @@ def build_context(stack: Stack, destination: Path, args: argparse.Namespace) -> 
         # template's own LICENSE.
         "license": getattr(args, "license", None),
     }
+    # only stacks that declare `python` in their manifest get these keys, so a
+    # template that does not use them is unaffected by --python
+    return pythonversions.apply(stack, context, getattr(args, "python", None))
 
 
 def _count(number: int, word: str = "file") -> str:
@@ -220,6 +223,7 @@ def cmd_new(args: argparse.Namespace) -> int:
         "path": str(destination),
         "dry_run": args.dry_run,
         "license": context.get("license"),
+        "python": context.get("python_version"),
         "files": result.files,
         "overwritten": result.overwritten,
         "git": None,
@@ -389,6 +393,8 @@ def cmd_update(args: argparse.Namespace) -> int:
         context["description"] = args.description
     if getattr(args, "license", None):
         context["license"] = args.license
+    # keeps the floor the project was generated with unless --python moves it
+    context = pythonversions.apply(stack, context, getattr(args, "python", None))
 
     plan = plan_update(
         stack, root, record=record, context=context, force=args.force, prune=args.prune
@@ -763,6 +769,11 @@ def build_parser() -> argparse.ArgumentParser:
             + f" (default: {licenses.DEFAULT})"
         ),
     )
+    new.add_argument(
+        "--python",
+        metavar="X.Y",
+        help="interpreter floor for the Python stacks (default: the stack's minimum)",
+    )
     new.add_argument("--private", action="store_true", help="make the GitHub repo private")
     new.add_argument("--json", action="store_true", help="machine readable output")
     new.set_defaults(handler=cmd_new)
@@ -794,6 +805,11 @@ def build_parser() -> argparse.ArgumentParser:
         choices=licenses.CHOICES,
         metavar="NAME",
         help="switch the recorded licence, e.g. --license apache-2.0",
+    )
+    update.add_argument(
+        "--python",
+        metavar="X.Y",
+        help="move the interpreter floor recorded for this project",
     )
     update.add_argument(
         "--force", action="store_true", help="overwrite files you edited locally"

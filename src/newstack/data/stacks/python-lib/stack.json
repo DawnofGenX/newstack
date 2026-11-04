@@ -7,6 +7,10 @@
     "uv",
     "git"
   ],
+  "python": {
+    "minimum": "3.10",
+    "versions": ["3.10", "3.11", "3.12", "3.13"]
+  },
   "default_description": "A Python library.",
   "next_steps": [
     "cd {path}",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -76,6 +77,12 @@ class Stack:
     detect_fallback: bool = False
     adopt: tuple[str, ...] = ()
     adopt_tests: tuple[str, ...] = ()
+    python_minimum: str | None = None
+    python_versions: tuple[str, ...] = ()
+
+    @property
+    def is_python(self) -> bool:
+        return bool(self.python_versions)
 
     @property
     def template_dir(self) -> Path:
@@ -104,6 +111,29 @@ def _as_tuple(value: object, field: str, where: Path) -> tuple[str, ...]:
     if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
         raise RegistryError(f"{where}: '{field}' must be a list of strings")
     return tuple(value)
+
+
+PYTHON_KEY_RE = re.compile(r"^3\.(?:[89]|1[0-9])$")
+
+
+def _python_versions(value: object, where: Path) -> tuple[str | None, tuple[str, ...]]:
+    """The ``python`` manifest key: the interpreter floor and the proven versions."""
+    if value is None:
+        return None, ()
+    if not isinstance(value, dict):
+        raise RegistryError(f"{where}: 'python' must be an object with 'minimum'/'versions'")
+    minimum = value.get("minimum")
+    if not isinstance(minimum, str) or not PYTHON_KEY_RE.match(minimum):
+        raise RegistryError(f"{where}: 'python.minimum' must look like '3.12'")
+    raw = value.get("versions", [minimum])
+    if not isinstance(raw, list) or not raw or not all(isinstance(item, str) for item in raw):
+        raise RegistryError(f"{where}: 'python.versions' must be a non-empty list of strings")
+    bad = [item for item in raw if not PYTHON_KEY_RE.match(item)]
+    if bad:
+        raise RegistryError(f"{where}: 'python.versions' has a bad entry: {', '.join(bad)}")
+    if minimum not in raw:
+        raise RegistryError(f"{where}: 'python.minimum' {minimum} is not in 'python.versions'")
+    return minimum, tuple(raw)
 
 
 def load_stack(directory: Path) -> Stack:
@@ -161,6 +191,8 @@ def load_stack(directory: Path) -> Stack:
     if not isinstance(fallback, bool):
         raise RegistryError(f"{manifest}: 'detect_fallback' must be a boolean")
 
+    minimum, versions = _python_versions(data.get("python"), manifest)
+
     return Stack(
         name=data["name"],
         title=data["title"],
@@ -175,6 +207,8 @@ def load_stack(directory: Path) -> Stack:
         detect_fallback=fallback,
         adopt=_as_tuple(data.get("adopt"), "adopt", manifest),
         adopt_tests=_as_tuple(data.get("adopt_tests"), "adopt_tests", manifest),
+        python_minimum=minimum,
+        python_versions=versions,
     )
 
 

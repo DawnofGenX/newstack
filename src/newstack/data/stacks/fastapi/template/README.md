@@ -6,6 +6,8 @@ A small typed JSON API: `GET /health`, `GET /items`, `POST /items`, `GET /items/
 
 ## Run
 
+Requires Python {{ python_version }} or newer.
+
 ```bash
 uv sync
 uv run uvicorn {{ package_name }}.main:app --reload

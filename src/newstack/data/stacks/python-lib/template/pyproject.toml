@@ -7,16 +7,13 @@ name = "{{ npm_name }}"
 version = "0.1.0"
 description = "{{ description }}"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">={{ python_version }}"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "{{ author }}", email = "{{ email }}" }]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
+{{ python_classifiers }},
 ]
 
 [dependency-groups]
@@ -27,7 +24,7 @@ packages = ["src/{{ package_name }}"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py{{ python_tag }}"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

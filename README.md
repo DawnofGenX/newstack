@@ -59,6 +59,7 @@ newstack new react-vite-ts ~/code/app
 newstack new fastapi ~/code/api -d "Billing service" --author "Your Name"
 newstack new python-lib ~/code/lib --dry-run     # preview, write nothing
 newstack new python-cli ~/code/tool --github     # create the repo and push it too
+newstack new fastapi ~/code/api --python 3.12    # raise a Python stack's floor
 newstack new python-lib ~/code/lib --license apache-2.0   # mit (default), apache-2.0, bsd-3, none
 newstack adopt ~/code/old-project --dry-run    # retrofit CI/lint onto existing code
 newstack update ~/code/app --dry-run   # re-apply template changes, keep your edits
@@ -92,6 +93,31 @@ template's own `LICENSE` is never trusted over it. The choice is stored in
 `.newstack.json`, so `newstack update` keeps writing the licence you picked;
 `newstack update --license bsd-3` switches it later. `newstack adopt` never
 touches `LICENSE`: retrofitting CI onto existing code must not relicence it.
+
+### Choosing the interpreter
+
+The Python stacks declare which interpreters they have been proven on, and
+`--python` picks a floor from that list:
+
+```console
+$ newstack new fastapi ~/code/api --python 3.12
+$ grep -E 'requires-python|target-version' ~/code/api/pyproject.toml
+requires-python = ">=3.12"
+target-version = "py312"
+```
+
+One value writes every line that names a version: `requires-python`, the ruff
+target, the trove classifiers, the `python-version` matrix in the generated
+workflow, the `FROM python:` tag in the Dockerfile, and the README's "requires"
+line. That is the point — the versions CI runs and the version the package
+promises cannot drift apart, because nothing in the template hard-codes them.
+The floor can only go **up**, and only to an interpreter the stack was proven
+on: `--python 3.9` on `python-cli` and `--python 3.10` on `django` (which needs
+3.12) are both refused before anything is written. Stacks that are not Python
+say so rather than silently ignoring the flag. The choice is recorded in
+`.newstack.json`, so `newstack update` keeps the floor your project declares;
+`newstack update --python 3.13` moves it later, and every affected file
+follows.
 
 ### Stacks from outside this repository
 
@@ -174,7 +200,8 @@ shows what came from where. Installed stacks live in `$NEWSTACK_HOME/stacks`
 | `swift-cli` | Swift 6 CLI on SwiftPM: pure counting core, hand-rolled argv parser, XCTest suites, I/O behind a struct of closures | `swift` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
-README, a licence (`--license mit|apache-2.0|bsd-3|none`), a `.gitignore`, and a
+README, a licence (`--license mit|apache-2.0|bsd-3|none`), an interpreter floor for the
+Python stacks (`--python 3.13`), a `.gitignore`, and a
 `.newstack.json` record that `newstack update` uses to re-apply later template changes.
 
 ## Adopting an existing project
@@ -357,6 +384,9 @@ manifest format, no fork required.
 - **A licence is data, not a template detail.** One copy of each licence text lives in
   `data/licenses/`, so 46 templates cannot drift apart and `--license none` is a real
   choice rather than a deleted file.
+- **A version is written once.** `--python` fills `requires-python`, the ruff target, the
+  classifiers, the CI matrix and the Docker tag from one value, so a project cannot claim
+  support for a version its own CI never runs.
 - **Updates are a hash comparison, not a diff dance.** `.newstack.json` records what
   newstack wrote; a file counts as yours only once it stops matching that hash, so
   `update` never has to guess whose change it is looking at.
@@ -366,7 +396,7 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More variable choices beyond the current defaults (Python version, package manager).
+- More variable choices beyond the current defaults (package manager, Node version).
 - `newstack stacks update` to re-pull an installed stack and merge it into the projects
   generated from it, the way `newstack update` does for shipped ones.
 

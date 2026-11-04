@@ -226,7 +226,9 @@ def test_shipped_ci_matrix_satisfies_requires_python(name: str) -> None:
     Copying one stack's workflow into another is the easy way to inherit a matrix that
     includes versions below the new stack's requires-python floor.
     """
+    from newstack.cli import build_context_for_check
     from newstack.registry import get_stack
+    from newstack.render import render_string
 
     stack = get_stack(name)
     pyproject = stack.template_dir / "pyproject.toml"
@@ -234,8 +236,16 @@ def test_shipped_ci_matrix_satisfies_requires_python(name: str) -> None:
     if not pyproject.is_file() or not workflow.is_file():
         pytest.skip("not a Python stack")
 
-    spec = re.search(r'requires-python\s*=\s*"([^"]+)"', pyproject.read_text(encoding="utf-8"))
-    matrix = re.search(r"python-version:\s*\[([^\]]+)\]", workflow.read_text(encoding="utf-8"))
+    # compare what the stack actually generates, so a --python placeholder counts
+    context = build_context_for_check(stack, "check-app")
+    spec = re.search(
+        r'requires-python\s*=\s*"([^"]+)"',
+        render_string(pyproject.read_text(encoding="utf-8"), context),
+    )
+    matrix = re.search(
+        r"python-version:\s*\[([^\]]+)\]",
+        render_string(workflow.read_text(encoding="utf-8"), context),
+    )
     if not spec or not matrix:
         pytest.skip("no requires-python or no matrix")
 
