@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Restore
+        run: dotnet restore --nologo
+      - name: Build
+        run: dotnet build -c Release --nologo --no-restore
+      - name: Test
+        run: dotnet test -c Release --nologo --no-build
+      - name: Help exits 0
+        run: |
+          set +e
+          dotnet bin/Release/net8.0/{{ npm_name }}.dll --help >/dev/null
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 0
+      - name: Usage error exits 2
+        run: |
+          set +e
+          dotnet bin/Release/net8.0/{{ npm_name }}.dll --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: Missing file exits 1
+        run: |
+          set +e
+          dotnet bin/Release/net8.0/{{ npm_name }}.dll does-not-exist.txt >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1
+      - name: wc parity
+        run: |
+          set +e
+          printf 'one two\nthree\n' > sample.txt
+          out=$(dotnet bin/Release/net8.0/{{ npm_name }}.dll sample.txt)
+          echo "$out"
+          test "$out" = "       2       3      14 sample.txt"

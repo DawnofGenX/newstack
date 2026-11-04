@@ -70,6 +70,20 @@ All notable changes to this project are documented here. The format follows
 - **Detect rules accept a glob** — a stack marker may be a pattern, so `haskell-cli` can
   be detected by `*.cabal` even though the file is named after the project. Literal
   markers behave exactly as before.
+- **`dotnet-cli` stack** — a .NET 8 C# CLI laid out the way a .NET solution actually is:
+  a `<name>.sln` with the app project and a separate xUnit project under `tests/`,
+  a pure `TextStat` counter that never touches I/O, a hand-written `Options.Parse` that
+  returns `{figures, files, status}` instead of throwing, and a `Cli.Run(args, out, err)`
+  that *returns* the 0/1/2 exit code so tests assert the contract without spawning a
+  process. `-l -w -c` combine like real `wc`, `--` ends flag parsing, and several files
+  get a `total` row. Verified against `wc -l -w -c`.
+- **`spring-boot` stack** — a Java 21 Spring Boot 3 web service rather than a console
+  tool: `StatsService` is pure counting, `StatsController` exposes `GET /stats?text=…`
+  (400 when the parameter is missing) and `GET /`, and the JUnit 5 suite covers the
+  service directly plus the controller through `MockMvc` — 5 tests, no running server
+  needed. A Maven wrapper is included, the jar is `target/<name>.jar`, and the shipped
+  workflow runs `mvn -B -ntp verify` plus a live endpoint smoke test on a port the app is
+  told to use, so a scaffolded service proves its own HTTP surface in CI.
 
 ### Fixed
 

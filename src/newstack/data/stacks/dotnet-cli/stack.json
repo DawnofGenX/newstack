@@ -1,0 +1,76 @@
+{
+  "name": "dotnet-cli",
+  "title": ".NET CLI",
+  "language": "csharp",
+  "blurb": ".NET 8 C# CLI: pure counting core, hand-written argv parser, xUnit suite, exit codes as a contract",
+  "requires": [
+    "dotnet"
+  ],
+  "default_description": "A .NET command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "dotnet test --nologo",
+    "dotnet run -- --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "dotnet test --nologo",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "dotnet bin/Debug/net8.0/{{ npm_name }}.dll --help >/dev/null",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "dotnet bin/Debug/net8.0/{{ npm_name }}.dll --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "dotnet bin/Debug/net8.0/{{ npm_name }}.dll does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "word-count",
+      "cmd": "printf 'one two\\nthree\\n' > sample.txt && dotnet bin/Debug/net8.0/{{ npm_name }}.dll sample.txt | grep -Eq '^ *2 +3 +14 +sample\\.txt$'",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "parity",
+      "cmd": "printf 'alpha beta\\ngamma delta\\n' > .p1.txt && printf 'no trailing newline' > .p2.txt && printf 'h\\303\\251llo w\\303\\266rld\\n' > .p3.txt && : > .p4.txt && for f in .p1.txt .p2.txt .p3.txt .p4.txt; do ours=$(dotnet bin/Debug/net8.0/{{ npm_name }}.dll -l -w -c \"$f\" | awk '{print $1, $2, $3}'); theirs=$(wc -l -w -c \"$f\" | awk '{print $1, $2, $3}'); if [ \"$ours\" != \"$theirs\" ]; then echo \"MISMATCH $f: ours=[$ours] theirs=[$theirs]\"; exit 1; fi; done && rm -f .p1.txt .p2.txt .p3.txt .p4.txt && echo \"parity ok\"",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "*.csproj"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

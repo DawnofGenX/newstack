@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Verify
+        run: mvn -B -ntp verify
+      - name: Endpoint smoke test
+        run: |
+          mvn -q spring-boot:run -Dspring-boot.run.arguments=--server.port=18080 > /tmp/springboot.log 2>&1 &
+          RUN_PID=$!
+          up=0
+          for i in $(seq 1 90); do
+            if curl -s -o /dev/null http://localhost:18080/ 2>/dev/null; then up=1; break; fi
+            sleep 1
+          done
+          if [ "$up" -ne 1 ]; then
+            echo "app did not come up" >&2
+            cat /tmp/springboot.log >&2
+            kill $RUN_PID 2>/dev/null || true
+            exit 1
+          fi
+          set +e
+          stats=$(curl -s "http://localhost:18080/stats?text=hello%20world")
+          status=$?
+          set -e
+          test "$status" -eq 0
+          echo "stats: $stats"
+          echo "$stats" | grep -q lines
+          echo "$stats" | grep -q words
+          echo "$stats" | grep -q bytes
+          kill $RUN_PID 2>/dev/null || true
+          wait $RUN_PID 2>/dev/null || true

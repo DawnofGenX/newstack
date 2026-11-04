@@ -1,0 +1,76 @@
+{
+  "name": "spring-boot",
+  "title": "Spring Boot Web Service",
+  "language": "java",
+  "blurb": "Java 21 Spring Boot 3 web service on Maven: a wc-style /stats endpoint, a pure service, and a JUnit 5 + MockMvc suite",
+  "requires": [
+    "java",
+    "mvn"
+  ],
+  "default_description": "A Spring Boot web service.",
+  "next_steps": [
+    "cd {path}",
+    "mvn -B -ntp package",
+    "java -jar target/{npm_name}.jar"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "mvn -B -ntp test",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "service-test",
+      "cmd": "mvn -B -ntp -Dtest=StatsServiceTest test",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "controller-test",
+      "cmd": "mvn -B -ntp -Dtest=StatsControllerTest test",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "package",
+      "cmd": "mvn -B -ntp package -DskipTests",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "endpoint",
+      "cmd": "mvn -q spring-boot:run -Dspring-boot.run.arguments=--server.port=18080 > /tmp/springboot-run.log 2>&1 & RUN_PID=$!; up=0; for i in $(seq 1 90); do if curl -s -o /dev/null http://localhost:18080/ 2>/dev/null; then up=1; break; fi; sleep 1; done; if [ \"$up\" -ne 1 ]; then echo 'app did not come up' >&2; cat /tmp/springboot-run.log >&2; kill $RUN_PID 2>/dev/null; exit 1; fi; stats=$(curl -s 'http://localhost:18080/stats?text=hello%20world'); echo \"stats: $stats\"; ok=1; echo \"$stats\" | grep -q lines || ok=0; echo \"$stats\" | grep -q words || ok=0; echo \"$stats\" | grep -q bytes || ok=0; code=$(curl -s -o /dev/null -w '%{http_code}' 'http://localhost:18080/stats'); echo \"missing-text status: $code\"; [ \"$code\" = \"400\" ] || ok=0; kill $RUN_PID 2>/dev/null; wait $RUN_PID 2>/dev/null; [ \"$ok\" -eq 1 ]",
+      "tools": [
+        "mvn",
+        "java",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "pom.xml",
+      "contains": "spring-boot-starter-parent"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

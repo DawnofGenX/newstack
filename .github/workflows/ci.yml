@@ -63,9 +63,11 @@ jobs:
           - terraform-module
           - ruby-sinatra
           - java-maven-cli
+          - spring-boot
           - php-composer-cli
           - symfony-app
           - csharp-cli
+          - dotnet-cli
           - elixir-mix-cli
           - dart-cli
           - kotlin-cli
@@ -118,7 +120,7 @@ jobs:
           ruby-version: "3.2"
           bundler-cache: true
       - name: Set up Java
-        if: contains(fromJSON('["java-maven-cli","kotlin-cli"]'), matrix.stack)
+        if: contains(fromJSON('["java-maven-cli","kotlin-cli","spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -159,7 +161,7 @@ jobs:
           extensions: ctype, mbstring, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["csharp-cli","fsharp-cli"]'), matrix.stack)
+        if: contains(fromJSON('["csharp-cli","fsharp-cli","dotnet-cli"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"

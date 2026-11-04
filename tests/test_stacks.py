@@ -74,6 +74,40 @@ def test_workflow_exit_code_assertions_survive_bash_e(tmp_path, name: str) -> No
             )
 
 
+# `dotnet test --no-build` reuses the last build's configuration, and the default is Debug.
+# A workflow that builds Release and then tests with `--no-build` alone asks for a Debug test
+# assembly that was never produced: "The argument .../tests/bin/Debug/net8.0/*.Tests.dll is
+# invalid", step exit 1 — while `newstack check` (plain `dotnet test`) stays green.
+DOTNET_NO_BUILD_RE = re.compile(r"dotnet test[^\n]*--no-build")
+DOTNET_BUILD_CONFIG_RE = re.compile(r"dotnet build[^\n]*?-c\s+(?P<config>[A-Za-z]+)")
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_dotnet_no_build_steps_name_the_configuration_they_reuse(tmp_path, name: str) -> None:
+    from newstack.cli import build_context_for_check
+    from newstack.registry import get_stack
+    from newstack.render import generate
+
+    stack = get_stack(name)
+    context = build_context_for_check(stack, "sample-app")
+    generate(stack.template_dir, tmp_path, context)
+
+    for workflow in tmp_path.glob(".github/workflows/*.y*ml"):
+        text = workflow.read_text(encoding="utf-8")
+        configs = [m.group("config") for m in DOTNET_BUILD_CONFIG_RE.finditer(text)]
+        if not configs or configs[-1].lower() == "debug":
+            continue  # nothing was built in a configuration other than the default
+        config = configs[-1]
+        for lineno, line in enumerate(text.splitlines(), 1):
+            if not DOTNET_NO_BUILD_RE.search(line):
+                continue
+            assert f"-c {config}" in line, (
+                f"{name}/{workflow.name}:{lineno}: the workflow builds {config} but this "
+                f"step tests with `--no-build` and no `-c {config}`, so it looks for the "
+                f"Debug assembly: {line.strip()!r}"
+            )
+
+
 # Actions that ship exact tags but no moving major tag: `@v1` resolves to nothing and the
 # job dies before its first step. Verified against `git ls-remote --tags` for each repo.
 ACTIONS_WITHOUT_MOVING_MAJOR = ("astral-sh/setup-uv", "crystal-lang/install-crystal")
