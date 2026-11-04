@@ -8,6 +8,17 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`prolog-cli`**: a `wc`-style counter in SWI-Prolog with no dependencies outside the
+  standard library — counting works on a stream, arguments are parsed by hand, output goes
+  through two writer closures so the whole contract is testable, and a four-predicate
+  harness runs 58 assertions. The shipped workflow checks the suite, the exit codes, stdin
+  and byte-for-byte parity with `wc` on five fixtures.
+- **`nest-api`**: a NestJS 12 service — a feature module with a controller, a service and a
+  pipe that rejects a missing `text` with 400, six unit tests plus four end-to-end tests
+  over supertest, and `GET /stats?text=...` returning `{lines, words, bytes}`. NestJS 12
+  ships no CommonJS build, so the project is ESM (`"type": "module"`, `.js` import
+  suffixes) and `jest.config.js` strips that suffix for ts-jest. The five verify steps
+  install, typecheck, test, build and then serve the app and query it live.
 - **`octave-cli`**: a wc-style CLI in plain Octave — the counting core, the argument
   parser and the runner live in a `+textstat` package directory, the runner takes its
   environment as a struct of function handles, and a 58-check suite needs no

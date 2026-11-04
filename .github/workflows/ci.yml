@@ -49,6 +49,7 @@ jobs:
           - flask
           - data-science
           - node-express-ts
+          - nest-api
           - react-vite-ts
           - vue-vite-ts
           - next-app-ts
@@ -98,6 +99,7 @@ jobs:
           - fortran-cli
           - ada-cli
           - octave-cli
+          - prolog-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -236,6 +238,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends gnat make
           gnatmake --version | head -1
+
+      - name: Install SWI-Prolog
+        if: matrix.stack == 'prolog-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends swi-prolog-nox
+          swipl --version
 
       - name: Install Octave
         if: matrix.stack == 'octave-cli'

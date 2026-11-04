@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      # No lockfile is shipped with a fresh scaffold, so a frozen install and the
+      # `cache:` option would both fail: they need a committed lockfile. Run the
+      # install once and commit {{ package_manager_lock }}, then switch to
+      # `{{ package_manager_ci }}` and add `cache: {{ package_manager }}`.
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - run: {{ package_manager_run }} typecheck
+      - run: {{ package_manager_test }}
+      - run: {{ package_manager_run }} build
+      - name: Serve and query
+        run: |
+          set -eu
+          PORT=18084 node dist/main.js > server.log 2>&1 &
+          server=$!
+          trap 'kill $server 2>/dev/null || true' EXIT
+          ready=0
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:18084/ >/dev/null 2>&1; then ready=1; break; fi
+            sleep 1
+          done
+          echo "ready: $ready"
+          test "$ready" -eq 1
+          body=$(curl -fsS 'http://127.0.0.1:18084/stats?text=alpha%20beta%0Agamma%0A')
+          echo "body: $body"
+          test "$body" = '{"lines":2,"words":3,"bytes":17}'
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18084/stats)
+          echo "missing text status: $code"
+          test "$code" = "400"

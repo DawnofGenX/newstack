@@ -1,0 +1,87 @@
+{
+  "name": "nest-api",
+  "title": "NestJS API",
+  "language": "node",
+  "blurb": "NestJS 12 service: module/controller/service wiring, a validating pipe, supertest end-to-end tests, ESM throughout",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A NestJS API.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_run} start"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "endpoint",
+      "cmd": "set +e; PORT=18084 node dist/main.js > server.log 2>&1 & server=$!; ready=0; for attempt in $(seq 1 60); do if curl -fsS http://127.0.0.1:18084/ >/dev/null 2>&1; then ready=1; break; fi; sleep 1; done; body=$(curl -fsS 'http://127.0.0.1:18084/stats?text=alpha%20beta%0Agamma%0A'); code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18084/stats); kill $server 2>/dev/null; wait $server 2>/dev/null; test \"$ready\" -eq 1 && test \"$body\" = '{\"lines\":2,\"words\":3,\"bytes\":17}' && test \"$code\" = 400",
+      "tools": [
+        "npm",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "@nestjs/core"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json"
+  ],
+  "adopt_tests": [
+    "test/stats.service.spec.ts"
+  ]
+}

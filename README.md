@@ -259,6 +259,7 @@ $ newstack stacks outdated
 | `astro` | Astro + TS content site: typed frontmatter, Vitest unit tests, `astro check` + static build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `data-science` | pandas workspace: testable DataFrame helpers, pytest, sample notebook | `uv` |
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `nest-api` | NestJS 12 service: module/controller/service wiring, a validating pipe, supertest end-to-end tests, ESM throughout | `node`, `npm`/\\`pnpm\\`/\\`yarn` |
 | `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `go-cli` | stdlib-only Go CLI: `flag` parsing, table tests, vet/test/build gates | `go` |
 | `go-http` | Go HTTP service on `net/http`: JSON routes, `httptest` suite, graceful shutdown | `go` |
@@ -303,6 +304,7 @@ $ newstack stacks outdated
 | `fortran-cli` | Fortran CLI on `gfortran` and `make`: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, output units injected | `gfortran`, `make` |
 | `ada-cli` | Ada CLI on GNAT: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, output through two subprogram parameters | `gnatmake`, `make` |
 | `octave-cli` | Octave CLI on plain `octave`: counting core in a `+textstat` package, hand-rolled argv parser, dependency-free suite, environment injected as function handles | `octave` |
+| `prolog-cli` | SWI-Prolog CLI: byte-exact counting over a stream, hand-rolled argv parser, a four-predicate test harness, output behind two writer closures | `swipl` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python

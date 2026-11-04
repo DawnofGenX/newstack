@@ -1,0 +1,74 @@
+{
+  "name": "prolog-cli",
+  "title": "Prolog CLI",
+  "language": "prolog",
+  "blurb": "SWI-Prolog CLI: byte-exact counting core, hand-rolled argv parser, a four-predicate test harness, output behind two writer closures",
+  "requires": [
+    "swipl"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "swipl -q -f tests/run_tests.pl",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "swipl -q -f tests/run_tests.pl",
+      "timeout": 600,
+      "tools": [
+        "swipl"
+      ]
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q 'Usage: {{ npm_name }}'",
+      "timeout": 120,
+      "tools": [
+        "swipl"
+      ]
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} --bogus > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 2",
+      "timeout": 120,
+      "tools": [
+        "swipl"
+      ]
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.txt > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 1",
+      "timeout": 120,
+      "tools": [
+        "swipl"
+      ]
+    },
+    {
+      "name": "stdin",
+      "cmd": "test \"$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w)\" = '3 -'",
+      "timeout": 120,
+      "tools": [
+        "swipl"
+      ]
+    },
+    {
+      "name": "parity",
+      "cmd": "mkdir -p .parity && printf 'alpha beta\\ngamma delta\\n' > .parity/p1.txt && printf 'alpha beta\\ngamma delta' > .parity/p2.txt && printf 'h\u00e9llo w\u00f6rld\\n' > .parity/p3.txt && : > .parity/p4.txt && printf 'a\\tb\\vc\\fd\\n' > .parity/p5.txt && for f in .parity/p*.txt; do ours=$(./bin/{{ npm_name }} \"$f\" | awk '{print $1, $2, $3}'); theirs=$(wc -l -w -c < \"$f\" | awk '{print $1, $2, $3}'); test \"$ours\" = \"$theirs\" || { echo \"mismatch on $f: $ours vs $theirs\"; exit 1; }; done; echo 'every fixture matches wc'",
+      "timeout": 120,
+      "tools": [
+        "swipl"
+      ]
+    }
+  ],
+  "detect": [
+    {
+      "file": "*.pl"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}
