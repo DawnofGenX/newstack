@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`erlang-cli` stack** — an Erlang project on plain OTP and `make`, no rebar and no hex packages.
+  Counting works on binaries so `wc` parity holds for UTF-8 and control characters, the argv parser
+  is hand-written, and the runner takes a map of four funs (`read_file`, `read_stdin`, `out`, `err`)
+  so 42 eunit tests run without touching a file — while the shipped `stdin` check still pipes real
+  text through the real binary, because a fake boundary cannot see a broken stdin path. The wrapper
+  builds on first use. `Makefile` containing `erlc` is the detection marker.
 - **`tcl-cli` stack** — a Tcl project on plain `tclsh`, no package manager and no build step. The
   counting core works on byte strings (`binary scan cu*`) so `wc` parity holds for UTF-8 and control
   characters, the argv parser is hand-written, and the runner takes a dictionary of `readFile`,

@@ -1,0 +1,8 @@
+#!/bin/sh
+# Thin wrapper: build once, then hand the arguments to the BEAM.
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if [ ! -f "$root/ebin/textstat_main.beam" ]; then
+  make -s -C "$root" all >&2
+fi
+exec erl -noshell -pa "$root/ebin" -eval 'textstat_main:run()' -extra "$@"
