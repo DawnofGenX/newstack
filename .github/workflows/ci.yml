@@ -153,6 +153,14 @@ jobs:
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: "4.14.1"
+          dune-cache: true
+      # setup-ocaml leaves dune off PATH for later steps, and `newstack check`
+      # needs `dune` resolvable to build the generated project.
+      - name: Put dune on PATH
+        if: matrix.stack == 'ocaml-cli'
+        run: |
+          opam install --yes dune
+          echo "$(opam var bin)" >> "$GITHUB_PATH"
       - name: Set up Julia
         if: matrix.stack == 'julia-cli'
         uses: julia-actions/setup-julia@v2
