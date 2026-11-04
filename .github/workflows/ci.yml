@@ -111,6 +111,7 @@ jobs:
           - awk-cli
           - forth-cli
           - sqlite-sql
+          - powershell-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -298,6 +299,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends sqlite3 make
           sqlite3 --version
+
+      - name: Set up PowerShell
+        if: matrix.stack == 'powershell-cli'
+        run: |
+          if ! command -v pwsh >/dev/null 2>&1; then
+            curl -sSLf -o /tmp/pwsh.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz
+            sudo mkdir -p /opt/microsoft/powershell/7
+            sudo tar -xzf /tmp/pwsh.tar.gz -C /opt/microsoft/powershell/7
+            sudo chmod +x /opt/microsoft/powershell/7/pwsh
+            sudo ln -sf /opt/microsoft/powershell/7/pwsh /usr/local/bin/pwsh
+          fi
+          pwsh --version
 
       - name: Install Groovy
         if: matrix.stack == 'groovy-cli'

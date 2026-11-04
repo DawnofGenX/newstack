@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`powershell-cli`**: a `wc`-style CLI in PowerShell 7. Counting is a byte loop
+  in `lib/TextStat.ps1`, options are parsed by hand in `lib/Options.ps1`, and the
+  report lives in `lib/Runner.ps1` — which takes its I/O as a hashtable of
+  scriptblocks, so the 57 checks assert the exact bytes on stdout and stderr
+  without spawning a process. `main.ps1` is the only file that opens files,
+  reads stdin and exits; it decides whether stdin is a stream with
+  `stat -L -c %F`, because that is what changes `wc`'s column width.
 - **`sqlite-sql`**: not a CLI for once — a SQL reporting project. `schema.sql`
   carries the keys and the `CHECK` constraints, `views.sql` holds the arithmetic
   exactly once, `queries/` is one `SELECT` per report and `bin/NAME` builds a
