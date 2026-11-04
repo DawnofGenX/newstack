@@ -1,0 +1,8 @@
+#!/bin/sh
+# Runs the CLI through Guile. The build is the interpreter, so there is nothing
+# to compile first.
+set -eu
+
+root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+
+exec env GUILE_AUTO_COMPILE=0 guile --no-auto-compile -L "$root/lib" -s "$root/main.scm" "$@"

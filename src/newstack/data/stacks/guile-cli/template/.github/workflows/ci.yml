@@ -1,0 +1,67 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Guile
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends guile-3.0
+          guile --version | head -1
+
+      - name: Test
+        run: env GUILE_AUTO_COMPILE=0 guile --no-auto-compile -L lib -L tests -s tests/run-tests.scm
+
+      - name: Help
+        run: './bin/{{ npm_name }} --help | grep -qF "Usage: {{ npm_name }} [OPTION]... [FILE]..."'
+
+      - name: Exit codes
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "usage error exit status: $status"
+          test "$status" -eq 2
+
+          ./bin/{{ npm_name }} missing-file.txt >/dev/null 2>&1
+          status=$?
+          echo "missing file exit status: $status"
+          test "$status" -eq 1
+
+      - name: Read stdin
+        run: |
+          set +e
+          out=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w)
+          status=$?
+          echo "implicit stdin exit status: $status, output: $out"
+          test "$status" -eq 0
+          test "$out" = "3"
+
+          out=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w -)
+          status=$?
+          echo "explicit stdin exit status: $status, output: $out"
+          test "$status" -eq 0
+          test "$out" = "3 -"
+
+      - name: Matches wc on every input
+        run: |
+          set -eu
+          mkdir -p .parity
+          printf 'alpha beta\ngamma delta\n' > .parity/p1.txt
+          printf 'alpha beta\ngamma' > .parity/p2.txt
+          printf 'h\303\251llo w\303\266rld\n' > .parity/p3.txt
+          : > .parity/p4.txt
+          printf 'a\tb\013c\014d\n' > .parity/p5.txt
+          for file in .parity/p*.txt; do
+            ours=$(./bin/{{ npm_name }} "$file" | awk '{print $1, $2, $3}')
+            theirs=$(wc -l -w -c < "$file" | awk '{print $1, $2, $3}')
+            echo "$file: ours=$ours wc=$theirs"
+            test "$ours" = "$theirs"
+          done

@@ -105,6 +105,7 @@ jobs:
           - pascal-cli
           - bash-cli
           - cobol-cli
+          - guile-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -257,6 +258,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends shellcheck
           shellcheck --version | head -2
+
+      - name: Install Guile
+        if: matrix.stack == 'guile-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends guile-3.0
+          guile --version | head -1
 
       - name: Install GNUCOBOL
         if: matrix.stack == 'cobol-cli'

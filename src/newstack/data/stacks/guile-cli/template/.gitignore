@@ -1,0 +1,6 @@
+# Guile's compiled modules land here if you run a file without
+# --no-auto-compile.
+*.go
+
+# Scratch space for the test suites.
+/.test-tmp/

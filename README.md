@@ -310,6 +310,7 @@ $ newstack stacks outdated
 | `pascal-cli` | Free Pascal CLI on FPC and `make`: byte-exact counting unit, hand-written argv parser, dependency-free test suite, terminal behind a record of function pointers | `fpc`, `make` |
 | `bash-cli` | Bash CLI on plain `bash` and `shellcheck`: counting in bash itself (no `wc`, no `awk`), hand-rolled argv parser, dependency-free test harness, terminal behind sourced functions | `bash`, `shellcheck` |
 | `cobol-cli` | COBOL CLI on GNUCOBOL: byte-exact counting over a one-byte sequential read, hand-rolled argv parser reading `/proc/self/cmdline`, a COBOL unit driver plus a shell suite, I/O in one program | `cobc`, `make` |
+| `guile-cli` | Scheme CLI on GNU Guile: bytevector counting core, hand-rolled argv parser, dependency-free harness, ports behind a record of procedures | `guile` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python

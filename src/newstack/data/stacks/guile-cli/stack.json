@@ -1,0 +1,59 @@
+{
+  "name": "guile-cli",
+  "title": "Guile CLI",
+  "language": "scheme",
+  "blurb": "Scheme CLI on GNU Guile: bytevector counting core, hand-rolled argv parser, dependency-free test harness, ports behind a record of procedures",
+  "requires": [
+    "guile"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "./bin/{npm_name} --help",
+    "env GUILE_AUTO_COMPILE=0 guile --no-auto-compile -L lib -L tests -s tests/run-tests.scm"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "env GUILE_AUTO_COMPILE=0 guile --no-auto-compile -L lib -L tests -s tests/run-tests.scm",
+      "timeout": 300,
+      "tools": [
+        "guile"
+      ]
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage: {{ npm_name }} [OPTION]... [FILE]...'",
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./bin/{{ npm_name }} --bogus >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2",
+      "timeout": 300
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e\n./bin/{{ npm_name }} /nonexistent/file.txt >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 1",
+      "timeout": 300
+    },
+    {
+      "name": "stdin",
+      "cmd": "test \"$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w)\" = '3' && test \"$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w -)\" = '3 -' && test \"$(printf 'alpha beta\\ngamma delta\\n' | ./bin/{{ npm_name }})\" = '      2       4      23'",
+      "timeout": 300
+    },
+    {
+      "name": "parity",
+      "cmd": "mkdir -p .parity\nprintf 'alpha beta\\ngamma delta\\n' > .parity/p1.txt\nprintf 'alpha beta\\ngamma' > .parity/p2.txt\nprintf 'h\\303\\251llo w\\303\\266rld\\n' > .parity/p3.txt\n: > .parity/p4.txt\nprintf 'a\\tb\\vc\\fd\\n' > .parity/p5.txt\nfor file in .parity/p*.txt; do\n  ours=$(./bin/{{ npm_name }} \"$file\" | awk '{print $1, $2, $3}')\n  theirs=$(wc -l -w -c < \"$file\" | awk '{print $1, $2, $3}')\n  echo \"$file ours=[$ours] wc=[$theirs]\"\n  test \"$ours\" = \"$theirs\"\ndone",
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "*.scm"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

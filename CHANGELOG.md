@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`guile-cli`**: a word-count CLI in Scheme. Guile's `read-bytevector` is not
+  there and `get-bytevector-all` hands back a bytevector, so the counting core
+  works on bytes with `bytevector-u8-ref`; the runner takes a record of four
+  procedures, so a formatting slip fails without spawning a process. 83
+  assertions, `-l/-w/-c` with clusters and `--`, and byte-for-byte agreement
+  with `wc`, including the implicit-standard-input row that carries no label.
 - **`cobol-cli`**: a word-count CLI in COBOL. GNUCOBOL has no `ARGUMENT-NUMBER` in
   every build, so `main.cob` reads `/proc/self/cmdline` with the same one-byte
   `ORGANIZATION IS SEQUENTIAL` reader it uses for files and splits it on `LOW-VALUE`;
