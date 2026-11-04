@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install GNAT
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gnat make
+          gnatmake --version | head -1
+
+      - name: Build
+        run: make -s all
+
+      - name: Test
+        run: make -s test
+
+      - name: Help
+        run: ./bin/{{ npm_name }} --help
+
+      - name: Exit codes
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "bad option exit status: $status"
+          test "$status" -eq 2
+          ./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1
+          status=$?
+          echo "missing file exit status: $status"
+          test "$status" -eq 1
+
+      - name: Read stdin
+        run: |
+          set -eu
+          out=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w)
+          echo "stdin words: $out"
+          test "$out" = "3 -"
+          out=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w -)
+          echo "dash operand words: $out"
+          test "$out" = "3 -"
+          out=$(printf 'alpha beta\ngamma delta\n' | ./bin/{{ npm_name }})
+          echo "implicit stdin row: $out"
+          test "$out" = " 2  4 23 -"
+
+      - name: Matches wc on every input
+        run: |
+          set -eu
+          mkdir -p .parity
+          printf 'alpha beta\ngamma delta\n' > .parity/p1.txt
+          printf 'one two three' > .parity/p2.txt
+          printf 'h\303\251llo w\303\266rld\n' > .parity/p3.txt
+          : > .parity/p4.txt
+          printf 'a\tb\vc\fd\n' > .parity/p5.txt
+          for file in .parity/p*.txt; do
+            ours=$(./bin/{{ npm_name }} -l -w -c "$file" | awk '{print $1, $2, $3}')
+            theirs=$(wc -l -w -c < "$file" | awk '{print $1, $2, $3}')
+            echo "$file ours=[$ours] wc=[$theirs]"
+            test "$ours" = "$theirs"
+          done

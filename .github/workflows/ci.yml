@@ -96,6 +96,7 @@ jobs:
           - deno-cli
           - vhdl-sim
           - fortran-cli
+          - ada-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -227,6 +228,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends gfortran make
           gfortran --version | head -1
+
+      - name: Install GNAT
+        if: matrix.stack == 'ada-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gnat make
+          gnatmake --version | head -1
 
       - name: Install Tcl
         if: matrix.stack == 'tcl-cli'
