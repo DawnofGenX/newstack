@@ -262,3 +262,124 @@ def test_the_suite_never_reads_the_developers_own_installs():
 def test_install_requires_a_url(url, capsys):
     assert main(["stacks", "add", url]) == 1
     assert "repository URL is required" in capsys.readouterr().err
+
+
+def _commit(repo: Path, message: str) -> None:
+    _git([*GIT_ENV, "add", "-A"], repo)
+    _git([*GIT_ENV, "commit", "-qm", message], repo)
+
+
+def test_update_pulls_a_changed_stack_from_its_repository(tmp_path, capsys):
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+
+    (repo / "mini-cli" / "template" / "README.md").write_text(
+        "# {{ npm_name }} v2\n", encoding="utf-8"
+    )
+    _commit(repo, "second version")
+
+    assert main(["stacks", "update", "mini-cli"]) == 0
+    out = capsys.readouterr().out
+    assert "updated" in out
+    assert "→" in out
+    assert "newstack update <path>" in out
+
+    installed = sources.list_installed()[0]
+    assert "v2" in (installed.path / "template/README.md").read_text(encoding="utf-8")
+    manifest = json.loads(sources.manifest_path().read_text(encoding="utf-8"))
+    assert manifest["mini-cli"]["rev"] != ""
+    assert "updated_at" in manifest["mini-cli"]
+    assert "added_at" in manifest["mini-cli"]
+
+
+def test_update_reports_nothing_to_do_when_the_repository_has_not_moved(tmp_path, capsys):
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+
+    assert main(["stacks", "update", "mini-cli"]) == 0
+    out = capsys.readouterr().out
+    assert "already current" in out
+    assert "nothing to refresh" in out
+
+
+def test_update_refreshes_every_installed_stack_by_default(tmp_path, capsys):
+    first = _repo(tmp_path)
+    second = tmp_path / "repo2"
+    second.mkdir()
+    _write_stack(second / "other-cli", "other-cli")
+    _git(["init", "-q", "-b", "main"], second)
+    _git([*GIT_ENV, "add", "-A"], second)
+    _git([*GIT_ENV, "commit", "-qm", "add"], second)
+
+    assert main(["stacks", "add", str(first)]) == 0
+    assert main(["stacks", "add", str(second)]) == 0
+    capsys.readouterr()
+
+    (first / "mini-cli" / "template" / "mini.toml").write_text(
+        'name = "{{ npm_name }}"\nextra = true\n', encoding="utf-8"
+    )
+    _commit(first, "tweak")
+
+    assert main(["stacks", "update"]) == 0
+    out = capsys.readouterr().out
+    assert "mini-cli" in out and "other-cli" in out
+    assert "already current" in out
+
+
+def test_update_leaves_the_installed_copy_alone_when_the_stack_disappeared(
+    tmp_path, capsys
+):
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+
+    (repo / "mini-cli" / "stack.json").unlink()
+    (repo / "mini-cli" / "template" / "README.md").unlink()
+    (repo / "mini-cli" / "template" / "mini.toml").unlink()
+    (repo / "mini-cli" / "template" / ".gitignore").unlink()
+    _commit(repo, "drop the stack")
+
+    assert main(["stacks", "update", "mini-cli"]) == 1
+    assert "no longer contains" in capsys.readouterr().err
+    installed = sources.list_installed()[0]
+    assert (installed.path / "stack.json").is_file()
+
+
+def test_update_leaves_the_installed_copy_alone_when_the_new_stack_is_broken(
+    tmp_path, capsys
+):
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+
+    (repo / "mini-cli" / "stack.json").write_text("{not json", encoding="utf-8")
+    _commit(repo, "break it")
+
+    assert main(["stacks", "update", "mini-cli"]) == 1
+    assert "invalid JSON" in capsys.readouterr().err
+    installed = sources.list_installed()[0]
+    manifest = json.loads((installed.path / "stack.json").read_text(encoding="utf-8"))
+    assert manifest["name"] == "mini-cli"
+
+
+def test_update_refuses_a_stack_that_is_not_installed(tmp_path, capsys):
+    assert main(["stacks", "update", "nope"]) == 1
+    assert "not installed" in capsys.readouterr().err
+
+
+def test_update_with_nothing_installed_says_so(capsys):
+    assert main(["stacks", "update"]) == 1
+    assert "no stacks installed" in capsys.readouterr().err
+
+
+def test_update_json_is_machine_readable(tmp_path, capsys):
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+
+    assert main(["stacks", "update", "--json"]) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload[0]["name"] == "mini-cli"
+    assert set(payload[0]) == {"name", "url", "old_rev", "new_rev", "changed"}

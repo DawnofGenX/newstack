@@ -622,6 +622,31 @@ def cmd_stacks_remove(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_stacks_update(args: argparse.Namespace) -> int:
+    refreshed = sources.update(args.name)
+    if args.json:
+        print(json.dumps([item.as_dict() for item in refreshed], indent=2))
+        return 0
+
+    width = max(len(item.name) for item in refreshed)
+    moved = [item for item in refreshed if item.changed]
+    print()
+    for item in refreshed:
+        if item.changed:
+            print(f"  {item.name:<{width}}  {item.old_rev or '?'} → {item.new_rev}  updated")
+        else:
+            print(f"  {item.name:<{width}}  {item.new_rev}  already current")
+    print()
+    if moved:
+        names = ", ".join(item.name for item in moved)
+        print(f"  {_count(len(moved), 'stack')} refreshed ({names})")
+        print("  projects generated from them pick this up with:  newstack update <path>")
+    else:
+        print("  nothing to refresh")
+    print()
+    return 0
+
+
 def cmd_stacks_list(args: argparse.Namespace) -> int:
     installed = sources.list_installed()
     if args.json:
@@ -841,6 +866,13 @@ def build_parser() -> argparse.ArgumentParser:
     stacks_add.add_argument("--force", action="store_true", help="replace an installed stack")
     stacks_add.add_argument("--json", action="store_true")
     stacks_add.set_defaults(handler=cmd_stacks_add)
+
+    stacks_update = stacks_command.add_parser(
+        "update", help="re-pull installed stacks from their repositories"
+    )
+    stacks_update.add_argument("name", nargs="?", help="one stack (default: all installed)")
+    stacks_update.add_argument("--json", action="store_true")
+    stacks_update.set_defaults(handler=cmd_stacks_update)
 
     stacks_remove = stacks_command.add_parser("remove", help="delete an installed stack")
     stacks_remove.add_argument("name")

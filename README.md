@@ -60,6 +60,7 @@ newstack new fastapi ~/code/api -d "Billing service" --author "Your Name"
 newstack new python-lib ~/code/lib --dry-run     # preview, write nothing
 newstack new python-cli ~/code/tool --github     # create the repo and push it too
 newstack new fastapi ~/code/api --python 3.12    # raise a Python stack's floor
+newstack stacks update              # re-pull every stack you installed from a repo
 newstack new python-lib ~/code/lib --license apache-2.0   # mit (default), apache-2.0, bsd-3, none
 newstack adopt ~/code/old-project --dry-run    # retrofit CI/lint onto existing code
 newstack update ~/code/app --dry-run   # re-apply template changes, keep your edits
@@ -147,6 +148,24 @@ shows what came from where. Installed stacks live in `$NEWSTACK_HOME/stacks`
 (default `~/.local/share/newstack/stacks`), are marked `[installed]` in
 `newstack list`, and behave like any other stack afterwards — `new`, `adopt`,
 `update` and `outdated` all see them.
+
+`newstack stacks update` re-pulls them, so a fix in the stack's repository
+reaches your machine without reinstalling by hand:
+
+```console
+$ newstack stacks update
+  elixir-cli  9f2c1ab → 4d0b7e2  updated
+
+  1 stack refreshed (elixir-cli)
+  projects generated from them pick this up with:  newstack update <path>
+```
+
+The clone, the validation and the name checks all happen before anything is
+replaced, so a repository that went bad — or one that dropped a stack — leaves
+your installed copy exactly as it was and says which stack it could not find.
+`newstack stacks update <name>` does one. Refreshing a stack changes the
+template, not your projects: `newstack update <path>` is still the step that
+re-applies it, and it keeps the local edits it finds.
 
 ## Stacks
 
@@ -397,8 +416,8 @@ manifest format, no fork required.
 ## Roadmap
 
 - More variable choices beyond the current defaults (package manager, Node version).
-- `newstack stacks update` to re-pull an installed stack and merge it into the projects
-  generated from it, the way `newstack update` does for shipped ones.
+- `newstack stacks outdated` to report which installed stacks have moved upstream without
+  cloning them.
 
 ## Licence
 

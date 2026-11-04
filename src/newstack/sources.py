@@ -13,6 +13,7 @@ Layout under the data root::
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -22,7 +23,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .registry import BUILTIN_ROOT, data_root, installed_root, load_stack
+from .registry import BUILTIN_ROOT, Stack, data_root, installed_root, load_stack
 
 MANIFEST = "sources.json"
 
@@ -46,6 +47,26 @@ class Installed:
             "url": self.url,
             "rev": self.rev,
             "added_at": self.added_at,
+        }
+
+
+@dataclass(frozen=True)
+class Refreshed:
+    """What ``stacks update`` did to one installed stack."""
+
+    name: str
+    url: str
+    old_rev: str
+    new_rev: str
+    changed: bool
+
+    def as_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "url": self.url,
+            "old_rev": self.old_rev,
+            "new_rev": self.new_rev,
+            "changed": self.changed,
         }
 
 
@@ -133,6 +154,54 @@ def builtin_names() -> set[str]:
     } if BUILTIN_ROOT.is_dir() else set()
 
 
+def _stage(
+    url: str,
+    subdir: str | None,
+    temporary: Path,
+    expected: tuple[str, ...] = (),
+) -> tuple[str, list[Stack]]:
+    """Clone *url* and validate every stack it carries, inside *temporary*."""
+    checkout = temporary / "checkout"
+    ok, output = _git(["clone", "--depth", "1", "--quiet", url, str(checkout)])
+    if not ok:
+        raise SourceError(f"could not clone {url}: {output}")
+    ok, rev = _git(["rev-parse", "--short", "HEAD"], cwd=checkout)
+    rev = rev if ok else ""
+
+    candidates = _candidates(checkout, subdir)
+    if not candidates:
+        if expected:
+            raise SourceError(
+                f"{url}: no longer contains {', '.join(sorted(expected))} — "
+                "the installed copy was left alone"
+            )
+        raise SourceError(
+            f"{url}: no stack found — a stack is a directory with a stack.json "
+            "and a template/ directory"
+        )
+
+    stage_root = temporary / "stage"
+    validated: list[Stack] = []
+    for directory in candidates:
+        staged = stage_root / (_declared_name(directory) or directory.name)
+        shutil.copytree(directory, staged, ignore=shutil.ignore_patterns(".git"))
+        try:
+            validated.append(load_stack(staged))
+        except Exception as exc:  # RegistryError, but never half-install
+            raise SourceError(f"{url}: {exc}") from exc
+    return rev, validated
+
+
+def _tree_digest(directory: Path) -> str:
+    """A digest of a stack directory's file names and contents."""
+    digest = hashlib.sha256()
+    for path in sorted(p for p in directory.rglob("*") if p.is_file()):
+        digest.update(path.relative_to(directory).as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
 def install(
     url: str,
     *,
@@ -153,30 +222,7 @@ def install(
     target_root = installed_root()
     shipped = builtin_names()
     with tempfile.TemporaryDirectory(prefix="newstack-add-") as temporary:
-        checkout = Path(temporary) / "checkout"
-        ok, output = _git(["clone", "--depth", "1", "--quiet", url, str(checkout)])
-        if not ok:
-            raise SourceError(f"could not clone {url}: {output}")
-        ok, rev = _git(["rev-parse", "--short", "HEAD"], cwd=checkout)
-        rev = rev if ok else ""
-
-        candidates = _candidates(checkout, subdir)
-        if not candidates:
-            raise SourceError(
-                f"{url}: no stack found — a stack is a directory with a stack.json "
-                "and a template/ directory"
-            )
-
-        stage_root = Path(temporary) / "stage"
-        validated = []
-        for directory in candidates:
-            staged = stage_root / (_declared_name(directory) or directory.name)
-            shutil.copytree(directory, staged, ignore=shutil.ignore_patterns(".git"))
-            try:
-                validated.append(load_stack(staged))
-            except Exception as exc:  # RegistryError, but never half-install
-                raise SourceError(f"{url}: {exc}") from exc
-
+        rev, validated = _stage(url, subdir, Path(temporary))
         clashes = [stack.name for stack in validated if stack.name in shipped]
         if clashes:
             raise SourceError(
@@ -210,9 +256,90 @@ def install(
 
     entries = read_installed()
     for stack in installed:
-        entries[stack.name] = {"url": stack.url, "rev": stack.rev, "added_at": stack.added_at}
+        entries[stack.name] = {
+            "url": stack.url,
+            "rev": stack.rev,
+            "added_at": stack.added_at,
+            "subdir": subdir,
+        }
     _write_installed(entries)
     return installed
+
+
+def update(name: str | None = None) -> list[Refreshed]:
+    """Re-pull installed stacks from the repositories they came from.
+
+    *name* refreshes one stack; omitting it refreshes every installed stack that
+    has a recorded origin. Everything is cloned and validated before anything is
+    replaced, so a repository that went bad — or that dropped a stack — leaves
+    the installed copy exactly as it was.
+    """
+    present = {entry.name: entry for entry in list_installed()}
+    if name is not None:
+        if name not in present:
+            raise SourceError(f"'{name}' is not installed (see `newstack stacks list`)")
+        if not present[name].url:
+            raise SourceError(f"'{name}' has no recorded origin — reinstall it with `stacks add`")
+        targets = [present[name]]
+    else:
+        targets = [entry for entry in present.values() if entry.url]
+        if not targets:
+            raise SourceError(
+                "no installed stack has a recorded origin — nothing to refresh"
+                if present
+                else "no stacks installed (see `newstack stacks add <git-url>`)"
+            )
+
+    if not shutil.which("git"):
+        raise SourceError("git is required to update a stack from a repository")
+
+    entries_meta = read_installed()
+    by_url: dict[str, list[Installed]] = {}
+    for entry in targets:
+        by_url.setdefault(entry.url, []).append(entry)
+
+    results: list[Refreshed] = []
+    for url, entries in by_url.items():
+        subdir = entries_meta.get(entries[0].name, {}).get("subdir")
+        subdir = subdir if isinstance(subdir, str) and subdir else None
+        with tempfile.TemporaryDirectory(prefix="newstack-update-") as temporary:
+            rev, validated = _stage(
+                url, subdir, Path(temporary), tuple(entry.name for entry in entries)
+            )
+            by_name = {stack.name: stack for stack in validated}
+            missing = [entry.name for entry in entries if entry.name not in by_name]
+            if missing:
+                raise SourceError(
+                    f"{url}: no longer contains {', '.join(sorted(missing))} — "
+                    "the installed copy was left alone"
+                )
+            added_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+            for entry in entries:
+                stack = by_name[entry.name]
+                changed = _tree_digest(stack.directory) != _tree_digest(entry.path)
+                if changed:
+                    shutil.rmtree(entry.path)
+                    shutil.copytree(
+                        stack.directory, entry.path, ignore=shutil.ignore_patterns(".git")
+                    )
+                    entries_meta[entry.name] = {
+                        **entries_meta.get(entry.name, {}),
+                        "url": url,
+                        "rev": rev,
+                        "updated_at": added_at,
+                    }
+                results.append(
+                    Refreshed(
+                        name=entry.name,
+                        url=url,
+                        old_rev=entry.rev,
+                        new_rev=rev,
+                        changed=changed,
+                    )
+                )
+
+    _write_installed(entries_meta)
+    return results
 
 
 def remove(name: str) -> Path:

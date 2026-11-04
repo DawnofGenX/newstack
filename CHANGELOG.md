@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`newstack stacks update [name]`** — re-pull installed stacks from the repositories they
+  came from, so a fix upstream reaches the machine without a manual reinstall. The clone,
+  the per-stack validation and the name checks all run before anything is replaced: a
+  repository that no longer validates — or one that dropped a stack — leaves the installed
+  copy untouched and names what it could not find. A stack whose files did not change is
+  reported as already current rather than rewritten. Refreshing a stack updates the
+  template; `newstack update <path>` is still what re-applies it to a project, and it keeps
+  local edits.
 - **`newstack --python 3.12`** — pick the interpreter floor for the Python stacks, and let
   one value write every line that names a version: `requires-python`, the ruff target, the
   trove classifiers, the `python-version` matrix in the generated workflow, the
