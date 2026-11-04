@@ -73,6 +73,17 @@ def test_plain_maven_pom_still_resolves_to_the_java_stack(tmp_path) -> None:
     assert names == ["java-maven-cli"], "the java fallback must still catch a plain pom.xml"
 
 
+def test_a_glob_marker_finds_a_project_named_by_its_build_file(tmp_path) -> None:
+    """haskell-cli is marked by `*.cabal`, because the file carries the project name.
+
+    A literal marker cannot express that, so detect rules accept a glob.
+    """
+
+    make_repo(tmp_path, {"mytool.cabal": "cabal-version: 3.0\nname: mytool\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["haskell-cli"], "the *.cabal rule must match any cabal package file"
+
+
 def test_symfony_app_wins_over_the_composer_fallback(tmp_path) -> None:
     """A Symfony project is also a Composer project.
 

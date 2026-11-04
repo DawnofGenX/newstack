@@ -36,16 +36,28 @@ class DetectRule:
     file: str
     contains: str | None = None
 
-    def matches(self, directory: Path) -> bool:
+    def _targets(self, directory: Path) -> list[Path]:
+        """The files this rule looks at.
+
+        A plain name is a single path. A name with a wildcard (``*.cabal``) is a
+        glob, which is how a stack whose marker carries the project name can
+        still be detected.
+        """
+        if any(character in self.file for character in "*?["):
+            return sorted(path for path in directory.glob(self.file) if path.is_file())
         target = directory / self.file
-        if not target.is_file():
-            return False
-        if self.contains is None:
-            return True
-        try:
-            return self.contains in target.read_text(encoding="utf-8", errors="ignore")
-        except OSError:
-            return False
+        return [target] if target.is_file() else []
+
+    def matches(self, directory: Path) -> bool:
+        for target in self._targets(directory):
+            if self.contains is None:
+                return True
+            try:
+                if self.contains in target.read_text(encoding="utf-8", errors="ignore"):
+                    return True
+            except OSError:
+                continue
+        return False
 
 
 @dataclass(frozen=True)

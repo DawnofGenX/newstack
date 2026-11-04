@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# Build (cheaply: cabal is incremental) and run the CLI. The program keeps
+# ownership of stdout and of the exit code; only the build chatter goes to stderr.
+set -e
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$root"
+cabal build -v0 exe:{{ npm_name }} >&2
+binary=$(cabal list-bin exe:{{ npm_name }})
+exec "$binary" "$@"

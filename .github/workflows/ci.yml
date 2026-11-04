@@ -83,6 +83,7 @@ jobs:
           - helm-chart
           - gleam-cli
           - scala-cli
+          - haskell-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -123,6 +124,17 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
+      # GHC and cabal come from haskell-actions/setup, which also puts both on
+      # PATH; cabal still needs an index before it can resolve a build plan.
+      - name: Set up GHC and cabal
+        if: matrix.stack == 'haskell-cli'
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: "9.4.7"
+          cabal-version: "3.10.3.0"
+      - name: Update the cabal package index
+        if: matrix.stack == 'haskell-cli'
+        run: cabal update
       # scala-cli is one binary, so installing it is the whole toolchain; no
       # Maven cache here because there is no pom (scala-cli fetches its own deps).
       - name: Set up Java (scala-cli)

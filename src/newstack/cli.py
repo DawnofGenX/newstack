@@ -89,6 +89,18 @@ def _npm_name(name: str) -> str:
     return slug or "app"
 
 
+def _cabal_name(name: str) -> str:
+    """A cabal package name where every hyphen-separated word contains a letter.
+
+    Cabal reads ``tool-2024`` as the package ``tool`` at version ``2024`` and refuses
+    to parse the file, so a numeric word is given a letter of its own: ``tool-v2024``.
+    Executable names have no such rule, which is why the binary keeps ``npm_name``.
+    """
+    words = [word for word in re.sub(r"[^0-9a-z]+", "-", name.lower()).split("-") if word]
+    words = [word if re.search(r"[a-z]", word) else f"v{word}" for word in words]
+    return "-".join(words) or "app"
+
+
 def _title(name: str) -> str:
     words = re.split(r"[-_.\s]+", name)
     return " ".join(word[:1].upper() + word[1:] for word in words if word)
@@ -131,6 +143,7 @@ def build_context(stack: Stack, destination: Path, args: argparse.Namespace) -> 
         "project_name": project_name,
         "package_name": _package_name(project_name),
         "npm_name": _npm_name(project_name),
+        "cabal_name": _cabal_name(project_name),
         "title": _title(project_name),
         "description": args.description or stack.default_description,
         "author": author,

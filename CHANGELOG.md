@@ -61,6 +61,15 @@ All notable changes to this project are documented here. The format follows
   the world, so the 0/1/2 exit contract and the `wc` column layout are asserted in munit
   without spawning a process. The generated project ships a workflow that installs the
   single scala-cli binary at a pinned version.
+- **`haskell-cli` stack** — a GHC 9.4 / cabal CLI whose only dependencies are `base` and
+  `bytestring`, both of which ship with GHC, so a generated project builds offline once
+  cabal has an index. Counting is a strict `foldl'` over the bytes; `Runner.run` takes an
+  `Io` record, so the 0/1/2 exit contract, the `-` stdin label and the `total` row are
+  asserted in a 47-check hand-written harness instead of a test framework. `wc` parity is
+  a verify step and part of the shipped workflow.
+- **Detect rules accept a glob** — a stack marker may be a pattern, so `haskell-cli` can
+  be detected by `*.cabal` even though the file is named after the project. Literal
+  markers behave exactly as before.
 
 ### Fixed
 
@@ -74,6 +83,12 @@ All notable changes to this project are documented here. The format follows
   and missing-file steps in `bun-cli`, `lua-cli` and `r-cli` now capture `$?` under
   `set +e` before asserting it, and a structural test rejects the broken shape across
   every stack.
+- **A Haskell project whose name ends in a number now builds.** Cabal reads
+  `tool-2024.cabal` as package `tool` at version `2024` and refuses the file, so a project
+  generated as `tool-2024` failed before its first build. Templates can now use a
+  `cabal_name` context key — the same slug with every all-numeric word given a letter
+  (`tool-v2024`) — and `haskell-cli` names its package with it while the executable keeps
+  the name the user typed.
 
 ## [0.4.0] - 2026-11-03
 

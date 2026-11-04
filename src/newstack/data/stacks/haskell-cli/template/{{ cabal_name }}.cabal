@@ -1,0 +1,48 @@
+cabal-version:      3.0
+name:               {{ cabal_name }}
+version:            0.1.0
+synopsis:           A tiny wc-style CLI
+description:        Counts newline, word and byte totals of files or stdin.
+license:            MIT
+license-file:       LICENSE
+author:             {{ author }}
+maintainer:         {{ author }}
+category:           Text
+build-type:         Simple
+extra-doc-files:    README.md
+
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    hs-source-dirs:   src
+    exposed-modules:  TextStat.Counts
+                      TextStat.Options
+                      TextStat.Runner
+    build-depends:    base >=4.14 && <5
+                    , bytestring
+    default-language: Haskell2010
+
+executable {{ npm_name }}
+    import:           warnings
+    hs-source-dirs:   app
+    main-is:          Main.hs
+    build-depends:    base
+                    , bytestring
+                    , {{ cabal_name }}
+    default-language: Haskell2010
+
+test-suite spec
+    import:           warnings
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Spec.hs
+    other-modules:    Harness
+                      CountsSpec
+                      OptionsSpec
+                      RunnerSpec
+    build-depends:    base
+                    , bytestring
+                    , {{ cabal_name }}
+    default-language: Haskell2010

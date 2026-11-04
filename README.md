@@ -117,6 +117,7 @@ directory to CI-ready project.
 | `helm-chart` | Kubernetes Helm chart: schema-validated values, named templates, hardened Deployment/Service, lint+render checks with no cluster | `helm` |
 | `gleam-cli` | Gleam CLI: pure counting module, hand-written option parser, stdlib-only test harness, Erlang helper for argv/stdin/exit codes | `gleam` |
 | `scala-cli` | Scala 3 CLI built with scala-cli (no sbt): pure counting core, hand-rolled argv parser, munit suites, wrapper that returns the process exit code | `scala-cli`, `java` |
+| `haskell-cli` | Haskell CLI on GHC and cabal: pure counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a record | `ghc`, `cabal` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, an MIT licence, a `.gitignore`, and a `.newstack.json` record that `newstack
@@ -305,7 +306,7 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More stacks: Haskell.
+- More stacks: Clojure, Swift, .NET.
 - `--license apache-2.0|bsd-3` and other variable choices beyond the current defaults.
 
 ## Licence

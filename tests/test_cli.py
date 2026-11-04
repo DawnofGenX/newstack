@@ -84,6 +84,29 @@ def test_package_name_sanitises_awkward_names(tmp_path) -> None:
     assert (reserved / "src/class_app").is_dir()
 
 
+def test_cabal_name_never_reads_as_a_version() -> None:
+    from newstack.cli import _cabal_name
+
+    # cabal parses `tool-2024` as package `tool` version `2024` and refuses the file.
+    assert _cabal_name("tool-2024") == "tool-v2024"
+    assert _cabal_name("my.tool_2") == "my-tool-v2"
+    assert _cabal_name("tool2024") == "tool2024"
+    assert _cabal_name("tool-v2") == "tool-v2"
+    assert _cabal_name("2fast") == "2fast"
+
+
+def test_haskell_project_name_ending_in_a_number_still_renders_a_legal_package(tmp_path) -> None:
+    dest = tmp_path / "hs"
+    assert main(["new", "haskell-cli", str(dest), "--name", "tool-2024", "--no-git"]) == 0
+    cabal = dest / "tool-v2024.cabal"
+    assert cabal.is_file()
+    text = cabal.read_text()
+    assert "name:               tool-v2024" in text
+    # the executable keeps the name the user typed
+    assert "executable tool-2024" in text
+    assert (dest / "bin/tool-2024").is_file()
+
+
 def test_check_unknown_stack_errors(capsys) -> None:
     assert main(["check", "nope"]) == 1
     assert "unknown stack" in capsys.readouterr().err
