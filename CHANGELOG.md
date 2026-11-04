@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`forth-cli`**: a word-count CLI in plain Forth on `gforth`, no library and
+  no build step. Everything is a byte loop over a block the runner reads whole,
+  so the counts are exact whatever the file contains; argv is parsed into
+  parallel vectors and the rows are padded the way `wc` pads them. 64 unit
+  checks in Forth plus 27 shell checks that diff the real binary against the
+  host `wc`, including the seven-column pad a pipe gets.
 - **`awk-cli`**: a word-count CLI in `gawk` and nothing else. `RS="\0"` makes
   each file a single record, so `length()` is the byte count and two `gsub`
   passes give the line and word counts. The runner fills a report and `main.awk`

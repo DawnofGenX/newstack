@@ -1,0 +1,6 @@
+#!/bin/sh
+# Runs the CLI straight from source: gforth reads main.fs, which reuses the
+# words in lib/, and exits with the status the program asks for.
+set -eu
+root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+exec gforth "$root/main.fs" "$@"
