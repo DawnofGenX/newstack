@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`haxe-cli`**: a Haxe program compiled to Neko that counts lines, words and
+  bytes the way `wc` does. Counting, option parsing and report building live in
+  separate modules behind an `Io` interface, so 43 assertions run without touching
+  the disk; a parity suite then diffs the output against the real `wc` across six
+  inputs and eight flag sets, padding included.
 - **`docker-compose-svc`**: a small HTTP service shipped as a container — a
   non-root image with a real `HEALTHCHECK`, a compose file driven by `PORT`, the
   service's answers kept as pure functions so the unit tests need no Docker, and a

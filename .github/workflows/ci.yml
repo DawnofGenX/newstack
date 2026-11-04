@@ -115,6 +115,7 @@ jobs:
           - jq-report
           - mdbook-docs
           - docker-compose-svc
+          - haxe-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -333,6 +334,14 @@ jobs:
             sudo install -m755 /tmp/mdbook /usr/local/bin/mdbook
           fi
           mdbook --version
+
+      - name: Install Haxe
+        if: matrix.stack == 'haxe-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends haxe neko
+          haxe --version
+          neko -version
 
       - name: Install Groovy
         if: matrix.stack == 'groovy-cli'

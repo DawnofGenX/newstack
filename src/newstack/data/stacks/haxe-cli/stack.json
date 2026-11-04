@@ -1,0 +1,98 @@
+{
+  "name": "haxe-cli",
+  "title": "Haxe CLI",
+  "language": "haxe",
+  "blurb": "Haxe command line tool compiled to Neko: pure counting module, hand-written option parser, dependency-free Haxe test suite and a parity suite that diffs against wc",
+  "requires": [
+    "haxe",
+    "neko",
+    "make"
+  ],
+  "default_description": "A Haxe command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "make parity",
+    "./bin/{npm_name} --help",
+    "./bin/{npm_name} README.md"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make build",
+      "tools": [
+        "haxe",
+        "neko"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "haxe",
+        "neko"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "parity",
+      "cmd": "make parity",
+      "tools": [
+        "haxe",
+        "neko",
+        "wc"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "haxe",
+        "neko"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "haxe",
+        "neko"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "haxe",
+        "neko"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "stdin",
+      "cmd": "printf 'a b c\\n' | ./bin/{{ npm_name }} | grep -q '1       3       6'",
+      "tools": [
+        "haxe",
+        "neko"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "build.hxml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "build.hxml",
+    "test.hxml"
+  ],
+  "adopt_tests": []
+}
