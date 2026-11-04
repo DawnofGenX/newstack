@@ -54,6 +54,13 @@ All notable changes to this project are documented here. The format follows
   process exit code. `Runner.run` *returns* the 0/1/2 code and only the entry point calls
   `erlang:halt`, so the exit contract is asserted without spawning a process. `gleam
   format --check` is part of the shipped workflow. Verified against `wc -l -w -c`.
+- **`scala-cli` stack** — a Scala 3 CLI where the build definition *is* the source:
+  `project.scala` holds three `//> using` directives (Scala 3.3.6, main class, munit) and
+  there is no `build.sbt`, no `pom.xml` and no build server (`--server=false`, so no Bloop
+  daemon is left running). Counting is pure, `Runner.run` takes an `Io` instead of touching
+  the world, so the 0/1/2 exit contract and the `wc` column layout are asserted in munit
+  without spawning a process. The generated project ships a workflow that installs the
+  single scala-cli binary at a pinned version.
 
 ### Fixed
 

@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Run the CLI through scala-cli. `--server=false` keeps it hermetic: no Bloop
+# build server is started and nothing keeps running after the command exits.
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$root"
+exec scala-cli run . --server=false --main-class textstat.Main -- "$@"
