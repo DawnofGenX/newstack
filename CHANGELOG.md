@@ -91,6 +91,14 @@ All notable changes to this project are documented here. The format follows
   only `textstat.main` touches the filesystem, `System/in` and `System/exit`. The seven
   shipped checks include stdin, so a broken real-input path cannot hide behind the fake
   I/O record the unit tests inject.
+- **`swift-cli` stack** — a Swift 6 CLI on SwiftPM with XCTest and no packages beyond
+  the toolchain: `TextStat` is a pure library (`ofBytes` over raw bytes, `add`, the
+  right-aligned row layout), `Options.parse` handles `-l/-w/-c`, the long flags, `--`, `-`
+  and help/version by hand, and `CLI.run(_:io:)` returns the exit code against a struct of
+  closures so 29 XCTest cases never spawn a process. Only `main.swift` touches the real
+  files, stdin and `exit`; the wrapper builds in release mode and execs the product. The
+  shipped checks include stdin and a `wc -l -w -c` parity loop, and `total` rows follow
+  `wc` even when an operand is unreadable.
 
 ### Fixed
 

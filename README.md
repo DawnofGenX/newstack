@@ -121,6 +121,7 @@ directory to CI-ready project.
 | `scala-cli` | Scala 3 CLI built with scala-cli (no sbt): pure counting core, hand-rolled argv parser, munit suites, wrapper that returns the process exit code | `scala-cli`, `java` |
 | `haskell-cli` | Haskell CLI on GHC and cabal: pure counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a record | `ghc`, `cabal` |
 | `clojure-cli` | Clojure CLI on `deps.edn` (no Leiningen): pure counting core, hand-rolled argv parser, `clojure.test` suites, I/O behind a record | `clojure`, `java` |
+| `swift-cli` | Swift 6 CLI on SwiftPM: pure counting core, hand-rolled argv parser, XCTest suites, I/O behind a struct of closures | `swift` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, an MIT licence, a `.gitignore`, and a `.newstack.json` record that `newstack
@@ -309,7 +310,6 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More stacks: Swift.
 - `--license apache-2.0|bsd-3` and other variable choices beyond the current defaults.
 
 ## Licence
