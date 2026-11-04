@@ -1,0 +1,53 @@
+{
+  "name": "jq-report",
+  "title": "jq report",
+  "language": "jq",
+  "blurb": "jq report: JSON access-log reports as plain jq programs, a shell command with a tested exit-code contract, and a dependency-free harness that pins every answer",
+  "requires": [
+    "jq"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "./bin/{npm_name} filters",
+    "./tests/run_tests.sh",
+    "make report"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "./bin/{{ npm_name }} lint",
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "./tests/run_tests.sh",
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage: {{ npm_name }} COMMAND [ARG]...'"
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./bin/{{ npm_name }} --bogus >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2"
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e\n./bin/{{ npm_name }} run status-counts /nonexistent/log.json >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 1"
+    },
+    {
+      "name": "report",
+      "cmd": "./bin/{{ npm_name }} run error-rate data/sample.json | grep -qF '\"errors\":1'"
+    }
+  ],
+  "detect": [
+    {
+      "file": "filters/status-counts.jq"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

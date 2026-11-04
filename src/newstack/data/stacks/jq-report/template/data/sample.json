@@ -1,0 +1,50 @@
+[
+  {
+    "time": "2026-11-01T09:12:00Z",
+    "method": "GET",
+    "path": "/",
+    "status": 200,
+    "bytes": 512,
+    "ms": 12
+  },
+  {
+    "time": "2026-11-01T09:13:04Z",
+    "method": "GET",
+    "path": "/api/items",
+    "status": 200,
+    "bytes": 2048,
+    "ms": 38
+  },
+  {
+    "time": "2026-11-01T09:14:10Z",
+    "method": "POST",
+    "path": "/api/items",
+    "status": 201,
+    "bytes": 128,
+    "ms": 57
+  },
+  {
+    "time": "2026-11-02T10:01:00Z",
+    "method": "GET",
+    "path": "/missing",
+    "status": 404,
+    "bytes": 300,
+    "ms": 9
+  },
+  {
+    "time": "2026-11-02T10:02:30Z",
+    "method": "GET",
+    "path": "/",
+    "status": 200,
+    "bytes": 512,
+    "ms": 11
+  },
+  {
+    "time": "2026-11-02T10:03:40Z",
+    "method": "POST",
+    "path": "/api/items",
+    "status": 500,
+    "bytes": 96,
+    "ms": 240
+  }
+]

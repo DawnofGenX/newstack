@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`jq-report`**: reports over a JSON access log, written as plain jq programs
+  and wrapped in a small shell command. `filters/*.jq` is one report each —
+  counts per status, busiest paths, slowest requests, bytes per day, error rate —
+  so `jq -c -f filters/top-paths.jq data/sample.json` and
+  `run top-paths data/sample.json` cannot disagree. 59 assertions pin every
+  answer, the exit-code contract (0 / 1 data / 2 usage), the empty-log case that
+  would otherwise divide by zero, and `lint`, which reports a filter that fails
+  to compile before any data is involved.
 - **`powershell-cli`**: a `wc`-style CLI in PowerShell 7. Counting is a byte loop
   in `lib/TextStat.ps1`, options are parsed by hand in `lib/Options.ps1`, and the
   report lives in `lib/Runner.ps1` — which takes its I/O as a hashtable of

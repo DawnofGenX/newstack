@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
+
+      - name: Lint the filters
+        run: ./bin/{{ npm_name }} lint
+
+      - name: Run the suites
+        run: ./tests/run_tests.sh
+
+      - name: Report on the sample log
+        run: |
+          ./bin/{{ npm_name }} run status-counts data/sample.json
+          ./bin/{{ npm_name }} run error-rate data/sample.json | grep -qF '"total":6'

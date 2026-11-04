@@ -316,6 +316,7 @@ $ newstack stacks outdated
 | `awk-cli` | awk CLI on `gawk`: counting with `RS="\0"` so each file is one record, hand-rolled argv parser, dependency-free harness, the report built before anything is printed | `gawk` |
 | `forth-cli` | Forth CLI on `gforth`: counting over a memory block with a loop and `c@`, hand-rolled argv parser, a four-word test harness, terminal reads behind one file | `gforth` |
 | `sqlite-sql` | SQL reporting project on SQLite: schema with `CHECK` constraints, views that hold the arithmetic, one `SELECT` per report, assertions over exact cents | `sqlite3`, `make` |
+| `jq-report` | Reports over a JSON access log as plain jq programs: status counts, busiest paths, slowest requests, bytes per day, error rate, behind a shell command with a tested exit-code contract | `jq`, `make` |
 | `powershell-cli` | PowerShell 7 CLI: byte loop over the payload, hand-rolled argv parser, I/O behind a hashtable of scriptblocks, a harness with no gallery modules | `pwsh` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
