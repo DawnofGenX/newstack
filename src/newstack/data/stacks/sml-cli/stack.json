@@ -1,0 +1,90 @@
+{
+  "name": "sml-cli",
+  "title": "Standard ML CLI",
+  "language": "sml",
+  "blurb": "Standard ML program compiled with MLton: counting over Word8Vector, hand-written argv parser, dependency-free SML test harness and a parity suite that diffs against wc",
+  "requires": [
+    "mlton",
+    "make"
+  ],
+  "default_description": "A Standard ML command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "make parity",
+    "./bin/{npm_name} --help",
+    "./bin/{npm_name} README.md"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make build",
+      "tools": [
+        "mlton"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "mlton"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "parity",
+      "cmd": "make parity",
+      "tools": [
+        "mlton",
+        "wc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "mlton"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "mlton"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "mlton"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "stdin",
+      "cmd": "printf 'a b c\\n' | ./bin/{{ npm_name }} | grep -q '1       3       6'",
+      "tools": [
+        "mlton"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "app.mlb"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "app.mlb",
+    "tests.mlb"
+  ],
+  "adopt_tests": []
+}

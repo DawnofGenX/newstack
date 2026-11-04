@@ -1,0 +1,11 @@
+$(SML_LIB)/basis/basis.mlb
+
+src/counts.sml
+src/options.sml
+src/runner.sml
+
+tests/harness.sml
+tests/counts_test.sml
+tests/options_test.sml
+tests/runner_test.sml
+tests/test_main.sml

@@ -116,6 +116,7 @@ jobs:
           - mdbook-docs
           - docker-compose-svc
           - haxe-cli
+          - sml-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -342,6 +343,13 @@ jobs:
           sudo apt-get install -y --no-install-recommends haxe neko
           haxe --version
           neko -version
+
+      - name: Install MLton
+        if: matrix.stack == 'sml-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends mlton
+          mlton
 
       - name: Install Groovy
         if: matrix.stack == 'groovy-cli'

@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`sml-cli`**: Standard ML compiled with MLton into one native binary. Counting
+  runs over `Word8Vector` so it is byte-accurate, argv parsing and report building
+  sit behind an `io` record so 37 assertions never touch the disk, and a parity
+  suite diffs every row against `wc`, padding included.
 - **`haxe-cli`**: a Haxe program compiled to Neko that counts lines, words and
   bytes the way `wc` does. Counting, option parsing and report building live in
   separate modules behind an `Io` interface, so 43 assertions run without touching
