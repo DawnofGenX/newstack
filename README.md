@@ -318,6 +318,7 @@ $ newstack stacks outdated
 | `sqlite-sql` | SQL reporting project on SQLite: schema with `CHECK` constraints, views that hold the arithmetic, one `SELECT` per report, assertions over exact cents | `sqlite3`, `make` |
 | `jq-report` | Reports over a JSON access log as plain jq programs: status counts, busiest paths, slowest requests, bytes per day, error rate, behind a shell command with a tested exit-code contract | `jq`, `make` |
 | `powershell-cli` | PowerShell 7 CLI: byte loop over the payload, hand-rolled argv parser, I/O behind a hashtable of scriptblocks, a harness with no gallery modules | `pwsh` |
+| `docker-compose-svc` | A small HTTP service shipped as a container: non-root image with a real HEALTHCHECK, compose file driven by `PORT`, pure-function contract with unit tests that need no Docker, and a smoke test that starts the container, checks every answer and leaves nothing running | `docker`, `make` |
 | `mdbook-docs` | An mdBook site with a shell link checker wired into CI: relative links and images must exist, every page must be listed in `src/SUMMARY.md`, and 25 assertions prove it catches broken links, missing images and orphan pages | `mdbook`, `make` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a

@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`docker-compose-svc`**: a small HTTP service shipped as a container — a
+  non-root image with a real `HEALTHCHECK`, a compose file driven by `PORT`, the
+  service's answers kept as pure functions so the unit tests need no Docker, and a
+  smoke test that builds the image, waits for healthy, checks every answer (health,
+  metrics counter, 404, 405, uid) and leaves nothing running.
 - **`mdbook-docs`**: an mdBook site whose links and table of contents are
   checked in CI. `tools/check-links.sh` reads every page under `src/`, reports a
   relative link or image whose target is missing, and reports any page that

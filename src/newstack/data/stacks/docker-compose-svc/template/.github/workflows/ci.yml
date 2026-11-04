@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit:
+    name: unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run the unit tests
+        run: make -s test
+
+  container:
+    name: container smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show the toolchain
+        run: docker compose version
+      - name: Build the image
+        run: docker compose build
+      - name: Start it, ask it questions, stop it
+        run: SMOKE_PORT=18080 ./tests/smoke.sh
+      - name: Container logs
+        if: failure()
+        run: docker compose logs --tail 60

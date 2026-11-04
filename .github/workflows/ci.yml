@@ -114,6 +114,7 @@ jobs:
           - powershell-cli
           - jq-report
           - mdbook-docs
+          - docker-compose-svc
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv

@@ -1,0 +1,58 @@
+{
+  "name": "docker-compose-svc",
+  "title": "Docker Compose service",
+  "language": "docker",
+  "blurb": "Docker Compose service: a small HTTP service shipped as a container \u2014 compose file with a real healthcheck, non-root image, unit tests that need nothing, and a smoke test that starts the container and checks every answer",
+  "requires": [
+    "docker",
+    "make"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "make up",
+    "curl -s localhost:8080/health",
+    "make down"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "make -s test",
+      "timeout": 180
+    },
+    {
+      "name": "help",
+      "cmd": "make -s help | grep -q 'smoke'"
+    },
+    {
+      "name": "build",
+      "cmd": "docker compose build",
+      "timeout": 900,
+      "tools": [
+        "docker"
+      ]
+    },
+    {
+      "name": "smoke",
+      "cmd": "SMOKE_PORT=18080 ./tests/smoke.sh",
+      "timeout": 900,
+      "tools": [
+        "docker"
+      ]
+    },
+    {
+      "name": "no-leftovers",
+      "cmd": "test -z \"$(docker compose ps -q)\" && echo 'no containers left running'"
+    }
+  ],
+  "detect": [
+    {
+      "file": "docker-compose.yml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}
