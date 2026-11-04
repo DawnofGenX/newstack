@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`octave-cli`**: a wc-style CLI in plain Octave — the counting core, the argument
+  parser and the runner live in a `+textstat` package directory, the runner takes its
+  environment as a struct of function handles, and a 58-check suite needs no
+  framework. The seven verify steps cover the suite, the help text, both exit-code
+  paths, standard input, the `-` operand and `wc` parity. Single-quoted Octave strings
+  do not interpret escapes, so the fixtures are built with `sprintf`.
 - **`ada-cli`**: Ada on GNAT — a counting core that works on bytes, an argv parser with
   `--` and short clusters, and a dependency-free harness of 71 checks; the runner takes
   its two output subprograms as parameters, so only `main.adb` touches the real stdin.

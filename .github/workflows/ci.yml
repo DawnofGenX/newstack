@@ -97,6 +97,7 @@ jobs:
           - vhdl-sim
           - fortran-cli
           - ada-cli
+          - octave-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -235,6 +236,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends gnat make
           gnatmake --version | head -1
+
+      - name: Install Octave
+        if: matrix.stack == 'octave-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends octave
+          octave --version | head -1
 
       - name: Install Tcl
         if: matrix.stack == 'tcl-cli'
