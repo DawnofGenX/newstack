@@ -1,0 +1,82 @@
+:root {
+  color-scheme: light dark;
+  --ink: #1b1b1f;
+  --paper: #fdfdfc;
+  --accent: #2f6f4f;
+  --muted: #6a6a72;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 42rem;
+  padding: 2rem 1.25rem 4rem;
+  font: 1.0625rem/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+a {
+  color: var(--accent);
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(0 0 0 / 12%);
+  padding-bottom: 0.75rem;
+}
+
+.brand {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+nav a {
+  margin-left: 0.75rem;
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+}
+
+.post-list li {
+  margin-bottom: 1.5rem;
+}
+
+.post-list time,
+.meta {
+  display: block;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.note {
+  border-left: 3px solid var(--accent);
+  background: rgb(47 111 79 / 8%);
+  padding: 0.75rem 1rem;
+  margin: 1.5rem 0;
+}
+
+.site-footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(0 0 0 / 12%);
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e9e9ee;
+    --paper: #14141a;
+    --accent: #7fd1a6;
+  }
+}

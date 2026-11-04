@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Hugo
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends hugo
+          hugo version
+      - name: Build the site
+        run: make -s build
+      - name: Render and assert on the output
+        run: make -s test
+      - name: Feed and sitemap
+        run: |
+          test -f public/sitemap.xml
+          test -f public/index.xml
+          grep -q '<urlset' public/sitemap.xml
+          grep -q '<rss' public/index.xml
+          grep -qF 'Sitemap:' public/robots.txt
+      - name: Shortcode and heading anchors
+        run: |
+          grep -qF '<aside class="note">' public/posts/welcome/index.html
+          grep -qF 'id="what-to-change-first"' public/posts/welcome/index.html
+      - name: Malformed front matter is rejected
+        run: |
+          set +e
+          printf '+++\ntitle = \n+++\n' > content/zz-bad.md
+          hugo --quiet --destination .parity/bad >/dev/null 2>&1
+          status=$?
+          rm -f content/zz-bad.md
+          echo "build status with broken front matter: $status"
+          test "$status" -ne 0
+      - name: Serve and fetch a page
+        run: |
+          set +e
+          hugo server --bind 127.0.0.1 --port 18087 --logLevel error > .serve.log 2>&1 &
+          server=$!
+          ready=1
+          i=0
+          while [ "$i" -lt 60 ]; do
+            if curl -fsS http://127.0.0.1:18087/ -o .serve-home.html 2>/dev/null; then ready=0; break; fi
+            i=$((i + 1))
+            sleep 1
+          done
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18087/posts/welcome/)
+          kill "$server" 2>/dev/null
+          wait "$server" 2>/dev/null
+          echo "index ready=$ready post status=$code"
+          test "$ready" -eq 0
+          test "$code" = 200
+          grep -qF 'class="post-list"' .serve-home.html

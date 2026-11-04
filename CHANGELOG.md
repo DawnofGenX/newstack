@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`hugo-site`**: a Hugo content site rather than a CLI — hand-written `layouts/` and
+  partials, no theme and no JavaScript, TOML front matter, a `{{< note >}}` shortcode, and a
+  stylesheet that is minified and fingerprinted (with subresource integrity) by Hugo's asset
+  pipeline. `make test` renders the whole site into a temporary directory and asserts on the
+  HTML — partials ran, the shortcode expanded, headings got ids, the sitemap and RSS feed
+  exist, `robots.txt` points at the sitemap, no dev-only script leaked into a built page — and
+  it writes deliberately malformed front matter to require the build to *fail*. Six verify
+  steps, including a negative one and a real `hugo server` fetch.
 - **`pascal-cli`**: a `wc`-style counter in Free Pascal on `fpc` and `make`, RTL only —
   bytes are read raw and folded once, arguments are parsed by hand, and the terminal lives
   behind a record of three function pointers, so the suite drives exit codes and rows

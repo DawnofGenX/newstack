@@ -85,6 +85,7 @@ jobs:
           - r-cli
           - ocaml-cli
           - static-site
+          - hugo-site
           - helm-chart
           - gleam-cli
           - scala-cli
@@ -275,6 +276,13 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends tcl
           echo 'puts [info patchlevel]' | tclsh
+
+      - name: Install Hugo
+        if: matrix.stack == 'hugo-site'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends hugo
+          hugo version
 
       - name: Set up PHP
         if: contains(fromJSON('["php-composer-cli","symfony-app"]'), matrix.stack)

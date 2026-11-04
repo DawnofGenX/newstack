@@ -1,0 +1,79 @@
+{
+  "name": "hugo-site",
+  "title": "Hugo site",
+  "language": "html",
+  "blurb": "Content site on Hugo: hand-written layouts, a shortcode, fingerprinted CSS, hermetic assertion suite",
+  "requires": [
+    "hugo",
+    "make"
+  ],
+  "default_description": "A content site built with Hugo.",
+  "next_steps": [
+    "cd {path}",
+    "make build",
+    "make serve"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make -s build",
+      "tools": [
+        "hugo",
+        "make"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make -s test",
+      "tools": [
+        "hugo",
+        "make"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "feed",
+      "cmd": "test -f public/sitemap.xml && test -f public/index.xml && grep -q '<urlset' public/sitemap.xml && grep -q '<rss' public/index.xml && grep -qF 'Sitemap:' public/robots.txt",
+      "tools": [
+        "hugo"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "shortcode",
+      "cmd": "grep -qF '<aside class=\"note\">' public/posts/welcome/index.html && grep -qF 'id=\"what-to-change-first\"' public/posts/welcome/index.html",
+      "tools": [
+        "hugo"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "bad-front-matter-rejected",
+      "cmd": "printf '+++\\ntitle = \\n+++\\n' > content/zz-bad.md; hugo --quiet --destination .parity/bad >/dev/null 2>&1; status=$?; rm -f content/zz-bad.md; test \"$status\" -ne 0",
+      "tools": [
+        "hugo"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "serve",
+      "cmd": "set +e\nhugo server --bind 127.0.0.1 --port 18087 --logLevel error > .serve.log 2>&1 &\nserver=$!\nready=1\ni=0\nwhile [ \"$i\" -lt 60 ]; do\n  if curl -fsS http://127.0.0.1:18087/ -o .serve-home.html 2>/dev/null; then ready=0; break; fi\n  i=$((i + 1))\n  sleep 1\ndone\ncode=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18087/posts/welcome/)\nkill \"$server\" 2>/dev/null\nwait \"$server\" 2>/dev/null\ntest \"$ready\" -eq 0 && test \"$code\" = 200 && grep -qF 'class=\"post-list\"' .serve-home.html",
+      "tools": [
+        "hugo",
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "hugo.toml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

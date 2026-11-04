@@ -1,0 +1,22 @@
+# Site configuration. Every value here is plain TOML that Hugo reads at build time.
+baseURL = "https://example.com/"
+languageCode = "en-us"
+title = "{{ title }}"
+copyright = "© {{ year }} {{ author }}"
+enableRobotsTXT = true
+summaryLength = 20
+disableKinds = ["taxonomy", "term"]
+
+[params]
+  description = "{{ description }}"
+  author = "{{ author }}"
+  repository = "https://github.com/example/{{ npm_name }}"
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = false
+  [markup.highlight]
+    noClasses = false
+
+[outputs]
+  home = ["HTML", "RSS"]
