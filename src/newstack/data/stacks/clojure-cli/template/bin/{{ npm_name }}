@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# Run the CLI through the Clojure CLI tooling. Everything after the main
+# namespace is handed to the program verbatim (the tooling does not stop
+# parsing its own flags there), so `-l` and friends reach the parser. The
+# program keeps ownership of stdout and of the exit code.
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$root"
+exec clojure -M -m textstat.main "$@"

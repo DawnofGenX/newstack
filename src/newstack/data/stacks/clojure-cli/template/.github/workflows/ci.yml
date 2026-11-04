@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      # The Clojure CLI is a launcher script plus a lib dir; the release tag is
+      # the version, so this installs 1.12.6 exactly. (The DeLaGuardo action
+      # only publishes bare numeric tags, which the repo's pinning rule rejects.)
+      # The first `clojure` run fetches the runtime from Maven Central into ~/.m2.
+      - name: Install the Clojure CLI
+        run: |
+          curl -sSLf -o linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
+          chmod +x linux-install.sh
+          sudo ./linux-install.sh
+          clojure -Sdescribe
+      - name: Test
+        run: clojure -M:test -m textstat.run-tests
+      - name: Help
+        run: ./bin/{{ npm_name }} --help
+      - name: Usage error exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: Stdin is counted
+        run: |
+          set +e
+          out=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w)
+          status=$?
+          echo "output: [$out] status: $status"
+          test "$status" -eq 0
+          test "$out" = "3 -"
+      - name: Missing file exits 1
+        run: |
+          set +e
+          ./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1

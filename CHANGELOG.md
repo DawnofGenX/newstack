@@ -84,6 +84,13 @@ All notable changes to this project are documented here. The format follows
   needed. A Maven wrapper is included, the jar is `target/<name>.jar`, and the shipped
   workflow runs `mvn -B -ntp verify` plus a live endpoint smoke test on a port the app is
   told to use, so a scaffolded service proves its own HTTP surface in CI.
+- **`clojure-cli` stack** — a Clojure CLI tool on `deps.edn` and `clojure -M:test`, with
+  no Leiningen and no third-party libraries: `textstat.counts` folds over raw bytes,
+  `textstat.options` parses argv by hand, `textstat.cli/run` returns the exit code as a
+  value so the `clojure.test` suite (28 tests, 54 assertions) never spawns a process, and
+  only `textstat.main` touches the filesystem, `System/in` and `System/exit`. The seven
+  shipped checks include stdin, so a broken real-input path cannot hide behind the fake
+  I/O record the unit tests inject.
 
 ### Fixed
 

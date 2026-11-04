@@ -86,6 +86,7 @@ jobs:
           - gleam-cli
           - scala-cli
           - haskell-cli
+          - clojure-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -153,6 +154,22 @@ jobs:
           chmod +x scala-cli
           sudo mv scala-cli /usr/local/bin/scala-cli
           scala-cli version
+      # The Clojure CLI is a launcher script plus a lib dir; the release tag is
+      # the version, so this installs 1.12.6 exactly. (The DeLaGuardo action
+      # only publishes bare numeric tags, which the repo's pinning rule rejects.)
+      - name: Set up Java (clojure-cli)
+        if: matrix.stack == 'clojure-cli'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install the Clojure CLI
+        if: matrix.stack == 'clojure-cli'
+        run: |
+          curl -sSLf -o linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
+          chmod +x linux-install.sh
+          sudo ./linux-install.sh
+          clojure -Sdescribe
       - name: Set up PHP
         if: contains(fromJSON('["php-composer-cli","symfony-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
