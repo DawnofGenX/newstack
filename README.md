@@ -300,6 +300,7 @@ $ newstack stacks outdated
 | `racket-cli` | Racket CLI on the core distribution: byte-counting core, struct-based argv parser, `rackunit` suites, I/O behind a struct of funs | `racket`, `raco` |
 | `deno-cli` | TypeScript CLI on Deno: byte-counting core, pure argv parser, `Deno.test` suites, I/O behind an object of functions | `deno` |
 | `vhdl-sim` | VHDL design with a self-checking testbench on GHDL: one clocked process, assertion-driven simulation, a run script that fails CI on a wrong design | `ghdl` |
+| `fortran-cli` | Fortran CLI on `gfortran` and `make`: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, output units injected | `gfortran`, `make` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python
@@ -503,7 +504,7 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More stacks once the toolchains are available here: Octave, Groovy/Gradle, Racket, Nix.
+- More stacks once the toolchains are available here: Octave, Groovy/Gradle, Nix.
 
   Open an issue with the stack or flag you want next.
 

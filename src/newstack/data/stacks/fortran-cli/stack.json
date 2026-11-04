@@ -1,0 +1,71 @@
+{
+  "name": "fortran-cli",
+  "title": "Fortran CLI",
+  "language": "fortran",
+  "blurb": "Fortran CLI on gfortran and make: byte-exact counting core, hand-written argv parser, dependency-free test harness, output units injected",
+  "requires": [
+    "gfortran",
+    "make"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make -s all",
+      "timeout": 600,
+      "tools": [
+        "gfortran",
+        "make"
+      ]
+    },
+    {
+      "name": "test",
+      "cmd": "make -s test",
+      "timeout": 600,
+      "tools": [
+        "gfortran",
+        "make"
+      ]
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q 'Usage: {{ npm_name }}'",
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "timeout": 300
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./bin/{{ npm_name }} /nonexistent/file.txt >/dev/null 2>&1; test $? -eq 1",
+      "timeout": 300
+    },
+    {
+      "name": "stdin",
+      "cmd": "test \"$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w)\" = '3 -'",
+      "timeout": 300
+    },
+    {
+      "name": "parity",
+      "cmd": "mkdir -p .parity && printf 'alpha beta\\ngamma delta\\n' > .parity/p1.txt && printf 'one two three' > .parity/p2.txt && printf 'h\\303\\251llo w\\303\\266rld\\n' > .parity/p3.txt && : > .parity/p4.txt && printf 'a\\tb\\vc\\fd\\n' > .parity/p5.txt && ok=0; for file in .parity/p*.txt; do ours=$(./bin/{{ npm_name }} -l -w -c \"$file\" | awk '{print $1, $2, $3}'); theirs=$(wc -l -w -c < \"$file\" | awk '{print $1, $2, $3}'); if [ \"$ours\" != \"$theirs\" ]; then echo \"mismatch on $file: ours=$ours wc=$theirs\"; ok=1; fi; done; test \"$ok\" -eq 0",
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Makefile",
+      "contains": "gfortran"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

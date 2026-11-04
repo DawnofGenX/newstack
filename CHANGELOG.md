@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`fortran-cli` stack.** Fortran 2018 on `gfortran` and `make`, with no test framework: the counting core takes bytes through a `counter_t`, the runner takes its output units as arguments so the 51-check suite reads what the tool would have printed, and stdin is read a byte at a time through a stream connection to `/dev/stdin` — the only byte-exact option in Fortran.
 - **`vhdl-sim` stack** — a synthesizable VHDL counter plus a self-checking testbench on GHDL: every
   check is an `assert ... severity error` and `run.sh` passes `--assert-level=error`, so a wrong design
   is a non-zero exit code rather than a waveform for a human to read. The `inject_fault` generic is the
