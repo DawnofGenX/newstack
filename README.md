@@ -59,6 +59,7 @@ newstack new react-vite-ts ~/code/app
 newstack new fastapi ~/code/api -d "Billing service" --author "Your Name"
 newstack new python-lib ~/code/lib --dry-run     # preview, write nothing
 newstack new python-cli ~/code/tool --github     # create the repo and push it too
+newstack new python-lib ~/code/lib --license apache-2.0   # mit (default), apache-2.0, bsd-3, none
 newstack adopt ~/code/old-project --dry-run    # retrofit CI/lint onto existing code
 newstack update ~/code/app --dry-run   # re-apply template changes, keep your edits
 newstack outdated ~/code/app         # what has the template moved on from?
@@ -71,6 +72,25 @@ Every command takes `--json` where it makes sense, so the tool is scriptable.
 `newstack new` renders variables, initialises git with a first commit, and (with
 `--github`) creates the remote repository and pushes — one command from empty
 directory to CI-ready project.
+
+### Choosing a licence
+
+Every project gets a `LICENSE` file, and `--license` decides which one:
+
+```console
+$ newstack new rust-cli ~/code/scanner --license apache-2.0
+$ head -2 ~/code/scanner/LICENSE
+                                 Apache License
+                           Version 2.0, January 2004
+```
+
+The choices are `mit` (the default), `apache-2.0`, `bsd-3`, and `none` for no
+file at all. The text comes from `src/newstack/data/licenses/`, is filled with
+your `--author` and the current year, and is the same for every stack — a
+template's own `LICENSE` is never trusted over it. The choice is stored in
+`.newstack.json`, so `newstack update` keeps writing the licence you picked;
+`newstack update --license bsd-3` switches it later. `newstack adopt` never
+touches `LICENSE`: retrofitting CI onto existing code must not relicence it.
 
 ## Stacks
 
@@ -124,8 +144,8 @@ directory to CI-ready project.
 | `swift-cli` | Swift 6 CLI on SwiftPM: pure counting core, hand-rolled argv parser, XCTest suites, I/O behind a struct of closures | `swift` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
-README, an MIT licence, a `.gitignore`, and a `.newstack.json` record that `newstack
-update` uses to re-apply later template changes.
+README, a licence (`--license mit|apache-2.0|bsd-3|none`), a `.gitignore`, and a
+`.newstack.json` record that `newstack update` uses to re-apply later template changes.
 
 ## Adopting an existing project
 
@@ -304,13 +324,17 @@ manifest format, no fork required.
   exactly what gets written.
 - **Verification is a product feature, not an afterthought.** `check` is the same code path
   CI uses.
+- **A licence is data, not a template detail.** One copy of each licence text lives in
+  `data/licenses/`, so 46 templates cannot drift apart and `--license none` is a real
+  choice rather than a deleted file.
 - **Updates are a hash comparison, not a diff dance.** `.newstack.json` records what
   newstack wrote; a file counts as yours only once it stops matching that hash, so
   `update` never has to guess whose change it is looking at.
 
 ## Roadmap
 
-- `--license apache-2.0|bsd-3` and other variable choices beyond the current defaults.
+- More variable choices beyond the current defaults (Python version, package manager).
+- `newstack stacks add <git-url>` to bring a stack in from outside the repository.
 
 ## Licence
 

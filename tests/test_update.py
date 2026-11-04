@@ -55,6 +55,7 @@ def test_new_records_every_file_it_wrote(tmp_path, monkeypatch) -> None:
     for rel, digest in record.files.items():
         assert sha256_bytes((dest / rel).read_bytes()) == digest, rel
     assert set(record.files) == {
+        "LICENSE",  # written from the licence registry, not from the template
         "README.md",
         "src/proj/__init__.py",
     }

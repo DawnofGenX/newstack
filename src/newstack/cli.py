@@ -11,7 +11,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import __version__
+from . import __version__, licenses
 from .adopt import apply_plan, detect_stacks, plan_adoption
 from .registry import RegistryError, Stack, get_stack, load_catalog
 from .render import TemplateError, generate
@@ -153,6 +153,10 @@ def build_context(stack: Stack, destination: Path, args: argparse.Namespace) -> 
         "stack": stack.name,
         "stack_title": stack.title,
         "newstack_version": __version__,
+        # `new` defaults this to "mit"; commands that must not invent files
+        # (adopt) leave it absent, which tells the renderer to keep the
+        # template's own LICENSE.
+        "license": getattr(args, "license", None),
     }
 
 
@@ -215,6 +219,7 @@ def cmd_new(args: argparse.Namespace) -> int:
         "stack": stack.name,
         "path": str(destination),
         "dry_run": args.dry_run,
+        "license": context.get("license"),
         "files": result.files,
         "overwritten": result.overwritten,
         "git": None,
@@ -382,6 +387,8 @@ def cmd_update(args: argparse.Namespace) -> int:
         context["email"] = args.email
     if args.description is not None:
         context["description"] = args.description
+    if getattr(args, "license", None):
+        context["license"] = args.license
 
     plan = plan_update(
         stack, root, record=record, context=context, force=args.force, prune=args.prune
@@ -623,7 +630,11 @@ def cmd_check(args: argparse.Namespace) -> int:
 
 def build_context_for_check(stack: Stack, name: str | None) -> dict:
     args = argparse.Namespace(
-        name=name or "check-app", description=None, author="newstack CI", email=None
+        name=name or "check-app",
+        description=None,
+        author="newstack CI",
+        email=None,
+        license=licenses.DEFAULT,
     )
     return build_context(stack, Path(args.name), args)
 
@@ -683,6 +694,17 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="OWNER/REPO",
         help="create a GitHub repo from the project and push (needs gh)",
     )
+    new.add_argument(
+        "--license",
+        choices=licenses.CHOICES,
+        default=licenses.DEFAULT,
+        metavar="NAME",
+        help=(
+            "licence written to LICENSE: "
+            + ", ".join(licenses.CHOICES)
+            + f" (default: {licenses.DEFAULT})"
+        ),
+    )
     new.add_argument("--private", action="store_true", help="make the GitHub repo private")
     new.add_argument("--json", action="store_true", help="machine readable output")
     new.set_defaults(handler=cmd_new)
@@ -709,6 +731,12 @@ def build_parser() -> argparse.ArgumentParser:
     update.add_argument("-d", "--description", help="override the recorded description")
     update.add_argument("--author", help="override the recorded author")
     update.add_argument("--email", help="override the recorded email")
+    update.add_argument(
+        "--license",
+        choices=licenses.CHOICES,
+        metavar="NAME",
+        help="switch the recorded licence, e.g. --license apache-2.0",
+    )
     update.add_argument(
         "--force", action="store_true", help="overwrite files you edited locally"
     )

@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`--license mit|apache-2.0|bsd-3|none`** on `new` (and `update`, to switch later) —
+  the generated `LICENSE` now comes from a licence registry in `data/licenses/` instead of
+  a per-template copy, filled in with `--author` and the current year. `none` ships no
+  file at all, and the choice is stored in `.newstack.json` so `update` keeps honouring
+  it. `adopt` never writes a licence, and `astro` — the one stack whose template had no
+  `LICENSE` — now gets one like every other stack. Closes the last roadmap item.
 - **`newstack update`** — re-apply a stack's current template to a project `newstack new`
   generated, without losing local edits. `new` now writes a `.newstack.json` record (the
   render context plus a sha256 per file); `update` re-renders the current template with

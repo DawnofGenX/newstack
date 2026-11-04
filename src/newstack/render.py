@@ -12,6 +12,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import licenses
+
 VAR_RE = re.compile(r"\{\{\s*([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*\}\}")
 
 
@@ -81,6 +83,36 @@ class _Entry:
     executable: bool
 
 
+def _apply_license(entries: list[_Entry], context: dict, missing: list[str]) -> list[_Entry]:
+    """Write ``LICENSE`` from the licence registry instead of the template copy.
+
+    ``context['license']`` is the ``--license`` value chosen at generation time.
+    A falsy value means "leave the template alone", which is what ``adopt``
+    passes: a licence file is not adoption infrastructure and must never appear
+    in its "would add" list. ``none`` removes the file, so a project can ship
+    without one.
+    """
+    key = context.get("license")
+    if not key:
+        return entries
+    if key == licenses.NONE:
+        return [entry for entry in entries if entry.rel != licenses.FILE_NAME]
+    try:
+        body = licenses.text(str(key))
+    except licenses.LicenseError as exc:
+        raise TemplateError(str(exc)) from exc
+
+    replacement = _Entry(
+        rel=licenses.FILE_NAME,
+        payload=render_string(body, context, missing=missing).encode("utf-8"),
+        executable=False,
+    )
+    for index, entry in enumerate(entries):
+        if entry.rel == licenses.FILE_NAME:
+            return [*entries[:index], replacement, *entries[index + 1 :]]
+    return sorted([*entries, replacement], key=lambda entry: entry.rel)
+
+
 def _collect(template_dir: Path, context: dict) -> tuple[list[_Entry], list[str]]:
     """Render the whole template in memory first, so a bad template writes nothing."""
     missing: list[str] = []
@@ -106,6 +138,8 @@ def _collect(template_dir: Path, context: dict) -> tuple[list[_Entry], list[str]
 
         executable = bool(os.access(src, os.X_OK) or src.suffix in {".sh", ".command"})
         entries.append(_Entry(rel=rel, payload=payload, executable=executable))
+
+    entries = _apply_license(entries, context, missing)
 
     if missing:
         names = ", ".join(sorted(set(missing)))
