@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`racket-cli` stack** — a Racket project on the core distribution, no packages and no build step.
+  Counting works on `bytes` so `wc` parity holds for UTF-8 and control characters, the argv parser is
+  a struct with no side effects, and the runner takes a `struct io` of four funs so 54 `rackunit`
+  checks run without touching a file — while the shipped `stdin` check still pipes real text through
+  the real command. `*.rkt` is the detection marker.
 - **`erlang-cli` stack** — an Erlang project on plain OTP and `make`, no rebar and no hex packages.
   Counting works on binaries so `wc` parity holds for UTF-8 and control characters, the argv parser
   is hand-written, and the runner takes a map of four funs (`read_file`, `read_stdin`, `out`, `err`)

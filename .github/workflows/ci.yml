@@ -92,6 +92,7 @@ jobs:
           - swift-cli
           - tcl-cli
           - erlang-cli
+          - racket-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -190,6 +191,13 @@ jobs:
         uses: swift-actions/setup-swift@v2
         with:
           swift-version: "6.2"
+      - name: Install Racket
+        if: matrix.stack == 'racket-cli'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends racket
+          racket --version
+
       - name: Install Erlang
         if: matrix.stack == 'erlang-cli'
         run: |

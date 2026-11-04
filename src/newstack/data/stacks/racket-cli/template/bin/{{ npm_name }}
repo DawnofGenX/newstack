@@ -1,0 +1,9 @@
+#!/usr/bin/env racket
+#lang racket/base
+
+;; The command people run.  A shebang file with a #lang line is a plain Racket
+;; module, so this is a two-line program: load the entry point, hand it over.
+
+(require "../main.rkt")
+
+(main)
