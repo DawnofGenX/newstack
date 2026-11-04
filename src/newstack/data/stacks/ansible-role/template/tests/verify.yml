@@ -1,0 +1,30 @@
+---
+# Asserts the state the role is supposed to leave behind.  Run it after
+# tests/playbook.yml with the same textstat_prefix.
+#
+# This playbook is standalone on purpose: it may only use extra vars (the
+# prefix) and facts it gathers itself, never the role's vars/ file.
+- name: Verify {{ npm_name }} is installed
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Look at the install tree
+      ansible.builtin.stat:
+        path: "{{! textstat_prefix }}/{{! item }}"
+      loop:
+        - bin/textstat
+        - etc/textstat.conf
+        - etc/.installed
+      register: stat
+
+    - name: Everything the role promises is there
+      ansible.builtin.assert:
+        that:
+          - stat.results | map(attribute='stat.exists') | select | list | length == 3
+          - stat.results[0].stat.mode == "0755"
+          - stat.results[1].stat.mode == "0644"
+        fail_msg: >-
+          The role did not leave the install tree it documents under
+          {{! textstat_prefix }}.
+        quiet: true

@@ -1,0 +1,62 @@
+{
+  "name": "ansible-role",
+  "title": "Ansible role",
+  "language": "yaml",
+  "blurb": "Ansible role with defaults, variables, a template, a handler and an assert-based verification playbook",
+  "requires": [
+    "ansible-playbook"
+  ],
+  "detect": [
+    {
+      "file": "tasks/main.yml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [],
+  "next_steps": [
+    "cd {path}",
+    "ansible-playbook -i localhost, tests/playbook.yml",
+    "ansible-playbook -i localhost, tests/verify.yml"
+  ],
+  "verify": [
+    {
+      "name": "syntax-check",
+      "cmd": "ansible-playbook --syntax-check -i localhost, tests/playbook.yml",
+      "timeout": 120
+    },
+    {
+      "name": "apply",
+      "cmd": "ansible-playbook -i localhost, -e textstat_prefix=$PWD/.play/prefix tests/playbook.yml",
+      "timeout": 300
+    },
+    {
+      "name": "verify-state",
+      "cmd": "ansible-playbook -i localhost, -e textstat_prefix=$PWD/.play/prefix tests/verify.yml",
+      "timeout": 300
+    },
+    {
+      "name": "idempotent",
+      "cmd": "ansible-playbook -i localhost, -e textstat_prefix=$PWD/.play/prefix tests/playbook.yml | tee .play/rerun.log | grep -q 'changed=0'",
+      "timeout": 300
+    },
+    {
+      "name": "counter-tests",
+      "cmd": "mkdir -p .play && { echo 'alpha beta'; echo 'gamma'; } > .play/sample.txt && test \"$(.play/prefix/bin/textstat .play/sample.txt)\" = '2 3 17'",
+      "timeout": 120
+    },
+    {
+      "name": "separator-override",
+      "cmd": "ansible-playbook -i localhost, -e textstat_prefix=$PWD/.play/prefix -e textstat_separator='|' tests/playbook.yml >/dev/null && test \"$(.play/prefix/bin/textstat .play/sample.txt)\" = '2|3|17'",
+      "timeout": 300
+    },
+    {
+      "name": "columns-override",
+      "cmd": "ansible-playbook -i localhost, -e textstat_prefix=$PWD/.play/prefix -e textstat_columns=bytes tests/playbook.yml >/dev/null && test \"$(.play/prefix/bin/textstat .play/sample.txt)\" = '17'",
+      "timeout": 300
+    }
+  ]
+}

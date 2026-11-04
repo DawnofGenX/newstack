@@ -61,7 +61,9 @@ jobs:
           - rust-axum
           - cpp-cmake-cli
           - terraform-module
+          - ansible-role
           - ruby-sinatra
+          - rails-app
           - java-maven-cli
           - spring-boot
           - php-composer-cli
@@ -115,8 +117,15 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.17.1"
+      # The role pins nothing but ansible-core; `uv tool install` is the fastest
+      # way to get a modern ansible-playbook onto the runner's PATH.
+      - name: Install ansible-core
+        if: matrix.stack == 'ansible-role'
+        run: |
+          uv tool install --quiet ansible-core
+          ansible-playbook --version
       - name: Set up Ruby
-        if: matrix.stack == 'ruby-sinatra'
+        if: contains(fromJSON('["ruby-sinatra","rails-app"]'), matrix.stack)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"

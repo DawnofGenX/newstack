@@ -1,0 +1,36 @@
+---
+- name: Check the requested columns are ones this role can report
+  ansible.builtin.assert:
+    that:
+      - textstat_columns | length > 0
+      - textstat_columns.split(',') | difference(textstat_supported_columns) | length == 0
+    fail_msg: >-
+      textstat_columns may only contain {{ textstat_supported_columns | join(', ') }};
+      got '{{! textstat_columns }}'.
+    quiet: true
+
+- name: Create the install tree
+  ansible.builtin.file:
+    path: "{{! textstat_prefix }}/{{! item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - bin
+    - etc
+
+- name: Install the counter
+  ansible.builtin.copy:
+    src: textstat
+    dest: "{{! textstat_prefix }}/bin/{{! textstat_binary_name }}"
+    mode: "{{! textstat_binary_mode }}"
+
+- name: Render the configuration
+  ansible.builtin.template:
+    src: textstat.conf.j2
+    dest: "{{! textstat_prefix }}/etc/textstat.conf"
+    mode: "{{! textstat_config_mode }}"
+  notify: Stamp the install
+
+- name: Report what was installed
+  ansible.builtin.debug:
+    msg: "{{! textstat_binary_name }} {{! textstat_prefix }}/bin/{{! textstat_binary_name }}"

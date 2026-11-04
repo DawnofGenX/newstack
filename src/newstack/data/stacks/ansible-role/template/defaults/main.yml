@@ -1,0 +1,9 @@
+---
+# Defaults are the knobs a user is expected to override.  Everything the role
+# installs lands under the prefix below, so a test run can point it at a
+# throwaway directory and never touch the real system.
+textstat_prefix: "{{ ansible_env.HOME | default('/tmp') }}/.local/textstat"
+textstat_separator: " "
+textstat_columns: "lines,words,bytes"
+textstat_binary_mode: "0755"
+textstat_config_mode: "0644"

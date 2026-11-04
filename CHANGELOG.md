@@ -8,6 +8,20 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`rails-app` stack** — Rails 8.1 on Ruby 3.2+: the counting lives in
+  `app/services/text_stat.rb` (a plain class, no Rails code), `StatsController` turns it into
+  `GET /stats?text=...`, and an `ActionDispatch::IntegrationTest` goes through the router so a
+  broken route fails the suite. `bin/setup` writes gems into `vendor/bundle` via the committed
+  `.bundle/config` instead of the system gem directory, and the five checks cover install,
+  `bin/rails test`, `wc` parity through `bin/rails runner`, and a live request against a
+  server started on its own port. No encrypted credentials are shipped.
+- **`ansible-role` stack** — a Galaxy-shaped role (defaults, vars, tasks, handlers, templates,
+  files, meta, `tests/playbook.yml` + `tests/verify.yml`) that installs a small POSIX counter
+  and refuses an unsupported `textstat_columns` value through an `assert`. Fourteen checks
+  include idempotence (`changed=0` on the second run), a `--check` dry run that writes
+  nothing, and two override runs proving the defaults actually drive the output.
+- **`class_name` context key** — a PascalCase identifier (`my-tool` → `MyTool`) for languages
+  that name a module after the project; the Rails template uses it for `module MyTool`.
 - **`--package-manager NAME`** — the JavaScript stacks declare the managers they are proven
   with (`"package_manager": ["npm", "pnpm", "yarn"]`, npm first) and one value writes every
   command in the project: the install, test, run and build lines in the generated workflow

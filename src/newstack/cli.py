@@ -101,6 +101,22 @@ def _cabal_name(name: str) -> str:
     return "-".join(words) or "app"
 
 
+def _class_name(name: str) -> str:
+    """A PascalCase identifier for languages that name a module after the project.
+
+    Rails wants ``module MyTool`` in config/application.rb and Java wants a class
+    name, both of which reject dashes and a leading digit.
+    """
+    words = [word for word in re.split(r"[^0-9A-Za-z]+", name) if word]
+    if not words:
+        return "App"
+    head = words[0]
+    if head[0].isdigit():
+        head = f"App{head}"
+    tail = "".join(word[:1].upper() + word[1:].lower() for word in words[1:])
+    return head[:1].upper() + head[1:] + tail
+
+
 def _title(name: str) -> str:
     words = re.split(r"[-_.\s]+", name)
     return " ".join(word[:1].upper() + word[1:] for word in words if word)
@@ -146,6 +162,7 @@ def build_context(stack: Stack, destination: Path, args: argparse.Namespace) -> 
         "npm_name": _npm_name(project_name),
         "cabal_name": _cabal_name(project_name),
         "title": _title(project_name),
+        "class_name": _class_name(project_name),
         "description": args.description or stack.default_description,
         "author": author,
         "email": email,

@@ -1,0 +1,55 @@
+name: Rails CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: ["3.2", "3.3"]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+      - name: Install gems
+        run: bundle install --quiet
+      - name: Test
+        run: bin/rails test
+      - name: Count agrees with wc
+        run: |
+          printf 'alpha beta\ngamma\n' > tmp/parity.txt
+          ours=$(bin/rails runner 'print TextStat.count(File.read("tmp/parity.txt")).values_at(:lines, :words, :bytes).join(" ")')
+          theirs=$(wc -l -w -c < tmp/parity.txt | awk '{print $1, $2, $3}')
+          echo "ours=$ours wc=$theirs"
+          test "$ours" = "$theirs"
+      - name: The endpoint answers for real
+        run: |
+          set +e
+          PORT=18082 bin/rails server > log/verify-server.log 2>&1 &
+          server=$!
+          ready=1
+          for _ in $(seq 1 60); do
+            if curl -fsS -o /dev/null http://127.0.0.1:18082/up; then ready=0; break; fi
+            sleep 1
+          done
+          body=$(curl -sS 'http://127.0.0.1:18082/stats?text=alpha+beta%0Agamma%0A')
+          status=$?
+          code=$(curl -sS -o /dev/null -w '%{http_code}' 'http://127.0.0.1:18082/stats')
+          kill "$server" 2>/dev/null
+          wait "$server" 2>/dev/null
+          cat log/verify-server.log
+          echo "ready=$ready body=$body code=$code"
+          test "$ready" -eq 0
+          test "$status" -eq 0
+          test "$body" = '{"lines":2,"words":3,"bytes":17}'
+          test "$code" = "400"

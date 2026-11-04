@@ -1,0 +1,55 @@
+#!/bin/sh
+# {{ npm_name }} — count a file and print the configured columns.
+#
+# Reads etc/textstat.conf (or $TEXTSTAT_CONFIG) for the separator and the
+# column order, and prints one line.  Counts come from wc, so they are the
+# same numbers `wc -l -w -c` reports.
+set -eu
+
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+conf=${TEXTSTAT_CONFIG:-$here/../etc/textstat.conf}
+
+separator=" "
+columns="lines,words,bytes"
+if [ -f "$conf" ]; then
+    # shellcheck disable=SC1090
+    . "$conf"
+fi
+
+if [ "$#" -ne 1 ]; then
+    printf 'usage: %s FILE\n' "${0##*/}" >&2
+    exit 2
+fi
+
+file=$1
+if [ ! -r "$file" ]; then
+    printf 'error: cannot open %s\n' "'$file'" >&2
+    exit 1
+fi
+
+read -r lines words bytes <<EOF
+$(wc -l -w -c < "$file")
+EOF
+
+out=""
+old_ifs=$IFS
+IFS=,
+for column in $columns; do
+    case $column in
+        lines) value=$lines ;;
+        words) value=$words ;;
+        bytes) value=$bytes ;;
+        *)
+            printf 'error: unsupported column: %s\n' "$column" >&2
+            exit 2
+            ;;
+    esac
+    if [ -z "$out" ]; then
+        out=$value
+    else
+        out=$out$separator$value
+    fi
+done
+IFS=$old_ifs
+
+printf '%s\n' "$out"

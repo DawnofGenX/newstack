@@ -1,0 +1,9 @@
+---
+# Applies this role to the machine running the test.  The role is the repository
+# root, which is the Galaxy layout for a standalone role.
+- name: Apply {{ npm_name }} to this host
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - role: "{{! playbook_dir }}/.."

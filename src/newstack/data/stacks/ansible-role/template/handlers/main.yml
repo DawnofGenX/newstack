@@ -1,0 +1,6 @@
+---
+- name: Stamp the install
+  ansible.builtin.copy:
+    content: "installed by the {{ npm_name }} role\n"
+    dest: "{{! textstat_prefix }}/etc/.installed"
+    mode: "0644"

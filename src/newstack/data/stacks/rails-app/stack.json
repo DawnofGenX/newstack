@@ -1,0 +1,71 @@
+{
+  "name": "rails-app",
+  "title": "Ruby on Rails app",
+  "language": "ruby",
+  "blurb": "Rails 8 JSON app: a service object for the logic, an integration test for the route, SQLite, CI",
+  "requires": [
+    "ruby",
+    "bundle"
+  ],
+  "default_description": "A small Rails JSON application.",
+  "next_steps": [
+    "cd {path}",
+    "bin/setup --skip-server",
+    "bin/rails test",
+    "bin/rails server"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "bundle install --quiet",
+      "tools": [
+        "bundle"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "bin/rails test",
+      "tools": [
+        "bundle"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "counts",
+      "cmd": "bin/rails runner 'exit(TextStat.count(\"alpha beta\\ngamma\\n\") == { lines: 2, words: 3, bytes: 17 } ? 0 : 1)'",
+      "tools": [
+        "bundle"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "parity",
+      "cmd": "printf 'alpha beta\\ngamma\\n' > tmp/parity.txt && ours=$(bin/rails runner 'print TextStat.count(File.read(\"tmp/parity.txt\")).values_at(:lines, :words, :bytes).join(\" \")') && theirs=$(wc -l -w -c < tmp/parity.txt | awk '{print $1, $2, $3}') && echo \"ours=$ours wc=$theirs\" && test \"$ours\" = \"$theirs\"",
+      "tools": [
+        "bundle"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "endpoint",
+      "cmd": "set +e; PORT=18082 bin/rails server > log/verify-server.log 2>&1 & server=$!; ready=1; for _ in $(seq 1 60); do if curl -fsS -o /dev/null http://127.0.0.1:18082/up; then ready=0; break; fi; sleep 1; done; body=$(curl -sS 'http://127.0.0.1:18082/stats?text=alpha+beta%0Agamma%0A'); status=$?; code=$(curl -sS -o /dev/null -w '%{http_code}' 'http://127.0.0.1:18082/stats'); kill \"$server\" 2>/dev/null; wait \"$server\" 2>/dev/null; echo \"ready=$ready body=$body code=$code\"; test \"$ready\" -eq 0; test \"$status\" -eq 0; test \"$body\" = '{\"lines\":2,\"words\":3,\"bytes\":17}'; test \"$code\" = 400",
+      "tools": [
+        "bundle"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Gemfile",
+      "contains": "rails"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

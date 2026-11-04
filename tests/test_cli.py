@@ -95,6 +95,17 @@ def test_cabal_name_never_reads_as_a_version() -> None:
     assert _cabal_name("2fast") == "2fast"
 
 
+def test_class_name_is_a_pascal_case_identifier() -> None:
+    from newstack.cli import _class_name
+
+    assert _class_name("my-tool") == "MyTool"
+    assert _class_name("my_tool") == "MyTool"
+    assert _class_name("myTool") == "MyTool"
+    assert _class_name("railsproj") == "Railsproj"
+    assert _class_name("2fast") == "App2fast"
+    assert _class_name("---") == "App"
+
+
 def test_haskell_project_name_ending_in_a_number_still_renders_a_legal_package(tmp_path) -> None:
     dest = tmp_path / "hs"
     assert main(["new", "haskell-cli", str(dest), "--name", "tool-2024", "--no-git"]) == 0

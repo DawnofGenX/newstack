@@ -266,7 +266,9 @@ $ newstack stacks outdated
 | `rust-axum` | axum service: typed routes, shared state, `tower` oneshot tests, fmt/clippy | `cargo` |
 | `cpp-cmake-cli` | C++20 CLI: CMake lib+bin split, CTest suite, warning-clean GCC/Clang build | `cmake`, `g++` |
 | `terraform-module` | Reusable module: validated inputs, computed tags, `terraform test` cases incl. a rejected input | `terraform` |
+| `ansible-role` | Galaxy-shaped Ansible role: validated inputs, idempotent tasks, a handler, molecule-free playbook + assert playbooks | `ansible-playbook` |
 | `ruby-sinatra` | Sinatra JSON API: modular app, RSpec + rack-test suite, RuboCop, committed lockfile | `ruby`, `bundle` |
+| `rails-app` | Rails 8 JSON app: a service object for the counting, an integration test that goes through the router, SQLite, committed lockfile | `ruby`, `bundle` |
 | `java-maven-cli` | Java 21 CLI on Maven: pure counting logic, 21 JUnit 5 tests, runnable jar | `java`, `mvn` |
 | `spring-boot` | Java 21 Spring Boot 3 web service on Maven: a wc-style `/stats` endpoint, a pure service, and a JUnit 5 + MockMvc suite | `java`, `mvn` |
 | `php-composer-cli` | PHP 8.3 CLI on Composer: PSR-4 autoloading, a PHPUnit 11 suite, and a wc-style text counter | `php`, `composer` |
@@ -496,7 +498,9 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- Nothing queued — open an issue with the stack or flag you want next.
+- More stacks once the toolchains are available here: Octave, Groovy/Gradle, Racket, Nix.
+
+  Open an issue with the stack or flag you want next.
 
 ## Licence
 

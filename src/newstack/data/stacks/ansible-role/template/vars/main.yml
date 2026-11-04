@@ -1,0 +1,8 @@
+---
+# Vars are the role's own constants: they are not meant to be overridden from
+# the command line, so a typo in a column name cannot silently pass through.
+textstat_binary_name: textstat
+textstat_supported_columns:
+  - lines
+  - words
+  - bytes

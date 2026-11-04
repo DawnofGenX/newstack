@@ -1,0 +1,10 @@
+/log/*
+!/log/.keep
+/tmp/*
+!/tmp/.keep
+!/tmp/pids
+!/tmp/storage
+/storage/*.sqlite3
+/vendor/bundle/
+/config/master.key
+.DS_Store
