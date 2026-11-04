@@ -89,6 +89,12 @@ All notable changes to this project are documented here. The format follows
   `cabal_name` context key — the same slug with every all-numeric word given a letter
   (`tool-v2024`) — and `haskell-cli` names its package with it while the executable keeps
   the name the user typed.
+- **`astro` no longer fails its own check on a moving Node floor.** `astro check` refuses
+  to run below the Node version Astro declares (`>=22.23.4` as of Astro 7.4), and the
+  runner image plus the shared CI step still installed 22.23.3, so the astro job failed
+  while every other stack was green. The repo's Node step now installs 24, the astro
+  scaffold declares `engines.node` and states it in its README, and its shipped workflow
+  tests that LTS instead of a floating 22.x.
 
 ## [0.4.0] - 2026-11-03
 

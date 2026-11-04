@@ -5,6 +5,10 @@
 A static site built with Astro and TypeScript: one page, one layout component, and a
 Vitest unit test around the helper the page imports.
 
+Astro 7 refuses to run on an older Node than the one it declares, and that floor moves:
+this scaffold asks for **Node 22.23.4 or newer** (`engines` in `package.json`) and its CI
+runs Node 24.
+
 ## Develop
 
 ```bash
