@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`groovy-cli`**: a word-count CLI in Groovy, no build step and no dependency.
+  The counting core walks a `byte[]`, the argv parser is a plain list walk, and
+  the runner takes its four side effects as closures so the suite drives the real
+  logic in-process. 83 assertions plus a five-fixture diff against `wc`.
 - **`raku-cli`**: a word-count CLI in Raku. Reading is `Buf`-based, so the
   counting core works on bytes rather than characters; the runner takes the four
   side effects as closures, so a formatting slip fails without spawning a

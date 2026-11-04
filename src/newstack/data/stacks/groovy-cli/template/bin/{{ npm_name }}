@@ -1,0 +1,6 @@
+#!/bin/sh
+# Build-free: hand the script to the Groovy runtime with the sources on the
+# classpath. The wrapper resolves its own root, so it works from any directory.
+set -eu
+root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+exec groovy -cp "$root/src" "$root/main.groovy" "$@"
