@@ -11,7 +11,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import __version__, licenses
+from . import __version__, licenses, sources
 from .adopt import apply_plan, detect_stacks, plan_adoption
 from .registry import RegistryError, Stack, get_stack, load_catalog
 from .render import TemplateError, generate
@@ -559,6 +559,7 @@ def cmd_list(args: argparse.Namespace) -> int:
                         "requires": list(s.requires),
                         "available": not missing_tools(s),
                         "missing_tools": missing_tools(s),
+                        "installed": s.installed,
                     }
                     for s in stacks.values()
                 ],
@@ -573,8 +574,65 @@ def cmd_list(args: argparse.Namespace) -> int:
     for stack in stacks.values():
         absent = missing_tools(stack)
         flag = "" if not absent else f"  (needs {', '.join(absent)})"
-        print(f"  {stack.name:<{width}}  {stack.language:<8}  {stack.blurb}{flag}")
+        origin = "  [installed]" if stack.installed else ""
+        print(f"  {stack.name:<{width}}  {stack.language:<8}  {stack.blurb}{flag}{origin}")
     print("\n  scaffold one:  newstack new <stack> <path>\n")
+    return 0
+
+
+def cmd_stacks_add(args: argparse.Namespace) -> int:
+    try:
+        installed = sources.install(args.url, subdir=args.dir, force=args.force)
+    except sources.SourceError as exc:
+        print(f"newstack: error: {exc}", file=sys.stderr)
+        return 1
+    if args.json:
+        print(json.dumps([item.as_dict() for item in installed], indent=2))
+        return 0
+
+    width = max(len(item.name) for item in installed)
+    print(f"\ninstalled {_count(len(installed), 'stack')} from {args.url}\n")
+    for item in installed:
+        rev = f"  ({item.rev})" if item.rev else ""
+        print(f"  {item.name:<{width}}  {item.path}{rev}")
+    print(
+        "\n  These are not covered by newstack's CI — prove one here with:\n"
+        f"    newstack check {installed[0].name}"
+    )
+    print(f"\n  scaffold one:  newstack new {installed[0].name} <path>\n")
+    return 0
+
+
+def cmd_stacks_remove(args: argparse.Namespace) -> int:
+    try:
+        path = sources.remove(args.name)
+    except sources.SourceError as exc:
+        print(f"newstack: error: {exc}", file=sys.stderr)
+        return 1
+    if args.json:
+        print(json.dumps({"removed": args.name, "path": str(path)}, indent=2))
+        return 0
+    print(f"removed {args.name} ({path})")
+    return 0
+
+
+def cmd_stacks_list(args: argparse.Namespace) -> int:
+    installed = sources.list_installed()
+    if args.json:
+        print(json.dumps([item.as_dict() for item in installed], indent=2))
+        return 0
+    if not installed:
+        print("\n  no stacks installed\n\n  add one:  newstack stacks add <git-url>\n")
+        return 0
+
+    width = max(len(item.name) for item in installed)
+    print(f"\n{_count(len(installed), 'installed stack')}\n")
+    for item in installed:
+        origin = item.url or "(origin not recorded)"
+        if item.rev:
+            origin = f"{origin} @{item.rev}"
+        print(f"  {item.name:<{width}}  {origin}")
+    print("\n  remove one:  newstack stacks remove <stack>\n")
     return 0
 
 
@@ -758,6 +816,25 @@ def build_parser() -> argparse.ArgumentParser:
     lst.add_argument("--json", action="store_true")
     lst.set_defaults(handler=cmd_list)
 
+    stacks = sub.add_parser("stacks", help="install stacks that are not shipped with newstack")
+    stacks_command = stacks.add_subparsers(dest="stacks_command", required=True)
+
+    stacks_add = stacks_command.add_parser("add", help="install the stack(s) in a git repository")
+    stacks_add.add_argument("url", help="repository to clone")
+    stacks_add.add_argument("--dir", help="subdirectory of the repository that holds the stacks")
+    stacks_add.add_argument("--force", action="store_true", help="replace an installed stack")
+    stacks_add.add_argument("--json", action="store_true")
+    stacks_add.set_defaults(handler=cmd_stacks_add)
+
+    stacks_remove = stacks_command.add_parser("remove", help="delete an installed stack")
+    stacks_remove.add_argument("name")
+    stacks_remove.add_argument("--json", action="store_true")
+    stacks_remove.set_defaults(handler=cmd_stacks_remove)
+
+    stacks_list = stacks_command.add_parser("list", help="which stacks are installed")
+    stacks_list.add_argument("--json", action="store_true")
+    stacks_list.set_defaults(handler=cmd_stacks_list)
+
     check = sub.add_parser("check", help="generate a stack in a temp dir and run its checks")
     check.add_argument("stacks", nargs="*", help="stack names")
     check.add_argument("--all", action="store_true", help="check every stack")
@@ -783,7 +860,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return int(args.handler(args))
-    except (RegistryError, TemplateError) as exc:
+    except (RegistryError, TemplateError, sources.SourceError) as exc:
         print(f"newstack: error: {exc}", file=sys.stderr)
         return 1
 

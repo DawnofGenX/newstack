@@ -9,6 +9,7 @@ from pathlib import Path
 
 BUILTIN_ROOT = Path(__file__).resolve().parent / "data" / "stacks"
 ENV_VAR = "NEWSTACK_STACKS"
+ENV_HOME = "NEWSTACK_HOME"
 
 
 class RegistryError(Exception):
@@ -86,6 +87,15 @@ class Stack:
 
     def matches(self, directory: Path) -> bool:
         return any(rule.matches(directory) for rule in self.detect)
+
+    @property
+    def installed(self) -> bool:
+        """True when this stack came from ``newstack stacks add``, not the package."""
+        try:
+            self.directory.resolve().relative_to(installed_root().resolve())
+        except ValueError:
+            return False
+        return True
 
 
 def _as_tuple(value: object, field: str, where: Path) -> tuple[str, ...]:
@@ -168,9 +178,33 @@ def load_stack(directory: Path) -> Stack:
     )
 
 
+def data_root() -> Path:
+    """Where installed stacks and their manifest live.
+
+    ``NEWSTACK_HOME`` wins so tests and throwaway sandboxes can stay hermetic;
+    otherwise this follows the XDG data directory.
+    """
+    override = os.environ.get(ENV_HOME, "").strip()
+    if override:
+        return Path(override).expanduser()
+    xdg = os.environ.get("XDG_DATA_HOME", "").strip()
+    base = Path(xdg).expanduser() if xdg else Path.home() / ".local" / "share"
+    return base / "newstack"
+
+
+def installed_root() -> Path:
+    """Where ``newstack stacks add`` puts stacks."""
+    return data_root() / "stacks"
+
+
 def search_roots() -> list[Path]:
-    """Built-in stacks first; ``NEWSTACK_STACKS`` entries may override them by name."""
-    roots = [BUILTIN_ROOT]
+    """Discovery order: built-in stacks, then installed ones, then ``NEWSTACK_STACKS``.
+
+    Built-in first means a shipped stack can never be shadowed by accident: an
+    installed stack with the same name is ignored, and ``stacks add`` refuses to
+    create one in the first place.
+    """
+    roots = [BUILTIN_ROOT, installed_root()]
     extra = os.environ.get(ENV_VAR, "")
     for entry in extra.split(os.pathsep):
         if entry.strip():

@@ -65,6 +65,7 @@ newstack update ~/code/app --dry-run   # re-apply template changes, keep your ed
 newstack outdated ~/code/app         # what has the template moved on from?
 newstack check --all                # prove every stack on this machine
 newstack doctor                     # which toolchains do I have?
+newstack stacks add <git-url>       # install a stack that is not shipped here
 ```
 
 Every command takes `--json` where it makes sense, so the tool is scriptable.
@@ -91,6 +92,35 @@ template's own `LICENSE` is never trusted over it. The choice is stored in
 `.newstack.json`, so `newstack update` keeps writing the licence you picked;
 `newstack update --license bsd-3` switches it later. `newstack adopt` never
 touches `LICENSE`: retrofitting CI onto existing code must not relicence it.
+
+### Stacks from outside this repository
+
+The stacks that ship in this repository are the ones CI proves. `stacks add`
+installs one from anywhere else, and says plainly that it is not covered by that
+promise:
+
+```console
+$ newstack stacks add https://github.com/you/newstack-stacks
+installed 1 stack from https://github.com/you/newstack-stacks
+
+  elixir-cli  /home/you/.local/share/newstack/stacks/elixir-cli  (9f2c1ab)
+
+  These are not covered by newstack's CI — prove one here with:
+    newstack check elixir-cli
+
+  scaffold one:  newstack new elixir-cli <path>
+```
+
+A repository may carry one stack at its root, a stack per directory, or a
+`stacks/` directory of them; `--dir` says where to look. Every stack in the
+repository is validated before any of them is written, so a repository with one
+broken manifest installs nothing, and a name that already ships with `newstack`
+is refused rather than shadowing it. `--force` replaces an installed stack
+wholesale, `newstack stacks remove <name>` deletes one, and `newstack stacks list`
+shows what came from where. Installed stacks live in `$NEWSTACK_HOME/stacks`
+(default `~/.local/share/newstack/stacks`), are marked `[installed]` in
+`newstack list`, and behave like any other stack afterwards — `new`, `adopt`,
+`update` and `outdated` all see them.
 
 ## Stacks
 
@@ -330,11 +360,15 @@ manifest format, no fork required.
 - **Updates are a hash comparison, not a diff dance.** `.newstack.json` records what
   newstack wrote; a file counts as yours only once it stops matching that hash, so
   `update` never has to guess whose change it is looking at.
+- **A stack you install is labelled as one.** `stacks add` validates everything before it
+  writes anything, and every command that follows says `[installed]`, because "this
+  repository's CI proved it" is a smaller claim than "someone published it".
 
 ## Roadmap
 
 - More variable choices beyond the current defaults (Python version, package manager).
-- `newstack stacks add <git-url>` to bring a stack in from outside the repository.
+- `newstack stacks update` to re-pull an installed stack and merge it into the projects
+  generated from it, the way `newstack update` does for shipped ones.
 
 ## Licence
 

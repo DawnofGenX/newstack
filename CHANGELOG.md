@@ -8,6 +8,15 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`newstack stacks add <git-url>`** — install a stack from any git repository, so a team
+  can keep its own starters without forking newstack. `add` clones shallowly, validates
+  every stack in the repository (one at the root, one per directory, or under `stacks/`;
+  `--dir` picks a subdirectory) before writing anything, refuses a name that already ships
+  with newstack, and records where each stack came from in `sources.json`. `stacks remove`
+  deletes one, `stacks list` shows origin and revision, and installed stacks are marked
+  `[installed]` in `newstack list`, because they are not covered by this repository's CI —
+  `newstack check <name>` is the local equivalent. Stacks live in `$NEWSTACK_HOME/stacks`
+  (default `~/.local/share/newstack/stacks`). `--force` replaces an installed stack.
 - **`--license mit|apache-2.0|bsd-3|none`** on `new` (and `update`, to switch later) —
   the generated `LICENSE` now comes from a licence registry in `data/licenses/` instead of
   a per-template copy, filled in with `--author` and the current year. `none` ships no
