@@ -305,5 +305,16 @@ def apply_update(plan: UpdatePlan, *, write_record_file: bool = True) -> list[Ac
                 # would make the next run treat the user's edit as ours and overwrite
                 # it. Unpruned orphans stay on record so --prune can find them later.
                 files[rel] = previous.files[rel]
-        write_record(plan.root, plan.stack.name, plan.context, files)
+        # A no-op run must leave the record byte-identical: rewriting it would
+        # bump ``updated_at`` and make "nothing changed" show up as a diff.
+        current = (
+            previous is not None
+            and not applied
+            and previous.stack == plan.stack.name
+            and previous.context == plan.context
+            and dict(previous.files) == files
+            and previous.version == __version__
+        )
+        if not current:
+            write_record(plan.root, plan.stack.name, plan.context, files)
     return applied

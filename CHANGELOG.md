@@ -311,6 +311,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- **`newstack update` no longer rewrites `.newstack.json` when there is nothing to
+  do.** The record carries `updated_at`, so a run over an up-to-date project bumped
+  the timestamp and turned "up to date" into a one-line diff every time. The record
+  is now written only when something actually changed.
 - **`fortran-cli` no longer fails its own test suite on a strict filesystem.** The harness
   used `status='scratch'` units and closed them with `status='delete'`; gfortran on a
   runner refuses with `Fortran runtime error: File cannot be deleted`, so the `test` step

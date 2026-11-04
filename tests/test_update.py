@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import json
+import types
+from datetime import datetime, timedelta, timezone
 
+from newstack import upgrade
 from newstack.cli import main
 from newstack.upgrade import RECORD_NAME, read_record, sha256_bytes
 
@@ -72,6 +75,25 @@ def test_update_is_a_noop_on_a_fresh_project(tmp_path, monkeypatch, capsys) -> N
 
     after = {p: p.read_bytes() for p in dest.rglob("*") if p.is_file()}
     assert after == before
+
+
+def test_a_noop_update_does_not_rewrite_the_record(tmp_path, monkeypatch, capsys) -> None:
+    """Nothing to do means nothing to write — even when the clock has moved on.
+
+    The record carries ``updated_at``; a no-op that rewrites it turns "up to
+    date" into a one-line diff on every run.
+    """
+    _template, dest = _project(tmp_path, monkeypatch)
+    record = dest / RECORD_NAME
+    before = record.read_bytes()
+
+    real = datetime.now(tz=timezone.utc)
+    later = types.SimpleNamespace(now=lambda tz=None: real + timedelta(seconds=5))
+    monkeypatch.setattr(upgrade, "datetime", later)
+
+    assert main(["update", str(dest)]) == 0
+    assert "up to date" in capsys.readouterr().out
+    assert record.read_bytes() == before
 
 
 def test_update_refreshes_a_file_nobody_touched(tmp_path, monkeypatch) -> None:
