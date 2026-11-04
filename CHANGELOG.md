@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`tcl-cli` stack** — a Tcl project on plain `tclsh`, no package manager and no build step. The
+  counting core works on byte strings (`binary scan cu*`) so `wc` parity holds for UTF-8 and control
+  characters, the argv parser is hand-written, and the runner takes a dictionary of `readFile`,
+  `readStdin`, `out` and `err` so 40 checks run without a process — while the shipped `stdin` check
+  still pipes real text through the real binary, because a fake boundary cannot see a broken stdin
+  path. `*.tcl` is the detection marker.
 - **`rails-app` stack** — Rails 8.1 on Ruby 3.2+: the counting lives in
   `app/services/text_stat.rb` (a plain class, no Rails code), `StatsController` turns it into
   `GET /stats?text=...`, and an `ActionDispatch::IntegrationTest` goes through the router so a

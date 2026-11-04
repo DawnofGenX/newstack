@@ -295,6 +295,7 @@ $ newstack stacks outdated
 | `haskell-cli` | Haskell CLI on GHC and cabal: pure counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a record | `ghc`, `cabal` |
 | `clojure-cli` | Clojure CLI on `deps.edn` (no Leiningen): pure counting core, hand-rolled argv parser, `clojure.test` suites, I/O behind a record | `clojure`, `java` |
 | `swift-cli` | Swift 6 CLI on SwiftPM: pure counting core, hand-rolled argv parser, XCTest suites, I/O behind a struct of closures | `swift` |
+| `tcl-cli` | Tcl CLI on plain `tclsh`: byte-level counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a dictionary | `tclsh` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python
