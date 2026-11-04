@@ -1,0 +1,16 @@
+;;;; Entry point: load the library, run every suite, report, exit.
+(let ((here (merge-pathnames (make-pathname :directory '(:relative :up))
+                             (make-pathname :name nil :type nil :defaults *load-truename*))))
+  (load (merge-pathnames "lib/counts.lisp" here))
+  (load (merge-pathnames "lib/options.lisp" here))
+  (load (merge-pathnames "lib/runner.lisp" here))
+  (load (merge-pathnames "tests/harness.lisp" here))
+  (load (merge-pathnames "tests/counts-tests.lisp" here))
+  (load (merge-pathnames "tests/options-tests.lisp" here))
+  (load (merge-pathnames "tests/runner-tests.lisp" here)))
+
+(textstat.harness:reset)
+(textstat.harness::counts-tests)
+(textstat.harness::options-tests)
+(textstat.harness::runner-tests)
+(sb-ext:exit :code (textstat.harness:report))

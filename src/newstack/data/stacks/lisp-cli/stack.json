@@ -1,0 +1,74 @@
+{
+  "name": "lisp-cli",
+  "title": "Common Lisp CLI",
+  "language": "lisp",
+  "blurb": "Common Lisp CLI on SBCL: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, I/O through a structure of functions",
+  "requires": [
+    "sbcl"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "sbcl --script tests/run-tests.lisp",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "sbcl --script tests/run-tests.lisp",
+      "timeout": 600,
+      "tools": [
+        "sbcl"
+      ]
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q 'Usage: {{ npm_name }}'",
+      "timeout": 300,
+      "tools": [
+        "sbcl"
+      ]
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} --bogus > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 2",
+      "timeout": 300,
+      "tools": [
+        "sbcl"
+      ]
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.txt > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 1",
+      "timeout": 300,
+      "tools": [
+        "sbcl"
+      ]
+    },
+    {
+      "name": "stdin",
+      "cmd": "test \"$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w)\" = '3 -'",
+      "timeout": 300,
+      "tools": [
+        "sbcl"
+      ]
+    },
+    {
+      "name": "parity",
+      "cmd": "mkdir -p .parity && printf 'alpha beta\\ngamma delta\\n' > .parity/p1.txt && printf 'alpha beta\\ngamma delta' > .parity/p2.txt && printf 'h\\303\\251llo w\\303\\266rld\\n' > .parity/p3.txt && : > .parity/p4.txt && printf 'a\\tb\\vc\\fd\\n' > .parity/p5.txt && for f in .parity/p*.txt; do ours=$(./bin/{{ npm_name }} \"$f\" | awk '{print $1, $2, $3}'); theirs=$(wc -l -w -c < \"$f\" | awk '{print $1, $2, $3}'); test \"$ours\" = \"$theirs\" || { echo \"mismatch on $f: $ours vs $theirs\"; exit 1; }; done && echo 'every fixture matches wc'",
+      "timeout": 900,
+      "tools": [
+        "sbcl"
+      ]
+    }
+  ],
+  "detect": [
+    {
+      "file": "*.lisp"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

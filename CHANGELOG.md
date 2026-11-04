@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`lisp-cli`**: a `wc`-style counter in Common Lisp on SBCL, standard library only —
+  bytes are read as `(unsigned-byte 8)` and folded once, arguments are parsed by hand, and
+  the program takes a structure of four functions so the suite drives it without a process.
+  69 assertions, and the shipped workflow checks the suite, the exit codes, stdin and
+  byte-for-byte parity with `wc`.
 - **`prolog-cli`**: a `wc`-style counter in SWI-Prolog with no dependencies outside the
   standard library — counting works on a stream, arguments are parsed by hand, output goes
   through two writer closures so the whole contract is testable, and a four-predicate
@@ -218,6 +223,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- **`fortran-cli` no longer fails its own test suite on a strict filesystem.** The harness
+  used `status='scratch'` units and closed them with `status='delete'`; gfortran on a
+  runner refuses with `Fortran runtime error: File cannot be deleted`, so the `test` step
+  failed even though the counter was correct. The harness now writes and truncates two
+  ordinary files under `build/`, which needs no unlink.
 - **The JavaScript stacks pass their tests under yarn, and install under pnpm.** npm and
   pnpm install the peer dependencies a package asks for, yarn 1 does not, so `yarn test`
   failed with `Cannot find module '@testing-library/dom'` (`react-vite-ts`) and with

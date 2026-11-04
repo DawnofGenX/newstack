@@ -175,21 +175,21 @@ contains
   end subroutine option_tests
 
   subroutine fresh_scratch()
-    ! One unit for stdout, another for stderr: the runner writes the file-level
+    ! One file for stdout, another for stderr: the runner writes the file-level
     ! complaint to stderr first, so sharing a unit would interleave the rows.
-    close (unit, status='delete')
-    close (err_unit, status='delete')
-    open (newunit=unit, status='scratch', action='readwrite')
-    open (newunit=err_unit, status='scratch', action='readwrite')
-    open (newunit=err_unit, status='scratch', action='readwrite')
+    ! Explicit files instead of status='scratch': a scratch file has to be
+    ! deleted when its unit closes, and gfortran refuses with "File cannot be
+    ! deleted" on filesystems that will not unlink an open file.
+    close (unit)
+    close (err_unit)
+    open (newunit=unit, file='build/verify-out.txt', status='replace', action='readwrite')
+    open (newunit=err_unit, file='build/verify-err.txt', status='replace', action='readwrite')
   end subroutine fresh_scratch
 
   subroutine runner_tests()
     call write_bytes('build/fixture1.txt', 'alpha beta' // new_line('a') // 'gamma' // new_line('a'))
     call write_bytes('build/fixture2.txt', 'delta' // new_line('a'))
     call write_bytes('build/empty.txt', '')
-
-    open (newunit=unit, status='scratch', action='readwrite')
 
     call fresh_scratch()
     code = run([character(len=64) :: 'build/fixture1.txt'], unit, err_unit)

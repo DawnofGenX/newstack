@@ -305,6 +305,7 @@ $ newstack stacks outdated
 | `ada-cli` | Ada CLI on GNAT: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, output through two subprogram parameters | `gnatmake`, `make` |
 | `octave-cli` | Octave CLI on plain `octave`: counting core in a `+textstat` package, hand-rolled argv parser, dependency-free suite, environment injected as function handles | `octave` |
 | `prolog-cli` | SWI-Prolog CLI: byte-exact counting over a stream, hand-rolled argv parser, a four-predicate test harness, output behind two writer closures | `swipl` |
+| `lisp-cli` | Common Lisp CLI on SBCL: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, I/O through a structure of functions | `sbcl` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python

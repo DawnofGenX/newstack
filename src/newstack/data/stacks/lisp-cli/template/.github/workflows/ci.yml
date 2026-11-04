@@ -1,0 +1,53 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install SBCL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends sbcl
+          sbcl --version
+      - name: Test
+        run: sbcl --script tests/run-tests.lisp
+      - name: Help
+        run: './bin/{{ npm_name }} --help | grep -q "Usage: {{ npm_name }}"'
+      - name: Exit codes
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus > /dev/null 2>&1
+          bogus=$?
+          ./bin/{{ npm_name }} nope.txt > /dev/null 2>&1
+          missing=$?
+          echo "exit status: bogus=$bogus missing=$missing"
+          test "$bogus" -eq 2
+          test "$missing" -eq 1
+      - name: Read stdin
+        run: |
+          set +e
+          out=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w)
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 0
+          test "$out" = "3 -"
+      - name: Matches wc on every input
+        run: |
+          set -eu
+          mkdir -p .parity
+          printf 'alpha beta\ngamma delta\n' > .parity/p1.txt
+          printf 'alpha beta\ngamma delta' > .parity/p2.txt
+          printf 'h\303\251llo w\303\266rld\n' > .parity/p3.txt
+          : > .parity/p4.txt
+          printf 'a\tb\vc\fd\n' > .parity/p5.txt
+          for f in .parity/p*.txt; do
+            ours=$(./bin/{{ npm_name }} "$f" | awk '{print $1, $2, $3}')
+            theirs=$(wc -l -w -c < "$f" | awk '{print $1, $2, $3}')
+            test "$ours" = "$theirs" || { echo "mismatch on $f: $ours vs $theirs"; exit 1; }
+          done
+          echo "every fixture matches wc"
