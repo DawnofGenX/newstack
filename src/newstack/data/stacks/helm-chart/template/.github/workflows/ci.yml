@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  chart:
+    name: chart
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # No cluster and no plugins: lint plus rendering catches the mistakes this
+      # chart can make (broken templates, values that do not match the schema).
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v4.3.1
+      - name: Lint
+        run: helm lint .
+      - name: Render
+        run: helm template ci-release . --namespace ci > "$RUNNER_TEMP/rendered.yaml"
+      - name: Rendered objects
+        run: |
+          grep -q "kind: Deployment" "$RUNNER_TEMP/rendered.yaml"
+          grep -q "kind: Service" "$RUNNER_TEMP/rendered.yaml"
+          grep -q "kind: ServiceAccount" "$RUNNER_TEMP/rendered.yaml"
+      # GitHub runs every run: step as `bash -e`, so a step that asserts a
+      # non-zero exit code has to capture it first: putting the assertion on the
+      # same line after the command would let `-e` kill the step before the
+      # assertion ran, failing it exactly when the chart is correct.
+      - name: Values reach the manifest
+        run: |
+          helm template ci-release . --set replicaCount=5 | grep -qE "^  replicas: 5$"
+      - name: The schema rejects bad values
+        run: |
+          set +e
+          helm template ci-release . --set replicaCount=0 >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -ne 0

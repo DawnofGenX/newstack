@@ -46,6 +46,14 @@ All notable changes to this project are documented here. The format follows
   shell wrapper around the dune executable so the dashed project name survives dune's
   "executable name must be a module identifier" rule. Verified against `wc -l -w -c` on
   plain, no-trailing-newline, multibyte-UTF-8, empty and control-character files.
+- **`helm-chart` stack** — a Kubernetes Helm chart for one stateless HTTP service,
+  the first stack that is not a program: named templates in `_helpers.tpl`, a Deployment
+  with a hardened `securityContext` and probes, a Service, an optional ServiceAccount,
+  and a `values.schema.json` that helm enforces on every `lint`, `template` and `install`
+  (so `--set replicaCount=0` fails the chart rather than the cluster). It also ships the
+  chart's own `helm test` hook — a pod that curls the Service — and seven checks: lint,
+  render, values plumbing, schema rejection, hook rendering, release-name plumbing and
+  the hardened defaults, all of which run without a cluster or any plugin.
 - **Shipped workflows no longer fail their own exit-code steps.** A `run:` step executes
   as `bash -e`, so `./bin/app --bogus …; test $? -eq 2` killed the step on the first
   command and reported the very behaviour the CLI gets right as a failure. The argument

@@ -1,0 +1,61 @@
+# Default values for {{ npm_name }}.
+# The shape of every key below is enforced by values.schema.json: `helm lint` and
+# `helm template` refuse a chart whose values do not match it, which turns typo'd
+# overrides into a failed build instead of a silently broken rollout.
+replicaCount: 2
+
+# Override the chart-derived names. Empty means "use .Chart.Name"/the fullname
+# helper, which is what almost every install wants.
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: ghcr.io/example/{{ npm_name }}
+  pullPolicy: IfNotPresent
+  # Empty falls back to .Chart.AppVersion, so bumping the chart bumps the image.
+  tag: ""
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  # Empty means "derive the name from the fullname helper".
+  name: ""
+
+podAnnotations: {}
+
+# The container runs as a non-root user with a read-only root filesystem: the
+# chart's default posture is "cannot write anywhere it should not".
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  fsGroup: 10001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+env:
+  - name: APP_ENV
+    value: production
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

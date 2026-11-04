@@ -80,6 +80,7 @@ jobs:
           - r-cli
           - ocaml-cli
           - static-site
+          - helm-chart
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -161,6 +162,11 @@ jobs:
         run: |
           opam install --yes dune
           echo "$(opam var bin)" >> "$GITHUB_PATH"
+      - name: Set up Helm
+        if: matrix.stack == 'helm-chart'
+        uses: azure/setup-helm@v4
+        with:
+          version: v4.3.1
       - name: Set up Julia
         if: matrix.stack == 'julia-cli'
         uses: julia-actions/setup-julia@v2

@@ -114,6 +114,7 @@ directory to CI-ready project.
 | `r-cli` | R CLI on base R only: pure counting function, hand-written option parser, dependency-free test harness | `Rscript` |
 | `ocaml-cli` | OCaml CLI on dune: pure counting library, hand-written option parser, stdlib-only test harness, zero opam dependencies | `ocaml`, `dune` |
 | `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
+| `helm-chart` | Kubernetes Helm chart: schema-validated values, named templates, hardened Deployment/Service, lint+render checks with no cluster | `helm` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, an MIT licence, a `.gitignore`, and a `.newstack.json` record that `newstack

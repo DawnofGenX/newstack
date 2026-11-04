@@ -1,0 +1,12 @@
+{{ npm_name }} {{ .Chart.Version }} is installed as release {{ .Release.Name }}
+in namespace {{ .Release.Namespace }} with {{ .Values.replicaCount }} replica(s).
+
+Check the rollout:
+
+  kubectl rollout status deployment/{{ include "{{ npm_name }}.fullname" . }} -n {{ .Release.Namespace }}
+
+Reach the service from your machine:
+
+  kubectl port-forward svc/{{ include "{{ npm_name }}.fullname" . }} -n {{ .Release.Namespace }} 8080:{{ .Values.service.port }}
+
+Then open http://localhost:8080.

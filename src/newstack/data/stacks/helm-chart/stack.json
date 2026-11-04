@@ -1,0 +1,85 @@
+{
+  "name": "helm-chart",
+  "title": "Helm chart",
+  "language": "yaml",
+  "blurb": "A Kubernetes Helm chart: schema-validated values, named templates, a hardened deployment, and lint/template checks that need no cluster",
+  "requires": [
+    "helm"
+  ],
+  "default_description": "A Kubernetes Helm chart.",
+  "next_steps": [
+    "cd {path}",
+    "helm lint .",
+    "helm template my-release . --namespace default",
+    "helm package ."
+  ],
+  "verify": [
+    {
+      "name": "lint",
+      "cmd": "helm lint .",
+      "tools": [
+        "helm"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "render",
+      "cmd": "helm template ci-release . --namespace ci > .rendered.yaml && grep -q \"kind: Deployment\" .rendered.yaml && grep -q \"kind: Service\" .rendered.yaml && grep -q \"kind: ServiceAccount\" .rendered.yaml && rm -f .rendered.yaml && echo \"rendered ok\"",
+      "tools": [
+        "helm"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "values-plumbing",
+      "cmd": "helm template ci-release . --set replicaCount=5 | grep -qE \"^  replicas: 5$\" && echo \"values reach the manifest\"",
+      "tools": [
+        "helm"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "schema-rejects",
+      "cmd": "helm template ci-release . --set replicaCount=0 >/dev/null 2>&1; test $? -ne 0 && echo \"schema rejected replicaCount=0\"",
+      "tools": [
+        "helm"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test-hook",
+      "cmd": "helm template ci-release . --show-only templates/tests/test-connection.yaml | grep -q \"kind: Pod\" && helm template ci-release . --show-only templates/tests/test-connection.yaml | grep -q \"helm.sh/hook\" && echo \"test hook renders\"",
+      "tools": [
+        "helm"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "release-names",
+      "cmd": "helm template myrel . | grep -qE \"^  name: myrel-\" && helm template myrel . | grep -q \"app.kubernetes.io/instance: myrel\" && echo \"release name is plumbed\"",
+      "tools": [
+        "helm"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "hardening",
+      "cmd": "helm template ci-release . | grep -q \"readOnlyRootFilesystem: true\" && helm template ci-release . | grep -q \"runAsNonRoot: true\" && helm template ci-release . | grep -q \"automountServiceAccountToken: false\" && echo \"hardened defaults\"",
+      "tools": [
+        "helm"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "Chart.yaml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

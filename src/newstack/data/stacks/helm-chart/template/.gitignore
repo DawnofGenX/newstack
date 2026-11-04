@@ -1,0 +1,5 @@
+# Packaged chart archives (`helm package` writes them here). Anchored: this file
+# also applies to the template tree inside the newstack repo, where an unanchored
+# rule could hide real sources from git and from CI checkouts.
+/charts/*.tgz
+/.values.local.yaml
