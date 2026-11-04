@@ -115,6 +115,7 @@ directory to CI-ready project.
 | `ocaml-cli` | OCaml CLI on dune: pure counting library, hand-written option parser, stdlib-only test harness, zero opam dependencies | `ocaml`, `dune` |
 | `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
 | `helm-chart` | Kubernetes Helm chart: schema-validated values, named templates, hardened Deployment/Service, lint+render checks with no cluster | `helm` |
+| `gleam-cli` | Gleam CLI: pure counting module, hand-written option parser, stdlib-only test harness, Erlang helper for argv/stdin/exit codes | `gleam` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, an MIT licence, a `.gitignore`, and a `.newstack.json` record that `newstack
@@ -303,7 +304,7 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More stacks: Gleam, Haskell, Scala.
+- More stacks: Haskell, Scala.
 - `--license apache-2.0|bsd-3` and other variable choices beyond the current defaults.
 
 ## Licence

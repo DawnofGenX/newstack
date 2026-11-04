@@ -33,13 +33,6 @@ All notable changes to this project are documented here. The format follows
   test next to the unit test, a working `bin/console`, and a shipped CI workflow with
   PHPUnit plus a console smoke step. Autowiring means the service needs no container
   configuration.
-
-### Fixed
-
-- **`adopt` no longer dead-ends on every Composer and Symfony project.** `symfony-app`
-  detects `bin/console`, which a plain Composer package does not have, so the generic
-  `php-composer-cli` rule became a `detect_fallback:` — a specific marker now wins and a
-  bare `composer.json` still resolves to the CLI stack, with both directions tested.
 - **`ocaml-cli` stack** — OCaml 4.14 on dune 3.14 with no opam packages at all: pure
   `Counts`/`Options`/`Runner` modules (`(wrapped false)`, no `open` boilerplate in the
   tests), a stdlib-only harness that prints a pass/fail tally and exits non-zero, and a
@@ -54,6 +47,20 @@ All notable changes to this project are documented here. The format follows
   chart's own `helm test` hook — a pod that curls the Service — and seven checks: lint,
   render, values plumbing, schema rejection, hook rendering, release-name plumbing and
   the hardened defaults, all of which run without a cluster or any plugin.
+- **`gleam-cli` stack** — a Gleam 1.19 CLI on Erlang/OTP 27 with no hex packages beyond
+  `gleam_stdlib`: pure `Counts`/`Options`/`Runner` modules, a hand-rolled test harness
+  (`gleam test` runs the tally and exits non-zero on failure), and one small Erlang module
+  for the three things Gleam's standard library has no answer for — argv, stdin and the
+  process exit code. `Runner.run` *returns* the 0/1/2 code and only the entry point calls
+  `erlang:halt`, so the exit contract is asserted without spawning a process. `gleam
+  format --check` is part of the shipped workflow. Verified against `wc -l -w -c`.
+
+### Fixed
+
+- **`adopt` no longer dead-ends on every Composer and Symfony project.** `symfony-app`
+  detects `bin/console`, which a plain Composer package does not have, so the generic
+  `php-composer-cli` rule became a `detect_fallback:` — a specific marker now wins and a
+  bare `composer.json` still resolves to the CLI stack, with both directions tested.
 - **Shipped workflows no longer fail their own exit-code steps.** A `run:` step executes
   as `bash -e`, so `./bin/app --bogus …; test $? -eq 2` killed the step on the first
   command and reported the very behaviour the CLI gets right as a failure. The argument

@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# User-facing entry point. `gleam run` compiles (if needed) and runs the
+# project's main module, forwarding the words after `--` to the program and
+# passing the VM exit code through unchanged (erlang:halt sets it).
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd) || exit 1
+cd "$root" || exit 1
+exec gleam run --no-print-progress -- "$@"

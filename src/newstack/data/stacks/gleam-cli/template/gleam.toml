@@ -1,0 +1,13 @@
+# Gleam package names may only contain lowercase letters, digits and underscores,
+# so the manifest uses the sanitised package name while the user-facing binary
+# keeps the dashed project name.
+name = "{{ package_name }}"
+version = "0.1.0"
+target = "erlang"
+
+# The only dependency is the Gleam standard library. There are no third-party
+# hex packages: the test suite is a hand-rolled harness (test/) using plain
+# assertions, and file I/O, argv and the process exit code come from the
+# Erlang/OTP runtime via @external(erlang, ...) (see src/textstat_io.erl).
+[dependencies]
+gleam_stdlib = ">= 1.0.0 and < 2.0.0"

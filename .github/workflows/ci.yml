@@ -81,6 +81,7 @@ jobs:
           - ocaml-cli
           - static-site
           - helm-chart
+          - gleam-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -167,6 +168,12 @@ jobs:
         uses: azure/setup-helm@v4
         with:
           version: v4.3.1
+      - name: Set up Gleam
+        if: matrix.stack == 'gleam-cli'
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.3"
+          gleam-version: 1.19.2
       - name: Set up Julia
         if: matrix.stack == 'julia-cli'
         uses: julia-actions/setup-julia@v2

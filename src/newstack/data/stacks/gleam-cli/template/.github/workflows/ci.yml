@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # ubuntu-latest ships no Gleam. The official action installs the pinned
+      # OTP and Gleam; there is no dependency to fetch beyond the stdlib.
+      # Gleam 1.19 requires OTP 27.
+      - name: Install Gleam
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.3"
+          gleam-version: 1.19.2
+      - name: Show version
+        run: gleam --version
+      - name: Build
+        run: gleam build
+      - name: Format check
+        run: gleam format --check
+      - name: Test
+        run: gleam test
+      - name: Help
+        run: ./bin/{{ npm_name }} --help
+      - name: Usage error exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: Missing file exits 1
+        run: |
+          set +e
+          ./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1
