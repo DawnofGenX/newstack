@@ -70,6 +70,28 @@ class Refreshed:
         }
 
 
+@dataclass(frozen=True)
+class Remote:
+    """Whether an installed stack's repository has moved since it was pulled."""
+
+    name: str
+    url: str
+    installed_rev: str
+    remote_rev: str
+    behind: bool
+    error: str = ""
+
+    def as_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "url": self.url,
+            "installed_rev": self.installed_rev,
+            "remote_rev": self.remote_rev,
+            "behind": self.behind,
+            "error": self.error,
+        }
+
+
 def manifest_path() -> Path:
     return data_root() / MANIFEST
 
@@ -339,6 +361,44 @@ def update(name: str | None = None) -> list[Refreshed]:
                 )
 
     _write_installed(entries_meta)
+    return results
+
+
+def outdated(name: str | None = None) -> list[Remote]:
+    """Which installed stacks have moved upstream, without cloning anything.
+
+    ``git ls-remote`` resolves the repository's default branch to a commit id, which
+    is the whole question — an installed stack is current when its recorded revision
+    is that commit. A repository that cannot be reached is reported, not raised: one
+    unreachable origin should not hide the state of the others.
+    """
+    present = list_installed()
+    if name is not None:
+        present = [entry for entry in present if entry.name == name]
+        if not present:
+            raise SourceError(f"'{name}' is not installed (see `newstack stacks list`)")
+    if not present:
+        installed_any = bool(list_installed())
+        raise SourceError(
+            "no installed stack has a recorded origin — nothing to compare"
+            if installed_any
+            else "no stacks installed (see `newstack stacks add <git-url>`)"
+        )
+
+    results: list[Remote] = []
+    for entry in present:
+        if not entry.url:
+            results.append(Remote(entry.name, "", entry.rev, "", False, "no recorded origin"))
+            continue
+        ok, output = _git(["ls-remote", entry.url, "HEAD"])
+        if not ok:
+            results.append(
+                Remote(entry.name, entry.url, entry.rev, "", False, output or "unreachable")
+            )
+            continue
+        remote_rev = output.split()[0][:7] if output.split() else ""
+        behind = bool(remote_rev) and not remote_rev.startswith(entry.rev) if entry.rev else True
+        results.append(Remote(entry.name, entry.url, entry.rev, remote_rev, behind))
     return results
 
 

@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`newstack stacks outdated`** — which installed stacks have moved upstream, answered with
+  one `git ls-remote` per repository rather than a clone, so checking is cheap and writes
+  nothing. Exits 1 when a stack is behind or an origin could not be reached; an unreachable
+  origin is reported as "could not check" instead of hiding the stacks whose state is known.
+  `stacks update` clears it.
 - **`newstack stacks update [name]`** — re-pull installed stacks from the repositories they
   came from, so a fix upstream reaches the machine without a manual reinstall. The clone,
   the per-stack validation and the name checks all run before anything is replaced: a

@@ -622,6 +622,35 @@ def cmd_stacks_remove(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_stacks_outdated(args: argparse.Namespace) -> int:
+    results = sources.outdated(args.name)
+    behind = [item for item in results if item.behind]
+    broken = [item for item in results if item.error]
+    if args.json:
+        print(json.dumps([item.as_dict() for item in results], indent=2))
+        return 1 if behind or broken else 0
+
+    width = max(len(item.name) for item in results)
+    print()
+    for item in results:
+        if item.error:
+            print(f"  {item.name:<{width}}  could not check: {item.error}")
+        elif item.behind:
+            was = item.installed_rev or "?"
+            print(f"  {item.name:<{width}}  {was} → {item.remote_rev}  behind")
+        else:
+            print(f"  {item.name:<{width}}  {item.remote_rev}  current")
+    print()
+    if behind:
+        print(f"  {_count(len(behind), 'stack')} behind upstream:  newstack stacks update")
+    elif not broken:
+        print("  every installed stack is up to date")
+    if broken:
+        print(f"  {_count(len(broken), 'stack')} could not be checked")
+    print()
+    return 1 if behind or broken else 0
+
+
 def cmd_stacks_update(args: argparse.Namespace) -> int:
     refreshed = sources.update(args.name)
     if args.json:
@@ -866,6 +895,13 @@ def build_parser() -> argparse.ArgumentParser:
     stacks_add.add_argument("--force", action="store_true", help="replace an installed stack")
     stacks_add.add_argument("--json", action="store_true")
     stacks_add.set_defaults(handler=cmd_stacks_add)
+
+    stacks_outdated = stacks_command.add_parser(
+        "outdated", help="check installed stacks against their repositories"
+    )
+    stacks_outdated.add_argument("name", nargs="?", help="one stack (default: all installed)")
+    stacks_outdated.add_argument("--json", action="store_true")
+    stacks_outdated.set_defaults(handler=cmd_stacks_outdated)
 
     stacks_update = stacks_command.add_parser(
         "update", help="re-pull installed stacks from their repositories"

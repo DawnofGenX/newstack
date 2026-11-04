@@ -264,6 +264,15 @@ def test_install_requires_a_url(url, capsys):
     assert "repository URL is required" in capsys.readouterr().err
 
 
+def _tree(root: Path) -> list[tuple[Path, bytes]]:
+    """Every installed file, so a read-only command can be proven read-only."""
+    return sorted(
+        (path.relative_to(root), path.read_bytes())
+        for path in sources.installed_root().rglob("*")
+        if path.is_file()
+    )
+
+
 def _commit(repo: Path, message: str) -> None:
     _git([*GIT_ENV, "add", "-A"], repo)
     _git([*GIT_ENV, "commit", "-qm", message], repo)
@@ -383,3 +392,84 @@ def test_update_json_is_machine_readable(tmp_path, capsys):
     payload = json.loads(capsys.readouterr().out)
     assert payload[0]["name"] == "mini-cli"
     assert set(payload[0]) == {"name", "url", "old_rev", "new_rev", "changed"}
+
+
+def test_outdated_reports_a_stack_whose_repository_moved(tmp_path, capsys):
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+
+    assert main(["stacks", "outdated"]) == 0
+    assert "current" in capsys.readouterr().out
+
+    (repo / "mini-cli" / "template" / "README.md").write_text("# v2\n", encoding="utf-8")
+    _commit(repo, "v2")
+
+    assert main(["stacks", "outdated"]) == 1
+    out = capsys.readouterr().out
+    assert "behind" in out
+    assert "newstack stacks update" in out
+
+
+def test_outdated_does_not_touch_the_installation(tmp_path, capsys):
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+    before = _tree(tmp_path)
+
+    assert main(["stacks", "outdated"]) == 0
+    capsys.readouterr()
+
+    after = _tree(tmp_path)
+    assert before == after
+
+
+def test_outdated_json_and_update_clear_it(tmp_path, capsys):
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+    (repo / "mini-cli" / "template" / "README.md").write_text("# v2\n", encoding="utf-8")
+    _commit(repo, "v2")
+
+    assert main(["stacks", "outdated", "--json"]) == 1
+    payload = json.loads(capsys.readouterr().out)
+    assert payload[0]["behind"] is True
+    assert set(payload[0]) == {
+        "name",
+        "url",
+        "installed_rev",
+        "remote_rev",
+        "behind",
+        "error",
+    }
+
+    assert main(["stacks", "update"]) == 0
+    capsys.readouterr()
+    assert main(["stacks", "outdated"]) == 0
+    assert "up to date" in capsys.readouterr().out
+
+
+def test_outdated_reports_an_unreachable_origin_without_hiding_the_rest(tmp_path, capsys):
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+
+    manifest = json.loads(sources.manifest_path().read_text(encoding="utf-8"))
+    manifest["mini-cli"]["url"] = str(tmp_path / "gone")
+    sources.manifest_path().write_text(json.dumps(manifest), encoding="utf-8")
+
+    assert main(["stacks", "outdated"]) == 1
+    out = capsys.readouterr().out
+    assert "could not check" in out
+    assert "1 stack could not be checked" in out
+
+
+def test_outdated_refuses_an_unknown_name_and_an_empty_registry(tmp_path, capsys):
+    assert main(["stacks", "outdated"]) == 1
+    assert "no stacks installed" in capsys.readouterr().err
+
+    repo = _repo(tmp_path)
+    assert main(["stacks", "add", str(repo)]) == 0
+    capsys.readouterr()
+    assert main(["stacks", "outdated", "nope"]) == 1
+    assert "not installed" in capsys.readouterr().err

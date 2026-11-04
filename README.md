@@ -60,6 +60,7 @@ newstack new fastapi ~/code/api -d "Billing service" --author "Your Name"
 newstack new python-lib ~/code/lib --dry-run     # preview, write nothing
 newstack new python-cli ~/code/tool --github     # create the repo and push it too
 newstack new fastapi ~/code/api --python 3.12    # raise a Python stack's floor
+newstack stacks outdated            # which installed stacks moved upstream
 newstack stacks update              # re-pull every stack you installed from a repo
 newstack new python-lib ~/code/lib --license apache-2.0   # mit (default), apache-2.0, bsd-3, none
 newstack adopt ~/code/old-project --dry-run    # retrofit CI/lint onto existing code
@@ -166,6 +167,19 @@ your installed copy exactly as it was and says which stack it could not find.
 `newstack stacks update <name>` does one. Refreshing a stack changes the
 template, not your projects: `newstack update <path>` is still the step that
 re-applies it, and it keeps the local edits it finds.
+
+`newstack stacks outdated` answers the same question without cloning: it asks
+each repository for the commit on its default branch and compares that with the
+revision recorded at install time, so a check costs one round trip per stack.
+It exits 1 when something is behind — and reports an origin it could not reach
+as "could not check" instead of hiding the stacks whose state it does know.
+
+```console
+$ newstack stacks outdated
+  elixir-cli  9f2c1ab → 4d0b7e2  behind
+
+  1 stack behind upstream:  newstack stacks update
+```
 
 ## Stacks
 
