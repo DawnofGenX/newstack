@@ -298,6 +298,8 @@ $ newstack stacks outdated
 | `tcl-cli` | Tcl CLI on plain `tclsh`: byte-level counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a dictionary | `tclsh` |
 | `erlang-cli` | Erlang CLI on plain OTP and `make`: byte-level counting core, hand-rolled argv parser, eunit suites, I/O behind a map of funs | `erl`, `erlc`, `make` |
 | `racket-cli` | Racket CLI on the core distribution: byte-counting core, struct-based argv parser, `rackunit` suites, I/O behind a struct of funs | `racket`, `raco` |
+| `deno-cli` | TypeScript CLI on Deno: byte-counting core, pure argv parser, `Deno.test` suites, I/O behind an object of functions | `deno` |
+| `vhdl-sim` | VHDL design with a self-checking testbench on GHDL: one clocked process, assertion-driven simulation, a run script that fails CI on a wrong design | `ghdl` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python

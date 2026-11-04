@@ -8,6 +8,17 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`vhdl-sim` stack** — a synthesizable VHDL counter plus a self-checking testbench on GHDL: every
+  check is an `assert ... severity error` and `run.sh` passes `--assert-level=error`, so a wrong design
+  is a non-zero exit code rather than a waveform for a human to read. The `inject_fault` generic is the
+  teeth test — the shipped workflow runs the testbench a second time with the fault enabled and
+  requires that run to fail. `*.vhd` is the detection marker.
+- **`deno-cli` stack** — a TypeScript project on Deno, with no `package.json` and no build step: the
+  runtime is also the typechecker and the test runner. Counting works on `Uint8Array` so `wc` parity
+  holds for UTF-8 and control characters, the argv parser is a pure function, and the runner takes an
+  object of four functions so 24 `Deno.test` cases run without touching a file — while the shipped
+  `stdin` check still pipes real text through the real command. The wrapper grants only `--allow-read`.
+  `deno.json` is the detection marker.
 - **`racket-cli` stack** — a Racket project on the core distribution, no packages and no build step.
   Counting works on `bytes` so `wc` parity holds for UTF-8 and control characters, the argv parser is
   a struct with no side effects, and the runner takes a `struct io` of four funs so 54 `rackunit`

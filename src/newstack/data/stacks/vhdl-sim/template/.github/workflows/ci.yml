@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install GHDL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ghdl
+          ghdl --version | head -1
+      - name: Testbench
+        run: ./run.sh
+      - name: The testbench reports success
+        run: './run.sh | grep -q "PASS: counter testbench complete"'
+      - name: The assertions have teeth
+        run: |
+          set +e
+          ghdl -r --std=08 counter_tb -ginject_fault=true --assert-level=error --stop-time=10us >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -ne 0

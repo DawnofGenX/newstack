@@ -1,0 +1,52 @@
+{
+  "name": "vhdl-sim",
+  "title": "VHDL simulation",
+  "language": "vhdl",
+  "blurb": "VHDL design and self-checking testbench on GHDL: one clocked process, assertion-driven simulation, a run script that fails CI on a wrong design",
+  "requires": [
+    "ghdl"
+  ],
+  "default_description": "A VHDL design with a self-checking testbench.",
+  "next_steps": [
+    "cd {path}",
+    "./run.sh",
+    "edit rtl/counter.vhd"
+  ],
+  "verify": [
+    {
+      "name": "testbench",
+      "cmd": "./run.sh",
+      "tools": [
+        "ghdl"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "pass-message",
+      "cmd": "./run.sh | grep -q \"PASS: counter testbench complete\"",
+      "tools": [
+        "ghdl"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "assertions-have-teeth",
+      "cmd": "ghdl -r --std=08 counter_tb -ginject_fault=true --assert-level=error --stop-time=10us >/dev/null 2>&1; test $? -ne 0",
+      "tools": [
+        "ghdl"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "*.vhd"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

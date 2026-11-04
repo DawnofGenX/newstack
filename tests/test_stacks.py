@@ -50,6 +50,36 @@ def test_workflow_actions_are_pinned_to_major_versions(tmp_path, name: str) -> N
             assert ACTION_REF_RE.match(ref), f"{workflow.name}: unpinned or odd action ref {ref!r}"
 
 
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_workflow_files_are_valid_yaml(tmp_path, name: str) -> None:
+    """A shipped workflow that is not valid YAML runs zero jobs, silently.
+
+    `run: ./run.sh | grep -q "PASS: done"` is the trap: an unquoted plain scalar cannot
+    contain `: `, so the file stops parsing and GitHub reports a run with no jobs at all.
+    """
+    from newstack.cli import build_context_for_check
+    from newstack.registry import get_stack
+    from newstack.render import generate
+
+    yaml = pytest.importorskip("yaml")
+
+    stack = get_stack(name)
+    context = build_context_for_check(stack, "sample-app")
+    generate(stack.template_dir, tmp_path, context)
+
+    workflows = list(tmp_path.glob(".github/workflows/*.yml")) + list(
+        tmp_path.glob(".github/workflows/*.yaml")
+    )
+    assert workflows, f"{name} ships no CI workflow"
+    for workflow in workflows:
+        try:
+            parsed = yaml.safe_load(workflow.read_text(encoding="utf-8"))
+        except yaml.YAMLError as error:
+            pytest.fail(f"{workflow.name}: not valid YAML\n{error}")
+        assert isinstance(parsed, dict), workflow
+        assert parsed.get("jobs"), f"{workflow.name}: no jobs"
+
+
 # Every `run:` step executes as `bash -e {0}`, so `cmd; test $? -eq 2` kills the step on
 # `cmd` itself — the assertion never runs and the job fails exactly when the CLI is right.
 # Capture the status first (`set +e ... status=$? ... test "$status" -eq 2`).
