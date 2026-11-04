@@ -101,6 +101,7 @@ jobs:
           - octave-cli
           - prolog-cli
           - lisp-cli
+          - pascal-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -239,6 +240,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends gnat make
           gnatmake --version | head -1
+
+      - name: Install Free Pascal
+        if: matrix.stack == 'pascal-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fp-compiler make
+          fpc -iV
 
       - name: Install SBCL
         if: matrix.stack == 'lisp-cli'

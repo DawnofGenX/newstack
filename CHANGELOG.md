@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`pascal-cli`**: a `wc`-style counter in Free Pascal on `fpc` and `make`, RTL only —
+  bytes are read raw and folded once, arguments are parsed by hand, and the terminal lives
+  behind a record of three function pointers, so the suite drives exit codes and rows
+  without spawning a process. 47 assertions, and the shipped workflow checks the suite,
+  the exit codes, stdin and byte-for-byte parity with `wc`.
 - **`lisp-cli`**: a `wc`-style counter in Common Lisp on SBCL, standard library only —
   bytes are read as `(unsigned-byte 8)` and folded once, arguments are parsed by hand, and
   the program takes a structure of four functions so the suite drives it without a process.
