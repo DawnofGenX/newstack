@@ -1,0 +1,55 @@
+{
+  "name": "mdbook-docs",
+  "title": "mdBook docs",
+  "language": "markdown",
+  "blurb": "mdBook docs: a real book whose links and table of contents are checked in CI \u2014 a shell link checker with a tested exit-code contract, and a suite that proves it catches broken links, missing images and orphan pages",
+  "requires": [
+    "mdbook",
+    "make"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "make check",
+    "make build",
+    "make serve"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make -s build && test -f book/index.html && test -f book/guide/writing.html",
+      "timeout": 300
+    },
+    {
+      "name": "check",
+      "cmd": "./tools/check-links.sh"
+    },
+    {
+      "name": "test",
+      "cmd": "./tests/run_tests.sh",
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./tools/check-links.sh --help | grep -qF 'Usage: check-links.sh [ROOT]'"
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./tools/check-links.sh /nonexistent/root >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2"
+    },
+    {
+      "name": "broken-link",
+      "cmd": "set +e\nwork=$(mktemp -d)\ncp -r book.toml src tools \"$work/\"\nprintf '\\n[gone](nowhere.md)\\n' >> \"$work/src/index.md\"\nout=$(./tools/check-links.sh \"$work\" 2>&1)\nstatus=$?\nprintf '%s\\n' \"$out\"\nrm -rf \"$work\"\ntest \"$status\" -eq 1\nprintf '%s\\n' \"$out\" | grep -q 'nowhere.md does not exist'",
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "book.toml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

@@ -113,6 +113,7 @@ jobs:
           - sqlite-sql
           - powershell-cli
           - jq-report
+          - mdbook-docs
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -321,6 +322,16 @@ jobs:
             sudo apt-get install -y --no-install-recommends jq
           fi
           jq --version
+
+      - name: Install mdbook
+        if: matrix.stack == 'mdbook-docs'
+        run: |
+          if ! command -v mdbook >/dev/null 2>&1; then
+            curl -sSLf -o /tmp/mdbook.tar.gz https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-gnu.tar.gz
+            tar -xzf /tmp/mdbook.tar.gz -C /tmp
+            sudo install -m755 /tmp/mdbook /usr/local/bin/mdbook
+          fi
+          mdbook --version
 
       - name: Install Groovy
         if: matrix.stack == 'groovy-cli'

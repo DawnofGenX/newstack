@@ -1,0 +1,20 @@
+[book]
+title = "{{ project_name }}"
+authors = ["{{ author }}"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+git-repository-url = ""
+edit-url-template = ""
+no-section-label = true
+
+[output.html.fold]
+enable = true
+level = 1

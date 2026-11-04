@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`mdbook-docs`**: an mdBook site whose links and table of contents are
+  checked in CI. `tools/check-links.sh` reads every page under `src/`, reports a
+  relative link or image whose target is missing, and reports any page that
+  `src/SUMMARY.md` does not list — because a page nobody can navigate to is a
+  page nobody reads. External, `mailto:` and same-page anchor links are left
+  alone; the exit contract is 0 intact / 1 problems / 2 usage error. Twenty-five
+  assertions cover the checker, the shipped book, and the two failure modes.
 - **`jq-report`**: reports over a JSON access log, written as plain jq programs
   and wrapped in a small shell command. `filters/*.jq` is one report each —
   counts per status, busiest paths, slowest requests, bytes per day, error rate —
