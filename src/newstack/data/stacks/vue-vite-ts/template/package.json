@@ -30,6 +30,6 @@
     "vue-tsc": "^3.3.11"
   },
   "engines": {
-    "node": "^22.18.0 || >=24.12.0"
+    "node": ">={{ node_version }}"
   }
 }

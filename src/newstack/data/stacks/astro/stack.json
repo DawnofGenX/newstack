@@ -8,6 +8,12 @@
     "npm",
     "git"
   ],
+  "node": {
+    "minimum": "24",
+    "versions": [
+      "24"
+    ]
+  },
   "default_description": "A static content site built with Astro.",
   "next_steps": [
     "cd {path}",

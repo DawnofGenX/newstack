@@ -8,7 +8,7 @@ Vue 3 + Vite + TypeScript single page application, scaffolded by
 
 ## Requirements
 
-- Node.js 22.18+ or 24.12+
+- Node.js {{ node_version }} or newer
 - npm 10+
 
 ## Getting started
@@ -50,7 +50,7 @@ mode with `npx vitest`.
 ## Continuous integration
 
 `.github/workflows/ci.yml` installs dependencies, type-checks, tests and builds
-on Node.js 22 and 24 for every push to `main` and every pull request. It uses
+on Node.js {{ node_list }} for every push to `main` and every pull request. It uses
 `npm install` (not the lockfile-strict `npm clean-install`) so it works in a
 fresh project with no lockfile committed yet. Commit `package-lock.json` once
 you have generated it to get reproducible CI installs.

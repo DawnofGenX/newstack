@@ -8,6 +8,13 @@
     "npm",
     "git"
   ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
   "default_description": "A React single page application.",
   "next_steps": [
     "cd {path}",
@@ -54,7 +61,7 @@
       "contains": "\"react\""
     }
   ],
-  "detect_fallback": false,
+  "detect_fallback": true,
   "adopt": [
     ".github/workflows/ci.yml",
     ".gitignore",

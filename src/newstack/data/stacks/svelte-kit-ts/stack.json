@@ -8,6 +8,13 @@
     "npm",
     "git"
   ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
   "default_description": "A SvelteKit application.",
   "next_steps": [
     "cd {path}",

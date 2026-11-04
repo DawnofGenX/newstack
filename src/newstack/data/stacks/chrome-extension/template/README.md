@@ -13,7 +13,7 @@ a content script, a Vite build and Vitest tests over the pure logic.
 
 ## Requirements
 
-- Node.js 22 or newer, npm.
+- Node.js {{ node_version }} or newer, npm.
 - Chrome (or any Chromium browser) to load the unpacked build.
 
 ## Install

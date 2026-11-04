@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`--node MAJOR`** — the JavaScript stacks declare the majors they are proven on
+  (`"node": {"minimum": "22", "versions": ["22", "24"]}`) and one value writes every place a
+  version appears: `engines` in `package.json`, the `node-version` matrix in the generated
+  workflow, and the README. The floor can only go up and only to a major the stack supports —
+  `astro` declares 24 as its own minimum, so `--node 22` is refused instead of scaffolding a
+  project Astro refuses to start. `newstack update --node` moves a project's floor later and
+  every affected file follows.
 - **`newstack stacks outdated`** — which installed stacks have moved upstream, answered with
   one `git ls-remote` per repository rather than a clone, so checking is cheap and writes
   nothing. Exits 1 when a stack is behind or an origin could not be reached; an unreachable
@@ -139,6 +146,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- **`adopt` recognises a Next.js app as `next-app-ts`.** Every Next project depends on React,
+  so the `"react"` marker matched both stacks and `adopt` would only ever have asked for
+  `--stack`. `next-app-ts` keeps the specific marker and `react-vite-ts` became a
+  `detect_fallback:`, so a Next app resolves to one stack and a plain React project still
+  resolves to the Vite SPA; both directions are tested.
 - **`adopt` no longer dead-ends on every Composer and Symfony project.** `symfony-app`
   detects `bin/console`, which a plain Composer package does not have, so the generic
   `php-composer-cli` rule became a `detect_fallback:` — a specific marker now wins and a

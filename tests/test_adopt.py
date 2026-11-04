@@ -45,6 +45,25 @@ def test_detects_each_stack(tmp_path, files, expected) -> None:
     assert found == sorted([expected] if isinstance(expected, str) else expected)
 
 
+def test_a_next_project_is_not_mistaken_for_a_react_spa(tmp_path) -> None:
+    # every Next app depends on React, so `"react"` alone cannot tell them apart:
+    # next-app-ts keeps the specific marker and react-vite-ts is the fallback.
+    make_repo(
+        tmp_path,
+        {
+            "package.json": json.dumps(
+                {"dependencies": {"next": "^16", "react": "^19", "react-dom": "^19"}}
+            )
+        },
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["next-app-ts"]
+
+
+def test_a_plain_react_project_still_resolves_to_the_vite_spa(tmp_path) -> None:
+    make_repo(tmp_path, {"package.json": json.dumps({"dependencies": {"react": "^19"}})})
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["react-vite-ts"]
+
+
 def test_generic_python_fallback_is_suppressed_by_a_specific_match(tmp_path) -> None:
     make_repo(tmp_path, {"pyproject.toml": 'dependencies = ["django"]\n'})
     names = [stack.name for stack in detect_stacks(tmp_path)]
@@ -114,9 +133,11 @@ def test_unrecognised_directory_yields_no_candidates(tmp_path) -> None:
 
 
 def test_two_specific_matches_are_reported_as_ambiguous(tmp_path) -> None:
-    make_repo(tmp_path, {"package.json": '{"dependencies": {"react": "19", "express": "5"}}'})
+    # go.mod matches the CLI and the HTTP service; neither is a fallback, so the
+    # only honest answer is to ask which one this repository is.
+    make_repo(tmp_path, {"go.mod": "module x\n\ngo 1.24\n"})
     names = sorted(stack.name for stack in detect_stacks(tmp_path))
-    assert names == ["node-express-ts", "react-vite-ts"]
+    assert names == ["go-cli", "go-http"]
 
 
 # --------------------------------------------------------------------- planning
@@ -214,7 +235,7 @@ def test_cli_adopt_json_schema(tmp_path, capsys) -> None:
 
 
 def test_cli_adopt_ambiguous_exits_2(tmp_path, capsys) -> None:
-    make_repo(tmp_path, {"package.json": '{"dependencies": {"react": "19", "express": "5"}}'})
+    make_repo(tmp_path, {"go.mod": "module x\n\ngo 1.24\n"})
     assert main(["adopt", str(tmp_path)]) == 2
     assert "more than one stack" in capsys.readouterr().err
 

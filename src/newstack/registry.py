@@ -79,10 +79,16 @@ class Stack:
     adopt_tests: tuple[str, ...] = ()
     python_minimum: str | None = None
     python_versions: tuple[str, ...] = ()
+    node_minimum: str | None = None
+    node_versions: tuple[str, ...] = ()
 
     @property
     def is_python(self) -> bool:
         return bool(self.python_versions)
+
+    @property
+    def is_node(self) -> bool:
+        return bool(self.node_versions)
 
     @property
     def template_dir(self) -> Path:
@@ -114,26 +120,43 @@ def _as_tuple(value: object, field: str, where: Path) -> tuple[str, ...]:
 
 
 PYTHON_KEY_RE = re.compile(r"^3\.(?:[89]|1[0-9])$")
+NODE_KEY_RE = re.compile(r"^(?:1[4-9]|2[0-9])$")
+
+
+def _versions_block(
+    value: object,
+    where: Path,
+    key: str,
+    pattern: re.Pattern[str],
+    example: str,
+) -> tuple[str | None, tuple[str, ...]]:
+    """A ``python``/``node`` manifest key: the floor and the versions proven on."""
+    if value is None:
+        return None, ()
+    if not isinstance(value, dict):
+        raise RegistryError(f"{where}: '{key}' must be an object with 'minimum'/'versions'")
+    minimum = value.get("minimum")
+    if not isinstance(minimum, str) or not pattern.match(minimum):
+        raise RegistryError(f"{where}: '{key}.minimum' must look like '{example}'")
+    raw = value.get("versions", [minimum])
+    if not isinstance(raw, list) or not raw or not all(isinstance(item, str) for item in raw):
+        raise RegistryError(f"{where}: '{key}.versions' must be a non-empty list of strings")
+    bad = [item for item in raw if not pattern.match(item)]
+    if bad:
+        raise RegistryError(f"{where}: '{key}.versions' has a bad entry: {', '.join(bad)}")
+    if minimum not in raw:
+        raise RegistryError(f"{where}: '{key}.minimum' {minimum} is not in '{key}.versions'")
+    return minimum, tuple(raw)
 
 
 def _python_versions(value: object, where: Path) -> tuple[str | None, tuple[str, ...]]:
     """The ``python`` manifest key: the interpreter floor and the proven versions."""
-    if value is None:
-        return None, ()
-    if not isinstance(value, dict):
-        raise RegistryError(f"{where}: 'python' must be an object with 'minimum'/'versions'")
-    minimum = value.get("minimum")
-    if not isinstance(minimum, str) or not PYTHON_KEY_RE.match(minimum):
-        raise RegistryError(f"{where}: 'python.minimum' must look like '3.12'")
-    raw = value.get("versions", [minimum])
-    if not isinstance(raw, list) or not raw or not all(isinstance(item, str) for item in raw):
-        raise RegistryError(f"{where}: 'python.versions' must be a non-empty list of strings")
-    bad = [item for item in raw if not PYTHON_KEY_RE.match(item)]
-    if bad:
-        raise RegistryError(f"{where}: 'python.versions' has a bad entry: {', '.join(bad)}")
-    if minimum not in raw:
-        raise RegistryError(f"{where}: 'python.minimum' {minimum} is not in 'python.versions'")
-    return minimum, tuple(raw)
+    return _versions_block(value, where, "python", PYTHON_KEY_RE, "3.12")
+
+
+def _node_versions(value: object, where: Path) -> tuple[str | None, tuple[str, ...]]:
+    """The ``node`` manifest key: the Node major floor and the proven majors."""
+    return _versions_block(value, where, "node", NODE_KEY_RE, "22")
 
 
 def load_stack(directory: Path) -> Stack:
@@ -192,6 +215,7 @@ def load_stack(directory: Path) -> Stack:
         raise RegistryError(f"{manifest}: 'detect_fallback' must be a boolean")
 
     minimum, versions = _python_versions(data.get("python"), manifest)
+    node_minimum, node_versions = _node_versions(data.get("node"), manifest)
 
     return Stack(
         name=data["name"],
@@ -209,6 +233,8 @@ def load_stack(directory: Path) -> Stack:
         adopt_tests=_as_tuple(data.get("adopt_tests"), "adopt_tests", manifest),
         python_minimum=minimum,
         python_versions=versions,
+        node_minimum=node_minimum,
+        node_versions=node_versions,
     )
 
 

@@ -60,6 +60,7 @@ newstack new fastapi ~/code/api -d "Billing service" --author "Your Name"
 newstack new python-lib ~/code/lib --dry-run     # preview, write nothing
 newstack new python-cli ~/code/tool --github     # create the repo and push it too
 newstack new fastapi ~/code/api --python 3.12    # raise a Python stack's floor
+newstack new react-vite-ts ~/web --node 24       # and a JavaScript stack's
 newstack stacks outdated            # which installed stacks moved upstream
 newstack stacks update              # re-pull every stack you installed from a repo
 newstack new python-lib ~/code/lib --license apache-2.0   # mit (default), apache-2.0, bsd-3, none
@@ -120,6 +121,29 @@ say so rather than silently ignoring the flag. The choice is recorded in
 `.newstack.json`, so `newstack update` keeps the floor your project declares;
 `newstack update --python 3.13` moves it later, and every affected file
 follows.
+
+### Choosing the Node major
+
+The JavaScript stacks do the same thing with majors. `--node` moves the floor,
+and `engines`, the CI matrix and the README are all rendered from it:
+
+```console
+$ newstack new react-vite-ts ~/code/web --node 24
+$ grep -A2 engines ~/code/web/package.json
+  "engines": {
+    "node": ">=24"
+  }
+$ grep node-version ~/code/web/.github/workflows/ci.yml
+        node-version: ["24"]
+```
+
+The matrix shrinks with the floor: asking for 24 on a stack proven on 22 and 24
+runs 24 alone, because a leg on a version you no longer claim to support is not
+a test. `astro` declares 24 as its own minimum — Astro 7 refuses to start on
+anything older — so `--node 22` there is an error rather than a broken project.
+As with `--python`, the floor can only go up, `newstack update` keeps the one
+your project declares, and `newstack update --node 22` moves it back down only
+if the stack still supports that major.
 
 ### Stacks from outside this repository
 
@@ -233,8 +257,8 @@ $ newstack stacks outdated
 | `swift-cli` | Swift 6 CLI on SwiftPM: pure counting core, hand-rolled argv parser, XCTest suites, I/O behind a struct of closures | `swift` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
-README, a licence (`--license mit|apache-2.0|bsd-3|none`), an interpreter floor for the
-Python stacks (`--python 3.13`), a `.gitignore`, and a
+README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python
+and JavaScript stacks (`--python 3.13`, `--node 24`), a `.gitignore`, and a
 `.newstack.json` record that `newstack update` uses to re-apply later template changes.
 
 ## Adopting an existing project
@@ -418,8 +442,9 @@ manifest format, no fork required.
   `data/licenses/`, so 46 templates cannot drift apart and `--license none` is a real
   choice rather than a deleted file.
 - **A version is written once.** `--python` fills `requires-python`, the ruff target, the
-  classifiers, the CI matrix and the Docker tag from one value, so a project cannot claim
-  support for a version its own CI never runs.
+  classifiers, the CI matrix and the Docker tag; `--node` fills `engines` and the JS CI
+  matrix. One value per ecosystem, so a project cannot claim support for a version its own
+  CI never runs.
 - **Updates are a hash comparison, not a diff dance.** `.newstack.json` records what
   newstack wrote; a file counts as yours only once it stops matching that hash, so
   `update` never has to guess whose change it is looking at.
@@ -429,9 +454,7 @@ manifest format, no fork required.
 
 ## Roadmap
 
-- More variable choices beyond the current defaults (package manager, Node version).
-- `newstack stacks outdated` to report which installed stacks have moved upstream without
-  cloning them.
+- More variable choices beyond the current defaults (package manager).
 
 ## Licence
 

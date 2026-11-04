@@ -7,7 +7,7 @@ runes-based component, unit tests, and static site generation via `@sveltejs/ada
 
 ## Requirements
 
-- Node.js 22.17 or newer
+- Node.js {{ node_version }} or newer
 - npm 11 or newer
 
 ## Setup
