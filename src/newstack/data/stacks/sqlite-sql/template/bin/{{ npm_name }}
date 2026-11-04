@@ -1,0 +1,56 @@
+#!/bin/sh
+# Runs one of the reports against a throwaway database built from schema.sql,
+# views.sql and seed.sql. Nothing is written inside the project.
+set -eu
+
+root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+program={{ npm_name }}
+version=0.1.0
+
+usage () {
+    cat <<EOF
+Usage: $program [QUERY]
+
+Runs a query from queries/ against a database built from schema.sql,
+views.sql and seed.sql, and prints the rows separated by |.
+
+  --list       print the available query names
+  -h, --help   show this help and exit
+  -V, --version  show the version and exit
+EOF
+}
+
+case ${1:-} in
+    ''|-h|--help)
+        usage
+        exit 0
+        ;;
+    -V|--version)
+        echo "$version"
+        exit 0
+        ;;
+    --list)
+        cd "$root/queries" || exit 1
+        set -- *.sql
+        for file in "$@"; do
+            echo "${file%.sql}"
+        done
+        exit 0
+        ;;
+esac
+
+query=$1
+file=$root/queries/$query.sql
+if [ ! -f "$file" ]; then
+    echo "$program: no such query: $query" >&2
+    echo "Try '$program --list' to see them." >&2
+    exit 2
+fi
+
+work=$(mktemp -d "${TMPDIR:-/tmp}/$program.XXXXXX")
+trap 'rm -rf "$work"' EXIT INT TERM
+
+sqlite3 "$work/report.db" < "$root/schema.sql"
+sqlite3 "$work/report.db" < "$root/views.sql"
+sqlite3 "$work/report.db" < "$root/seed.sql"
+sqlite3 -batch -separator '|' "$work/report.db" ".read $file"

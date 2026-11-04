@@ -315,6 +315,7 @@ $ newstack stacks outdated
 | `groovy-cli` | Groovy CLI on the plain Groovy runtime: byte-array counting core, hand-rolled argv parser, dependency-free harness, the four side effects handed in as closures | `groovy`, `java` |
 | `awk-cli` | awk CLI on `gawk`: counting with `RS="\0"` so each file is one record, hand-rolled argv parser, dependency-free harness, the report built before anything is printed | `gawk` |
 | `forth-cli` | Forth CLI on `gforth`: counting over a memory block with a loop and `c@`, hand-rolled argv parser, a four-word test harness, terminal reads behind one file | `gforth` |
+| `sqlite-sql` | SQL reporting project on SQLite: schema with `CHECK` constraints, views that hold the arithmetic, one `SELECT` per report, assertions over exact cents | `sqlite3`, `make` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python

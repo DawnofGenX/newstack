@@ -110,6 +110,7 @@ jobs:
           - groovy-cli
           - awk-cli
           - forth-cli
+          - sqlite-sql
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -290,6 +291,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends gforth
           gforth --version
+
+      - name: Install sqlite3
+        if: matrix.stack == 'sqlite-sql'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends sqlite3 make
+          sqlite3 --version
 
       - name: Install Groovy
         if: matrix.stack == 'groovy-cli'

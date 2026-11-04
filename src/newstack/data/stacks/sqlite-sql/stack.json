@@ -1,0 +1,60 @@
+{
+  "name": "sqlite-sql",
+  "title": "SQLite SQL project",
+  "language": "sql",
+  "blurb": "SQL reporting project on SQLite: schema with CHECK constraints, views that hold the arithmetic, one SELECT per report, a shell wrapper, assertions over exact cents",
+  "requires": [
+    "sqlite3",
+    "make"
+  ],
+  "default_description": "A SQL reporting project on SQLite.",
+  "next_steps": [
+    "cd {path}",
+    "make db",
+    "make test",
+    "./bin/{npm_name} top_customers"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make -s db && test -f build/app.db",
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": "sh tests/run_tests.sh",
+      "timeout": 120
+    },
+    {
+      "name": "integrity",
+      "cmd": "test \"$(sqlite3 build/app.db 'PRAGMA integrity_check;')\" = ok",
+      "timeout": 60
+    },
+    {
+      "name": "report",
+      "cmd": "./bin/{{ npm_name }} top_customers | head -1 | grep -qxF 'Bruno|2|87.00'",
+      "timeout": 60
+    },
+    {
+      "name": "constraints",
+      "cmd": "set +e; sqlite3 build/app.db \"INSERT INTO customers (id, name, country) VALUES (9, 'Eve', 'FR');\" 2>/dev/null; status=$?; echo \"exit status: $status\"; test \"$status\" -ne 0",
+      "timeout": 60
+    },
+    {
+      "name": "cascade",
+      "cmd": "cp build/app.db .cascade.db; sqlite3 .cascade.db 'PRAGMA foreign_keys = ON; DELETE FROM customers WHERE id = 1;' && test \"$(sqlite3 .cascade.db 'SELECT COUNT(*) FROM orders;')\" = 3 && test \"$(sqlite3 .cascade.db 'SELECT COUNT(*) FROM order_items;')\" = 4; status=$?; rm -f .cascade.db; exit $status",
+      "timeout": 60
+    }
+  ],
+  "detect": [
+    {
+      "file": "schema.sql"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ]
+}

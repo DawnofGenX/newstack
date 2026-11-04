@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`sqlite-sql`**: not a CLI for once — a SQL reporting project. `schema.sql`
+  carries the keys and the `CHECK` constraints, `views.sql` holds the arithmetic
+  exactly once, `queries/` is one `SELECT` per report and `bin/NAME` builds a
+  throwaway database and prints one of them. 24 assertions cover exact cents,
+  every refused row and the `ON DELETE CASCADE` counts; the wrapper never writes
+  inside the project.
 - **`forth-cli`**: a word-count CLI in plain Forth on `gforth`, no library and
   no build step. Everything is a byte loop over a block the runner reads whole,
   so the counts are exact whatever the file contains; argv is parsed into

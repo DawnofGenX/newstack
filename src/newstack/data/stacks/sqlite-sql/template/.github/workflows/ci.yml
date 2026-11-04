@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install sqlite3
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends sqlite3 make
+          sqlite3 --version
+
+      - name: Build
+        run: make -s db
+
+      - name: Test
+        run: sh tests/run_tests.sh
+
+      - name: Integrity
+        run: test "$(sqlite3 build/app.db 'PRAGMA integrity_check;')" = ok
+
+      - name: Report
+        run: './bin/{{ npm_name }} top_customers | head -1 | grep -qxF "Bruno|2|87.00"'
+
+      - name: Constraints bite
+        run: |
+          set +e
+          sqlite3 build/app.db "INSERT INTO customers (id, name, country) VALUES (9, 'Eve', 'FR');" 2>/dev/null
+          status=$?
+          echo "insert of an unknown country exited $status"
+          test "$status" -ne 0
