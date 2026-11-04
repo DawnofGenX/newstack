@@ -30,7 +30,12 @@ git init -q -b main
 git add -A
 git -c user.name="newstack proof" -c user.email="proof@newstack.invalid" \
     commit -q -m "proof: ${stack} template as shipped"
-gh repo create "$repo" --private --source . --push >/dev/null
+# `gh repo create --source . --push` goes through GraphQL, which returns
+# sporadic 502s; the REST endpoint is steady.
+gh api "user/repos" -f name="${repo#*/}" -F private=true --jq .full_name >/dev/null
+remote="https://x-access-token:$(gh auth token)@github.com/${repo}.git"
+git remote add origin "$remote" 2>/dev/null || git remote set-url origin "$remote"
+git push -q origin main
 
 run=""
 for _ in $(seq 1 24); do
