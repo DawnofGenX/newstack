@@ -8,6 +8,17 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`cobol-cli`**: a word-count CLI in COBOL. GNUCOBOL has no `ARGUMENT-NUMBER` in
+  every build, so `main.cob` reads `/proc/self/cmdline` with the same one-byte
+  `ORGANIZATION IS SEQUENTIAL` reader it uses for files and splits it on `LOW-VALUE`;
+  `TEXTSTAT-COUNTS` counts bytes handed to it a block at a time, `TEXTSTAT-OPTIONS`
+  decides what argv means without any I/O, and `TEXTSTAT-RUNNER` is the only program
+  that opens anything. One-byte records are what make stdin byte-exact — a pipe and a
+  redirect behave alike. The runner reproduces `wc`'s padding and labelling rules and
+  keeps the `total` row when an operand could not be read; a directory operand is
+  refused instead of being reported as zeroes. A COBOL unit driver (38 assertions over
+  the counting and parsing subprograms) plus a shell suite that diffs the built tool
+  against the real `wc` add up to `checks: 71, passed: 71, failed: 0`.
 - **`bash-cli`**: a word-count CLI written in bash itself — no `wc`, no `awk`, no `od`.
   `lib/counts.sh` counts newlines by substitution, words by a `read -a` split on the
   shell's own whitespace set, and bytes by `${#data}`; `lib/io.sh` is the only file that

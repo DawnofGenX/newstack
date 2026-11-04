@@ -1,0 +1,11 @@
+#!/bin/sh
+# The wrapper the project ships: build once, then hand the process to the
+# real program so stdin, stdout and the exit code pass straight through.
+set -eu
+root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$root"
+app={{ npm_name }}
+if [ ! -x "build/$app" ]; then
+  make -s all APP="$app" >&2
+fi
+exec "build/$app" "$@"

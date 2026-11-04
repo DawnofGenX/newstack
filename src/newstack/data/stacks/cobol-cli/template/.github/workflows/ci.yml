@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install GNUCOBOL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gnucobol make
+          cobc --version | head -1
+
+      - name: Build
+        run: make -s all
+
+      - name: Test
+        run: make -s test
+
+      - name: Help
+        run: './bin/{{ npm_name }} --help | grep -qF "Usage: {{ npm_name }}"'
+
+      - name: Exit codes
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "unknown option exit status: $status"
+          test "$status" -eq 2
+          ./bin/{{ npm_name }} nope.txt >/dev/null 2>&1
+          status=$?
+          echo "missing file exit status: $status"
+          test "$status" -eq 1
+
+      - name: Read stdin
+        run: |
+          set +e
+          out=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w)
+          status=$?
+          echo "stdin exit status: $status, output: $out"
+          test "$status" -eq 0
+          test "$out" = "3"
+          dash=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w -)
+          dash_status=$?
+          echo "dash exit status: $dash_status, output: $dash"
+          test "$dash_status" -eq 0
+          test "$dash" = "3 -"
+
+      - name: Matches wc on every input
+        run: |
+          set -eu
+          mkdir -p .parity
+          printf 'alpha beta\ngamma delta\n' > .parity/p1.txt
+          printf 'one line, no trailing newline' > .parity/p2.txt
+          printf 'h\303\251llo w\303\266rld\n' > .parity/p3.txt
+          : > .parity/p4.txt
+          printf 'alpha\vbeta\fgamma\rdelta\n' > .parity/p5.txt
+          for f in .parity/p*.txt; do
+            ours=$(./bin/{{ npm_name }} "$f")
+            theirs=$(wc -l -w -c "$f")
+            echo "$f: $ours"
+            test "$ours" = "$theirs"
+          done

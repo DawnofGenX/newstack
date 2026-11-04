@@ -1,0 +1,64 @@
+{
+  "name": "cobol-cli",
+  "title": "COBOL CLI",
+  "language": "cobol",
+  "blurb": "COBOL CLI on GNUCOBOL: byte-exact counting over a sequential file, hand-rolled argv parser, a COBOL unit driver plus a shell suite, I/O in one program",
+  "requires": [
+    "cobc",
+    "make"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "make all",
+    "make test",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make -s all",
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "make -s test",
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage: {{ npm_name }}'",
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} --bogus >/dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 2",
+      "timeout": 300
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.txt >/dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 1",
+      "timeout": 300
+    },
+    {
+      "name": "stdin",
+      "cmd": "set +e; piped=$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w); status=$?; echo \"stdin exit status: $status, output: $piped\"; dash=$(printf 'alpha beta\\ngamma\\n' | ./bin/{{ npm_name }} -w -); dash_status=$?; echo \"dash exit status: $dash_status, output: $dash\"; test \"$status\" -eq 0 && test \"$piped\" = '3' && test \"$dash_status\" -eq 0 && test \"$dash\" = '3 -'",
+      "timeout": 300
+    },
+    {
+      "name": "parity",
+      "cmd": "set -eu; mkdir -p .parity; printf 'alpha beta\\ngamma delta\\n' > .parity/p1.txt; printf 'one line, no trailing newline' > .parity/p2.txt; printf 'h\\303\\251llo w\\303\\266rld\\n' > .parity/p3.txt; : > .parity/p4.txt; printf 'alpha\\vbeta\\fgamma\\rdelta\\n' > .parity/p5.txt; for f in .parity/p*.txt; do ours=$(./bin/{{ npm_name }} \"$f\"); theirs=$(wc -l -w -c \"$f\"); echo \"$f: $ours\"; test \"$ours\" = \"$theirs\"; done",
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Makefile",
+      "contains": "cobc"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}
