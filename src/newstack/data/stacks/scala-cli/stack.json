@@ -17,7 +17,7 @@
   "verify": [
     {
       "name": "compile",
-      "cmd": "scala-cli compile . --server=false",
+      "cmd": "scala-cli compile . --server=false || { sleep 5; scala-cli compile . --server=false; }",
       "tools": [
         "scala-cli",
         "java"

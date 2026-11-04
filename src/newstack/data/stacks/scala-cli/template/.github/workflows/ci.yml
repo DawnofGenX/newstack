@@ -28,7 +28,12 @@ jobs:
           sudo mv scala-cli /usr/local/bin/scala-cli
           scala-cli version
       - name: Compile
-        run: scala-cli compile . --server=false
+        run: |
+          # scala-cli resolves the pinned Scala version against Maven Central while its cache
+          # is cold. A transient failure there is reported as an unknown version ("Cannot find
+          # matching Scala version"), so give the network one more try before believing it.
+          scala-cli compile . --server=false ||
+            { sleep 5; scala-cli compile . --server=false; }
       - name: Test
         run: scala-cli test . --server=false
       - name: Help

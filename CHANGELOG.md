@@ -146,6 +146,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- **`scala-cli` no longer fails on a cold-cache Maven Central hiccup.** scala-cli resolves the
+  pinned Scala version against Maven Central metadata while its cache is empty, and a transient
+  failure there is reported as `Cannot find matching Scala version for '3.3.6'` — a version
+  that plainly exists. Compilation now retries once (in the manifest's verify step and in the
+  shipped workflow), which keeps a genuine compile error failing while a network blip does not.
 - **`adopt` recognises a Next.js app as `next-app-ts`.** Every Next project depends on React,
   so the `"react"` marker matched both stacks and `adopt` would only ever have asked for
   `--stack`. `next-app-ts` keeps the specific marker and `react-vite-ts` became a
