@@ -1,0 +1,60 @@
+{
+  "name": "java-httpserver-api",
+  "title": "Java HTTP API",
+  "language": "java",
+  "blurb": "Java 21 JSON service on the JDK's own com.sun.net.httpserver: pure counting and contract classes, a hand-written JSON reader that keeps a string apart from a number, and a Makefile over javac with -Xlint:all -Werror",
+  "requires": [
+    "java",
+    "make",
+    "curl"
+  ],
+  "default_description": "A Java 21 JSON service on the JDK HTTP server.",
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "PORT=8080 java -cp build/classes {package_name}.App"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "tools": [
+        "java",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "java",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5442/health >/dev/null 2>&1; then\n  echo 'port 5442 is already answering - stop that process before running this step'\n  exit 1\nfi\nPORT=5442 java -cp build/classes {{ package_name }}.App > .java-http.log 2>&1 &\nserver=$!\ntrap 'kill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT\ni=0\nwhile [ $i -lt 120 ]; do\n  if curl -fsS --max-time 2 http://127.0.0.1:5442/health >/dev/null 2>&1; then\n    break\n  fi\n  i=$((i + 1))\n  sleep 0.25\ndone\nif [ $i -ge 120 ]; then\n  cat .java-http.log\n  echo 'the server did not answer in time'\n  exit 1\nfi\nkill -0 $server 2>/dev/null || { cat .java-http.log; echo 'the server exited before it answered'; exit 1; }\nhealth=$(curl -sS --max-time 10 http://127.0.0.1:5442/health)\ntest \"$health\" = '{\"status\":\"ok\"}'\nget=$(curl -sS --max-time 10 'http://127.0.0.1:5442/stats?text=hello%20world%0A')\nprintf '%s' \"$get\" | grep -q '\"lines\":1'\nprintf '%s' \"$get\" | grep -q '\"bytes\":12'\nposted=$(curl -sS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5442/stats)\nprintf '%s' \"$posted\" | grep -q '\"words\":3'\nmissing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5442/stats)\ntest \"$missing\" = 422\nbroken=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5442/stats)\ntest \"$broken\" = 422\nnumber=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary '{\"text\":42}' http://127.0.0.1:5442/stats)\ntest \"$number\" = 422\ngone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5442/nope)\ntest \"$gone\" = 404\nwrong=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5442/health)\ntest \"$wrong\" = 405",
+      "tools": [
+        "java",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.java",
+      "contains": "com.sun.net.httpserver"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/RunTests.java"
+  ]
+}

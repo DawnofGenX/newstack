@@ -25,7 +25,7 @@ jobs:
           fi
           PORT=5433 ./bin/{{ npm_name }} > .lisp.log 2>&1 &
           server=$!
-          trap 'kill -TERM -"$server" 2>/dev/null || kill $server 2>/dev/null || true' EXIT
+          trap 'kill -TERM -"$server" 2>/dev/null || kill $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT
           i=0
           while [ $i -lt 120 ]; do
             if curl -fsS --max-time 2 http://127.0.0.1:5433/health >/dev/null 2>&1; then
