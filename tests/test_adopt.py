@@ -1039,3 +1039,26 @@ def test_a_plain_d_project_still_resolves_to_the_d_cli(tmp_path) -> None:
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["d-cli"], "source/app.d with no socket is the CLI stack"
 
+def test_an_ocaml_socket_server_resolves_to_the_ocaml_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "dune-project": "(lang dune 3.14)\n",
+            "lib/server.ml": "let socket = Unix.socket Unix.PF_INET Unix.SOCK_STREAM 0\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["ocaml-http-api"], "Unix.socket is the service marker"
+
+
+def test_a_plain_ocaml_project_still_resolves_to_the_ocaml_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "dune-project": "(lang dune 3.14)\n",
+            "lib/counts.ml": "let of_bytes data = String.length data\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["ocaml-cli"], "a dune project with no socket is the CLI stack"
+

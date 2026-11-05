@@ -1,0 +1,4 @@
+# Dune build artifacts. Anchored: this file ships inside the template and
+# therefore also applies to the template tree in the newstack repo, where an
+# unanchored entry would hide real source directories from git.
+/_build/

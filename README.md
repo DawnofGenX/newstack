@@ -312,6 +312,7 @@ $ newstack stacks outdated
 | `r-cli` | R CLI on base R only: pure counting function, hand-written option parser, dependency-free test harness | `Rscript` |
 | `r-plumber-api` | Plumber JSON service in R: annotated routes, a pure `textstat_route(method, path, query, body)` covering every status code, a base-R test harness, and a JSON 404 built into `bin/serve.R` | `Rscript`, `plumber` |
 | `ocaml-cli` | OCaml CLI on dune: pure counting library, hand-written option parser, stdlib-only test harness, zero opam dependencies | `ocaml`, `dune` |
+| `ocaml-http-api` | OCaml JSON service on the `Unix` module: pure `route`, a hand-written JSON reader that keeps `42` apart from `"42"`, and three `dune runtest` suites over a stdlib harness | `ocaml`, `dune` |
 | `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
 | `hugo-site` | Content site on Hugo: hand-written layouts and partials, a shortcode, fingerprinted CSS, sitemap and RSS, assertion suite that renders into a temp dir | `hugo` |
 | `helm-chart` | Kubernetes Helm chart: schema-validated values, named templates, hardened Deployment/Service, lint+render checks with no cluster | `helm` |

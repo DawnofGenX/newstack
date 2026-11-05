@@ -7,6 +7,9 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `ocaml-http-api` — an OCaml JSON service on the `Unix` module with no opam package
+  beyond dune: the JSON reader is hand-written so a number and a string stay
+  distinguishable, and `\uXXXX` escapes (surrogate pairs included) decode to UTF-8.
 - `d-http-api` — a D JSON service on `std.socket` with a pure route table and
   `std.json` deciding whether `text` is a string; the tests are ordinary `unittest`
   blocks run through `-unittest -main`, so no test framework is installed.

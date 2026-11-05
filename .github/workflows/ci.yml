@@ -106,6 +106,7 @@ jobs:
           - r-cli
           - r-plumber-api
           - ocaml-cli
+          - ocaml-http-api
           - static-site
           - hugo-site
           - helm-chart
@@ -522,7 +523,7 @@ jobs:
         with:
           version: "0.17.0"
       - name: Set up OCaml
-        if: matrix.stack == 'ocaml-cli'
+        if: contains(fromJSON('["ocaml-cli","ocaml-http-api"]'), matrix.stack)
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: "4.14.1"
@@ -530,7 +531,7 @@ jobs:
       # setup-ocaml leaves dune off PATH for later steps, and `newstack check`
       # needs `dune` resolvable to build the generated project.
       - name: Put dune on PATH
-        if: matrix.stack == 'ocaml-cli'
+        if: contains(fromJSON('["ocaml-cli","ocaml-http-api"]'), matrix.stack)
         run: |
           opam install --yes dune
           echo "$(opam var bin)" >> "$GITHUB_PATH"

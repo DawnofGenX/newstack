@@ -1,0 +1,3 @@
+(tests
+ (names counts_test json_test contract_test)
+ (libraries textstat test_harness))

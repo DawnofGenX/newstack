@@ -1,0 +1,5 @@
+(library
+ (name textstat)
+ (wrapped false)
+ (libraries unix)
+ (synopsis "wc-style counting behind a JSON route table"))
