@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{{ python_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install
+        run: |
+          uv venv --allow-existing .venv
+          uv pip install --python .venv/bin/python -e . pytest httpx ruff
+      - name: Lint
+        run: .venv/bin/ruff check .
+      - name: Migrations are idempotent
+        run: |
+          .venv/bin/python -c "from {{ package_name }}.db import connect, migrate; c = connect(':memory:'); assert migrate(c) == ['001_events.sql'], migrate(c); assert migrate(c) == []"
+      - name: Test
+        run: .venv/bin/python -m pytest -q
+      - name: Contract over a real socket
+        # smoke.sh signs with openssl, not with the code under test, and stops the
+        # server in an EXIT trap that escalates to SIGKILL (uvicorn can ignore TERM
+        # while a request is in flight, and a leaked listener fails the next run).
+        run: bash smoke.sh

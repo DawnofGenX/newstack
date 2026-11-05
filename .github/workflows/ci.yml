@@ -50,6 +50,7 @@ jobs:
           - python-fastapi-sqlite
           - python-sse-api
           - python-scheduler-api
+          - python-webhook-receiver
           - python-litestar-api
           - python-eval-harness
           - python-batch-inference

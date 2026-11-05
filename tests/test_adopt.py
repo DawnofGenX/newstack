@@ -1740,3 +1740,32 @@ def test_a_plain_axum_project_does_not_match_the_sqlx_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "rust-sqlx-api" not in names
+
+
+def test_a_signed_webhook_receiver_resolves_to_the_webhook_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": (
+                '[project]\nname = "hooks"\ndependencies = ["fastapi>=0.115", "uvicorn>=0.30"]\n'
+            ),
+            "src/hooks/signature.py": (
+                "import hmac\n\n\ndef good(expected, header):\n"
+                "    return hmac.compare_digest(expected, header)\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-webhook-receiver"]
+
+
+def test_a_plain_fastapi_app_does_not_match_the_webhook_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": '[project]\nname = "api"\ndependencies = ["fastapi"]\n',
+            "app.py": "from fastapi import FastAPI\n\napp = FastAPI()\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-webhook-receiver" not in names

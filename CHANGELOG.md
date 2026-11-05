@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-webhook-receiver` — a webhook endpoint that trusts only signed bytes. The HMAC is
+  computed over the body that actually arrived, before any parser touches it: a receiver that
+  hashes `json.dumps(json.loads(body))` rejects every honest sender, because spacing, key order
+  and unicode escapes all move. Checks run in a fixed order (secret, signature, replay window,
+  event id, JSON) so an unauthorised malformed body is a 401 rather than a 422; comparisons go
+  through `hmac.compare_digest`; the window rejects future timestamps as well as old ones; and
+  the event id is a primary key, so a sender's retry after a crash gets a 200 and no second row.
 - `python-batch-inference` — a resumable batch inference runner. The results file *is* the
   checkpoint: it is append-only and flushed per line, a torn final line is discarded on the next
   run, and ids already present are skipped instead of sent twice — so a `kill -9` costs one

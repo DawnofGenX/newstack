@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.DS_Store
+
+# the ledger and its write-ahead log
+events.db
+events.db-wal
+events.db-shm
+
+# server log from the smoke step
+/.webhook.log
