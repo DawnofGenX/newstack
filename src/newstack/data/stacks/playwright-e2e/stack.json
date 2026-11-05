@@ -1,0 +1,73 @@
+{
+  "name": "playwright-e2e",
+  "title": "Playwright browser suite",
+  "language": "node",
+  "blurb": "Browser-level tests: Playwright starts the fixture server itself, chromium + mobile viewport, trace on failure, CI installs the browser with --with-deps",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A Playwright browser test suite.",
+  "port": 5464,
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "npx playwright install chromium",
+    "{package_manager_test}"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "browser",
+      "cmd": "npx playwright install chromium",
+      "tools": [
+        "npx"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"@playwright/test\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "playwright.config.ts"
+  ],
+  "adopt_tests": [
+    "tests/stats.spec.ts"
+  ]
+}

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text stats</title>
+    <link rel="stylesheet" href="/app.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Text stats</h1>
+      <label for="input">Text</label>
+      <textarea id="input" name="input" rows="5" data-testid="input"></textarea>
+      <p data-testid="summary" aria-live="polite">0 lines &middot; 0 words &middot; 0 bytes</p>
+      <dl>
+        <div><dt>Lines</dt><dd data-testid="lines">0</dd></div>
+        <div><dt>Words</dt><dd data-testid="words">0</dd></div>
+        <div><dt>Bytes</dt><dd data-testid="bytes">0</dd></div>
+      </dl>
+      <button type="button" data-testid="clear">Clear</button>
+      <button type="button" data-testid="ask-server">Ask the server</button>
+      <p data-testid="server-answer" role="status"></p>
+      <a href="/about">About</a>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

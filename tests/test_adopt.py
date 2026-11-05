@@ -1681,3 +1681,21 @@ def test_a_react_project_does_not_match_the_angular_app(tmp_path) -> None:
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "angular-app" not in names
 
+
+def test_a_playwright_suite_resolves_to_the_e2e_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"devDependencies": {"@playwright/test": "^1.64.1"}}',
+            "playwright.config.ts": "export default {};\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["playwright-e2e"]
+
+
+def test_a_plain_node_project_does_not_match_the_e2e_stack(tmp_path) -> None:
+    make_repo(tmp_path, {"package.json": '{"name": "demo"}'})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "playwright-e2e" not in names
+
