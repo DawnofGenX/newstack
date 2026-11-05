@@ -1,0 +1,28 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=25mm]{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\input{macros}
+
+\title{{{ title }}}
+\author{{{ author }}}
+\date{{{ year }}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent {{ description }}
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/method}
+\input{sections/results}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

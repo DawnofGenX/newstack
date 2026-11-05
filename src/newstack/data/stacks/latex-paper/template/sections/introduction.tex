@@ -1,0 +1,12 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Counting lines, words and bytes is the oldest text-processing job there is, and it is
+still the first thing a new tool gets asked to do~\cite{knuth1984}. Doing it correctly
+is mostly a question of deciding what a word is and of remembering that a byte and a
+character are different things: the string \texttt{h\'ello w\"orld} is five characters
+short of its UTF-8 encoding\wcnote{a byte count counts the encoding, not the string}.
+
+This note records the three rules \projectname{} uses, why they were chosen, and the
+fixtures that pin them down. It is deliberately short: the interesting part is the
+edge cases, not the algorithm.

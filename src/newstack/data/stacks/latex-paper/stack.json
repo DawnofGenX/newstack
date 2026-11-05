@@ -1,0 +1,49 @@
+{
+  "name": "latex-paper",
+  "title": "LaTeX paper",
+  "language": "latex",
+  "blurb": "LaTeX paper: a two-page article with a real bibliography whose build is gated on the PDF a reader gets — latexmk plus bibtex, then pdftotext assertions for the title, headings, citation and page count",
+  "default_description": "A field note on counting lines, words and bytes.",
+  "requires": [
+    "latexmk",
+    "pdflatex",
+    "pdftotext",
+    "make"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "make build",
+    "make check",
+    "pdftotext build/paper.pdf - | head"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make -s build && test -s build/paper.pdf",
+      "timeout": 600
+    },
+    {
+      "name": "check",
+      "cmd": "bash check.sh",
+      "timeout": 600
+    },
+    {
+      "name": "clean",
+      "cmd": "make -s clean && test ! -d build"
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.tex",
+      "contains": "\\documentclass"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile",
+    "check.sh"
+  ],
+  "adopt_tests": []
+}

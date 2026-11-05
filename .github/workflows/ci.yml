@@ -196,6 +196,7 @@ jobs:
           - d-http-api
           - jsonnet-config
           - github-action
+          - latex-paper
     steps:
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -465,6 +466,13 @@ jobs:
             sudo apt-get install -y --no-install-recommends jq
           fi
           jq --version
+
+      - name: Install TeX Live and poppler
+        if: matrix.stack == 'latex-paper'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended latexmk poppler-utils
 
       - name: Install mdbook
         if: matrix.stack == 'mdbook-docs'

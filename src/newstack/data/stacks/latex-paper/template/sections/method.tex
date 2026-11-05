@@ -1,0 +1,19 @@
+\section{Method}
+\label{sec:method}
+
+The input is read once, as bytes. A line ends at a newline; a word is a maximal run of
+bytes that are not one of the six ASCII separators (space, tab, newline, carriage
+return, vertical tab and form feed); a byte count is simply the length of the input.
+Carriage return is a separator rather than a line break, which is what the POSIX
+specification asks for~\cite{posix2024} and what makes CRLF input agree with LF input.
+
+\begin{table}[h]
+  \centering
+  \caption{Fixtures used by the test suite.}
+  \label{tab:fixtures}
+  \input{tables/counts}
+\end{table}
+
+Table~\ref{tab:fixtures} shows why the byte column is the one that catches mistakes:
+the accented text has the same number of characters as the ASCII text plus one, but
+two more bytes.

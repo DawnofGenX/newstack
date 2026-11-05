@@ -7,6 +7,12 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `latex-paper` — a two-page article built with `latexmk` and `bibtex`, and gated on the PDF
+  instead of the sources: `pdftotext` must show the title, every heading, the `[1]` citation and
+  the bibliography entry, `pdfinfo` must report two pages, and `build/paper.log` must contain no
+  overfull line and no unresolved citation. The starter documents why `\n` inside `\texttt{}` is
+  a fatal undefined control sequence, why section numbers vanish from plain `pdftotext` output,
+  and why `latexmk -v` hangs a CI step instead of printing a version.
 - `kotlin-ktor-api` — Ktor 3 + kotlinx.serialization on JDK 21, one shaded jar. Ktor routes answer
   unknown paths with their own plain-text body, so the service intercepts `Setup` on the raw
   `Application` instead: that keeps `{"error":"not_found","detail":"no route for GET /nope"}`

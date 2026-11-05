@@ -401,6 +401,7 @@ $ newstack stacks outdated
 | `haxe-cli` | Haxe command line tool compiled to Neko: byte-accurate `wc`-style counting, hand-written option parser, dependency-free Haxe test suite plus a parity suite that diffs the output against `wc` | `haxe`, `neko`, `make` |
 | `haxe-http-api` | Haxe JSON service on the eval target: no build step, a hand-written JSON reader that keeps a number apart from a string, and a blocking `sys.net.Socket` loop that waits for the client to hang up so the port is free for the next run | `haxe` |
 | `mdbook-docs` | An mdBook site with a shell link checker wired into CI: relative links and images must exist, every page must be listed in `src/SUMMARY.md`, and 25 assertions prove it catches broken links, missing images and orphan pages | `mdbook`, `make` |
+| `latex-paper` | A two-page LaTeX article with a real bibliography, gated on the PDF a reader gets: `latexmk` plus `bibtex`, then `pdftotext` assertions for the title, the headings, the `[1]` citation and the page count, and the build log itself inspected for overfull lines and unresolved references | `latexmk`, `pdflatex`, `pdftotext`, `make` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python

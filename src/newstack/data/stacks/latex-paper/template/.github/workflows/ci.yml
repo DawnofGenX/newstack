@@ -1,0 +1,26 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install TeX Live and poppler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended latexmk poppler-utils
+      - name: Build the paper
+        run: make build
+      - name: Check the text a reader gets
+        run: bash check.sh
+      - name: Keep the pdf
+        uses: actions/upload-artifact@v5
+        with:
+          name: paper
+          path: build/paper.pdf
+          if-no-files-found: error

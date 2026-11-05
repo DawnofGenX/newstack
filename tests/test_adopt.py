@@ -1905,3 +1905,20 @@ def test_a_jdk_http_server_kotlin_project_does_not_match_the_ktor_stack(tmp_path
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["kotlin-http-api"]
+
+
+def test_a_latex_article_resolves_to_the_latex_paper(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "main.tex": "\\documentclass[11pt]{article}\n\\begin{document}\nhi\n\\end{document}\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["latex-paper"]
+
+
+def test_a_plain_makefile_project_does_not_match_the_latex_paper(tmp_path):
+    make_repo(tmp_path, {"Makefile": "all:\n\t@echo hi\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "latex-paper" not in names

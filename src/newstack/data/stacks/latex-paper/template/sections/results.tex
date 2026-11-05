@@ -1,0 +1,12 @@
+\section{Results}
+\label{sec:results}
+
+All fixtures in Table~\ref{tab:fixtures} pass, including the empty input, which counts
+zero of everything rather than one line. The rule that surprises people is the last
+row: a single trailing newline ends a line but does not start one, so two newlines are
+two lines and not three.
+
+The implementation is checked by \texttt{check.sh}, which rebuilds the document with
+\texttt{latexmk}, extracts the text with \texttt{pdftotext} and asserts the strings a
+reader would look for. A citation that does not resolve, a reference that prints as two question marks or
+an overfull line all fail the build.
