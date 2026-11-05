@@ -11,7 +11,12 @@ from pypdf import PdfReader
 
 from {{ package_name }}.cli import main
 from {{ package_name }}.counts import count_text
-from {{ package_name }}.model import InputError, Record, parse_ndjson, read_records
+from {{ package_name }}.model import (
+    InputError,
+    Record,
+    parse_ndjson,
+    read_records,
+)
 from {{ package_name }}.render import build_report
 
 
