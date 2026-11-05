@@ -1078,3 +1078,25 @@ def test_a_plain_groovy_script_still_resolves_to_the_groovy_cli(tmp_path) -> Non
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["groovy-cli"], "a root groovy script with no server is the CLI stack"
 
+def test_a_cpp_socket_server_resolves_to_the_cpp_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "src/http.cpp": "#include <sys/socket.h>\nint main() { return 0; }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["cpp-http-api"], "sys/socket.h is the service marker"
+
+
+def test_a_plain_cmake_project_still_resolves_to_the_cmake_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "CMakeLists.txt": "project(tool)\n",
+            "src/main.cpp": "int main() { return 0; }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["cpp-cmake-cli"], "a CMake tree with no socket is the CLI stack"
+

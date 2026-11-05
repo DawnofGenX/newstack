@@ -71,6 +71,7 @@ jobs:
           - c-cli
           - c-http-api
           - cpp-cmake-cli
+          - cpp-http-api
           - terraform-module
           - ansible-role
           - ruby-sinatra

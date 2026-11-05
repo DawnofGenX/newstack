@@ -7,6 +7,9 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `cpp-http-api` — C++17 with a plain Makefile instead of CMake: POSIX sockets,
+  a validating JSON reader that keeps a JSON number apart from a JSON string, and
+  `make test` running a hand-rolled harness.
 - `groovy-http-api` — a Groovy JSON service with no build tool: `com.sun.net.httpserver`
   serves a pure route table, `JsonSlurper` already distinguishes a number from a
   string, and the tests are a plain script rather than JUnit.

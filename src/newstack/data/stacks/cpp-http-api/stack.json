@@ -1,0 +1,62 @@
+{
+  "name": "cpp-http-api",
+  "title": "C++ HTTP API",
+  "language": "cpp",
+  "blurb": "C++17 JSON service with a plain Makefile and POSIX sockets: a validating JSON reader that keeps a number apart from a string, a pure route table, and a hand-rolled check harness",
+  "requires": [
+    "c++",
+    "make",
+    "curl"
+  ],
+  "default_description": "A C++ JSON service.",
+  "next_steps": [
+    "cd {path}",
+    "make",
+    "make test",
+    "PORT=8080 ./build/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "tools": [
+        "c++",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "c++",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5438/health >/dev/null 2>&1; then\n  echo 'port 5438 is already answering - stop that process before running this step'\n  exit 1\nfi\nPORT=5438 ./build/{{ npm_name }} > .serve.log 2>&1 &\nserver=$!\ntrap 'kill $server 2>/dev/null || true' EXIT\ni=0\nwhile [ $i -lt 240 ]; do\n  if curl -fsS --max-time 2 http://127.0.0.1:5438/health >/dev/null 2>&1; then\n    break\n  fi\n  i=$((i + 1))\n  sleep 0.5\ndone\nif [ $i -ge 240 ]; then\n  cat .serve.log\n  echo 'the server did not answer in time'\n  exit 1\nfi\nkill -0 $server 2>/dev/null || { cat .serve.log; echo 'the server exited before it answered'; exit 1; }\nhealth=$(curl -sS --max-time 10 http://127.0.0.1:5438/health)\ntest \"$health\" = '{\"status\":\"ok\"}'\nget=$(curl -sS --max-time 10 'http://127.0.0.1:5438/stats?text=hello%20world%0A')\nprintf '%s' \"$get\" | grep -q '\"lines\":1'\nprintf '%s' \"$get\" | grep -q '\"bytes\":12'\nposted=$(curl -sS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5438/stats)\nprintf '%s' \"$posted\" | grep -q '\"words\":3'\nmissing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5438/stats)\ntest \"$missing\" = 422\nbroken=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5438/stats)\ntest \"$broken\" = 422\nnumber=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary '{\"text\":42}' http://127.0.0.1:5438/stats)\ntest \"$number\" = 422\ngone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5438/nope)\ntest \"$gone\" = 404\nwrong=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5438/health)\ntest \"$wrong\" = 405",
+      "tools": [
+        "c++",
+        "make",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.cpp",
+      "contains": "sys/socket.h"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_contract.cpp"
+  ]
+}

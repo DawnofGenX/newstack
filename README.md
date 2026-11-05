@@ -277,6 +277,7 @@ $ newstack stacks outdated
 | `c-cli` | C11 CLI: Makefile lib+bin split, assert-header test suite, `-Wall -Wextra -Wpedantic -Werror` from the first commit | `cc`, `make` |
 | `c-http-api` | C11 JSON service on POSIX sockets: pure `textstat_route`, a hand-written JSON reader that keeps strings and numbers apart, and a socket loop with 5 s read timeouts | `cc`, `make` |
 | `cpp-cmake-cli` | C++20 CLI: CMake lib+bin split, CTest suite, warning-clean GCC/Clang build | `cmake`, `g++` |
+| `cpp-http-api` | C++17 JSON service with a plain Makefile and POSIX sockets: a validating JSON reader that keeps a number apart from a string, pure `route`, hand-rolled check harness | `c++`, `make` |
 | `terraform-module` | Reusable module: validated inputs, computed tags, `terraform test` cases incl. a rejected input | `terraform` |
 | `ansible-role` | Galaxy-shaped Ansible role: validated inputs, idempotent tasks, a handler, molecule-free playbook + assert playbooks | `ansible-playbook` |
 | `ruby-sinatra` | Sinatra JSON API: modular app, RSpec + rack-test suite, RuboCop, committed lockfile | `ruby`, `bundle` |
