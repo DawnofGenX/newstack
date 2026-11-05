@@ -553,3 +553,27 @@ def test_a_plain_deno_config_still_resolves_to_the_deno_cli(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["deno-cli"]
+
+
+def test_a_bun_package_resolves_to_the_bun_service(tmp_path) -> None:
+    """`bun-types` in devDependencies means the project is type-checked against Bun itself."""
+
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"devDependencies": {"bun-types": "^1.4.4"}}',
+            "src/server.ts": "Bun.serve({ fetch: handler });\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["bun-api"]
+
+
+def test_a_bunfig_file_still_resolves_to_the_bun_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {".bunfig.toml": '[test]\nroot = "."\n', "src/cli.ts": "export {};\n"},
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["bun-cli"]
+

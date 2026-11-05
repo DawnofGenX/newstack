@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# Bun
+.bun/
+bun.lockb.bak
+
+# Logs
+*.log
+
+# Editors
+.DS_Store

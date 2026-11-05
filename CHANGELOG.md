@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`bun-api`**: Bun service whose application is one `(Request) => Promise<Response>`
+  function handed to `Bun.serve`, so `bun test` drives the routes in-process while the
+  verify step still curls a real socket. Types come from `bun-types` plus `tsc --noEmit`
+  (`bun run typecheck`), and `bun install` is a verify step because the toolchain, unlike
+  Deno's, resolves its compiler from `node_modules`.
 - **`deno-api`**: Deno 2 service with no framework — `handler` is a plain
   `(Request) => Response` function, so `Deno.test` builds requests and awaits
   responses with no port to bind, while `Deno.serve` in `src/server.ts` and a curl
