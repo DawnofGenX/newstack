@@ -1,0 +1,67 @@
+{
+  "name": "github-action",
+  "title": "GitHub Action",
+  "language": "node",
+  "node": {
+    "minimum": "24",
+    "versions": [
+      "24"
+    ]
+  },
+  "blurb": "Zero-dependency JavaScript action: pure counting, Markdown step summary, GITHUB_OUTPUT, node:test suite that spawns the real entry point",
+  "requires": [
+    "node"
+  ],
+  "default_description": "A GitHub Action that measures files.",
+  "next_steps": [
+    "cd {path}",
+    "npm test",
+    "git add . && git commit -m 'Add action' && git push"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "node --test",
+      "tools": [
+        "node"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "syntax",
+      "cmd": "npm run check",
+      "tools": [
+        "node",
+        "npm"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "run",
+      "cmd": "out=$(mktemp) && sum=$(mktemp) && INPUT_PATHS='README.md,package.json' GITHUB_OUTPUT=$out GITHUB_STEP_SUMMARY=$sum node src/index.js >/dev/null && cat $out && grep -q '^lines=' $out && grep -q '^### ' $sum; status=$?; rm -f $out $sum; exit $status",
+      "tools": [
+        "node"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "empty-input",
+      "cmd": "INPUT_PATHS='' node src/index.js >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "node"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "action.yml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

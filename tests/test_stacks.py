@@ -47,6 +47,10 @@ def test_workflow_actions_are_pinned_to_major_versions(tmp_path, name: str) -> N
         assert "jobs:" in text, workflow
         assert "runs-on:" in text, workflow
         for ref in USES_RE.findall(text):
+            if ref.startswith("./"):
+                # A repository exercising its own action uses `uses: ./`, which
+                # resolves to this checkout — there is no version to pin.
+                continue
             assert ACTION_REF_RE.match(ref), f"{workflow.name}: unpinned or odd action ref {ref!r}"
 
 

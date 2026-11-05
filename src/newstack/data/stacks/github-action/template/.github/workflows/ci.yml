@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Syntax check
+        run: npm run check
+      - name: Unit tests
+        run: npm test
+      # The action is the deliverable, so the workflow drives it the way a user
+      # would: a local `uses: ./` with an `id`, then read the outputs back.
+      - name: Use the action
+        id: measure
+        uses: ./
+        with:
+          paths: README.md, package.json
+          title: This repository
+      - name: Show what the action reported
+        run: |
+          echo "lines=${{! steps.measure.outputs.lines }}"
+          echo "words=${{! steps.measure.outputs.words }}"
+          echo "bytes=${{! steps.measure.outputs.bytes }}"
+          test -n "${{! steps.measure.outputs.lines }}"

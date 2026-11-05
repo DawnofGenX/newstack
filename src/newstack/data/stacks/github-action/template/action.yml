@@ -1,0 +1,28 @@
+name: {{ title }}
+description: {{ description }}
+author: newstack
+
+branding:
+  icon: file-text
+  color: blue
+
+inputs:
+  paths:
+    description: Comma or newline separated paths to measure, relative to the workspace.
+    required: true
+  title:
+    description: Heading for the rendered summary table.
+    required: false
+    default: File sizes
+
+outputs:
+  lines:
+    description: Total line count across every measured file.
+  words:
+    description: Total word count across every measured file.
+  bytes:
+    description: Total UTF-8 byte count across every measured file.
+
+runs:
+  using: node24
+  main: src/index.js

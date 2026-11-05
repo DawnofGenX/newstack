@@ -1,0 +1,64 @@
+{
+  "name": "phoenix-app",
+  "title": "Phoenix API",
+  "language": "elixir",
+  "blurb": "Phoenix 1.8 JSON service on Elixir 1.18: pure counting module, endpoint-level ExUnit tests via Phoenix.ConnTest, 422/404 as contract",
+  "requires": [
+    "elixir",
+    "mix"
+  ],
+  "default_description": "A Phoenix JSON API.",
+  "next_steps": [
+    "cd {path}",
+    "mix deps.get",
+    "mix test",
+    "mix phx.server"
+  ],
+  "verify": [
+    {
+      "name": "deps",
+      "cmd": "mix deps.get",
+      "tools": [
+        "mix"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "format",
+      "cmd": "mix format --check-formatted",
+      "tools": [
+        "mix"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "mix test",
+      "tools": [
+        "mix"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "http",
+      "cmd": "PORT=5417 mix phx.server >.phx.log 2>&1 & srv=$!; ok=1; for _ in $(seq 1 240); do if curl -fsS http://127.0.0.1:5417/health >/dev/null 2>&1; then ok=0; break; fi; sleep 0.5; done; if [ $ok -ne 0 ]; then cat .phx.log; kill $srv 2>/dev/null; exit 1; fi; body=$(curl -fsS 'http://127.0.0.1:5417/stats?text=hello%20world%0A'); missing=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:5417/stats); unknown=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5417/nope); kill $srv 2>/dev/null; wait $srv 2>/dev/null; rm -f .phx.log; printf 'get=%s\\nmissing=%s unknown=%s\\n' \"$body\" \"$missing\" \"$unknown\"; test \"$missing\" = 422; test \"$unknown\" = 404; echo \"$body\" | grep -q '\"lines\":1'; echo \"$body\" | grep -q '\"bytes\":12'",
+      "tools": [
+        "mix",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "mix.exs",
+      "contains": ":phoenix"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

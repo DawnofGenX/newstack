@@ -261,6 +261,7 @@ $ newstack stacks outdated
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `nest-api` | NestJS 12 service: module/controller/service wiring, a validating pipe, supertest end-to-end tests, ESM throughout | `node`, `npm`/\\`pnpm\\`/\\`yarn` |
 | `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `github-action` | JavaScript action on `node24` (no Docker, zero deps): pure counting core, Markdown step summary, `GITHUB_OUTPUT` writes, `node:test` suite that spawns the real entry point | `node` |
 | `go-cli` | stdlib-only Go CLI: `flag` parsing, table tests, vet/test/build gates | `go` |
 | `go-http` | Go HTTP service on `net/http`: JSON routes, `httptest` suite, graceful shutdown | `go` |
 | `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
@@ -279,6 +280,7 @@ $ newstack stacks outdated
 | `aspnet-api` | ASP.NET Core 8 minimal API: pure counting core, `/stats` JSON routes, WebApplicationFactory HTTP tests, 422/404 as contract | `dotnet` |
 | `dotnet-cli` | .NET 8 C# CLI with a solution file: counting core, hand-written argv parser, xUnit suite, exit codes as a contract | `dotnet` |
 | `elixir-mix-cli` | Elixir CLI on Mix: pure counting module, ExUnit suite, escript binary | `elixir`, `mix` |
+| `phoenix-app` | Phoenix 1.8 JSON API on Elixir 1.18: pure counting module, endpoint + router + controller, ConnTest suite covering 422/404, `mix format` gate | `elixir`, `mix` |
 | `dart-cli` | Dart 3 CLI: pub package with a pure counting library, package:test suite and zero runtime dependencies | `dart` |
 | `kotlin-cli` | Kotlin CLI on Maven (no Gradle wrapper to ship): pure counting core, JUnit 5 suite, shaded runnable jar | `java`, `mvn` |
 | `zig-cli` | Zig 0.17 CLI: counting module with in-source test blocks, `zig build test`, no runtime | `zig` |

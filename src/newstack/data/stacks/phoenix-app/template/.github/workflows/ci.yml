@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.18"
+          otp-version: "27"
+      - name: Fetch dependencies
+        run: mix deps.get
+      - name: Check formatting
+        run: mix format --check-formatted
+      - name: Test
+        run: mix test
+      - name: Serves HTTP
+        run: |
+          set -euo pipefail
+          PORT=5417 mix phx.server >server.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for _ in $(seq 1 120); do
+            if curl -fsS http://127.0.0.1:5417/health >/dev/null 2>&1; then
+              break
+            fi
+            sleep 0.5
+          done
+          body=$(curl -fsS 'http://127.0.0.1:5417/stats?text=hello%20world%0A')
+          echo "GET /stats -> $body"
+          echo "$body" | grep -q '"lines":1'
+          echo "$body" | grep -q '"words":2'
+          missing=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:5417/stats)
+          echo "POST /stats {} -> $missing"
+          test "$missing" = "422"
+          unknown=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5417/nope)
+          echo "GET /nope -> $unknown"
+          test "$unknown" = "404"

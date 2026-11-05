@@ -74,6 +74,7 @@ jobs:
           - aspnet-api
           - dotnet-cli
           - elixir-mix-cli
+          - phoenix-app
           - dart-cli
           - kotlin-cli
           - zig-cli
@@ -121,6 +122,7 @@ jobs:
           - sml-cli
           - d-cli
           - jsonnet-config
+          - github-action
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -431,7 +433,7 @@ jobs:
         with:
           dotnet-version: "8.0.x"
       - name: Set up Elixir
-        if: matrix.stack == 'elixir-mix-cli'
+        if: contains(fromJSON('["elixir-mix-cli","phoenix-app"]'), matrix.stack)
         uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.18"

@@ -1,0 +1,14 @@
+{
+  "name": "{{ npm_name }}",
+  "version": "0.1.0",
+  "private": true,
+  "description": "{{ description }}",
+  "license": "MIT",
+  "engines": {
+    "node": ">={{ node_version }}"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check src/index.js && node --check src/report.js && node --check src/count.js"
+  }
+}

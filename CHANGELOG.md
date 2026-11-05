@@ -8,6 +8,17 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`github-action`**: a JavaScript GitHub Action on `node24` with no dependencies.
+  Counting is a pure `countText`, the Markdown table and `GITHUB_OUTPUT` writes live in
+  `report.js`, and the `node:test` suite spawns the real entry point with temporary
+  `GITHUB_OUTPUT` / `GITHUB_STEP_SUMMARY` files, so what the runner sees is what the
+  tests assert — including the exit code for an empty `paths` input.
+- **`phoenix-app`**: a Phoenix 1.8 JSON API on Elixir 1.18. A pure `TextStat` module does
+  the counting, and endpoint → router → controller → controller test go through
+  `Phoenix.ConnTest` with `@endpoint`, covering 200s, 422s and a rendered JSON 404.
+  `mix format --check-formatted` is a verify step, so the starter cannot drift from the
+  formatter; `elixir-mix-cli` became a detection fallback so a Phoenix project no longer
+  matches two stacks.
 - **`aspnet-api`**: a minimal ASP.NET Core 8 API. Counting lives in a pure
   `TextStat.Of(string)` returning a `Counts` record, and `WebApplicationFactory` boots
   the real pipeline in memory so routing, model binding, 422s and 404s are tested

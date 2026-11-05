@@ -166,6 +166,44 @@ def test_plain_console_project_still_resolves_to_dotnet_cli(tmp_path) -> None:
     assert names == ["dotnet-cli"], "the csproj fallback must still catch a console project"
 
 
+def test_phoenix_app_wins_over_the_mix_fallback(tmp_path) -> None:
+    """A Phoenix project is also a Mix project.
+
+    elixir-mix-cli detects a bare mix.exs; it is a fallback, so the `:phoenix`
+    dependency in that same file must decide, or every Phoenix repo is ambiguous.
+    """
+
+    make_repo(
+        tmp_path,
+        {
+            "mix.exs": (
+                "defmodule Demo.MixProject do\n"
+                "  defp deps, do: [{:phoenix, \"~> 1.7\"}]\n"
+                "end\n"
+            )
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["phoenix-app"], "elixir-mix-cli must not compete with a Phoenix project"
+
+
+def test_plain_mix_project_still_resolves_to_elixir_mix_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {"mix.exs": 'defmodule Demo.MixProject do\n  defp deps, do: [{:jason, "~> 1.4"}]\nend\n'},
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["elixir-mix-cli"], "the mix fallback must still catch a plain project"
+
+
+def test_an_action_repository_is_recognised_by_action_yml(tmp_path) -> None:
+    """`action.yml` is the only marker a GitHub Action repository needs."""
+
+    make_repo(tmp_path, {"action.yml": "name: measure\nruns:\n  using: node24\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["github-action"]
+
+
 def test_unrecognised_directory_yields_no_candidates(tmp_path) -> None:
     (tmp_path / "notes.txt").write_text("nothing here")
     assert detect_stacks(tmp_path) == []
