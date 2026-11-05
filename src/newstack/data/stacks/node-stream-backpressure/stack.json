@@ -1,0 +1,84 @@
+{
+  "name": "node-stream-backpressure",
+  "title": "Node stream backpressure",
+  "language": "node",
+  "blurb": "The same chunk series through the same slow sink four ways, with the buffer measured: ignoring a false return, awaiting a promise that is not backpressure, honouring drain, and pipeline() \u2014 plus the two transform mistakes that hang a process without an error",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "default_description": "A backpressure measurement harness.",
+  "next_steps": [
+    "cd {path}",
+    "npm install --no-audit --no-fund",
+    "npm run build",
+    "node dist/src/main.js demo",
+    "node dist/src/main.js compare --chunks 256 --latency 1"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "npm run selftest",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "measure",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "node"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/**/*.ts",
+      "contains": "a false return is a request, not an error"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json"
+  ],
+  "adopt_tests": [
+    "tests/pipeline.test.ts"
+  ]
+}
