@@ -1797,8 +1797,8 @@ def test_a_plain_bun_service_does_not_match_the_bun_sqlite_stack(tmp_path) -> No
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "bun-sqlite-api" not in names
 
-def test_a_metrics_exporter_resolves_to_the_metrics_stack(tmp_path):
-    write_tree(
+def test_a_metrics_exporter_resolves_to_the_metrics_stack(tmp_path) -> None:
+    make_repo(
         tmp_path,
         {
             "package.json": '{"name": "metrics", "type": "module"}\n',
@@ -1811,8 +1811,8 @@ def test_a_metrics_exporter_resolves_to_the_metrics_stack(tmp_path):
     assert names == ["node-metrics-exporter"]
 
 
-def test_a_plain_node_service_does_not_match_the_metrics_stack(tmp_path):
-    write_tree(
+def test_a_plain_node_service_does_not_match_the_metrics_stack(tmp_path) -> None:
+    make_repo(
         tmp_path,
         {
             "package.json": '{"name": "plain", "type": "module"}\n',

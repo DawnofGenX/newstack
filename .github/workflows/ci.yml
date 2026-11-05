@@ -55,6 +55,7 @@ jobs:
           - python-eval-harness
           - python-batch-inference
           - python-duckdb-report
+          - python-migrations
           - data-science
           - dbt-project
           - sphinx-docs

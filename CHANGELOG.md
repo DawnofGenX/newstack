@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-migrations` — numbered SQL files applied once, in order, each inside one explicit
+  transaction. The ledger keeps the sha256 of every file it applied, so editing a migration
+  that already ran fails with `drift` instead of leaving the database and the repository
+  quietly different, and a file numbered below an applied one is refused rather than squeezed
+  in. Two sqlite3 traps drove the design and are asserted in the tests: `with
+  sqlite3.connect(...)` does not roll back DDL, and `executescript` commits any open
+  transaction before it runs, so statements are split with `sqlite3.complete_statement` and
+  executed one at a time.
 - `node-metrics-exporter` — a text-stats service that publishes its own Prometheus metrics without `prom-client`. Counter names must end in `_total`, histogram buckets are cumulative and `+Inf` must equal `_count`, label values are escaped (`\\`, `\"`, `\n`), and the scrape is counted before it renders so it never looks a request behind. `src/exposition.js` is a strict reader for the format — `tools/check_scrape.mjs` runs it over the live payload, so the smoke test fails on a malformed scrape instead of importing garbage.
 - `bun-sqlite-api` — a notes API on Bun with no dependencies. `bun:sqlite` has no `db.pragma()`
   helper and `exec("PRAGMA …")` throws the result away, so every connection reads the mode
