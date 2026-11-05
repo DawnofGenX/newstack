@@ -118,6 +118,7 @@ jobs:
           - clojure-ring-api
           - swift-cli
           - tcl-cli
+          - tcl-http-api
           - erlang-cli
           - erlang-cowboy-api
           - racket-cli
@@ -474,7 +475,7 @@ jobs:
           octave --version | head -1
 
       - name: Install Tcl
-        if: matrix.stack == 'tcl-cli'
+        if: contains(fromJSON('["tcl-cli","tcl-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends tcl

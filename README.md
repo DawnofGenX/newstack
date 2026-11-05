@@ -324,6 +324,7 @@ $ newstack stacks outdated
 | `clojure-ring-api` | Ring JSON service on `deps.edn`: the handler is a plain request-map function, `ring.mock` drives the routes with no port, Jetty serves it, `clojure.test` gates it | `clojure`, `java` |
 | `swift-cli` | Swift 6 CLI on SwiftPM: pure counting core, hand-rolled argv parser, XCTest suites, I/O behind a struct of closures | `swift` |
 | `tcl-cli` | Tcl CLI on plain `tclsh`: byte-level counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a dictionary | `tclsh` |
+| `tcl-http-api` | Tcl JSON service on plain `tclsh`: a hand-written strict JSON reader (no tcllib), the route table as one pure function, and a socket server that binds in one file | `tclsh` |
 | `erlang-cli` | Erlang CLI on plain OTP and `make`: byte-level counting core, hand-rolled argv parser, eunit suites, I/O behind a map of funs | `erl`, `erlc`, `make` |
 | `erlang-cowboy-api` | Erlang JSON service on Cowboy: pure `route(Method, Path, Query, Body)` covering every status code, eunit suites, an escript release, and a real-socket verify step | `erl`, `rebar3` |
 | `racket-cli` | Racket CLI on the core distribution: byte-counting core, struct-based argv parser, `rackunit` suites, I/O behind a struct of funs | `racket`, `raco` |

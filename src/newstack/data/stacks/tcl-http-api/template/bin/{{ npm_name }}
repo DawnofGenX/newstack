@@ -1,0 +1,17 @@
+#!/usr/bin/env tclsh
+# The executable: find src/ from this script's own directory, load the modules
+# in dependency order, then bind. Tcl has no import machinery worth the setup
+# here, so `source` in order is the honest version.
+set here [file dirname [file normalize [info script]]]
+set root [file join $here .. src]
+
+foreach module {json counts contract server} {
+    source [file join $root $module.tcl]
+}
+
+set host [expr {[info exists ::env(HOST)] ? $::env(HOST) : "127.0.0.1"}]
+set port [expr {[info exists ::env(PORT)] ? $::env(PORT) : 8080}]
+
+puts "listening on http://$host:$port"
+flush stdout
+textstat::server::serve $host $port

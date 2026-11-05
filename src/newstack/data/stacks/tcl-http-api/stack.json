@@ -1,0 +1,49 @@
+{
+  "name": "tcl-http-api",
+  "title": "Tcl HTTP API",
+  "language": "tcl",
+  "blurb": "Tcl JSON service on plain tclsh: hand-written JSON reader, byte-counting core and a socket server with no packages at all",
+  "requires": [
+    "tclsh",
+    "curl"
+  ],
+  "default_description": "A Tcl JSON service.",
+  "next_steps": [
+    "cd {path}",
+    "tclsh tests/run.tcl",
+    "PORT=8080 ./bin/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "tclsh tests/run.tcl",
+      "tools": [
+        "tclsh"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5432/health >/dev/null 2>&1; then echo 'port 5432 is already answering - stop that process before running this step'; exit 1; fi\nPORT=5432 ./bin/{{ npm_name }} > .tcl.log 2>&1 &\nserver=$!\ntrap 'kill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true' EXIT\ni=0\nwhile [ $i -lt 120 ]; do\n    if curl -fsS --max-time 2 http://127.0.0.1:5432/health >/dev/null 2>&1; then break; fi\n    i=$((i + 1))\n    sleep 0.25\ndone\nif [ $i -ge 120 ]; then cat .tcl.log; echo 'the server did not answer in time'; exit 1; fi\nkill -0 $server 2>/dev/null || { cat .tcl.log; echo 'the server exited before it answered'; exit 1; }\nhealth=$(curl -sS --max-time 10 http://127.0.0.1:5432/health)\ntest \"$health\" = '{\"status\":\"ok\"}'\nget=$(curl -sS --max-time 10 'http://127.0.0.1:5432/stats?text=hello%20world%0A')\nprintf '%s' \"$get\" | grep -q '\"lines\":1'\nprintf '%s' \"$get\" | grep -q '\"bytes\":12'\nposted=$(curl -sS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5432/stats)\nprintf '%s' \"$posted\" | grep -q '\"words\":3'\nmissing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5432/stats)\ntest \"$missing\" = 422\nbroken=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5432/stats)\ntest \"$broken\" = 422\nnumber=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary '{\"text\":42}' http://127.0.0.1:5432/stats)\ntest \"$number\" = 422\ngone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5432/nope)\ntest \"$gone\" = 404\nwrong=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5432/health)\ntest \"$wrong\" = 405\n",
+      "tools": [
+        "tclsh",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.tcl",
+      "contains": "socket -server"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/run.tcl"
+  ]
+}

@@ -956,3 +956,21 @@ def test_a_plain_guile_script_still_resolves_to_the_guile_cli(tmp_path) -> None:
     make_repo(tmp_path, {"main.scm": "(display \"hello\")\n"})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["guile-cli"], "a script with no web server is the CLI stack"
+
+
+def test_a_tcl_socket_server_resolves_to_the_tcl_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "src/server.tcl": "socket -server textstat::server::handle 0\n",
+            "src/counts.tcl": "proc textstat::counts::count_text {text} { return $text }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["tcl-http-api"], "socket -server is the service marker"
+
+
+def test_a_plain_tcl_script_still_resolves_to_the_tcl_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"main.tcl": "puts \"hello\"\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["tcl-cli"], "a script with no socket is the CLI stack"

@@ -7,6 +7,12 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `tcl-http-api` — the Tcl service: no tcllib on a stock box, so the JSON
+  reader is hand-written (numbers are kept apart from strings, so
+  `{"text": 42}` is a 422 while `{"text": "42"}` is counted), the route
+  table is one pure function over four strings, and only `src/server.tcl`
+  touches a socket. Tcl counts braces textually inside a braced body, which
+  is why a `}` inside a quoted string had to be written `\}`.
 - `lua-http-api` — the Lua service: LuaSocket plus `cjson` from the
   distribution, 26 checks with no framework, and response documents written
   by hand because a Lua table has no key order to promise. `cjson` is only
