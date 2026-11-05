@@ -71,6 +71,7 @@ jobs:
           - python-task-queue
           - python-circuit-breaker
           - python-money-allocation
+          - python-rate-limiter
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
