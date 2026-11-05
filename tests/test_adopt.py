@@ -1062,3 +1062,19 @@ def test_a_plain_ocaml_project_still_resolves_to_the_ocaml_cli(tmp_path) -> None
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["ocaml-cli"], "a dune project with no socket is the CLI stack"
 
+def test_a_groovy_http_server_resolves_to_the_groovy_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "src/textstat/Server.groovy": "import com.sun.net.httpserver.HttpServer\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["groovy-http-api"], "HttpServer is the service marker"
+
+
+def test_a_plain_groovy_script_still_resolves_to_the_groovy_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"Main.groovy": "println 'hi'\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["groovy-cli"], "a root groovy script with no server is the CLI stack"
+

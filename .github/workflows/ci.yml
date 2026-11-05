@@ -142,6 +142,7 @@ jobs:
           - guile-http-api
           - raku-cli
           - groovy-cli
+          - groovy-http-api
           - awk-cli
           - forth-cli
           - sqlite-sql
@@ -446,7 +447,7 @@ jobs:
           mlton
 
       - name: Install Groovy
-        if: matrix.stack == 'groovy-cli'
+        if: contains(fromJSON('["groovy-cli","groovy-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends groovy

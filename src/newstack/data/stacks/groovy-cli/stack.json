@@ -3,7 +3,10 @@
   "title": "Groovy CLI",
   "language": "groovy",
   "blurb": "Groovy CLI on the plain Groovy runtime: byte counting core, hand-rolled argv parser, dependency-free harness, the four side effects handed in as closures",
-  "requires": ["groovy", "java"],
+  "requires": [
+    "groovy",
+    "java"
+  ],
   "next_steps": [
     "cd {path}",
     "./bin/{npm_name} --help",
@@ -42,6 +45,9 @@
       "file": "*.groovy"
     }
   ],
-  "detect_fallback": false,
-  "adopt": [".github/workflows/ci.yml", ".gitignore"]
+  "detect_fallback": true,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
 }

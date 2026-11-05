@@ -7,6 +7,9 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `groovy-http-api` — a Groovy JSON service with no build tool: `com.sun.net.httpserver`
+  serves a pure route table, `JsonSlurper` already distinguishes a number from a
+  string, and the tests are a plain script rather than JUnit.
 - `ocaml-http-api` — an OCaml JSON service on the `Unix` module with no opam package
   beyond dune: the JSON reader is hand-written so a number and a string stay
   distinguishable, and `\uXXXX` escapes (surrogate pairs included) decode to UTF-8.

@@ -348,6 +348,7 @@ $ newstack stacks outdated
 | `guile-http-api` | Guile JSON service on the built-in web server: counting over the UTF-8 bytes, the route table as one pure procedure, a framework-free test suite, one script binds the socket | `guile`, `guile-json` |
 | `raku-cli` | Raku CLI on Rakudo: `Buf` counting core, hand-rolled argv parser, dependency-free harness, the four side effects handed in as closures | `raku` |
 | `groovy-cli` | Groovy CLI on the plain Groovy runtime: byte-array counting core, hand-rolled argv parser, dependency-free harness, the four side effects handed in as closures | `groovy`, `java` |
+| `groovy-http-api` | Groovy JSON service on the JDK's `com.sun.net.httpserver`: pure `route`, `JsonSlurper` keeping a number apart from a string, and a plain-script test gate — no Gradle, no JUnit | `groovy` |
 | `awk-cli` | awk CLI on `gawk`: counting with `RS="\0"` so each file is one record, hand-rolled argv parser, dependency-free harness, the report built before anything is printed | `gawk` |
 | `forth-cli` | Forth CLI on `gforth`: counting over a memory block with a loop and `c@`, hand-rolled argv parser, a four-word test harness, terminal reads behind one file | `gforth` |
 | `sqlite-sql` | SQL reporting project on SQLite: schema with `CHECK` constraints, views that hold the arithmetic, one `SELECT` per report, assertions over exact cents | `sqlite3`, `make` |

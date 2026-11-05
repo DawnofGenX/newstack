@@ -1,0 +1,4 @@
+#!/bin/sh
+# Runs the service with the sources on the classpath, no build step needed.
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec groovy -cp "$root/src" "$root/src/textstat/App.groovy" "$@"
