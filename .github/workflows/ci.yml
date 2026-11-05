@@ -117,6 +117,7 @@ jobs:
           - docker-compose-svc
           - haxe-cli
           - sml-cli
+          - d-cli
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -343,6 +344,13 @@ jobs:
           sudo apt-get install -y --no-install-recommends haxe neko
           haxe --version
           neko -version
+
+      - name: Install LDC
+        if: matrix.stack == 'd-cli'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ldc
+          ldc2 --version | head -1
 
       - name: Install MLton
         if: matrix.stack == 'sml-cli'

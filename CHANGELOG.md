@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`d-cli`**: D compiled with LDC into one native binary. Counting runs over
+  `ubyte[]` so it is byte-accurate, report building sits behind an `Io` struct of
+  function pointers so 37 assertions never touch the disk, and a parity suite diffs
+  every row against `wc`, padding included.
 - **`sml-cli`**: Standard ML compiled with MLton into one native binary. Counting
   runs over `Word8Vector` so it is byte-accurate, argv parsing and report building
   sit behind an `io` record so 37 assertions never touch the disk, and a parity
