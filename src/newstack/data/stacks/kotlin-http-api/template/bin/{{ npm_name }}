@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Build once, then hand the terminal to the server.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+if [ ! -f "target/{{ npm_name }}.jar" ]; then
+  mvn -q -B -DskipTests package
+fi
+exec java -jar "target/{{ npm_name }}.jar" "$@"

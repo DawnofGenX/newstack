@@ -1331,3 +1331,34 @@ def test_a_plain_octave_script_still_resolves_to_the_octave_cli(tmp_path) -> Non
     make_repo(tmp_path, {"main.m": "printf('hi\\n');\n"})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["octave-cli"], "the octave service must not claim a plain script"
+
+
+def test_a_kotlin_jdk_server_resolves_to_the_kotlin_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pom.xml": "<project><artifactId>svc</artifactId></project>\n",
+            "src/main/kotlin/Server.kt": (
+                "import com.sun.net.httpserver.HttpServer\n"
+                "\n"
+                "fun serve() = HttpServer.create()\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["kotlin-http-api"], "the JDK server marks a service, not a CLI"
+
+
+def test_a_plain_kotlin_project_still_resolves_to_the_kotlin_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pom.xml": (
+                "<project><artifactId>cli</artifactId>"
+                "<dependency>kotlin-stdlib</dependency></project>\n"
+            ),
+            "src/main/kotlin/Main.kt": "fun main() = println(\"hi\")\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["kotlin-cli"], "the kotlin service must not claim a plain project"

@@ -64,12 +64,21 @@ class AdoptionPlan:
 
 
 def detect_stacks(root: Path) -> list[Stack]:
-    """Stacks whose markers match *root*; generic fallbacks are dropped on a specific match."""
+    """Stacks whose markers match *root*; generic fallbacks are dropped on a specific match.
+
+    Inside the fallback group a content-aware marker beats a bare filename: the
+    Kotlin CLI wants a ``pom.xml`` that mentions ``kotlin``, and without this rule
+    every Kotlin project would also match the generic ``java-maven-cli`` fallback
+    and come out ambiguous.
+    """
     stacks = load_stacks()
     matched = [stack for stack in stacks.values() if stack.detect and stack.matches(root)]
     specific = [stack for stack in matched if not stack.detect_fallback]
+    if specific:
+        return specific
     fallbacks = [stack for stack in matched if stack.detect_fallback]
-    return specific or fallbacks
+    content_aware = [stack for stack in fallbacks if any(rule.contains for rule in stack.detect)]
+    return content_aware or fallbacks
 
 
 def _manual_steps(stack: Stack, root: Path) -> list[str]:

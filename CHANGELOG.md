@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `kotlin-http-api` — a Kotlin JSON service on the JDK's own `HttpServer`, so the
+  only dependency is the standard library. `Counts.kt`, `Json.kt` and
+  `Contract.kt` are pure Kotlin (byte-exact counting, a hand-written JSON reader
+  that decodes `\u` escapes and surrogate pairs, and the router that owns every
+  status code), `Server.kt` is the thin adapter to `com.sun.net.httpserver`, and
+  `SelfTest.kt` is the whole suite (50 checks) behind `--selftest` — no JUnit, no
+  test runner. Maven shades one runnable jar and the root context means the
+  router, not the JDK, answers `404` and `405`.
 - `octave-http-api` — an Octave JSON service with no packages to install. Octave
   has no sockets, so `lib/serve.m` drives `java.net.ServerSocket` through the
   bundled JVM bridge, reads the head byte by byte with

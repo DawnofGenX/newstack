@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Build
+        run: mvn -B -DskipTests package
+      - name: Self test
+        run: java -jar target/{{ npm_name }}.jar --selftest
+      - name: HTTP contract
+        run: |
+          set -e
+          PORT=5449 java -jar target/{{ npm_name }}.jar > .kotlin-http.log 2>&1 &
+          server=$!
+          trap 'kill -TERM $server 2>/dev/null || true; for _ in $(seq 1 20); do kill -0 $server 2>/dev/null || break; sleep 0.1; done; kill -KILL $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT
+          for _ in $(seq 1 160); do
+            if curl --max-time 2 -fsS http://127.0.0.1:5449/health > /dev/null 2>&1; then break; fi
+            sleep 0.25
+          done
+          kill -0 $server 2>/dev/null || { cat .kotlin-http.log; exit 1; }
+          test "$(curl --max-time 10 -fsS http://127.0.0.1:5449/health)" = '{"status":"ok"}'
+          test "$(curl --max-time 10 -fsS 'http://127.0.0.1:5449/stats?text=hello%20world%0A')" \
+            = '{"text":"hello world\n","lines":1,"words":2,"bytes":12}'
+          test "$(curl --max-time 10 -s -o /dev/null -w '%{http_code}' -X POST --data-binary '{"text":1}' http://127.0.0.1:5449/stats)" = 422
