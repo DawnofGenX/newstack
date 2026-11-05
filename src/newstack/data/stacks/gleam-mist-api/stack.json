@@ -1,0 +1,68 @@
+{
+  "name": "gleam-mist-api",
+  "title": "Gleam Mist API",
+  "language": "gleam",
+  "blurb": "Gleam JSON service on Mist: pure request contract, gleeunit suite, checked over a real socket",
+  "requires": [
+    "gleam",
+    "rebar3",
+    "curl"
+  ],
+  "default_description": "A Gleam JSON web service on Mist.",
+  "next_steps": [
+    "cd {path}",
+    "gleam deps download",
+    "gleam test",
+    "PORT=8080 gleam run",
+    "curl 'localhost:8080/stats?text=hello%20world%0A'"
+  ],
+  "verify": [
+    {
+      "name": "deps",
+      "cmd": "gleam deps download",
+      "tools": [
+        "gleam"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "format",
+      "cmd": "gleam format --check src test",
+      "tools": [
+        "gleam"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "gleam test",
+      "tools": [
+        "gleam"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "http",
+      "cmd": "PORT=5416 gleam run > .gleam.log 2>&1 &\nserver=$!\nready=1\nfor _ in $(seq 1 240); do\n  if curl -fsS http://127.0.0.1:5416/health >/dev/null 2>&1; then ready=0; break; fi\n  sleep 0.5\ndone\nif [ \"$ready\" != 0 ]; then\n  cat .gleam.log\n  kill $server 2>/dev/null || true\n  wait $server 2>/dev/null || true\n  exit 1\nfi\nhealth=$(curl -fsS http://127.0.0.1:5416/health)\nstats=$(curl -fsS 'http://127.0.0.1:5416/stats?text=hello%20world%0A')\nposted=$(curl -fsS -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5416/stats)\nmissing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5416/stats)\nbroken=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5416/stats)\ngone=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5416/nope)\nkill $server 2>/dev/null || true\nwait $server 2>/dev/null || true\ntest \"$health\" = '{\"status\":\"ok\"}' || { echo \"health: $health\"; exit 1; }\nprintf '%s' \"$stats\" | grep -q '\"lines\":1' || { echo \"stats: $stats\"; exit 1; }\nprintf '%s' \"$stats\" | grep -q '\"bytes\":12' || { echo \"stats: $stats\"; exit 1; }\nprintf '%s' \"$posted\" | grep -q '\"words\":3' || { echo \"posted: $posted\"; exit 1; }\ntest \"$missing\" = 422 || { echo \"missing: $missing\"; exit 1; }\ntest \"$broken\" = 422 || { echo \"broken: $broken\"; exit 1; }\ntest \"$gone\" = 404 || { echo \"gone: $gone\"; exit 1; }\necho \"the service answered every check\"\n",
+      "tools": [
+        "gleam",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "gleam.toml",
+      "contains": "mist"
+    }
+  ],
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "gleam.toml"
+  ],
+  "adopt_tests": [
+    "test/{{ package_name }}_test.gleam"
+  ]
+}

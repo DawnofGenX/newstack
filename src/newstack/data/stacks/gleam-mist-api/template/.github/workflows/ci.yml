@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27"
+          gleam-version: "1.19.2"
+          rebar3-version: "3.28.0"
+      - name: Dependencies
+        run: gleam deps download
+      - name: Format
+        run: gleam format --check src test
+      - name: Test
+        run: gleam test
+      - name: Serve
+        run: |
+          PORT=5416 gleam run > .gleam.log 2>&1 &
+          server=$!
+          ready=1
+          for _ in $(seq 1 240); do
+            if curl -fsS http://127.0.0.1:5416/health >/dev/null 2>&1; then ready=0; break; fi
+            sleep 0.5
+          done
+          if [ "$ready" != 0 ]; then
+            cat .gleam.log
+            kill $server 2>/dev/null || true
+            wait $server 2>/dev/null || true
+            exit 1
+          fi
+          health=$(curl -fsS http://127.0.0.1:5416/health)
+          stats=$(curl -fsS 'http://127.0.0.1:5416/stats?text=hello%20world%0A')
+          posted=$(curl -fsS -X POST -H 'content-type: application/json' --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5416/stats)
+          missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5416/stats)
+          gone=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5416/nope)
+          kill $server 2>/dev/null || true
+          wait $server 2>/dev/null || true
+          test "$health" = '{"status":"ok"}'
+          printf '%s' "$stats" | grep -q '"lines":1'
+          printf '%s' "$stats" | grep -q '"bytes":12'
+          printf '%s' "$posted" | grep -q '"words":3'
+          test "$missing" = 422
+          test "$gone" = 404
+          echo "the service answered every check"

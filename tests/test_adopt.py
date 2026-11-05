@@ -654,6 +654,32 @@ def test_a_plain_shard_still_resolves_to_the_crystal_cli(tmp_path) -> None:
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["crystal-cli"]
 
+def test_a_mist_gleam_config_resolves_to_the_gleam_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "gleam.toml": 'name = "blog_count"\ntarget = "erlang"\n\n[dependencies]\n'
+            'mist = ">= 6.0.0 and < 7.0.0"\n',
+            "src/blog_count.gleam": "pub fn main() { Nil }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["gleam-mist-api"]
+
+
+def test_a_plain_gleam_config_still_resolves_to_the_gleam_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "gleam.toml": 'name = "blog_count"\ntarget = "erlang"\n\n[dependencies]\n'
+            'gleam_stdlib = ">= 1.0.0 and < 2.0.0"\n',
+            "src/blog_count.gleam": "pub fn main() { Nil }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["gleam-cli"]
+
+
 def test_a_cask_scala_project_resolves_to_the_scala_service(tmp_path) -> None:
     make_repo(
         tmp_path,

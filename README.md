@@ -309,6 +309,7 @@ $ newstack stacks outdated
 | `hugo-site` | Content site on Hugo: hand-written layouts and partials, a shortcode, fingerprinted CSS, sitemap and RSS, assertion suite that renders into a temp dir | `hugo` |
 | `helm-chart` | Kubernetes Helm chart: schema-validated values, named templates, hardened Deployment/Service, lint+render checks with no cluster | `helm` |
 | `gleam-cli` | Gleam CLI: pure counting module, hand-written option parser, stdlib-only test harness, Erlang helper for argv/stdin/exit codes | `gleam` |
+| `gleam-mist-api` | Gleam JSON service on Mist: pure request contract, gleeunit suite, counted over a real socket | `gleam`, `rebar3` |
 | `scala-cli` | Scala 3 CLI built with scala-cli (no sbt): pure counting core, hand-rolled argv parser, munit suites, wrapper that returns the process exit code | `scala-cli`, `java` |
 | `scala-cask-api` | Scala 3 JSON service on Cask: pure request contract, utest suite, one assembly jar served over a real socket | `scala-cli`, `java` |
 | `haskell-cli` | Haskell CLI on GHC and cabal: pure counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a record | `ghc`, `cabal` |

@@ -103,6 +103,7 @@ jobs:
           - hugo-site
           - helm-chart
           - gleam-cli
+          - gleam-mist-api
           - scala-cli
           - scala-cask-api
           - haskell-cli
@@ -482,11 +483,12 @@ jobs:
         with:
           version: v4.3.1
       - name: Set up Gleam
-        if: matrix.stack == 'gleam-cli'
+        if: contains(fromJSON('["gleam-cli","gleam-mist-api"]'), matrix.stack)
         uses: erlef/setup-beam@v1
         with:
           otp-version: "27.3"
           gleam-version: 1.19.2
+          rebar3-version: "3.28.0"
       - name: Set up Julia
         if: matrix.stack == 'julia-cli'
         uses: julia-actions/setup-julia@v2
