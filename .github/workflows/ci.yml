@@ -74,6 +74,7 @@ jobs:
           - python-rate-limiter
           - python-audit-log
           - python-feature-flags
+          - python-keyset-pagination
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
