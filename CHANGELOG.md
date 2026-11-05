@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`crystal-kemal-api`**: Crystal 1.11 + Kemal 1.5 service. As in the Nim stack, the
+  counting rules and the route table are pure functions, so `crystal spec` covers every
+  status code with no socket and `crystal tool format --check` is a real gate. Three Crystal
+  traps are pre-solved: `env.request.body` is an `IO` (`try(&.gets_to_end)`), a `%(...)`
+  literal processes escapes so a JSON body must be `%q(...)`, and `JSON::Any#as_s?` is a
+  nil-returning cast that must be compared with `nil` — `if node.nil? || node.as_s?` looks
+  right but silently accepts an integer. Kemal 1.6 needs a newer Crystal (`Process.on_terminate`),
+  so the shard pins `~> 1.5.0`.
 - **`nim-http-api`**: Nim service that needs no package manager at all — the counting core
   and the router are plain modules, so `nimble test` exercises every status code through a
   pure `route(method, path, query, body)` function while `std/asynchttpserver` adapts real

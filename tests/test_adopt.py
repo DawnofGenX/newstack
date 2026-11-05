@@ -628,3 +628,28 @@ def test_a_plain_nim_project_still_resolves_to_the_nim_cli(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["nim-cli"]
+
+
+def test_a_kemal_shard_resolves_to_the_crystal_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "shard.yml": 'name: blog_count\ncrystal: ">= 1.11.0"\ndependencies:\n  kemal:\n'
+            "    github: kemalcr/kemal\n",
+            "src/blog_count/main.cr": "require \"./server\"\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["crystal-kemal-api"]
+
+
+def test_a_plain_shard_still_resolves_to_the_crystal_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "shard.yml": 'name: textstat\ncrystal: ">= 1.11.0"\n',
+            "src/textstat.cr": "puts \"hello\"\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["crystal-cli"]

@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1.9.5
+        with:
+          crystal: 1.11.2
+      - name: Install shards
+        run: shards install
+      - name: Test
+        run: crystal spec
+      - name: Check formatting
+        run: crystal tool format --check src spec
+      - name: Build
+        run: shards build --release
+      - name: Serve and query
+        run: |
+          PORT=5418 ./bin/{{ npm_name }} >.kemal.log 2>&1 &
+          srv=$!
+          ready=1
+          for _ in $(seq 1 120); do
+            if curl -fsS http://127.0.0.1:5418/health >/dev/null 2>&1; then
+              ready=0
+              break
+            fi
+            sleep 0.5
+          done
+          if [ $ready -ne 0 ]; then
+            cat .kemal.log
+            kill $srv 2>/dev/null
+            exit 1
+          fi
+          health=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5418/health)
+          stats=$(curl -s 'http://127.0.0.1:5418/stats?text=hello%20world%0A')
+          posted=$(curl -s -X POST -H 'content-type: application/json' \
+            --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5418/stats)
+          bad=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5418/stats)
+          missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5418/nope)
+          kill $srv 2>/dev/null
+          wait $srv 2>/dev/null || true
+          cat .kemal.log
+          test "$health" = 200
+          printf '%s' "$stats" | grep -q '"lines":1'
+          printf '%s' "$stats" | grep -q '"bytes":12'
+          printf '%s' "$posted" | grep -q '"words":3'
+          test "$bad" = 422
+          test "$missing" = 404

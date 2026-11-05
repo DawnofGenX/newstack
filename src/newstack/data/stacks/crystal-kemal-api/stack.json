@@ -1,0 +1,79 @@
+{
+  "name": "crystal-kemal-api",
+  "title": "Crystal Kemal API",
+  "language": "crystal",
+  "blurb": "Crystal 1.11+ service on Kemal: counting rules and the whole route table are pure functions under `crystal spec`, with a real socket check behind them",
+  "requires": [
+    "crystal",
+    "shards",
+    "curl"
+  ],
+  "default_description": "A Crystal service that counts lines, words and bytes.",
+  "next_steps": [
+    "cd {path}",
+    "shards install",
+    "crystal spec",
+    "shards build --release",
+    "PORT=8080 ./bin/{npm_name}",
+    "curl 'http://127.0.0.1:8080/stats?text=hello%20world%0A'"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "shards install",
+      "tools": [
+        "crystal",
+        "shards"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "crystal spec",
+      "tools": [
+        "crystal"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "format",
+      "cmd": "crystal tool format --check src spec",
+      "tools": [
+        "crystal"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "build",
+      "cmd": "shards build --release",
+      "tools": [
+        "crystal",
+        "shards"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "http",
+      "cmd": "PORT=5418 ./bin/{{ npm_name }} >.kemal.log 2>&1 & srv=$!; ready=1; for _ in $(seq 1 120); do if curl -fsS http://127.0.0.1:5418/health >/dev/null 2>&1; then ready=0; break; fi; sleep 0.5; done; if [ $ready -ne 0 ]; then cat .kemal.log; kill $srv 2>/dev/null; exit 1; fi; health=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5418/health); stats=$(curl -s 'http://127.0.0.1:5418/stats?text=hello%20world%0A'); posted=$(curl -s -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5418/stats); bad=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5418/stats); missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5418/nope); kill $srv 2>/dev/null; wait $srv 2>/dev/null || true; cat .kemal.log; test \"$health\" = 200 && printf '%s' \"$stats\" | grep -q '\"lines\":1' && printf '%s' \"$stats\" | grep -q '\"bytes\":12' && printf '%s' \"$posted\" | grep -q '\"words\":3' && test \"$bad\" = 422 && test \"$missing\" = 404",
+      "tools": [
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "shard.yml",
+      "contains": "kemal"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "shard.yml"
+  ],
+  "adopt_tests": [
+    "spec/contract_spec.cr"
+  ]
+}

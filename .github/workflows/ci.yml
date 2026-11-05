@@ -94,6 +94,7 @@ jobs:
           - lua-cli
           - fsharp-cli
           - crystal-cli
+          - crystal-kemal-api
           - bun-cli
           - bun-api
           - r-cli
@@ -502,7 +503,7 @@ jobs:
           sudo apt-get install -y -qq lua5.4
           lua5.4 -v
       - name: Install Crystal
-        if: matrix.stack == 'crystal-cli'
+        if: contains(fromJSON('["crystal-cli","crystal-kemal-api"]'), matrix.stack)
         uses: crystal-lang/install-crystal@v1.9.5
         with:
           crystal: "1.11"
