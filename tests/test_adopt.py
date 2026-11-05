@@ -653,3 +653,27 @@ def test_a_plain_shard_still_resolves_to_the_crystal_cli(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["crystal-cli"]
+
+def test_a_cask_scala_project_resolves_to_the_scala_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "project.scala": "//> using scala 3.3.7\n"
+            "//> using dep com.lihaoyi::cask:0.11.3\n",
+            "src/blog_count/Server.scala": "package blog_count\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["scala-cask-api"]
+
+
+def test_a_plain_scala_project_still_resolves_to_the_scala_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "project.scala": "//> using scala 3.3.7\n//> using dep com.lihaoyi::os-lib:0.11.3\n",
+            "src/Main.scala": "object Main { def main(args: Array[String]): Unit = () }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["scala-cli"]

@@ -1,0 +1,68 @@
+{
+  "name": "scala-cask-api",
+  "title": "Scala Cask API",
+  "language": "scala",
+  "blurb": "Scala 3 JSON service on Cask: pure request contract, utest suite, one assembly jar for the socket check",
+  "requires": [
+    "scala-cli",
+    "java",
+    "curl"
+  ],
+  "default_description": "A Scala 3 JSON web service on Cask.",
+  "next_steps": [
+    "cd {path}",
+    "scala-cli test .",
+    "mkdir -p bin && scala-cli --power package . -o bin/{npm_name}.jar --assembly -f",
+    "PORT=8080 java -jar bin/{npm_name}.jar",
+    "curl 'localhost:8080/stats?text=hello%20world%0A'"
+  ],
+  "verify": [
+    {
+      "name": "format",
+      "cmd": "scala-cli fmt --check .",
+      "tools": [
+        "scala-cli"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "scala-cli test .",
+      "tools": [
+        "scala-cli"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "package",
+      "cmd": "mkdir -p bin && scala-cli --power package . -o bin/{{ npm_name }}.jar --assembly -f",
+      "tools": [
+        "scala-cli"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "http",
+      "cmd": "PORT=5419 java -jar bin/{{ npm_name }}.jar > .cask.log 2>&1 &\nserver=$!\nready=1\nfor _ in $(seq 1 120); do\n  if curl -fsS http://127.0.0.1:5419/health >/dev/null 2>&1; then ready=0; break; fi\n  sleep 0.5\ndone\nif [ \"$ready\" != 0 ]; then\n  cat .cask.log\n  kill $server 2>/dev/null || true\n  wait $server 2>/dev/null || true\n  exit 1\nfi\nhealth=$(curl -fsS http://127.0.0.1:5419/health)\nstats=$(curl -fsS 'http://127.0.0.1:5419/stats?text=hello%20world%0A')\nposted=$(curl -fsS -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5419/stats)\nmissing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5419/stats)\nbroken=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5419/stats)\ngone=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5419/nope)\nwrong=$(curl -s -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5419/health)\nkill $server 2>/dev/null || true\nwait $server 2>/dev/null || true\ntest \"$health\" = '{\"status\":\"ok\"}' || { echo \"health: $health\"; exit 1; }\nprintf '%s' \"$stats\" | grep -q '\"lines\":1' || { echo \"stats: $stats\"; exit 1; }\nprintf '%s' \"$stats\" | grep -q '\"bytes\":12' || { echo \"stats: $stats\"; exit 1; }\nprintf '%s' \"$posted\" | grep -q '\"words\":3' || { echo \"posted: $posted\"; exit 1; }\ntest \"$missing\" = 422 || { echo \"missing: $missing\"; exit 1; }\ntest \"$broken\" = 422 || { echo \"broken: $broken\"; exit 1; }\ntest \"$gone\" = 404 || { echo \"gone: $gone\"; exit 1; }\ntest \"$wrong\" = 405 || { echo \"wrong: $wrong\"; exit 1; }\necho \"the service answered every check\"\n",
+      "tools": [
+        "java",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "project.scala",
+      "contains": "cask"
+    }
+  ],
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "project.scala"
+  ],
+  "adopt_tests": [
+    "test/ContractTests.scala"
+  ]
+}

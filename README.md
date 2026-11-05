@@ -310,6 +310,7 @@ $ newstack stacks outdated
 | `helm-chart` | Kubernetes Helm chart: schema-validated values, named templates, hardened Deployment/Service, lint+render checks with no cluster | `helm` |
 | `gleam-cli` | Gleam CLI: pure counting module, hand-written option parser, stdlib-only test harness, Erlang helper for argv/stdin/exit codes | `gleam` |
 | `scala-cli` | Scala 3 CLI built with scala-cli (no sbt): pure counting core, hand-rolled argv parser, munit suites, wrapper that returns the process exit code | `scala-cli`, `java` |
+| `scala-cask-api` | Scala 3 JSON service on Cask: pure request contract, utest suite, one assembly jar served over a real socket | `scala-cli`, `java` |
 | `haskell-cli` | Haskell CLI on GHC and cabal: pure counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a record | `ghc`, `cabal` |
 | `clojure-cli` | Clojure CLI on `deps.edn` (no Leiningen): pure counting core, hand-rolled argv parser, `clojure.test` suites, I/O behind a record | `clojure`, `java` |
 | `clojure-ring-api` | Ring JSON service on `deps.edn`: the handler is a plain request-map function, `ring.mock` drives the routes with no port, Jetty serves it, `clojure.test` gates it | `clojure`, `java` |

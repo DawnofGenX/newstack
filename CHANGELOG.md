@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- `scala-cask-api` — a Scala 3 JSON service on Cask: `Contract.route` is a pure function so the whole HTTP surface is covered without a socket, a utest suite covers the counting rules, and the verify step serves a single assembly jar (`scala-cli --power package --assembly`) over a real socket.
 - **`crystal-kemal-api`**: Crystal 1.11 + Kemal 1.5 service. As in the Nim stack, the
   counting rules and the route table are pure functions, so `crystal spec` covers every
   status code with no socket and `crystal tool format --check` is a real gate. Three Crystal
