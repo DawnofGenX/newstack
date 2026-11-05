@@ -1,0 +1,11 @@
+{
+  "k": 3,
+  "queries": {
+    "how do I rotate a signing key": {"rotate-key.md": 2},
+    "what happens when a write is retried": {"retry-policy.md": 2, "cold-start.md": 1},
+    "rebalance shards after a node failure": {"shard-rebalancing.md": 2},
+    "request limit per tenant": {"quota-limits.md": 2, "retry-policy.md": 1},
+    "which request is slow during a rolling deploy": {"cold-start.md": 2},
+    "a query nothing answers": {}
+  }
+}

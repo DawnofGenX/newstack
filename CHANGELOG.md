@@ -7,6 +7,18 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-rag-eval` — a retrieval evaluation harness whose numbers can be defended. The chunk
+  windows are word-aligned with stable `doc#offset` ids and a coverage check, because a step
+  larger than `size - overlap` silently leaves a hole and every later metric is then measured
+  against an incomplete corpus. BM25 uses the smoothed idf `log(1 + (N - df + 0.5)/(df + 0.5))`
+  so a term in every chunk scores zero instead of negative. Before any metric runs, the chunk
+  ranking collapses to a document ranking at each document's best chunk — counting chunk hits
+  inflates recall for long documents, which are simply chunked more often. Precision divides by
+  `k`, not by the number of results returned; a query with no judgements is reported as
+  `skipped` instead of being scored 0.0 (which blames the retriever for a gap in the labels);
+  macro and micro recall are printed together because either one alone can hide a regression;
+  and `compare --baseline before.json --candidate after.json` exits 1 when macro recall, micro
+  recall, ndcg or mrr drops, so a retrieval change either earns its place in CI or fails it.
 - `python-openapi-client` — the OpenAPI document as an executable contract, not a comment. A
   stdlib-only client reads `fixtures/openapi.json` at run time, validates the request body before
   a byte leaves the process, and validates each response against the schema attached to that
