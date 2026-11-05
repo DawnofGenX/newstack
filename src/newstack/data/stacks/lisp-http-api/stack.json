@@ -1,0 +1,49 @@
+{
+  "name": "lisp-http-api",
+  "title": "Common Lisp HTTP API",
+  "language": "lisp",
+  "blurb": "Common Lisp JSON service on SBCL: pure route table, a hand-written JSON reader, and an HTTP loop built on sb-bsd-sockets",
+  "requires": [
+    "sbcl",
+    "curl"
+  ],
+  "default_description": "A Common Lisp JSON service.",
+  "next_steps": [
+    "cd {path}",
+    "sbcl --script tests/run-tests.lisp",
+    "PORT=8080 ./bin/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "sbcl --script tests/run-tests.lisp",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5433/health >/dev/null 2>&1; then\n  echo 'port 5433 is already answering - stop that process before running this step'\n  exit 1\nfi\nPORT=5433 ./bin/{{ npm_name }} > .lisp.log 2>&1 &\nserver=$!\ntrap 'kill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true' EXIT\ni=0\nwhile [ $i -lt 120 ]; do\n  if curl -fsS --max-time 2 http://127.0.0.1:5433/health >/dev/null 2>&1; then\n    break\n  fi\n  i=$((i + 1))\n  sleep 0.25\ndone\nif [ $i -ge 120 ]; then\n  cat .lisp.log\n  echo 'the server did not answer in time'\n  exit 1\nfi\nkill -0 $server 2>/dev/null || { cat .lisp.log; echo 'the server exited before it answered'; exit 1; }\nhealth=$(curl -sS --max-time 10 http://127.0.0.1:5433/health)\ntest \"$health\" = '{\"status\":\"ok\"}'\nget=$(curl -sS --max-time 10 'http://127.0.0.1:5433/stats?text=hello%20world%0A')\nprintf '%s' \"$get\" | grep -q '\"lines\":1'\nprintf '%s' \"$get\" | grep -q '\"bytes\":12'\nposted=$(curl -sS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5433/stats)\nprintf '%s' \"$posted\" | grep -q '\"words\":3'\nmissing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5433/stats)\ntest \"$missing\" = 422\nbroken=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5433/stats)\ntest \"$broken\" = 422\nnumber=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary '{\"text\":42}' http://127.0.0.1:5433/stats)\ntest \"$number\" = 422\ngone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5433/nope)\ntest \"$gone\" = 404\nwrong=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5433/health)\ntest \"$wrong\" = 405",
+      "tools": [
+        "sbcl",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.lisp",
+      "contains": "sb-bsd-sockets"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/run-tests.lisp"
+  ]
+}

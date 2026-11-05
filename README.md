@@ -338,6 +338,7 @@ $ newstack stacks outdated
 | `prolog-cli` | SWI-Prolog CLI: byte-exact counting over a stream, hand-rolled argv parser, a four-predicate test harness, output behind two writer closures | `swipl` |
 | `prolog-http-api` | SWI-Prolog JSON service on `library(http/http_server)`: the route table is one pure predicate, a plain Prolog script tests it, one module binds the port | `swipl` |
 | `lisp-cli` | Common Lisp CLI on SBCL: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, I/O through a structure of functions | `sbcl` |
+| `lisp-http-api` | Common Lisp JSON service on SBCL: pure `route` function, a hand-written JSON reader that keeps strings and numbers apart, and an HTTP loop on `sb-bsd-sockets` | `sbcl` |
 | `pascal-cli` | Free Pascal CLI on FPC and `make`: byte-exact counting unit, hand-written argv parser, dependency-free test suite, terminal behind a record of function pointers | `fpc`, `make` |
 | `bash-cli` | Bash CLI on plain `bash` and `shellcheck`: counting in bash itself (no `wc`, no `awk`), hand-rolled argv parser, dependency-free test harness, terminal behind sourced functions | `bash`, `shellcheck` |
 | `cobol-cli` | COBOL CLI on GNUCOBOL: byte-exact counting over a one-byte sequential read, hand-rolled argv parser reading `/proc/self/cmdline`, a COBOL unit driver plus a shell suite, I/O in one program | `cobc`, `make` |

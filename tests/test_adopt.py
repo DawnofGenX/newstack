@@ -974,3 +974,21 @@ def test_a_plain_tcl_script_still_resolves_to_the_tcl_cli(tmp_path) -> None:
     make_repo(tmp_path, {"main.tcl": "puts \"hello\"\n"})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["tcl-cli"], "a script with no socket is the CLI stack"
+
+
+def test_a_lisp_socket_server_resolves_to_the_lisp_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "main.lisp": '(format t "hello")',
+            "lib/server.lisp": "(require :sb-bsd-sockets)\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["lisp-http-api"], "sb-bsd-sockets is the service marker"
+
+
+def test_a_plain_lisp_script_still_resolves_to_the_lisp_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"main.lisp": '(format t "hello")'})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["lisp-cli"], "a script that opens no socket is the CLI stack"

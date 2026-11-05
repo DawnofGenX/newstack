@@ -7,6 +7,10 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `lisp-http-api` — a JSON service on SBCL with no Quicklisp: the route table is a pure
+  function, the JSON reader keeps strings and numbers apart (so `{"text":42}` is a
+  422 while `{"text":"42"}` counts), and the HTTP loop is `sb-bsd-sockets` with one
+  thread per connection.
 - `tcl-http-api` — the Tcl service: no tcllib on a stock box, so the JSON
   reader is hand-written (numbers are kept apart from strings, so
   `{"text": 42}` is a 422 while `{"text": "42"}` is counted), the route

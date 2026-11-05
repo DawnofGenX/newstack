@@ -132,6 +132,7 @@ jobs:
           - prolog-cli
           - prolog-http-api
           - lisp-cli
+          - lisp-http-api
           - pascal-cli
           - bash-cli
           - cobol-cli
@@ -456,7 +457,7 @@ jobs:
           cobc --version | head -1
 
       - name: Install SBCL
-        if: matrix.stack == 'lisp-cli'
+        if: contains(fromJSON('["lisp-cli","lisp-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends sbcl
