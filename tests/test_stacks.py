@@ -403,3 +403,20 @@ def test_every_template_file_is_tracked_by_git() -> None:
         "template files ignored by git, so CI checkouts lack them "
         f"(anchor the offending .gitignore rule): {missing}"
     )
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_every_uv_install_step_is_idempotent(name: str) -> None:
+    """`uv venv` refuses a directory it already made.
+
+    A developer who runs the documented steps twice — or a second `check` against
+    a render someone kept around — must not be told their environment already
+    exists. `--allow-existing` makes the step repeatable instead of version
+    dependent.
+    """
+    stack = get_stack(name)
+    for step in stack.verify:
+        if "uv venv" in step.cmd:
+            assert "--allow-existing" in step.cmd, (
+                f"{name}: the {step.name} step creates a venv without --allow-existing, "
+                "so running it twice fails"
+            )

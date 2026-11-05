@@ -22,7 +22,7 @@
       "name": "install",
       "runner": "uv",
       "timeout": 900,
-      "cmd": "uv venv -q .venv && uv pip install -q --python .venv/bin/python -e . pytest ruff"
+      "cmd": "uv venv -q --allow-existing .venv && uv pip install -q --python .venv/bin/python -e . pytest ruff"
     },
     {
       "name": "ruff",
