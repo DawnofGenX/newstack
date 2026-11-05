@@ -58,6 +58,7 @@ jobs:
           - node-ws-api
           - node-upload-api
           - hono-api
+          - fastify-api
           - openapi-spec
           - graphql-api
           - nest-api

@@ -7,6 +7,12 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `fastify-api` — Fastify 5 service. Fastify's built-in `application/json` parser takes
+  precedence over an added `*` parser, so `{}` arrived as an object and every request
+  without a `text` member answered `invalid_json` instead of `missing_text`;
+  `removeAllContentTypeParsers()` is what makes the raw body readable. Replies are sent as
+  `JSON.stringify(...)` so the key order stays fixed, and parse failures are mapped to 422
+  (Fastify would answer 400 on its own).
 - `python-scheduler-api` — delayed and repeating jobs with the database as the only
   state. A tick claims due rows inside `BEGIN IMMEDIATE`: a SELECT-then-UPDATE is not
   a claim, because with autocommit on, two tickers read the same rows and both run

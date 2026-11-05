@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      # No lockfile ships with a fresh scaffold, so `cache: {{ package_manager }}`
+      # and `{{ package_manager_ci }}` would both fail until you commit one.
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - run: {{ package_manager_run }} typecheck
+      - run: {{ package_manager_test }}
+      - name: Offline checks
+        run: {{ package_manager_run }} selftest
+      - name: Contract over a real socket
+        # The tests drive a server on port 0; this drives the documented port with
+        # curl, so body parsing and the 404/405 paths are exercised from outside.
+        run: |
+          if curl -fsS --max-time 2 http://127.0.0.1:5460/health >/dev/null 2>&1; then
+            echo "port 5460 is already answering - stop that process before running this step"
+            exit 1
+          fi
+          PORT=5460 node dist/src/main.js >.fastify-http.log 2>&1 &
+          server=$!
+          set -e
+          trap 'kill -TERM $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT
+          for _ in $(seq 1 120); do
+            if curl -fsS --max-time 2 http://127.0.0.1:5460/health >/dev/null 2>&1; then break; fi
+            sleep 0.25
+          done
+          kill -0 $server
+          test "$(curl -fsS --max-time 2 'http://127.0.0.1:5460/stats?text=a+b%0Ac%0A')" = \
+            '{"text":"a b\nc\n","lines":2,"words":3,"bytes":6}'
+          test "$(curl -fsS --max-time 2 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:5460/stats)" = \
+            '{"error":"missing_text"}'
+          test "$(curl -fsS --max-time 2 -X POST -H 'Content-Type: application/json' -d '{"text":' http://127.0.0.1:5460/stats)" = \
+            '{"error":"invalid_json"}'
+          test "$(curl -sS -o /dev/null -w '%{http_code}' --max-time 2 -X DELETE http://127.0.0.1:5460/health)" = 405
+          case "$(curl -sS --max-time 2 http://127.0.0.1:5460/nope)" in
+            *'"detail":"no route for GET /nope"'*) ;;
+            *) echo "404 detail missing"; exit 1 ;;
+          esac

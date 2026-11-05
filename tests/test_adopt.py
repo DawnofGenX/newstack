@@ -1650,3 +1650,16 @@ def test_every_stack_can_adopt_into_a_project_it_detects(stack, tmp_path):
     )
     if stack.adopt_tests:
         assert plan.tests_available, f"{stack.name} promises adopt_tests but plans none"
+
+
+def test_a_fastify_service_resolves_to_the_fastify_stack(tmp_path) -> None:
+    make_repo(tmp_path, {"package.json": '{"dependencies": {"fastify": "^5.12.8"}}'})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["fastify-api"]
+
+
+def test_an_express_project_does_not_match_the_fastify_stack(tmp_path) -> None:
+    make_repo(tmp_path, {"package.json": '{"dependencies": {"express": "^5"}}'})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "fastify-api" not in names
+
