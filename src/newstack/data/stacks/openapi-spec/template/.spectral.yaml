@@ -1,0 +1,8 @@
+extends: ["spectral:oas"]
+rules:
+  info-contact: off
+  contact-properties: off
+  # The ruleset's own defaults are warnings; `--fail-severity=warn` in package.json turns
+  # them into failures, so the two settings are only useful together.
+  operation-description: error
+  operation-tag-defined: error

@@ -426,3 +426,17 @@ def test_a_sphinx_conf_resolves_to_the_docs_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["sphinx-docs"]
+
+
+def test_an_openapi_document_resolves_to_the_contract_stack(tmp_path) -> None:
+    """`openapi.yaml` is the marker; a package.json alone must not shadow it."""
+
+    make_repo(
+        tmp_path,
+        {
+            "openapi.yaml": 'openapi: 3.1.0\ninfo:\n  title: demo\n  version: 0.1.0\n',
+            "package.json": '{"name": "demo"}\n',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["openapi-spec"]

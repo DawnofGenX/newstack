@@ -8,6 +8,15 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`openapi-spec`**: contract-first in the literal sense — `openapi.yaml` (3.1, so JSON
+  Schema 2020-12) is written before the handler, `spectral` lints it with warnings promoted
+  to failures, `redocly` bundles it and renders an HTML reference, and the tests validate
+  the server's live responses against the **bundle** with `ajv` in 2020-12 mode. Validating
+  the bundle rather than the source is deliberate: a `$ref` that resolves against the source
+  can still be broken for the consumer who only has `dist/openapi.yaml`. The server is
+  `node:http` with no runtime dependencies, and `additionalProperties: false` everywhere
+  means a response that grows a field fails the suite instead of silently widening the
+  contract.
 - **`sphinx-docs`**: a documentation site whose docs are tested like code. `autodoc` reads
   the docstrings from `src/`, the prose in `docs/guides/counting.rst` is executed as
   doctests, and the build runs with `-W --keep-going` against `nitpicky = True`, so a

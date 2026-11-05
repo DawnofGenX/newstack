@@ -1,0 +1,26 @@
+{
+  "name": "{{ npm_name }}",
+  "version": "0.1.0",
+  "description": "{{ description }}",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">={{ node_version }}"
+  },
+  "scripts": {
+    "lint:spec": "spectral lint --fail-severity=warn openapi.yaml",
+    "bundle": "redocly bundle openapi.yaml --output dist/openapi.yaml",
+    "docs": "redocly build-docs openapi.yaml --output dist/index.html --title '{{ title }} API'",
+    "start": "node src/server.js",
+    "test": "npm run bundle && node --test",
+    "check": "npm run lint:spec && npm run bundle && npm run docs && node --test"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^2.75.0",
+    "@stoplight/spectral-cli": "^6.17.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "yaml": "^2.8.1"
+  }
+}

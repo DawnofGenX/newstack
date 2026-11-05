@@ -1,0 +1,142 @@
+openapi: 3.1.0
+info:
+  title: {{ title }} API
+  version: 0.1.0
+  summary: Word, line and byte counts over HTTP.
+  description: |
+    `{{ npm_name }}` documents the contract before it writes the handler. The document is
+    the source of truth: the server is tested against it, and the bundled copy is what a
+    client generator would consume.
+
+    Every response body is JSON. A request that names a field the API does not understand
+    is rejected with `422` rather than silently ignored, so a client cannot believe it sent
+    something it did not.
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: http://127.0.0.1:5399
+    description: Local development server
+tags:
+  - name: stats
+    description: Counting text by line, word and byte.
+  - name: health
+    description: Readiness probe.
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Report that the server is up.
+      description: Returns a constant body, so it can be used as a readiness probe.
+      tags: [health]
+      responses:
+        "200":
+          description: The server is accepting requests.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+  /stats:
+    get:
+      operationId: getStats
+      summary: Count a string passed in the query string.
+      description: |
+        Convenience wrapper over the `POST` for short inputs. The `text` parameter is
+        required; an absent parameter is a `422`, not an empty count.
+      tags: [stats]
+      parameters:
+        - name: text
+          in: query
+          required: true
+          description: The text to count. Percent-encode newlines as `%0A`.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The counts for the submitted text.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stat"
+        "422":
+          description: The `text` parameter was absent.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: postStats
+      summary: Count a string passed in a JSON body.
+      description: |
+        The body must be a JSON object with a string `text` field. Text is counted exactly
+        as sent — no trimming — so `"  padded  \n"` reports 11 bytes.
+      tags: [stats]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StatRequest"
+      responses:
+        "200":
+          description: The counts for the submitted text.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stat"
+        "422":
+          description: The body was not JSON, or `text` was absent or not a string.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status:
+          type: string
+          const: ok
+          description: Always `ok` when the server is up.
+    StatRequest:
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties:
+        text:
+          type: string
+          description: The text to count.
+    Stat:
+      type: object
+      additionalProperties: false
+      required: [text, lines, words, bytes]
+      properties:
+        text:
+          type: string
+          description: The text as it was counted, echoed back.
+        lines:
+          type: integer
+          minimum: 0
+          description: Number of newline characters.
+        words:
+          type: integer
+          minimum: 0
+          description: Number of maximal runs of non-whitespace.
+        bytes:
+          type: integer
+          minimum: 0
+          description: Length of the UTF-8 encoding, not the number of characters.
+    Error:
+      type: object
+      additionalProperties: false
+      required: [error, detail]
+      properties:
+        error:
+          type: string
+          description: A stable machine-readable code.
+        detail:
+          type: string
+          description: A sentence for a human reading a log.

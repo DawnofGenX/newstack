@@ -51,6 +51,7 @@ jobs:
           - sphinx-docs
           - node-express-ts
           - hono-api
+          - openapi-spec
           - nest-api
           - react-vite-ts
           - vue-vite-ts

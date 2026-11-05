@@ -262,6 +262,7 @@ $ newstack stacks outdated
 | `sphinx-docs` | Sphinx site over a real package: autodoc, executed doctests, `-W` build, docs tested in CI | `uv` |
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `hono-api` | Hono JSON API: `createApp()` returned as a value so tests use `app.request()` with no socket, `tsc` build (no bundler), `node dist/server.js` | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `openapi-spec` | OpenAPI 3.1 first: spectral lint with warnings as failures, redocly bundle + HTML reference, contract tests validating live responses against the bundle | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `nest-api` | NestJS 12 service: module/controller/service wiring, a validating pipe, supertest end-to-end tests, ESM throughout | `node`, `npm`/\\`pnpm\\`/\\`yarn` |
 | `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `github-action` | JavaScript action on `node24` (no Docker, zero deps): pure counting core, Markdown step summary, `GITHUB_OUTPUT` writes, `node:test` suite that spawns the real entry point | `node` |

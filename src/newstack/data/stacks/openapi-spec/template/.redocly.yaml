@@ -1,0 +1,6 @@
+# Redocly applies its recommended ruleset by default; name it so a future reader knows
+# where the `operation-4xx-response`-style failures come from.
+extends:
+  - recommended
+rules:
+  no-server-example.com: off

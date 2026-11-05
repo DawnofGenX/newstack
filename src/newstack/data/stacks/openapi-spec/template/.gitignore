@@ -1,0 +1,8 @@
+# Dependencies
+/node_modules/
+
+# Build output: the bundle, the HTML reference and the test's temporary artifacts
+/dist/
+
+# Local server log written by the verify step
+.oas.log

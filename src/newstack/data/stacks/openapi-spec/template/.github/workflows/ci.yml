@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      # Warnings are failures: a document that lints clean today and warns tomorrow is a
+      # document whose schema has started to drift from the intent.
+      - name: Lint the document
+        run: {{ package_manager_run }} lint:spec
+      - name: Render the reference
+        run: {{ package_manager_run }} docs
+      - name: Validate responses against the document
+        run: {{ package_manager_test }}
+      # The document claims these routes exist. Boot the server and ask it, so the spec is
+      # checked against a socket rather than only against the handler function.
+      - name: Serves what the document says
+        run: |
+          PORT=5399 node src/main.js &
+          server=$!
+          trap 'kill $server 2>/dev/null' EXIT
+          for _ in $(seq 1 120); do
+            curl -fsS http://127.0.0.1:5399/health >/dev/null 2>&1 && break
+            sleep 0.5
+          done
+          curl -fsS http://127.0.0.1:5399/health
+          curl -fsS 'http://127.0.0.1:5399/stats?text=hello%20world%0A'
+          curl -fsS -X POST -H 'content-type: application/json' \
+            --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5399/stats
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+            -H 'content-type: application/json' -d '{}' http://127.0.0.1:5399/stats)" = 422
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5399/nope)" = 404
