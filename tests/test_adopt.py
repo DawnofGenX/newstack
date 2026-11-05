@@ -502,3 +502,28 @@ def test_a_buf_workspace_without_go_still_resolves(tmp_path) -> None:
 
     make_repo(tmp_path, {"buf.yaml": "version: v2\n"})
     assert [stack.name for stack in detect_stacks(tmp_path)] == ["grpc-go"]
+
+
+def test_a_shelf_pubspec_resolves_to_the_dart_service(tmp_path) -> None:
+    """`shelf` in the dependencies is what separates a service from a plain Dart CLI."""
+
+    make_repo(
+        tmp_path,
+        {
+            "pubspec.yaml": (
+                'name: demo\nenvironment:\n  sdk: ">=3.5.0 <4.0.0"\n'
+                "dependencies:\n  shelf: ^1.4.2\n  shelf_router: ^1.1.4\n"
+            )
+        },
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["dart-shelf-api"]
+
+
+def test_a_plain_pubspec_still_resolves_to_the_dart_cli(tmp_path) -> None:
+    """The service detects a narrower marker, so the CLI stack has to stay the fallback."""
+
+    make_repo(
+        tmp_path,
+        {"pubspec.yaml": 'name: demo\nenvironment:\n  sdk: ">=3.5.0 <4.0.0"\n'},
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["dart-cli"]

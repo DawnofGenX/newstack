@@ -1,0 +1,7 @@
+# pubspec.lock is deliberately not ignored: this is an application, so builds use the
+# versions that were tested. The template ships without one — `dart pub get` writes it.
+.dart_tool/
+build/
+.idea/
+*.iml
+.vscode/

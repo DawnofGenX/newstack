@@ -290,6 +290,7 @@ $ newstack stacks outdated
 | `elixir-mix-cli` | Elixir CLI on Mix: pure counting module, ExUnit suite, escript binary | `elixir`, `mix` |
 | `phoenix-app` | Phoenix 1.8 JSON API on Elixir 1.18: pure counting module, endpoint + router + controller, ConnTest suite covering 422/404, `mix format` gate | `elixir`, `mix` |
 | `dart-cli` | Dart 3 CLI: pub package with a pure counting library, package:test suite and zero runtime dependencies | `dart` |
+| `dart-shelf-api` | Dart 3 JSON service on `shelf`: a `Handler` the tests call in-process, `shelf_router` routes, real-socket smoke test | `dart` |
 | `kotlin-cli` | Kotlin CLI on Maven (no Gradle wrapper to ship): pure counting core, JUnit 5 suite, shaded runnable jar | `java`, `mvn` |
 | `zig-cli` | Zig 0.17 CLI: counting module with in-source test blocks, `zig build test`, no runtime | `zig` |
 | `julia-cli` | Julia CLI: pure counting module, `Test` stdlib suite, zero external packages | `julia` |

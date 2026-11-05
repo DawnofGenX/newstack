@@ -84,6 +84,7 @@ jobs:
           - elixir-mix-cli
           - phoenix-app
           - dart-cli
+          - dart-shelf-api
           - kotlin-cli
           - zig-cli
           - julia-cli
@@ -447,7 +448,7 @@ jobs:
           elixir-version: "1.18"
           otp-version: "27"
       - name: Set up Dart
-        if: matrix.stack == 'dart-cli'
+        if: contains(fromJSON('["dart-cli","dart-shelf-api"]'), matrix.stack)
         uses: dart-lang/setup-dart@v1
         with:
           sdk: "3.13.7"

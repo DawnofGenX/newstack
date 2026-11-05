@@ -1,0 +1,68 @@
+{
+  "name": "dart-shelf-api",
+  "title": "Dart Shelf API",
+  "language": "dart",
+  "blurb": "Dart 3 JSON service on shelf: a handler you can call in a test, shelf_router routes, and a real socket smoke test",
+  "requires": [
+    "dart",
+    "curl"
+  ],
+  "default_description": "A Dart JSON service built on shelf.",
+  "next_steps": [
+    "cd {path}",
+    "dart pub get",
+    "PORT=8080 dart run bin/{npm_name}.dart",
+    "curl 'http://127.0.0.1:8080/stats?text=hello%20world%0A'",
+    "dart test"
+  ],
+  "verify": [
+    {
+      "name": "get",
+      "cmd": "dart pub get",
+      "tools": [
+        "dart"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "analyze",
+      "cmd": "dart analyze --fatal-infos",
+      "tools": [
+        "dart"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "dart test",
+      "tools": [
+        "dart"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "http",
+      "cmd": "PORT=5411 dart run bin/{{ npm_name }}.dart >.dart.log 2>&1 & srv=$!; ready=1; for _ in $(seq 1 60); do if curl -fsS http://127.0.0.1:5411/health >/dev/null 2>&1; then ready=0; break; fi; sleep 0.5; done; if [ $ready -ne 0 ]; then cat .dart.log; kill $srv 2>/dev/null; exit 1; fi; health=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5411/health); stats=$(curl -s 'http://127.0.0.1:5411/stats?text=hello%20world%0A'); posted=$(curl -s -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5411/stats); bad=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5411/stats); nonjson=$(curl -s -o /dev/null -w '%{http_code}' -X POST --data-binary 'nope' http://127.0.0.1:5411/stats); missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5411/nope); kill $srv 2>/dev/null; wait $srv 2>/dev/null; cat .dart.log; test \"$health\" = 200 && printf '%s' \"$stats\" | grep -q '\"lines\":1' && printf '%s' \"$stats\" | grep -q '\"bytes\":12' && printf '%s' \"$posted\" | grep -q '\"words\":3' && test \"$bad\" = 422 && test \"$nonjson\" = 422 && test \"$missing\" = 404",
+      "tools": [
+        "dart",
+        "curl"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "pubspec.yaml",
+      "contains": "shelf"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "analysis_options.yaml"
+  ],
+  "adopt_tests": [
+    "test/handler_test.dart"
+  ]
+}

@@ -8,6 +8,15 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`dart-shelf-api`**: the registry's first Dart service, and the shape is worth
+  copying: `buildHandler()` returns a `Handler`, so tests call the exact function the
+  socket drives — no port, no readiness loop, no flaky `SocketException` on a busy
+  runner — while the verify step still boots `dart run bin/<name>.dart` and curls it,
+  because a handler that only works in-process fails in production. `dart analyze
+  --fatal-infos` (not plain `analyze`) is the gate, and the hyphenated entry file needs
+  `// ignore_for_file: file_names`, since a directory name is not a Dart identifier.
+  `dart pub get` resolves `shelf` 1.x and `shelf_router` 1.x; the lock file is left for
+  you to commit.
 - **`grpc-go`**: protobuf-first Go service where the `.proto` is the source of truth. `buf lint` enforces the contract style rules (including the `Service` suffix), `buf generate` builds the stubs locally via `protoc-gen-go`, and the generated code is
   gitignored so a contract and its stubs cannot drift. Tests run over `bufconn` — the real
   gRPC stack without a socket — with one case that dials TCP so listener setup is not
