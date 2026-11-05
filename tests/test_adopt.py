@@ -2049,3 +2049,20 @@ def test_a_plain_python_project_does_not_match_the_dns_stack(tmp_path):
     make_repo(tmp_path, {"src/app/main.py": "print('hello')\n"})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "python-dns-server" not in names
+
+
+def test_an_mqtt_broker_resolves_to_the_mqtt_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "src/broker/packet.py": "def encode_remaining_length(value):\n    return b''\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-mqtt-broker"]
+
+
+def test_a_plain_python_project_does_not_match_the_mqtt_stack(tmp_path):
+    make_repo(tmp_path, {"src/app/main.py": "print('hello')\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-mqtt-broker" not in names

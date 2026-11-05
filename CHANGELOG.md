@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- **python-mqtt-broker**: an MQTT 3.1.1 broker with no dependencies. The remaining-length field is seven bits per byte with a continuation bit, so a 20 KB payload needs three length bytes; SUBACK is written *before* the retained replay, otherwise a client that reads one reply per call sees a PUBLISH where it expects its grant; `a/#` also matches the parent `a`; a retained publish is only observable from a test at QoS 1 because QoS 0 is never acknowledged and the assertion races the server thread; a connection dropped with unread bytes reaches the peer as `ECONNRESET`, not a clean EOF; and an empty retained publish both deletes the record and delivers an empty message. `mosquitto_pub`/`mosquitto_sub` drive the smoke test.
 - `node-cli`: a streaming counter whose contract is the shell — byte-accurate UTF-8, a carried word across chunk boundaries, logical lines, `EPIPE` as exit 0, unknown flags as exit 2, and tests that pipe a real child process into `head`.
 - `python-graceful-shutdown`: a SIGTERM path as a tested contract — non-daemon request threads, a drain watcher off the serving thread, the listener closed mid-drain, `503 draining` for keep-alive, a deadline that exits 1 immediately, and a second signal that exits 130.
 - `python-rag-eval` — a retrieval evaluation harness whose numbers can be defended. The chunk

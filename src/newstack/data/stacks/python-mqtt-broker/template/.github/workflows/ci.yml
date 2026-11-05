@@ -1,0 +1,31 @@
+name: {{ npm_name }}
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{{ python_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+      - name: Install the Mosquitto command-line clients
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends mosquitto-clients
+      - name: Install the project
+        run: |
+          uv venv --quiet --allow-existing .venv
+          uv pip install --quiet --python .venv/bin/python -e ".[dev]"
+      - name: Lint
+        run: .venv/bin/ruff check .
+      - name: Test
+        run: .venv/bin/python -m pytest -q
+      - name: Self-checks
+        run: .venv/bin/python -m {{ package_name }} --selftest
+      - name: Contract over a real socket
+        run: PY=.venv/bin/python bash smoke.sh
