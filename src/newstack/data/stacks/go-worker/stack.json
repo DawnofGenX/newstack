@@ -1,0 +1,65 @@
+{
+  "name": "go-worker",
+  "title": "Go NDJSON worker",
+  "language": "go",
+  "blurb": "Batch worker, not a service: NDJSON jobs in and out, retries with backoff for retryable failures only, an idempotency ledger written atomically, and a SIGTERM drain that does not wait for the producer",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "An NDJSON batch worker.",
+  "next_steps": [
+    "cd {path}",
+    "make build",
+    "./bin/{npm_name} --input jobs.ndjson --state seen.json"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "mkdir -p bin && go build -o bin/{{ npm_name }} . && ./bin/{{ npm_name }} --selftest",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "jobs",
+      "cmd": "bash run.sh",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.go",
+      "contains": "idempotency ledger"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "adopt_tests": [
+    "worker_test.go"
+  ]
+}

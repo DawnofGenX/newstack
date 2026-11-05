@@ -66,16 +66,17 @@ class AdoptionPlan:
 def detect_stacks(root: Path) -> list[Stack]:
     """Stacks whose markers match *root*; generic fallbacks are dropped on a specific match.
 
-    Inside the fallback group a content-aware marker beats a bare filename: the
-    Kotlin CLI wants a ``pom.xml`` that mentions ``kotlin``, and without this rule
-    every Kotlin project would also match the generic ``java-maven-cli`` fallback
-    and come out ambiguous.
+    A content-aware marker also beats a bare filename inside the specific group,
+    but only when it narrows the field to one stack: a Go worker pins itself with a
+    phrase in its own source and must not come out ambiguous against ``go.mod``,
+    while a bare ``go.mod`` with no Go files must still report both Go stacks.
     """
     stacks = load_stacks()
     matched = [stack for stack in stacks.values() if stack.detect and stack.matches(root)]
     specific = [stack for stack in matched if not stack.detect_fallback]
     if specific:
-        return specific
+        content_aware = [stack for stack in specific if any(rule.contains for rule in stack.detect)]
+        return content_aware if len(content_aware) == 1 else specific
     fallbacks = [stack for stack in matched if stack.detect_fallback]
     content_aware = [stack for stack in fallbacks if any(rule.contains for rule in stack.detect)]
     return content_aware or fallbacks

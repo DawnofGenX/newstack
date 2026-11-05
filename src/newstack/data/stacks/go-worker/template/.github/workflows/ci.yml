@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.24"
+          cache: false
+      - run: go vet ./...
+      - run: go test ./...
+      - run: go build -o bin/{{ npm_name }} .
+      - run: ./bin/{{ npm_name }} --selftest
+      # A worker is not a server, so there is no port to poll: this step feeds a
+      # fixture through the binary twice (idempotency) and then interrupts a run
+      # in the middle of a stream to prove the drain.
+      - name: Jobs, replay and drain
+        run: ./run.sh

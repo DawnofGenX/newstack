@@ -1,0 +1,6 @@
+{"id":"one","op":"count","text":"a b\nc\n"}
+{"id":"two","op":"flaky","fail_times":2,"text":"x y\n"}
+{"id":"three","op":"flaky","fail_times":9,"text":"never"}
+{"id":"four","op":"count","text":"h\u00e9llo w\u00f6rld\n"}
+{"id":"five","op":"shout","text":"nope"}
+{"op":"count","text":"no id"}

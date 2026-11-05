@@ -7,6 +7,15 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `go-worker` — the registry's first batch worker and the first stack with no
+  port at all. `job.go` splits failures into permanent (`invalid_json`,
+  `missing_id`, `unknown_op`) and `transient`, so only a retryable failure spends
+  the retry budget; `state.go` keeps the idempotency ledger and writes it with a
+  temp file, `Sync` and `Rename`, because `os.WriteFile` truncates first and a
+  kill in between replays the whole input; `worker.go`'s `Consume` runs the scan
+  in its own goroutine so a SIGTERM returns without waiting for a producer that
+  is blocked in `read(2)`. `run.sh` proves all three: the fixture twice
+  (skipped), then an interrupt in the middle of a stream.
 - `node-ws-api` — the registry's first non-HTTP service. `ws` runs with
   `noServer: true` and its own `upgrade` handler, because the default
   `new WebSocketServer({ server })` hijacks every upgrade and would accept

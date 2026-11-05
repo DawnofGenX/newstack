@@ -1437,4 +1437,41 @@ def test_a_plain_javascript_project_does_not_match_the_ws_stack(tmp_path) -> Non
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == [], "a client that consumes ws must not claim the server stack"
 
+def test_a_go_worker_resolves_to_the_worker_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module example.com/jobs\n\ngo 1.24\n",
+            "main.go": (
+                "package main\n"
+                "\n"
+                'import "flag"\n'
+                "\n"
+                "func main() {\n"
+                '\t// -state is the path to the idempotency ledger\n'
+                '\tflag.String("state", "seen.json", "")\n'
+                "\tflag.Parse()\n"
+                "}\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    # go.mod alone matches the CLI and the HTTP service by design; the worker's
+    # content marker still wins outright because it is the only content-aware match.
+    assert names == ["go-worker"], "a ledger-driven batch worker is not a plain Go CLI"
+
+
+def test_a_plain_go_program_still_resolves_to_the_go_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module example.com/hello\n\ngo 1.24\n",
+            "main.go": "package main\n\nfunc main() { println(\"hi\") }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    # Still the CLI/service pair: the worker must not claim every Go module.
+    assert names == ["go-cli", "go-http"], "the worker must not claim every Go project"
+
+
 

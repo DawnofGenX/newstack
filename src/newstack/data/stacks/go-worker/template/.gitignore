@@ -1,0 +1,3 @@
+bin/
+/seen.json
+.seen-*.json
