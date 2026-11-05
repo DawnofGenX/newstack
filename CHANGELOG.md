@@ -7,6 +7,9 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `c-http-api` — a C11 JSON service on POSIX sockets with no dependencies: the route
+  table is a pure function, the JSON reader distinguishes a string from a number, and
+  the socket loop sets a read timeout so one stalled client cannot wedge the process.
 - `lisp-http-api` — a JSON service on SBCL with no Quicklisp: the route table is a pure
   function, the JSON reader keeps strings and numbers apart (so `{"text":42}` is a
   422 while `{"text":"42"}` counts), and the HTTP loop is `sb-bsd-sockets` with one

@@ -69,6 +69,7 @@ jobs:
           - rust-cli
           - rust-axum
           - c-cli
+          - c-http-api
           - cpp-cmake-cli
           - terraform-module
           - ansible-role

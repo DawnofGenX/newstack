@@ -992,3 +992,27 @@ def test_a_plain_lisp_script_still_resolves_to_the_lisp_cli(tmp_path) -> None:
     make_repo(tmp_path, {"main.lisp": '(format t "hello")'})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["lisp-cli"], "a script that opens no socket is the CLI stack"
+
+def test_a_c_socket_server_resolves_to_the_c_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "Makefile": "all:\n\tcc -std=c11 -o app src/main.c\n",
+            "src/http.c": "int s = socket(AF_INET, SOCK_STREAM, 0);\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["c-http-api"], "SOCK_STREAM is the service marker"
+
+
+def test_a_plain_c_project_still_resolves_to_the_c_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "Makefile": "all:\n\tcc -std=c11 -o app src/main.c\n",
+            "src/main.c": "int main(void) { return 0; }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["c-cli"], "a Makefile with -std=c11 and no socket is the CLI stack"
+

@@ -275,6 +275,7 @@ $ newstack stacks outdated
 | `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
 | `rust-axum` | axum service: typed routes, shared state, `tower` oneshot tests, fmt/clippy | `cargo` |
 | `c-cli` | C11 CLI: Makefile lib+bin split, assert-header test suite, `-Wall -Wextra -Wpedantic -Werror` from the first commit | `cc`, `make` |
+| `c-http-api` | C11 JSON service on POSIX sockets: pure `textstat_route`, a hand-written JSON reader that keeps strings and numbers apart, and a socket loop with 5 s read timeouts | `cc`, `make` |
 | `cpp-cmake-cli` | C++20 CLI: CMake lib+bin split, CTest suite, warning-clean GCC/Clang build | `cmake`, `g++` |
 | `terraform-module` | Reusable module: validated inputs, computed tags, `terraform test` cases incl. a rejected input | `terraform` |
 | `ansible-role` | Galaxy-shaped Ansible role: validated inputs, idempotent tasks, a handler, molecule-free playbook + assert playbooks | `ansible-playbook` |
