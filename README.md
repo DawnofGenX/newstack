@@ -256,6 +256,7 @@ $ newstack stacks outdated
 | `python-sse-api` | Server-sent events: an endless `text/event-stream` response, `Last-Event-ID` resume, proxy-proof headers, and a socket test that fails if the body is buffered | `uv` |
 | `python-scheduler-api` | A durable scheduler: due jobs claimed under `BEGIN IMMEDIATE`, interval jobs rescheduled from *now* so an overdue job does not stampede, exponential back-off capped by `max_attempts`, and a run ledger with the counts of every attempt | `uv` |
 | `python-litestar-api` | Litestar 2 text-statistics API: the handler takes `Request` instead of a validated parameter so `422` stays the project's answer, `raw_path` already carries the query string, and every rule lives in a pure `route()` function with a TestClient suite on top | `uv` |
+| `python-eval-harness` | Offline eval harness: JSONL gold + predictions, `exact_match`/`token_f1`, a missing prediction scores zero instead of shrinking the denominator, and `compare` exits 1 on a per-example regression | `uv` |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle served by a zero-dependency static server with an SPA fallback, page/bundle/404 asserted by curl in `smoke.sh` | `node`, `npm`/`\`pnpm`\`/`\`yarn` |

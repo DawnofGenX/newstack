@@ -7,6 +7,16 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-eval-harness` — an offline evaluation harness, and the first stack in the registry that is
+  about measuring rather than serving. Three rules are enforced by the code, because each is a way
+  published numbers go wrong: a **missing prediction scores zero** (dropping it shrinks the
+  denominator and makes a model that answered 3 of 100 look perfect on the ones it answered), the
+  metric is written into both the output and the record (`token_f1` and `exact_match` disagree on
+  almost everything), and every record carries provenance — the git commit with `+dirty` when the
+  tree was not clean. `compare` exits 1 on any per-example regression, so it drops into CI as a
+  gate; `--tolerance` is the only way to let a drop through. Predictions can be piped in with
+  `--predictions -`, and unknown metrics are rejected by our own code rather than argparse's
+  `choices`, because a `SystemExit` from argparse cannot be turned into the documented exit 2.
 - `rust-sqlx-api` — axum + sqlx on SQLite, with the schema *in* the binary: `sqlx::migrate!`
   embeds `migrations/`, so a shipped release can never drift from the tables it was built
   against. The macro is gated behind the `macros` feature — `["runtime-tokio","sqlite","migrate"]`

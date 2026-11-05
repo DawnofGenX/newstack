@@ -1,0 +1,4 @@
+{"id": "cap-1", "prompt": "What is the capital of France?", "gold": "Paris"}
+{"id": "math-2", "prompt": "What is 2 + 2?", "gold": "4"}
+{"id": "cap-3", "prompt": "What is the capital of Japan?", "gold": "Tokyo"}
+{"id": "word-4", "prompt": "What colour is a clear midday sky?", "gold": "blue"}
