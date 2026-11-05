@@ -72,6 +72,7 @@ jobs:
           - python-circuit-breaker
           - python-money-allocation
           - python-rate-limiter
+          - python-audit-log
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
