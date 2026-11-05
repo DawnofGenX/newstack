@@ -31,7 +31,10 @@ curl -fsS --max-time 2 "${BASE}/" >/dev/null || { cat "$LOG" >&2; fail "server n
 index=$(curl -fsS --max-time 2 "${BASE}/")
 case "$index" in *"<app-root"*) echo "ok index" ;; *) fail "index.html does not contain app-root" ;; esac
 
-bundle=$(printf '%s' "$index" | sed -n 's/.*src="\([^"]*\.js\)".*/\1/p' | head -1)
+# Take the first match with parameter expansion: a `| head -1` here would
+# be killed by SIGPIPE under `set -o pipefail` whenever sed writes twice.
+bundle=$(printf '%s' "$index" | sed -n 's/.*src="\([^"]*\.js\)".*/\1/p')
+bundle=${bundle%%$'\n'*}
 [ -n "$bundle" ] || fail "index.html has no script bundle"
 # `ng build` emits a relative script src, so it needs the leading slash for curl.
 case "$bundle" in /*) ;; *) bundle="/$bundle" ;; esac

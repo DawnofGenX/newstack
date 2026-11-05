@@ -121,14 +121,19 @@ fi
 # -- a large payload ----------------------------------------------------
 # mosquitto_sub terminates whatever it prints with a newline, so compare the
 # first 20000 bytes and assert the extra byte is that newline.
-head -c 20000 /dev/urandom | base64 | tr -d '\n' | head -c 20000 >"$work/big.txt"
+# Build the payload without a truncating `head` at the end of the pipe:
+# under `set -o pipefail` that head exits early, `tr` takes SIGPIPE and the
+# whole pipeline fails about one run in three. 15000 bytes is 20000 base64
+# characters, so a plain redirect is enough.
+head -c 15000 /dev/urandom | base64 | tr -d '\n' >"$work/big.txt"
 sub -t 'big/1' -C 1 -W 6 >"$work/big.out" &
 watcher=$!
 sleep 0.4
 pub -t 'big/1' -q 1 -f "$work/big.txt"
 wait "$watcher" || true
 size="$(wc -c <"$work/big.out")"
-if head -c 20000 "$work/big.out" | cmp -s - "$work/big.txt" && [ "$size" -eq 20001 ]; then
+head -c 20000 "$work/big.out" >"$work/big.first"
+if cmp -s "$work/big.first" "$work/big.txt" && [ "$size" -eq 20001 ]; then
   ok "a 20 KB payload survives the wire"
 else
   bad "a 20 KB payload survives the wire" "$size bytes received"

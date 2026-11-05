@@ -26,7 +26,7 @@ compare() {
   else
     fail=$((fail + 1))
     echo "FAIL $label"
-    diff <(cat -A "$work/ours.out") <(cat -A "$work/wc.out") | head -4
+    diff <(cat -A "$work/ours.out") <(cat -A "$work/wc.out") | head -4 || true  # a long diff must not trip pipefail
     echo "  status: ours=$ours_status wc=$wc_status"
   fi
 }
@@ -54,7 +54,7 @@ stdin_compare() {
   else
     fail=$((fail + 1))
     echo "FAIL $label"
-    diff <(cat -A "$work/ours.out") <(cat -A "$work/wc.out") | head -4
+    diff <(cat -A "$work/ours.out") <(cat -A "$work/wc.out") | head -4 || true  # a long diff must not trip pipefail
   fi
 }
 

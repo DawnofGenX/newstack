@@ -80,7 +80,9 @@ kill -0 "$server"
 
 # +ignore keeps dig from quietly retrying over TCP after a truncated answer.
 d() { dig +ignore +short "@$HOST" -p "$PORT" "$@"; }
-status() { dig +ignore "@$HOST" -p "$PORT" +noall +comments "$@" | grep -o 'status: [A-Z]*' | head -1; }
+# `|| true`: head exits after the first status line, and the grep that still
+# had a line to write would kill the pipeline under `set -o pipefail`.
+status() { dig +ignore "@$HOST" -p "$PORT" +noall +comments "$@" | grep -o 'status: [A-Z]*' | head -1 || true; }
 
 check "A records" "192.0.2.11
 192.0.2.12" "$(d www.example.test A | sort)"
@@ -99,7 +101,7 @@ check "an unknown name is NXDOMAIN" "status: NXDOMAIN" "$(status nope.example.te
 check "a name outside the zone is REFUSED" "status: REFUSED" "$(status example.org A)"
 check "an unknown class is NOTIMP" "status: NOTIMP" "$(status -c CH example.test A)"
 check "the SOA is served" "status: NOERROR" "$(status example.test SOA)"
-check "ANY returns the addresses" "192.0.2.11" "$(d www.example.test ANY | head -1)"
+check "ANY returns the addresses" "192.0.2.11" "$(d www.example.test ANY | head -1 || true)"
 
 check "the big TXT does not fit plain UDP" "" "$(d +noedns big.example.test TXT)"
 contains "and it comes back truncated" "tc" "$(dig +ignore "@$HOST" -p "$PORT" +noedns +noall +comments big.example.test TXT | grep -o 'flags:[^;]*')"

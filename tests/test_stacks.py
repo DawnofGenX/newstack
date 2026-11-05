@@ -632,3 +632,45 @@ def test_python_workflows_import_the_rendered_package(name: str) -> None:
         "use {{ package_name }} so the rendered project works"
     )
 
+
+PIPE_HEAD = re.compile(r"\|\s*head\b")
+
+
+def _pipefail_offences(text: str) -> list[int]:
+    """Line numbers where a `| head` truncation can trip `set -o pipefail`.
+
+    A head that exits after its share leaves the producer writing into a closed
+    pipe; the producer then dies with SIGPIPE and, under `pipefail`, the whole
+    pipeline reports 141. In a smoke script that aborts the step about one run
+    in three, which looks exactly like an intermittent product bug.
+    """
+    lines = text.splitlines()
+    if not any("pipefail" in line for line in lines):
+        return []
+    offences: list[int] = []
+    for index, line in enumerate(lines):
+        # A comment that names the pattern is documentation, not a pipeline.
+        if line.lstrip().startswith("#"):
+            continue
+        if PIPE_HEAD.search(line) is None:
+            continue
+        window = " ".join(lines[index : index + 3])
+        if "|| true" in line or "PIPESTATUS" in window or "pipefail-ok" in line:
+            continue
+        offences.append(index + 1)
+    return offences
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_no_template_head_can_trip_pipefail(name: str) -> None:
+    """A template shell script must not die of its own diagnostics.
+
+    The stacks run with `set -euo pipefail`; every deliberate truncation has to
+    say so with `|| true` (or assert PIPESTATUS, like node-cli's EPIPE test).
+    """
+    template = get_stack(name).template_dir
+    offenders: list[str] = []
+    for path in sorted(template.rglob("*.sh")):
+        for line in _pipefail_offences(path.read_text(encoding="utf-8")):
+            offenders.append(f"{path.relative_to(template)}:{line}")
+    assert not offenders, f"{name}: | head can trip pipefail: {offenders}"
