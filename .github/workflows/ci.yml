@@ -60,6 +60,7 @@ jobs:
           - python-property-tests
           - python-openapi-client
           - python-rag-eval
+          - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
           - python-resp-server

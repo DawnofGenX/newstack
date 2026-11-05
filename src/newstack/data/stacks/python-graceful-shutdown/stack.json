@@ -1,0 +1,80 @@
+{
+  "name": "python-graceful-shutdown",
+  "title": "Python graceful shutdown",
+  "language": "python",
+  "blurb": "An HTTP server whose SIGTERM path is a tested contract: non-daemon request threads so an in-flight response is never truncated, a drain watcher in its own thread because shutdown() deadlocks on the serving one, the listening socket closed so new clients are refused instead of queued, keep-alive requests answered 503 rather than counted, a bounded drain that exits 1 when work outlives the deadline, and a second signal that exits 130 instead of hanging a deploy",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A stdlib HTTP server that finishes in-flight work before it exits, with the shutdown sequence covered by process-level tests.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} serve --port 5477",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the listening socket was still accepting after the drain began"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_lifecycle.py"
+  ]
+}

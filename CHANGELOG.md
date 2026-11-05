@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-graceful-shutdown`: a SIGTERM path as a tested contract — non-daemon request threads, a drain watcher off the serving thread, the listener closed mid-drain, `503 draining` for keep-alive, a deadline that exits 1 immediately, and a second signal that exits 130.
 - `python-rag-eval` — a retrieval evaluation harness whose numbers can be defended. The chunk
   windows are word-aligned with stable `doc#offset` ids and a coverage check, because a step
   larger than `size - overlap` silently leaves a hole and every later metric is then measured
