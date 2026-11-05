@@ -82,7 +82,6 @@ jobs:
           - rust-cli
           - rust-axum
           - actix-web
-          - actix-web
           - c-cli
           - c-http-api
           - cpp-cmake-cli

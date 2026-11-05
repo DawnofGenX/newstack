@@ -7,19 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
-- `actix-web` — actix-web 4 with no framework magic. `web::route()` (any method) per path
-  instead of `web::get()`/`web::post()` is what lets an unsupported method answer the
-  app's own `405` JSON rather than actix's `404`; replies are built from a `struct` so the
-  `text, lines, words, bytes` key order is byte-exact (`serde_json::json!` alone is not
-  ordered); the query decoder returns `bytes`, because `%C3%A9` is one character but two
-  bytes and the counter must see two. Its `detect` rule carries `actix-web` as content, which
-  is what keeps a real actix project from coming out ambiguous against the bare-`Cargo.toml`
-  Rust stacks.
-- `actix-web` — the service owns its routing: `web::route()` (there is no `web::any()`
-  in actix 4) with a manual method check, plus `default_service`, because actix's own
-  405/404 bodies are plain text. `serde_json::json!` sorts keys, so a byte-compared
-  response must come from a struct; and `query_string()` arrives raw, so `+` and `%C3`
-  are the app's job.
+- `actix-web` — the service owns its routing: `web::route()` (actix 4 has no `web::any()`)
+  with a manual method check, plus `default_service`, because actix's own `405`/`404` bodies
+  are plain text and this stack answers JSON. `serde_json::json!` sorts keys, so a
+  byte-compared response has to come from a struct; `query_string()` arrives raw, so `+` and
+  `%C3` are the app's job — and the decoder returns `bytes`, because `%C3%A9` is one
+  character but two bytes and the counter must see two. Its `detect` rule carries
+  `actix-web` as content, which is what keeps a real actix project from coming out
+  ambiguous against the bare-`Cargo.toml` Rust stacks.
 - `prisma-api` — Prisma 6 + SQLite + Express 5. The CLI resolves `file:./dev.db` relative to
   `schema.prisma`, so the runtime default has to resolve the *same* absolute file or
   `migrate deploy` looks like a no-op against a database the app never opens. `app.all()`
