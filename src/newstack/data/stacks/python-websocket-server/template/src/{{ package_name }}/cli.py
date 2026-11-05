@@ -1,7 +1,4 @@
-"""CLI entry point: --host/--port/--selftest, PORT env.
-
-Run as the installed console script or `python -m {{ package_name }}`.
-"""
+"""CLI entry point: --host, --port, --selftest; the PORT variable is honoured too."""
 
 import argparse
 import os
