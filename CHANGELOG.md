@@ -7,6 +7,16 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `go-jwt-api` — the registry's first stack with accounts. Passwords are
+  PBKDF2-HMAC-SHA256 with the iteration count and salt stored inside the digest,
+  tokens are HMAC-SHA256 with an absolute `exp` (a duration would be read against
+  the wrong clock after a restart), and every rejected token is the same 401
+  `invalid_token`: telling "expired" from "forged" hands an attacker an oracle.
+  `login` hashes against a dummy digest when the email is unknown so the response
+  time does not enumerate accounts, and `/me` looks the account up rather than
+  trusting the claims, so deleting a user invalidates a live token. The store
+  writes with a temp file, `Sync` and `Rename`; a truncate-then-write leaves JSON
+  the next boot refuses to open.
 - `python-sse-api` — the registry's first streaming response. `GET /stream` holds
   the connection open and writes one event per tick, `Last-Event-ID` resumes
   instead of replaying, and `src/<pkg>/wire.py` is the only place that knows the

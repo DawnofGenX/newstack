@@ -276,6 +276,7 @@ $ newstack stacks outdated
 | `go-http` | Go HTTP service on `net/http`: JSON routes, `httptest` suite, graceful shutdown | `go` |
 | `grpc-go` | Protobuf-first Go service: `buf` lint/codegen, `bufconn` tests, real-socket smoke test, health service and reflection | `go` |
 | `go-worker` | NDJSON batch worker: retries with backoff for retryable failures only, idempotency ledger written with temp file + rename, SIGTERM drain that does not wait for the producer | `go` |
+| `go-jwt-api` | Go token service: PBKDF2 password digests, HMAC-signed bearer tokens with an absolute deadline, constant-time comparisons, an account store that writes atomically, and one indistinguishable 401 for expired-vs-forged | `go` |
 | `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
 | `rust-axum` | axum service: typed routes, shared state, `tower` oneshot tests, fmt/clippy | `cargo` |
 | `c-cli` | C11 CLI: Makefile lib+bin split, assert-header test suite, `-Wall -Wextra -Wpedantic -Werror` from the first commit | `cc`, `make` |

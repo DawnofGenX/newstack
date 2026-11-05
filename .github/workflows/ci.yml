@@ -70,6 +70,7 @@ jobs:
           - go-http
           - grpc-go
           - go-worker
+          - go-jwt-api
           - rust-cli
           - rust-axum
           - c-cli
@@ -208,7 +209,7 @@ jobs:
         with:
           node-version: "24"
       - name: Set up Go
-        if: contains(fromJSON('["go-cli","go-http","grpc-go","go-worker"]'), matrix.stack)
+        if: contains(fromJSON('["go-cli","go-http","grpc-go","go-worker","go-jwt-api"]'), matrix.stack)
         uses: actions/setup-go@v7
         with:
           go-version: "1.24"

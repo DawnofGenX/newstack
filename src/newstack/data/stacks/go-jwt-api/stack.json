@@ -1,0 +1,52 @@
+{
+  "name": "go-jwt-api",
+  "title": "Go token service",
+  "language": "go",
+  "default_description": "A JSON API with accounts and bearer tokens.",
+  "blurb": "A JSON API with real accounts: PBKDF2 password digests, HMAC-signed bearer tokens, and a token check that behaves the same whether the token expired or was forged.",
+  "requires": [
+    "go",
+    "curl",
+    "make"
+  ],
+  "port": 5455,
+  "next_steps": [
+    "cd {path}",
+    "make build",
+    "TOKEN_SECRET=dev-secret PORT=8080 ./build/{npm_name} --db users.json",
+    "curl -sS -X POST -H 'Content-Type: application/json' -d '{{\"email\":\"ada@example.com\",\"password\":\"correct horse\"}}' http://127.0.0.1:8080/register"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./..."
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./..."
+    },
+    {
+      "name": "selftest",
+      "cmd": "mkdir -p build && go build -o build/{{ npm_name }} . && ./build/{{ npm_name }} --selftest"
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5455/health >/dev/null 2>&1; then\n  echo \"port 5455 is already answering - stop that process before running this step\" >&2\n  exit 1\nfi\nwork=$(mktemp -d)\nlog=$(mktemp)\nserver=\"\"\ntrap 'kill -TERM $server 2>/dev/null || true; wait $server 2>/dev/null || true; rm -rf \"$work\" \"$log\"' EXIT\nmake -s build\nTOKEN_SECRET=step-secret PORT=5455 ./build/{{ npm_name }} --db \"$work/users.json\" >\"$log\" 2>&1 &\nserver=$!\nready=0\nfor _ in $(seq 1 120); do\n  if curl -fsS --max-time 2 http://127.0.0.1:5455/health >/dev/null 2>&1; then ready=1; break; fi\n  sleep 0.25\ndone\nif [ \"$ready\" != 1 ]; then cat \"$log\" >&2; exit 1; fi\nkill -0 \"$server\"\nbody=$work/body.json\nfail=0\ncheck() {\n  if [ \"$2\" = \"$3\" ]; then echo \"ok $1\"; else echo \"FAIL $1: want [$3] got [$2]\"; fail=1; fi\n}\nhas() { if grep -Fq -- \"$2\" \"$body\"; then echo yes; else echo no; fi; }\nstatus() { curl -sS -o \"$body\" -w '%{http_code}' \"$@\"; }\nbase=http://127.0.0.1:5455\ncheck health \"$(status \"$base/health\")\" 200\ncheck health_users \"$(has users '\"users\":0')\" yes\ncheck register \"$(status -X POST -H 'Content-Type: application/json' -d '{\"email\":\"ada@example.com\",\"password\":\"correct horse\"}' \"$base/register\")\" 201\ncheck registered_email \"$(has email '\"email\":\"ada@example.com\"')\" yes\ncheck duplicate \"$(status -X POST -H 'Content-Type: application/json' -d '{\"email\":\"ADA@example.com\",\"password\":\"correct horse\"}' \"$base/register\")\" 409\ncheck duplicate_error \"$(has email_taken '\"error\":\"email_taken\"')\" yes\ncheck weak \"$(status -X POST -H 'Content-Type: application/json' -d '{\"email\":\"new@example.com\",\"password\":\"short\"}' \"$base/register\")\" 422\ncheck missing_password \"$(status -X POST -H 'Content-Type: application/json' -d '{\"email\":\"new@example.com\"}' \"$base/register\")\" 422\ncheck bad_json \"$(status -X POST -H 'Content-Type: application/json' -d '{\"email\":' \"$base/register\")\" 422\ncheck login \"$(status -X POST -H 'Content-Type: application/json' -d '{\"email\":\"ada@example.com\",\"password\":\"correct horse\"}' \"$base/login\")\" 200\ntoken=$(sed -n 's/.*\"token\":\"\\([^\"]*\\)\".*/\\1/p' \"$body\")\nif [ -n \"$token\" ]; then echo \"ok login_token\"; else echo \"FAIL login_token: empty\"; fail=1; fi\ncheck wrong_password \"$(status -X POST -H 'Content-Type: application/json' -d '{\"email\":\"ada@example.com\",\"password\":\"nope nope\"}' \"$base/login\")\" 401\ncheck unknown_email \"$(status -X POST -H 'Content-Type: application/json' -d '{\"email\":\"ghost@example.com\",\"password\":\"nope nope\"}' \"$base/login\")\" 401\ncheck me \"$(status -H \"Authorization: Bearer $token\" \"$base/me\")\" 200\ncheck me_email \"$(has ada@example.com ada@example.com)\" yes\ncheck me_missing \"$(status \"$base/me\")\" 401\ncheck me_scheme \"$(status -H 'Authorization: Basic abc' \"$base/me\")\" 401\ncheck me_forged \"$(status -H \"Authorization: Bearer ${token}x\" \"$base/me\")\" 401\ncheck me_forged_error \"$(has invalid_token '\"error\":\"invalid_token\"')\" yes\ncheck not_found \"$(status \"$base/nope\")\" 404\ncheck not_found_detail \"$(has 'no route for GET /nope' 'no route for GET /nope')\" yes\ncheck wrong_method \"$(status -X POST \"$base/health\")\" 405\ncheck persisted \"$(grep -c 'pbkdf2-sha256' \"$work/users.json\")\" 1\nif [ \"$fail\" -ne 0 ]; then echo \"http contract failed\" >&2; exit 1; fi\ncurl -fsS --max-time 2 http://127.0.0.1:5455/health >/dev/null\n"
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.go",
+      "contains": "pbkdf2-sha256$"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "adopt_tests": [
+    "handlers_test.go"
+  ]
+}

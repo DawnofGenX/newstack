@@ -1508,3 +1508,30 @@ def test_a_plain_fastapi_app_does_not_match_the_sse_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "python-sse-api" not in names, "the sse stack must not claim every FastAPI app"
+
+
+def test_a_go_token_service_resolves_to_the_jwt_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module x\n\ngo 1.24\n",
+            "password.go": (
+                "package main\n\n"
+                'return fmt.Sprintf("pbkdf2-sha256$%d$%s$%s", rounds, salt, key), nil\n'
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["go-jwt-api"], "a token service must not come out ambiguous against go.mod"
+
+
+def test_a_go_worker_does_not_match_the_jwt_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module x\n\ngo 1.24\n",
+            "main.go": "package main\n\nimport \"fmt\"\n\nfunc main() { fmt.Println(\"hi\") }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "go-jwt-api" not in names, "a plain Go module is not a token service"
