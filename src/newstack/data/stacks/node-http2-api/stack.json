@@ -1,0 +1,64 @@
+{
+  "name": "node-http2-api",
+  "title": "Node HTTP/2 service",
+  "language": "node",
+  "blurb": "Node HTTP/2 service: h2c with prior knowledge and no framework — raw Http2Stream handling, a body cap enforced while the stream is still arriving, concurrent-stream tests, and a curl contract that proves the protocol really is HTTP/2",
+  "default_description": "A text-stats service that speaks HTTP/2 with prior knowledge.",
+  "port": 5478,
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "requires": [
+    "node",
+    "curl"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "npm install",
+    "npm start",
+    "bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "{{ package_manager_install }}",
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "node src/main.js --selftest"
+    },
+    {
+      "name": "test",
+      "cmd": "{{ package_manager_test }}"
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh"
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.js",
+      "contains": "http2.createServer"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "smoke.sh"
+  ],
+  "adopt_tests": [
+    "tests/api.test.js"
+  ]
+}

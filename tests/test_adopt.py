@@ -1922,3 +1922,29 @@ def test_a_plain_makefile_project_does_not_match_the_latex_paper(tmp_path):
     make_repo(tmp_path, {"Makefile": "all:\n\t@echo hi\n"})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "latex-paper" not in names
+
+
+def test_an_http2_service_resolves_to_the_http2_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"name": "svc", "type": "module"}\n',
+            "src/server.js": 'import http2 from "node:http2";\n\n'
+            "export const server = http2.createServer({});\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["node-http2-api"]
+
+
+def test_a_plain_websocket_service_does_not_match_the_http2_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"name": "svc", "dependencies": {"ws": "^8.18.0"}}\n',
+            "src/server.js": 'import { WebSocketServer } from "ws";\n',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "node-http2-api" not in names
+
