@@ -301,20 +301,22 @@ jobs:
           racket --version
 
       - name: Install Erlang
-        if: contains(fromJSON('["erlang-cli","erlang-cowboy-api"]'), matrix.stack)
+        if: matrix.stack == 'erlang-cli'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends erlang-nox erlang-dev make curl
           erl -noshell -eval 'io:format("~s~n", [erlang:system_info(otp_release)]), halt().'
 
-      - name: Install rebar3
+      # The release escript for rebar3 dies on the distro's Erlang with
+      # "escript: exception error: undefined function rebar3:main/1", so the
+      # service job takes its Erlang and rebar3 from the toolbox that already
+      # works for the Gleam stacks.
+      - name: Set up Erlang and rebar3
         if: matrix.stack == 'erlang-cowboy-api'
-        run: |
-          # The s3 mirror once served a truncated escript, so the release asset
-          # is pinned and the binary is exercised before anything trusts it.
-          sudo fetch /usr/local/bin/rebar3 https://github.com/erlang/rebar3/releases/download/3.28.0/rebar3
-          sudo chmod +x /usr/local/bin/rebar3
-          rebar3 --version
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27"
+          rebar3-version: "3.28.0"
 
       - name: Install gfortran
         if: matrix.stack == 'fortran-cli'
