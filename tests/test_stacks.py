@@ -228,6 +228,35 @@ def test_every_http_step_only_trusts_the_listener_it_started(name: str) -> None:
 
 
 @pytest.mark.parametrize("name", STACK_NAMES)
+def test_every_multiline_http_step_fails_loudly(name: str) -> None:
+    """A multi-line step must not end with ``|| true`` and call it a pass.
+
+    ``newstack check`` runs each step through ``sh -c``, which does not stop at
+    the first failing command. A step written as a list of bare assertions and
+    finished with ``wait $server || true`` therefore reports success even when
+    every assertion failed. ``set -e`` makes the assertions fatal; the EXIT trap
+    then stops the server on the failure path, where the closing ``kill`` never
+    runs.
+    """
+    stack = get_stack(name)
+    for step in stack.verify:
+        cmd = step.cmd
+        if "curl" not in cmd or "\n" not in cmd:
+            continue
+        last = [line for line in cmd.splitlines() if line.strip()][-1].strip()
+        if cmd.startswith("set -e\n"):
+            assert "trap '" in cmd and "EXIT" in cmd, (
+                f"{name}: step {step.name!r} uses `set -e` and must also trap EXIT "
+                "to stop its server on the failure path"
+            )
+            continue
+        assert not last.endswith("|| true"), (
+            f"{name}: step {step.name!r} ends with `|| true`, so every assertion in it "
+            "can fail and the step still reports success"
+        )
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
 def test_stack_manifest_is_consistent(name: str) -> None:
     from newstack.registry import get_stack
 
