@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `fsharp-http-api` — an F# JSON service on .NET 8 with no web framework. `Server.fs`
+  accepts a `TcpListener` connection and reads the head byte by byte until CRLFCRLF
+  (`ReadByte()` returning `-1` is the only end-of-stream signal), reads exactly
+  `Content-Length` bytes and writes its own status line; `Counts.fs` counts over
+  `byte[]` so UTF-8 never round-trips through a decoder; `Json.fs` is a
+  recursive-descent reader that re-encodes `\u00e9` and surrogate pairs to UTF-8 and
+  keeps the last `text` member; `Program.fs` adds a `--selftest` mode (34 checks, no
+  test framework) so the suite runs on plain `dotnet`.
 - `sml-http-api` — a Standard ML JSON service on `INetSock.TCP`, compiled by MLton
   into one native binary with `-warnings-as-errors`-grade hygiene and no packages to
   install. MLton's basis has no `Posix.Socket`: the socket is

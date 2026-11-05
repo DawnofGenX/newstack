@@ -307,6 +307,7 @@ $ newstack stacks outdated
 | `lua-cli` | Lua 5.4 CLI: stdlib-only modules, a hand-rolled spec harness, zero luarocks dependencies | `lua5.4` |
 | `lua-http-api` | JSON service on LuaSocket: the route table as one pure function, JSON written by hand so the key order is stable, a framework-free suite, one script binds the socket | `lua5.4`, `lua-socket`, `lua-cjson` |
 | `fsharp-cli` | F# on .NET 8: pure counting core, `Mode` discriminated union parser, xUnit suite that launches the binary for its exit codes | `dotnet` |
+| `fsharp-http-api` | F# JSON service on .NET 8 with no web framework: a byte-level `TcpListener` loop, a hand-written JSON reader that re-encodes escapes, and a `--selftest` mode with 34 checks | `dotnet`, `curl` |
 | `crystal-cli` | Crystal CLI: stdlib-only modules, `crystal spec` suite, compiled binary with a 0/2/1 exit contract | `crystal` |
 | `crystal-kemal-api` | Crystal service on Kemal: counting rules and the whole route table are pure functions under `crystal spec`, plus a real socket check | `crystal`, `shards` |
 | `bun-cli` | Bun CLI: pure counting module, hand-written option parser, zero-dependency `bun:test` suite | `bun` |

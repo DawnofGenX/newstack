@@ -101,6 +101,7 @@ jobs:
           - lua-cli
           - lua-http-api
           - fsharp-cli
+          - fsharp-http-api
           - crystal-cli
           - crystal-kemal-api
           - bun-cli
@@ -523,7 +524,7 @@ jobs:
           extensions: ctype, fileinfo, mbstring, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["csharp-cli","fsharp-cli","dotnet-cli","aspnet-api"]'), matrix.stack)
+        if: contains(fromJSON('["csharp-cli","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"

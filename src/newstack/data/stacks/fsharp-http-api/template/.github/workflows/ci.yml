@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Build
+        run: dotnet build {{ npm_name }}.fsproj --nologo
+      - name: Contract tests
+        run: dotnet bin/Debug/net8.0/{{ npm_name }}.dll --selftest
+      - name: HTTP contract
+        run: |
+          PORT=5446 dotnet bin/Debug/net8.0/{{ npm_name }}.dll > .fsharp-http.log 2>&1 &
+          server=$!
+          trap 'kill -TERM -"$server" 2>/dev/null || kill $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT
+          for _ in $(seq 1 120); do
+            if curl --max-time 2 -fsS http://127.0.0.1:5446/health > /dev/null 2>&1; then break; fi
+            sleep 0.25
+          done
+          kill -0 $server 2>/dev/null || { cat .fsharp-http.log; exit 1; }
+          test "$(curl --max-time 10 -fsS http://127.0.0.1:5446/health)" = '{"status":"ok"}'
+          test "$(curl --max-time 10 -fsS 'http://127.0.0.1:5446/stats?text=hello%20world%0A')" \
+            = '{"text":"hello world\n","lines":1,"words":2,"bytes":12}'

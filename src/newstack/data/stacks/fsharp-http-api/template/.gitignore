@@ -1,0 +1,10 @@
+# .NET build output - anchored names only, never a project directory
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/
+TestResults/
+/.fsharp-http.log

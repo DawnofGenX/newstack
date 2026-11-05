@@ -1250,6 +1250,30 @@ def test_an_sml_socket_server_resolves_to_the_sml_service(tmp_path) -> None:
     assert names == ["sml-http-api"], "INetSock marks a socket server, not a CLI"
 
 
+def test_an_fsharp_socket_server_resolves_to_the_fsharp_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "App.fsproj": '<Project Sdk="Microsoft.NET.Sdk"></Project>\n',
+            "src/Server.fs": "let listener = new TcpListener(IPAddress.Parse host, port)\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["fsharp-http-api"], "TcpListener marks a socket server, not a CLI"
+
+
+def test_a_plain_fsharp_project_still_resolves_to_the_fsharp_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "App.fsproj": '<Project Sdk="Microsoft.NET.Sdk"></Project>\n',
+            "Program.fs": 'printfn "hi"\n',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["fsharp-cli"], "the fsharp service must not claim a plain project"
+
+
 def test_a_plain_sml_program_still_resolves_to_the_sml_cli(tmp_path) -> None:
     make_repo(
         tmp_path,
