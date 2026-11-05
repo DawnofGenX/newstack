@@ -1,0 +1,82 @@
+{
+  "name": "python-bloom-filter",
+  "title": "Membership tests whose error rate you can measure",
+  "language": "python",
+  "blurb": "A Bloom filter sized from the math (bits = -n ln p / ln2^2, hashes = bits/n ln2), with the one guarantee it really has proved by testing every added item, and the false-positive rate measured against the formula at three budgets. The k sweep shows why more hashes stop helping, removal by clearing bits breaks the guarantee for a second item (shown failing), and the counting filter with saturating byte counters is the way back. Saturation is reported instead of hidden: info exits non-zero once the filter answers yes to nearly everything.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "Bit-array membership sized from the math, with the measured false-positive rate and a removal that cannot lie.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} sized --expected 1000 --rate 0.01",
+    ".venv/bin/python -m {package_name} create --filter items.json --expected 1000",
+    ".venv/bin/python -m {package_name} demo",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "erases whatever else shares those bits"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_bloom.py"
+  ]
+}
