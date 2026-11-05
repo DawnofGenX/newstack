@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .registry import Stack, load_stacks
-from .render import TemplateError, render_tree
+from .render import TemplateError, render_string, render_tree
 
 # Files adopt must never copy into someone else's project: they carry identity
 # (licence, name, entrypoints) rather than infrastructure.
@@ -120,9 +120,13 @@ def plan_adoption(
     if not stack.adopt:
         raise TemplateError(f"stack '{stack.name}' declares no adoptable files")
 
-    wanted = list(stack.adopt)
+    # Adoptable paths can carry a placeholder (a Haskell ``{{ cabal_name }}.cabal``,
+    # a Clojure ``test/{{ package_name }}/…``): they have to be rendered the same way
+    # the tree is, or the "not in its template" check compares a template path with a
+    # rendered one and refuses a stack that is perfectly fine.
+    wanted = [render_string(rel, context) for rel in stack.adopt]
     if with_tests:
-        wanted.extend(stack.adopt_tests)
+        wanted.extend(render_string(rel, context) for rel in stack.adopt_tests)
 
     forbidden = sorted(set(wanted) & FORBIDDEN)
     if forbidden:

@@ -23,6 +23,41 @@ def make_repo(root, files: dict[str, str]):
 
 # --------------------------------------------------------------------- detection
 
+STACK_LIST = sorted(STACKS.values(), key=lambda stack: stack.name)
+
+
+def _path_for(pattern: str):
+    """A concrete file path a glob rule can match, with the glob part filled in."""
+    parts = []
+    for part in pattern.split("/"):
+        if part == "**":
+            parts.append("src")
+        else:
+            parts.append(part.replace("*", "marker").replace("?", "m"))
+    return "/".join(parts)
+
+
+@pytest.mark.parametrize("stack", STACK_LIST, ids=[stack.name for stack in STACK_LIST])
+def test_every_stack_recognises_its_own_marker(stack, tmp_path):
+    """Each stack's detect rules must be satisfied by a directory built from them.
+
+    This is the guard the registry kept missing: a stack whose marker is shared
+    with another stack (``go.mod``, a bare ``Makefile``) still has to come out of
+    `detect_stacks` when its own evidence is present, and a *specific* stack must
+    not be shadowed by a fallback that matches everything.
+    """
+    assert stack.detect, f"{stack.name} ships no detect rule at all"
+    for rule in stack.detect:
+        target = tmp_path / _path_for(rule.file)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(rule.contains or "marker\n", encoding="utf-8")
+
+    names = [match.name for match in detect_stacks(tmp_path)]
+    assert stack.name in names, (
+        f"{stack.name} does not recognise a directory built from its own markers; got {names}"
+    )
+
+
 
 @pytest.mark.parametrize(
     ("files", "expected"),
@@ -1591,3 +1626,27 @@ def test_a_plain_fastapi_app_does_not_match_the_scheduler_stack(tmp_path) -> Non
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "python-scheduler-api" not in names, "a plain FastAPI app is not a scheduler"
+
+@pytest.mark.parametrize("stack", STACK_LIST, ids=[stack.name for stack in STACK_LIST])
+def test_every_stack_can_adopt_into_a_project_it_detects(stack, tmp_path):
+    """`adopt` must be able to act on every stack, not just the ones with tests.
+
+    The plan is built from the same synthetic marker directory the detection test
+    uses, so a stack that declares adoptable files but renders them with an
+    unknown placeholder (or asks for a file adopt refuses to write) fails here
+    instead of failing in a user's repository.
+    """
+    for rule in stack.detect:
+        target = tmp_path / _path_for(rule.file)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(rule.contains or "marker\n", encoding="utf-8")
+
+    context = build_context_for_check(stack, "demo")
+    plan = plan_adoption(stack, tmp_path, context, with_tests=bool(stack.adopt_tests))
+
+    assert plan.added, f"{stack.name} would add nothing to a project it detects"
+    assert not (set(plan.added) & FORBIDDEN), (
+        f"{stack.name} would overwrite project identity: {sorted(set(plan.added) & FORBIDDEN)}"
+    )
+    if stack.adopt_tests:
+        assert plan.tests_available, f"{stack.name} promises adopt_tests but plans none"
