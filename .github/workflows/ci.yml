@@ -50,6 +50,7 @@ jobs:
           - data-science
           - dbt-project
           - sphinx-docs
+          - mkdocs-site
           - node-express-ts
           - hono-api
           - openapi-spec

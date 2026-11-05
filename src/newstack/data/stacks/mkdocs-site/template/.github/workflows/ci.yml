@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{{ python_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install
+        run: uv sync --group dev
+      # --strict turns every MkDocs warning (broken internal link, missing nav
+      # target, unknown Markdown extension) into a build failure.
+      - name: Build site
+        run: uv run mkdocs build --strict
+      - name: Execute the documented examples
+        run: uv run python tools/check_fences.py docs
+      - name: Lint
+        run: uv run ruff check .
+      - name: Test
+        run: uv run pytest
+      - name: Upload site
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-${{ matrix.python-version }}
+          path: site
+          if-no-files-found: error

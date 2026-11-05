@@ -1,0 +1,66 @@
+{
+  "name": "mkdocs-site",
+  "title": "MkDocs site",
+  "language": "python",
+  "blurb": "MkDocs Material docs site: executed Markdown examples, strict build, and a checker with its own test suite",
+  "requires": [
+    "uv"
+  ],
+  "default_description": "A MkDocs Material documentation site.",
+  "next_steps": [
+    "cd {path}",
+    "uv sync --group dev",
+    "uv run mkdocs serve",
+    "uv run mkdocs build --strict",
+    "uv run python tools/check_fences.py docs"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv sync --group dev",
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "uv run mkdocs build --strict",
+      "timeout": 600
+    },
+    {
+      "name": "examples",
+      "cmd": "uv run python tools/check_fences.py docs",
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "uv run pytest",
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": "uv run ruff check .",
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "mkdocs.yml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "mkdocs.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_fences.py"
+  ],
+  "python": {
+    "minimum": "3.11",
+    "versions": [
+      "3.11",
+      "3.12",
+      "3.13"
+    ]
+  }
+}

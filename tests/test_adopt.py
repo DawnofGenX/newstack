@@ -756,3 +756,16 @@ def test_a_plain_julia_project_still_resolves_to_the_julia_cli(tmp_path) -> None
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["julia-cli"]
+
+
+
+def test_an_mkdocs_config_resolves_to_the_mkdocs_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "mkdocs.yml": "site_name: Docs\nnav:\n  - Home: index.md\n",
+            "docs/index.md": "# Docs\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["mkdocs-site"]
