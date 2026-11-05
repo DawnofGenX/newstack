@@ -101,6 +101,7 @@ jobs:
           - bun-cli
           - bun-api
           - r-cli
+          - r-plumber-api
           - ocaml-cli
           - static-site
           - hugo-site
@@ -519,11 +520,14 @@ jobs:
         with:
           bun-version: 1.4.2
       - name: Install R
-        if: matrix.stack == 'r-cli'
+        if: contains(fromJSON('["r-cli","r-plumber-api"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends r-base-core
           Rscript --version
+      - name: Install plumber
+        if: matrix.stack == 'r-plumber-api'
+        run: sudo apt-get install -y -qq --no-install-recommends r-cran-plumber
       - name: Install newstack
         run: uv sync --group dev
       - name: Generate and verify the stack

@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install R and plumber
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends r-base-core r-cran-plumber
+      - name: Show versions
+        run: Rscript --version && Rscript -e 'cat("plumber", as.character(packageVersion("plumber")), "\n")'
+      - name: Test
+        run: Rscript tests/run.R
+      - name: Serve
+        run: |
+          set -eu
+          PORT=5423 Rscript bin/serve.R > .plumber.log 2>&1 &
+          srv=$!
+          ready=1
+          for _ in $(seq 1 120); do
+            if curl --max-time 2 -fsS http://127.0.0.1:5423/health >/dev/null 2>&1; then ready=0; break; fi
+            sleep 0.5
+          done
+          if [ "$ready" -ne 0 ]; then cat .plumber.log; kill $srv 2>/dev/null; exit 1; fi
+          health=$(curl -fsS --max-time 10 http://127.0.0.1:5423/health)
+          stats=$(curl -fsS --max-time 10 'http://127.0.0.1:5423/stats?text=hello%20world%0A')
+          posted=$(curl -fsS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5423/stats)
+          missing=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5423/stats)
+          broken=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5423/stats)
+          gone=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5423/nope)
+          wrong=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' -X DELETE http://127.0.0.1:5423/health)
+          kill $srv 2>/dev/null
+          wait $srv 2>/dev/null || true
+          cat .plumber.log
+          printf 'health=%s\nget=%s\npost=%s\nmissing=%s broken=%s gone=%s wrong=%s\n' "$health" "$stats" "$posted" "$missing" "$broken" "$gone" "$wrong"
+          test "$health" = '{"status":"ok"}'
+          printf '%s' "$stats" | grep -q '"lines":1'
+          printf '%s' "$stats" | grep -q '"bytes":12'
+          printf '%s' "$posted" | grep -q '"words":3'
+          test "$missing" = 422
+          test "$broken" = 422
+          test "$gone" = 404
+          test "$wrong" = 405

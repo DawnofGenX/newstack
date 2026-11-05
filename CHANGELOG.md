@@ -7,6 +7,12 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `r-plumber-api`: a plumber service in R. The route table is one pure function
+  (`textstat_route()`), so the base-R suite pins every status code without binding a
+  socket; `bin/serve.R` adds the two things plumber does not default to — an unboxed
+  JSON serializer (`{"lines":[2]}` would otherwise be the wire format) and no JSON
+  body parser, because plumber answers 500 to a malformed body while the contract
+  wants 422 `invalid_json`.
 
 - `mkdocs-site` — an MkDocs Material site over the same counting module family. Two different gates: `mkdocs build --strict` fails on broken internal links and missing nav targets, while `tools/check_fences.py` executes every `python` fence in `docs/` and diffs the printed output against the `# ->` lines beside it, so an example that stops matching the module fails CI. The checker has its own suite that proves it catches a wrong expectation and a traceback.
 - `julia-api` — a Julia JSON service on HTTP.jl. `count_text` and `route(method, path, query, body)` are pure functions, so the `Test` suite covers 200/404/405/422 without a socket and only one test opens a port. `ncodeunits`, not `length`, is the byte count; the word scan is a hand-written `isspace` loop because `length` is not defined for the iterator `eachmatch` returns.

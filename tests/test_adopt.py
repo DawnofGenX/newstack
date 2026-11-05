@@ -769,3 +769,29 @@ def test_an_mkdocs_config_resolves_to_the_mkdocs_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["mkdocs-site"]
+
+
+def test_a_plumber_entry_file_resolves_to_the_r_service(tmp_path) -> None:
+    """plumber.R is the conventional entry point, and nothing else uses that name."""
+    make_repo(tmp_path, {"plumber.R": "#* @get /health\nfunction() list(status = 'ok')\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["r-plumber-api"]
+
+
+def test_a_plumber_project_with_a_description_still_resolves_to_the_service(tmp_path) -> None:
+    """r-cli detects a DESCRIPTION, so it is a fallback: the service must still win."""
+    make_repo(
+        tmp_path,
+        {
+            "plumber.R": "#* @get /health\nfunction() list(status = 'ok')\n",
+            "DESCRIPTION": "Package: blogcount\nTitle: x\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["r-plumber-api"], "the service marker is the specific one"
+
+
+def test_a_plain_r_package_still_resolves_to_the_r_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"DESCRIPTION": "Package: blogcount\nTitle: x\n", "R/counts.R": "x <- 1\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["r-cli"], "a package with no entry point is the CLI stack"

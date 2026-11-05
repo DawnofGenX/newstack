@@ -307,6 +307,7 @@ $ newstack stacks outdated
 | `bun-cli` | Bun CLI: pure counting module, hand-written option parser, zero-dependency `bun:test` suite | `bun` |
 | `bun-api` | Bun JSON service: one `Request`→`Response` handler, `Bun.serve`, `bun:test` suites, `tsc --noEmit` via `bun run typecheck`, real socket smoke test | `bun` |
 | `r-cli` | R CLI on base R only: pure counting function, hand-written option parser, dependency-free test harness | `Rscript` |
+| `r-plumber-api` | Plumber JSON service in R: annotated routes, a pure `textstat_route(method, path, query, body)` covering every status code, a base-R test harness, and a JSON 404 built into `bin/serve.R` | `Rscript`, `plumber` |
 | `ocaml-cli` | OCaml CLI on dune: pure counting library, hand-written option parser, stdlib-only test harness, zero opam dependencies | `ocaml`, `dune` |
 | `static-site` | HTML/CSS/JS page, `node:test` suite, GitHub Pages deploy workflow | `node` |
 | `hugo-site` | Content site on Hugo: hand-written layouts and partials, a shortcode, fingerprinted CSS, sitemap and RSS, assertion suite that renders into a temp dir | `hugo` |

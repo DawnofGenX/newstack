@@ -1,0 +1,57 @@
+{
+  "name": "r-plumber-api",
+  "title": "R Plumber API",
+  "language": "R",
+  "blurb": "Plumber JSON service in R: annotated routes, a pure counting function with a base-R test harness, and a live http contract check",
+  "requires": [
+    "Rscript",
+    "curl"
+  ],
+  "default_description": "An R HTTP service built with plumber.",
+  "next_steps": [
+    "cd {path}",
+    "Rscript tests/run.R",
+    "Rscript -e 'plumber::pr_run(plumber::pr(\"plumber.R\"), host = \"127.0.0.1\", port = 5423)'"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "Rscript -e 'if (!requireNamespace(\"plumber\", quietly = TRUE)) { message(\"plumber is not installed: sudo apt-get install -y r-cran-plumber, or install.packages(\\\"plumber\\\")\"); quit(status = 1) }; cat(\"plumber\", as.character(packageVersion(\"plumber\")), \"\\n\")'",
+      "tools": [
+        "Rscript"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "Rscript tests/run.R",
+      "tools": [
+        "Rscript"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "if curl -fsS --max-time 2 http://127.0.0.1:5423/health >/dev/null 2>&1; then echo 'port 5423 is already answering - stop that process before running this step'; exit 1; fi; PORT=5423 Rscript bin/serve.R > .plumber.log 2>&1 & srv=$!; ready=1; for _ in $(seq 1 120); do if curl --max-time 2 -fsS http://127.0.0.1:5423/health >/dev/null 2>&1; then ready=0; break; fi; sleep 0.5; done; kill -0 $srv 2>/dev/null || { cat .plumber.log; echo 'the server exited before it answered'; exit 1; }; if [ $ready -ne 0 ]; then cat .plumber.log; kill $srv 2>/dev/null; exit 1; fi; health=$(curl -fsS --max-time 10 http://127.0.0.1:5423/health); stats=$(curl -fsS --max-time 10 'http://127.0.0.1:5423/stats?text=hello%20world%0A'); posted=$(curl -fsS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5423/stats); missing=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5423/stats); broken=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5423/stats); gone=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5423/nope); wrong=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' -X DELETE http://127.0.0.1:5423/health); kill $srv 2>/dev/null; wait $srv 2>/dev/null || true; cat .plumber.log; printf 'get=%s\\npost=%s\\nmissing=%s broken=%s gone=%s wrong=%s\\n' \"$stats\" \"$posted\" \"$missing\" \"$broken\" \"$gone\" \"$wrong\"; test \"$health\" = '{\"status\":\"ok\"}' && printf '%s' \"$stats\" | grep -q '\"lines\":1' && printf '%s' \"$stats\" | grep -q '\"bytes\":12' && printf '%s' \"$posted\" | grep -q '\"words\":3' && test \"$missing\" = 422 && test \"$broken\" = 422 && test \"$gone\" = 404 && test \"$wrong\" = 405",
+      "tools": [
+        "Rscript",
+        "curl"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "plumber.R"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "plumber.R"
+  ],
+  "adopt_tests": [
+    "tests/contract_test.R"
+  ]
+}
