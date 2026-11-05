@@ -1998,3 +1998,21 @@ def test_a_plain_go_service_does_not_match_the_framing_stack(tmp_path):
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "go-tcp-framing" not in names
 
+
+def test_a_capturing_smtp_server_resolves_to_the_smtp_sink(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": 'dependencies = ["aiosmtpd>=1.4.6"]\n',
+            "src/sink/server.py": "from aiosmtpd.controller import Controller\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-smtp-sink"]
+
+
+def test_a_plain_python_service_does_not_match_the_smtp_sink(tmp_path):
+    make_repo(tmp_path, {"src/svc/main.py": "print('hello')\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-smtp-sink" not in names
+

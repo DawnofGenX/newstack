@@ -59,6 +59,7 @@ jobs:
           - python-pdf-report
           - python-property-tests
           - python-c-extension
+          - python-smtp-sink
           - data-science
           - dbt-project
           - sphinx-docs

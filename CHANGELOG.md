@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-smtp-sink` — a development SMTP capture server: `Controller(port=0)` does not work
+  (aiosmtpd probes the server by connecting to port 0 and raises ConnectionRefusedError), the
+  size limit can surface as `SMTPSenderRefused` rather than `SMTPDataError` because EHLO
+  advertises SIZE, and dot-stuffing is a wire encoding that must be undone before the message is
+  stored — so the test parses the stored mail instead of scanning it for `..`. Messages are
+  written to a `.part` file and renamed before the index line is `fsync`ed, and `rebuild`
+  recreates the index from the `.eml` files alone because the files are the truth.
 - `go-tcp-framing` — a service that is not HTTP: 4-byte big-endian length prefixes in
   front of JSON payloads over raw TCP. The cap is enforced before the length prefix can
   allocate, a zero-length frame is refused instead of read as an empty message, protocol
