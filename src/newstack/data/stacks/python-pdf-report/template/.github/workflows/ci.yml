@@ -1,0 +1,36 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{{ python_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          uv venv --quiet .venv --allow-existing
+          uv pip install --quiet --python .venv/bin/python -e ".[dev]"
+      - name: Lint
+        run: .venv/bin/ruff check .
+      - name: Tests
+        run: .venv/bin/python -m pytest -q
+      - name: Report end to end
+        run: PY=.venv/bin/python bash smoke.sh
+      - name: Keep the report as an artifact
+        uses: actions/upload-artifact@v5
+        with:
+          # pypdf is what proves the numbers are on the page; the file is the proof.
+          name: report-py${{ matrix.python-version }}
+          path: report.pdf
+          if-no-files-found: error

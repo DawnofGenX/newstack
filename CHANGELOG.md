@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-pdf-report` — NDJSON records to a PDF report with reportlab. `rl_config.invariant = 1`
+  must be set before the first canvas: it pins the creation date and the object ids, so two
+  builds of the same input are byte-identical and a golden-file test is possible. Bytes are
+  counted over UTF-8 (a 5-character `héllo` is 6 bytes), text cp1252 cannot encode is replaced
+  with `?` and counted, and the finished PDF is read back with pypdf to prove the rows and the
+  totals are on the page rather than merely in the summary. Input errors name the line, and an
+  exit 2 leaves no half-written file behind.
 - `python-migrations` — numbered SQL files applied once, in order, each inside one explicit
   transaction. The ledger keeps the sha256 of every file it applied, so editing a migration
   that already ran fails with `drift` instead of leaving the database and the repository

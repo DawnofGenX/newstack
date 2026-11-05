@@ -1821,3 +1821,30 @@ def test_a_plain_node_service_does_not_match_the_metrics_stack(tmp_path) -> None
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "node-metrics-exporter" not in names
+
+
+def test_a_reportlab_pdf_builder_resolves_to_the_pdf_report_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": '[project]\nname = "report-cli"\ndependencies = ["reportlab>=4.2"]\n',
+            "src/report/render.py": (
+                "from reportlab import rl_config\n"
+                "rl_config.invariant = 1\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-pdf-report"]
+
+
+def test_a_plain_python_cli_does_not_match_the_pdf_report_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": '[project]\nname = "plain"\n',
+            "src/plain/cli.py": "def main() -> int:\n    return 0\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-pdf-report" not in names
