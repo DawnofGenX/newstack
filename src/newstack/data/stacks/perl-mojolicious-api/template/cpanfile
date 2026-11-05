@@ -1,0 +1,6 @@
+requires 'Mojolicious', '>= 9.30';
+requires 'JSON::PP', '== 0';
+
+on test => sub {
+    requires 'Test::More', '== 0';
+};

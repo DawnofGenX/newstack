@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Mojolicious
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmojolicious-perl
+      - name: Syntax check
+        run: |
+          perl -c -Ilib bin/{{ npm_name }}
+          perl -c -Ilib lib/Textstat/Counts.pm
+          perl -c -Ilib lib/Textstat/Contract.pm
+      - name: Test
+        run: |
+          perl Makefile.PL >/dev/null
+          make test
+      - name: Serve
+        run: |
+          set -eu
+          PORT=5426 perl bin/{{ npm_name }} > .mojo.log 2>&1 &
+          server=$!
+          ok=0
+          for _ in $(seq 1 120); do
+            if curl -fsS --max-time 2 http://127.0.0.1:5426/health >/dev/null 2>&1; then ok=1; break; fi
+            sleep 0.5
+          done
+          kill -0 $server 2>/dev/null || { cat .mojo.log; echo "the service exited before it answered"; exit 1; }
+          if [ $ok -ne 1 ]; then echo "the service never answered"; cat .mojo.log; kill $server 2>/dev/null || true; exit 1; fi
+          health=$(curl -sS --max-time 10 http://127.0.0.1:5426/health)
+          test "$health" = '{"status":"ok"}'
+          get=$(curl -sS --max-time 10 "http://127.0.0.1:5426/stats?text=hello%20world%0A")
+          printf '%s' "$get" | grep -q '"lines":1'
+          printf '%s' "$get" | grep -q '"bytes":12'
+          posted=$(curl -sS --max-time 10 -H 'content-type: application/json' --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5426/stats)
+          printf '%s' "$posted" | grep -q '"words":3'
+          missing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5426/stats)
+          test "$missing" = 422
+          broken=$(curl -sS --max-time 10 -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5426/stats)
+          printf '%s' "$broken" | grep -q 'invalid_json'
+          gone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5426/nope)
+          test "$gone" = 404
+          kill $server 2>/dev/null || true
+          wait $server 2>/dev/null || true

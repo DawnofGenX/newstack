@@ -814,3 +814,45 @@ def test_a_rebar_project_without_cowboy_is_not_claimed_by_the_service(tmp_path) 
     make_repo(tmp_path, {"rebar.config": "{deps, [{jsx, \"3.1.0\"}]}.\n"})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == []
+
+
+def test_a_mojolicious_cpanfile_resolves_to_the_perl_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "cpanfile": "requires 'Mojolicious', '>= 9.30';\n",
+            "lib/Textstat/Contract.pm": "package Textstat::Contract;\n1;\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["perl-mojolicious-api"], "the web dependency picks the service"
+
+
+def test_a_plain_perl_project_still_resolves_to_the_perl_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "Makefile.PL": "use ExtUtils::MakeMaker;\nWriteMakefile(NAME => 'Textstat');\n",
+            "lib/Textstat.pm": "package Textstat;\n1;\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["perl-cli"], "a distribution with no web dependency is the CLI stack"
+
+
+def test_a_warp_cabal_file_resolves_to_the_haskell_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "blog-count.cabal": "name: blog-count\nbuild-depends: base, warp\n",
+            "src/Contract.hs": "module Contract where\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["haskell-warp-api"], "warp in the cabal file is the service marker"
+
+
+def test_a_plain_cabal_project_still_resolves_to_the_haskell_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"blog-count.cabal": "name: blog-count\nbuild-depends: base\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["haskell-cli"], "cabal without warp is the CLI stack"

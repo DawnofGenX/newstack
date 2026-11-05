@@ -1,0 +1,61 @@
+{
+  "name": "perl-mojolicious-api",
+  "title": "Perl Mojolicious API",
+  "language": "perl",
+  "blurb": "Mojolicious JSON service on Perl 5: a pure route table, a Test::More suite, and a JSON 404 that never leaks a template error",
+  "requires": [
+    "perl",
+    "curl",
+    "make"
+  ],
+  "default_description": "A Perl JSON service.",
+  "next_steps": [
+    "cd {path}",
+    "perl Makefile.PL && make test",
+    "PORT=8080 perl bin/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "perl -MMojolicious -MJSON::PP -e 1",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": "perl Makefile.PL >/dev/null && make test",
+      "tools": [
+        "perl",
+        "make"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "http",
+      "cmd": "if curl -fsS --max-time 2 http://127.0.0.1:5426/health >/dev/null 2>&1; then echo 'port 5426 is already answering - stop that process before running this step'; exit 1; fi\nPORT=5426 perl bin/{{ npm_name }} > .mojo.log 2>&1 &\nserver=$!\nkill -0 $server 2>/dev/null || { cat .mojo.log; echo 'the service exited before it answered'; exit 1; }\nok=0\nfor _ in $(seq 1 120); do\n  if curl -fsS --max-time 2 http://127.0.0.1:5426/health >/dev/null 2>&1; then ok=1; break; fi\n  sleep 0.5\ndone\nif [ $ok -ne 1 ]; then echo 'the service never answered'; cat .mojo.log; kill $server 2>/dev/null || true; exit 1; fi\nhealth=$(curl -sS --max-time 10 http://127.0.0.1:5426/health)\ntest \"$health\" = '{\"status\":\"ok\"}'\nget=$(curl -sS --max-time 10 'http://127.0.0.1:5426/stats?text=hello%20world%0A')\nprintf '%s' \"$get\" | grep -q '\"lines\":1'\nprintf '%s' \"$get\" | grep -q '\"bytes\":12'\nposted=$(curl -sS --max-time 10 -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5426/stats)\nprintf '%s' \"$posted\" | grep -q '\"words\":3'\nmissing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5426/stats)\ntest \"$missing\" = 422\nbroken=$(curl -sS --max-time 10 -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5426/stats)\nprintf '%s' \"$broken\" | grep -q 'invalid_json'\ngone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5426/nope)\ntest \"$gone\" = 404\nkill $server 2>/dev/null || true\nwait $server 2>/dev/null || true",
+      "tools": [
+        "perl",
+        "curl"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "cpanfile",
+      "contains": "Mojolicious"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "cpanfile",
+    "Makefile.PL"
+  ],
+  "adopt_tests": [
+    "t/02-contract.t"
+  ]
+}

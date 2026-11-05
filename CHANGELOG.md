@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `haskell-warp-api`, `perl-mojolicious-api` — the last two runtimes that had a CLI stack
+  and no service. Both keep the whole route table in a pure function (`Contract.route` /
+  `Textstat::Contract->route`) so every status code is pinned by the unit suite and only the
+  verify step binds a port. Haskell ships a hand-written JSON reader instead of `aeson` to
+  keep the dependency set at warp/wai, and learns that warp hands over the query string with
+  its leading `?` still attached. Perl re-encodes a decoded `JSON::PP` value to tell `"42"`
+  from `42`, because both stringify the same way and a numeric `text` would otherwise pass.
 - `erlang-cowboy-api` — an Erlang JSON service on Cowboy, built with rebar3 and shipped as
   an escript so the run step starts and stops exactly one process. `contract:route/4` is a
   pure function over `(Method, Path, Query, Body)`, so the eunit suites pin every status

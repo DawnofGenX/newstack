@@ -94,6 +94,7 @@ jobs:
           - nim-cli
           - nim-http-api
           - perl-cli
+          - perl-mojolicious-api
           - lua-cli
           - fsharp-cli
           - crystal-cli
@@ -111,6 +112,7 @@ jobs:
           - scala-cli
           - scala-cask-api
           - haskell-cli
+          - haskell-warp-api
           - clojure-cli
           - clojure-ring-api
           - swift-cli
@@ -191,16 +193,22 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
+      # Mojolicious is not in core Perl, so the service stack installs the
+      # distro package; `perl -MMojolicious -e1` in its own verify step is the
+      # same presence check CI does here.
+      - name: Install Mojolicious
+        if: matrix.stack == 'perl-mojolicious-api'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmojolicious-perl
       # GHC and cabal come from haskell-actions/setup, which also puts both on
       # PATH; cabal still needs an index before it can resolve a build plan.
       - name: Set up GHC and cabal
-        if: matrix.stack == 'haskell-cli'
+        if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
         uses: haskell-actions/setup@v2
         with:
           ghc-version: "9.4.7"
           cabal-version: "3.10.3.0"
       - name: Update the cabal package index
-        if: matrix.stack == 'haskell-cli'
+        if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
         run: cabal update
       # scala-cli is one binary, so installing it is the whole toolchain; no
       # Maven cache here because there is no pom (scala-cli fetches its own deps).

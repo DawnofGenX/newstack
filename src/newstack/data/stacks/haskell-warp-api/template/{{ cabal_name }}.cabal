@@ -1,0 +1,39 @@
+cabal-version:      2.4
+name:               {{ cabal_name }}
+version:            0.1.0.0
+synopsis:           A JSON service that counts lines, words and bytes
+build-type:         Simple
+extra-source-files: README.md
+
+library
+  hs-source-dirs:   src
+  exposed-modules:  Counts
+                    Contract
+  build-depends:    base >=4.17 && <5
+                  , bytestring
+                  , text
+  default-language: Haskell2010
+  ghc-options:      -Wall -Werror
+
+executable {{ npm_name }}
+  hs-source-dirs:   app
+  main-is:          Main.hs
+  build-depends:    base >=4.17 && <5
+                  , bytestring
+                  , text
+                  , {{ cabal_name }}
+                  , http-types
+                  , wai
+                  , warp
+  default-language: Haskell2010
+  ghc-options:      -Wall -Werror -threaded -rtsopts
+
+test-suite spec
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   test
+  main-is:          Spec.hs
+  build-depends:    base >=4.17 && <5
+                  , text
+                  , {{ cabal_name }}
+  default-language: Haskell2010
+  ghc-options:      -Wall -Werror

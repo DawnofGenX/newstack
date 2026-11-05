@@ -300,6 +300,7 @@ $ newstack stacks outdated
 | `nim-cli` | Nim CLI: pure counting module, `unittest` suite that also checks exit codes, `nimble build` binary | `nim`, `nimble` |
 | `nim-http-api` | Nim JSON service: counting core, a pure `route()` covering every status code, `asynchttpserver` on top — no dependencies at all | `nim`, `nimble` |
 | `perl-cli` | Perl CLI on core modules only: `Makefile.PL` + `Test::More` suite, no CPAN install step | `perl`, `make` |
+| `perl-mojolicious-api` | Mojolicious JSON service on Perl 5: a pure `Textstat::Contract->route(method, path, query, body)` covering every status code, a `Test::More` suite, and a numeric-vs-string check that survives `JSON::PP` | `perl`, `make`, `Mojolicious` |
 | `lua-cli` | Lua 5.4 CLI: stdlib-only modules, a hand-rolled spec harness, zero luarocks dependencies | `lua5.4` |
 | `fsharp-cli` | F# on .NET 8: pure counting core, `Mode` discriminated union parser, xUnit suite that launches the binary for its exit codes | `dotnet` |
 | `crystal-cli` | Crystal CLI: stdlib-only modules, `crystal spec` suite, compiled binary with a 0/2/1 exit contract | `crystal` |
@@ -317,6 +318,7 @@ $ newstack stacks outdated
 | `scala-cli` | Scala 3 CLI built with scala-cli (no sbt): pure counting core, hand-rolled argv parser, munit suites, wrapper that returns the process exit code | `scala-cli`, `java` |
 | `scala-cask-api` | Scala 3 JSON service on Cask: pure request contract, utest suite, one assembly jar served over a real socket | `scala-cli`, `java` |
 | `haskell-cli` | Haskell CLI on GHC and cabal: pure counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a record | `ghc`, `cabal` |
+| `haskell-warp-api` | Warp JSON service on GHC: `Contract.route` is pure so every status code is testable without a socket, a hand-written JSON reader keeps the dependency set to warp/wai, and a plain exitcode-stdio suite gates it | `ghc`, `cabal` |
 | `clojure-cli` | Clojure CLI on `deps.edn` (no Leiningen): pure counting core, hand-rolled argv parser, `clojure.test` suites, I/O behind a record | `clojure`, `java` |
 | `clojure-ring-api` | Ring JSON service on `deps.edn`: the handler is a plain request-map function, `ring.mock` drives the routes with no port, Jetty serves it, `clojure.test` gates it | `clojure`, `java` |
 | `swift-cli` | Swift 6 CLI on SwiftPM: pure counting core, hand-rolled argv parser, XCTest suites, I/O behind a struct of closures | `swift` |
