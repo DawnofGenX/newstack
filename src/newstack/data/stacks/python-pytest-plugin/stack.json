@@ -1,0 +1,82 @@
+{
+  "name": "python-pytest-plugin",
+  "title": "Python pytest plugin",
+  "language": "python",
+  "blurb": "A pytest plugin as the product: a registered ticket marker, a duration report written for every phase of every test, a strict mode that refuses a suite with unmarked tests, and a console script that gates on long tests",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A pytest plugin that reports what each test actually cost, with a strict metadata mode and a duration gate.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m pytest fixtures/demo/test_demo.py --testmeta-report report.json",
+    ".venv/bin/{npm_name} summary report.json --top 5",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the strict mode must refuse to run it"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tests/conftest.py"
+  ],
+  "adopt_tests": [
+    "tests/test_model.py"
+  ]
+}
