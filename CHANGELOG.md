@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`clojure-ring-api`**: Ring on `deps.edn`, and the lesson is that a Ring handler is
+  already a testable function — `ring.mock.request` builds the request map, so the suite
+  covers every route with no port and `ring/ring-mock` sits in the `:test` alias rather
+  than the production classpath. `clojure.test` needs a runner to be a CI gate, so
+  `run_tests.clj` requires the namespaces and exits non-zero; `ring.util.codec/form-decode-map`
+  (not the `parse-query-string` you might expect) parses the query string.
 - **`bun-api`**: Bun service whose application is one `(Request) => Promise<Response>`
   function handed to `Bun.serve`, so `bun test` drives the routes in-process while the
   verify step still curls a real socket. Types come from `bun-types` plus `tsc --noEmit`

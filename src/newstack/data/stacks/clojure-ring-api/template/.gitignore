@@ -1,0 +1,14 @@
+# Clojure CLI
+.cpcache/
+.clj-kondo/
+.lsp/
+
+# Build output
+target/
+classes/
+
+# Logs
+*.log
+
+# Editors
+.DS_Store

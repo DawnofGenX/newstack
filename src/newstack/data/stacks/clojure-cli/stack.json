@@ -84,7 +84,7 @@
       "file": "deps.edn"
     }
   ],
-  "detect_fallback": false,
+  "detect_fallback": true,
   "adopt": [
     ".github/workflows/ci.yml",
     ".gitignore"

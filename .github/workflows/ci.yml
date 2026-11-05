@@ -104,6 +104,7 @@ jobs:
           - scala-cli
           - haskell-cli
           - clojure-cli
+          - clojure-ring-api
           - swift-cli
           - tcl-cli
           - erlang-cli
@@ -212,13 +213,13 @@ jobs:
       # the version, so this installs 1.12.6 exactly. (The DeLaGuardo action
       # only publishes bare numeric tags, which the repo's pinning rule rejects.)
       - name: Set up Java (clojure-cli)
-        if: matrix.stack == 'clojure-cli'
+        if: contains(fromJSON('["clojure-cli","clojure-ring-api"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
       - name: Install the Clojure CLI
-        if: matrix.stack == 'clojure-cli'
+        if: contains(fromJSON('["clojure-cli","clojure-ring-api"]'), matrix.stack)
         run: |
           curl -sSLf -o linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
           chmod +x linux-install.sh

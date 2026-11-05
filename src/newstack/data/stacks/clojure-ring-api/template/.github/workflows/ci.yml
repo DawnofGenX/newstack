@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test and smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install the Clojure CLI
+        run: |
+          curl -sSLf -o linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
+          chmod +x linux-install.sh
+          sudo ./linux-install.sh
+          clojure -Sdescribe
+      - name: Test
+        run: clojure -M:test -m {{ package_name }}.run-tests
+      - name: Serve and curl
+        run: |
+          PORT=5414 clojure -M -m {{ package_name }}.server >.ring.log 2>&1 &
+          server=$!
+          ready=1
+          for _ in $(seq 1 240); do
+            if curl -fsS http://127.0.0.1:5414/health >/dev/null 2>&1; then
+              ready=0
+              break
+            fi
+            sleep 0.5
+          done
+          if [ $ready -ne 0 ]; then
+            cat .ring.log
+            kill $server 2>/dev/null
+            exit 1
+          fi
+          stats=$(curl -s 'http://127.0.0.1:5414/stats?text=hello%20world%0A')
+          posted=$(curl -s -X POST -H 'content-type: application/json' --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5414/stats)
+          bad=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5414/stats)
+          missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5414/nope)
+          kill $server 2>/dev/null
+          wait $server 2>/dev/null || true
+          cat .ring.log
+          printf '%s\n' "$stats" "$posted"
+          printf '%s' "$stats" | grep -q '"lines":1'
+          printf '%s' "$stats" | grep -q '"bytes":12'
+          printf '%s' "$posted" | grep -q '"words":3'
+          test "$bad" = 422
+          test "$missing" = 404

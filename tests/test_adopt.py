@@ -577,3 +577,29 @@ def test_a_bunfig_file_still_resolves_to_the_bun_cli(tmp_path) -> None:
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["bun-cli"]
 
+
+def test_a_ring_deps_file_resolves_to_the_clojure_service(tmp_path) -> None:
+    """`ring/ring-core` in `deps.edn` means a server, not a script runner."""
+
+    make_repo(
+        tmp_path,
+        {
+            "deps.edn": '{:deps {ring/ring-core {:mvn/version "1.15.0"}}}\n',
+            "src/demo/handler.clj": "(ns demo.handler)\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["clojure-ring-api"]
+
+
+def test_a_plain_deps_file_still_resolves_to_the_clojure_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "deps.edn": '{:deps {org.clojure/clojure {:mvn/version "1.12.6"}}}\n',
+            "src/textstat/cli.clj": "(ns textstat.cli)\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["clojure-cli"]
+
