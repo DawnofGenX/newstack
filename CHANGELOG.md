@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`ts-lib`**: a publishable TypeScript package, and the first stack whose subject is the
+  *published shape* rather than the code. `countText`/`formatCounts` are ordinary, but
+  `package.json` splits `exports` per condition (`import` → `.d.ts`, `require` → `.d.cts`)
+  because a single `types` entry lies to CommonJS consumers, and CI proves every declared
+  entry point resolves by importing the built ESM file and `require`ing the built CJS one.
+  `publint --strict` and `npm pack --dry-run` are verify steps, so a missing `.d.ts` or a
+  file outside `files` fails here. TypeScript is pinned to 6.x: the 7.x compiler ships no
+  compiler API, which tsup's `.d.ts` bundler needs.
 - **`c-cli`**: a C11 command line tool built by plain GNU make, no dependencies. Counting
   lives in a `textstat` library so it is testable on its own, argv parsing is hand-rolled
   (including `--`, a lone `-` for stdin and "later flag wins" like `wc`), and the suite is a

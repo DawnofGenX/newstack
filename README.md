@@ -257,6 +257,7 @@ $ newstack stacks outdated
 | `next-app-ts` | Next.js App Router + TS + Tailwind 4, Vitest + Testing Library | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `chrome-extension` | MV3 extension: popup + service worker + content script, `npm run pack` → extension.zip | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `astro` | Astro + TS content site: typed frontmatter, Vitest unit tests, `astro check` + static build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `ts-lib` | Publishable TS package: tsup ESM+CJS+`.d.ts`, split `exports` types per format, vitest, publint `--strict` and `npm pack --dry-run` gates | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `data-science` | pandas workspace: testable DataFrame helpers, pytest, sample notebook | `uv` |
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `nest-api` | NestJS 12 service: module/controller/service wiring, a validating pipe, supertest end-to-end tests, ESM throughout | `node`, `npm`/\\`pnpm\\`/\\`yarn` |

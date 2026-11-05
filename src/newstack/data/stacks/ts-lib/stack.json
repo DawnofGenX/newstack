@@ -1,0 +1,98 @@
+{
+  "name": "ts-lib",
+  "title": "TypeScript library",
+  "language": "node",
+  "blurb": "Publishable TypeScript package: tsup ESM+CJS build, exports map, vitest, publint",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A TypeScript library.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_run} test",
+    "{package_manager_run} build",
+    "{package_manager_run} lint:publish"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "exports",
+      "cmd": "node scripts/smoke.mjs",
+      "tools": [
+        "node"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "publint",
+      "cmd": "npm run lint:publish",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"tsup\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "tsup.config.ts"
+  ],
+  "adopt_tests": [
+    "src/count.test.ts",
+    "src/format.test.ts"
+  ]
+}

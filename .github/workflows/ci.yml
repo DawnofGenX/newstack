@@ -55,6 +55,7 @@ jobs:
           - next-app-ts
           - chrome-extension
           - astro
+          - ts-lib
           - svelte-kit-ts
           - go-cli
           - go-http

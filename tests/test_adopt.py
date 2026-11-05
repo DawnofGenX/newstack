@@ -374,3 +374,24 @@ def test_cli_adopt_go_repo_asks_for_stack(tmp_path, capsys) -> None:
     assert main(["adopt", str(tmp_path)]) == 2
     err = capsys.readouterr().err
     assert "go-cli" in err and "go-http" in err
+
+
+def test_a_tsup_package_resolves_to_the_ts_library_stack(tmp_path) -> None:
+    """`tsup` in devDependencies is the marker for a bundled library.
+
+    Application stacks detect package.json too, but they look for their own framework
+    dependency, so a package that bundles itself is unambiguous.
+    """
+
+    make_repo(
+        tmp_path,
+        {
+            "package.json": (
+                '{"name": "demo",\n'
+                ' "devDependencies": {"tsup": "^9.0.0", "vitest": "^5.1.0"}}\n'
+            ),
+            "src/index.ts": "export const answer = 42;\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["ts-lib"]

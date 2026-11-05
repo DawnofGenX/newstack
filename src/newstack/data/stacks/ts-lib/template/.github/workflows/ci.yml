@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      # No lockfile is shipped with a fresh scaffold, so `cache: {{ package_manager }}`
+      # and `{{ package_manager_ci }}` would both fail here: they require a committed
+      # {{ package_manager_lock }}. Run `{{ package_manager_install }}` once and commit
+      # the lockfile, then you can switch to `{{ package_manager_ci }}` and re-add
+      # `cache: {{ package_manager }}` for reproducible, cached installs.
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - name: Typecheck
+        run: {{ package_manager_run }} typecheck
+      - name: Test
+        run: {{ package_manager_test }}
+      - name: Build
+        run: {{ package_manager_run }} build
+      # The build is the contract: both entries in `exports` must resolve, so this
+      # imports the built ESM file and requires the built CJS one.
+      - name: Entries resolve
+        run: node scripts/smoke.mjs
+      # publint checks package.json against the files that were actually built:
+      # missing types, a wrong "main", an export that points at nothing.
+      - name: Published shape
+        run: {{ package_manager_run }} lint:publish
+      - name: Tarball contents
+        run: npm pack --dry-run
