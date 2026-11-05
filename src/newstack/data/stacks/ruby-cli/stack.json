@@ -1,0 +1,76 @@
+{
+  "name": "ruby-cli",
+  "title": "Ruby CLI",
+  "language": "ruby",
+  "blurb": "Ruby command line tool in gem shape: lib+bin split, Data-based value objects, injected I/O, minitest suite run by rake",
+  "requires": [
+    "ruby",
+    "rake",
+    "git"
+  ],
+  "default_description": "A Ruby command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "bin/{npm_name} --help",
+    "printf 'a b\\n' | bin/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "help",
+      "cmd": "bin/{{ npm_name }} --help",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "stdin",
+      "cmd": "test \"$(printf 'a b\\n' | bin/{{ npm_name }} -c | tr -d ' ')\" = \"4\"",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "*.gemspec",
+      "contains": "executables"
+    }
+  ],
+  "detect_fallback": true,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Rakefile"
+  ],
+  "adopt_tests": [
+    "test/cli_test.rb"
+  ]
+}

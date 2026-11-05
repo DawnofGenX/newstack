@@ -90,6 +90,7 @@ jobs:
           - ansible-role
           - ruby-sinatra
           - rails-app
+          - ruby-cli
           - java-maven-cli
           - spring-boot
           - java-httpserver-api
@@ -247,6 +248,14 @@ jobs:
         with:
           ruby-version: "3.2"
           bundler-cache: true
+      # ruby-cli needs no gems (minitest and rake ship with Ruby), so it takes
+      # setup-ruby without the bundler cache its sibling stacks require.
+      - name: Set up Ruby (no bundle)
+        if: matrix.stack == 'ruby-cli'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: false
       - name: Set up Java
         if: contains(fromJSON('["java-maven-cli","kotlin-cli","kotlin-http-api","spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5

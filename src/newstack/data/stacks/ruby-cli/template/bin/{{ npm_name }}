@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../lib/textstat"
+
+exit Textstat::CLI.new(stdin: $stdin, stdout: $stdout, stderr: $stderr).run(ARGV)

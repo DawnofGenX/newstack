@@ -296,6 +296,7 @@ $ newstack stacks outdated
 | `ansible-role` | Galaxy-shaped Ansible role: validated inputs, idempotent tasks, a handler, molecule-free playbook + assert playbooks | `ansible-playbook` |
 | `ruby-sinatra` | Sinatra JSON API: modular app, RSpec + rack-test suite, RuboCop, committed lockfile | `ruby`, `bundle` |
 | `rails-app` | Rails 8 JSON app: a service object for the counting, an integration test that goes through the router, SQLite, committed lockfile | `ruby`, `bundle` |
+| `ruby-cli` | Ruby CLI in gem shape: `Data` value objects, injected I/O, minitest suite via `rake`, no gems to install | `ruby`, `rake` |
 | `java-maven-cli` | Java 21 CLI on Maven: pure counting logic, 21 JUnit 5 tests, runnable jar | `java`, `mvn` |
 | `spring-boot` | Java 21 Spring Boot 3 web service on Maven: a wc-style `/stats` endpoint, a pure service, and a JUnit 5 + MockMvc suite | `java`, `mvn` |
 | `java-httpserver-api` | Java 21 JSON service on the JDK's own `com.sun.net.httpserver`: counting and contract classes with no framework, a hand-written JSON reader, and a Makefile over `javac -Xlint:all -Werror` | `java`, `make` |

@@ -7,6 +7,16 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `ruby-cli` — the missing scripting-language CLI, in the shape a gem takes. `bin/{{ npm_name }}`
+  is three lines because the whole program is `CLI#run(argv)`: stdin, stdout, stderr and the
+  file reader all arrive as keyword arguments, so the suite drives the real CLI through
+  `StringIO` and never spawns a process. `Data.define` carries `Counts` and `Options` as
+  immutable values, which makes an assertion one comparison instead of three, and the JSON
+  body is assembled by hand so the key order is the contract. The counting rules are wc's,
+  including the one that trips people up: lines are newline *bytes*, so `"hi"` with no
+  trailing newline is one word and **zero** lines. A missing file exits 1 and the remaining
+  arguments still get counted; an unknown option raises `UsageError` and exits 2 with only
+  the usage line, which is what keeps the two failures distinguishable in a script.
 - `actix-web` — the service owns its routing: `web::route()` (actix 4 has no `web::any()`)
   with a manual method check, plus `default_service`, because actix's own `405`/`404` bodies
   are plain text and this stack answers JSON. `serde_json::json!` sorts keys, so a
