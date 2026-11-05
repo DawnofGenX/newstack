@@ -7,8 +7,9 @@ import gleam/int
 import gleam/option
 import gleam/result
 
-import {{ package_name }}/contract
 import mist
+
+import {{ package_name }}/contract
 
 const default_port = 8080
 
