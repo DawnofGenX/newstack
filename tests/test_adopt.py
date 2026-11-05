@@ -412,3 +412,17 @@ def test_a_hono_package_resolves_to_the_hono_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["hono-api"]
+
+
+def test_a_sphinx_conf_resolves_to_the_docs_stack(tmp_path) -> None:
+    """`docs/conf.py` is the marker: a package with no docs/conf.py is a package, not a site."""
+
+    make_repo(
+        tmp_path,
+        {
+            "docs/conf.py": 'project = "demo"\nextensions = ["sphinx.ext.autodoc"]\n',
+            "docs/index.rst": "demo\n====\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["sphinx-docs"]

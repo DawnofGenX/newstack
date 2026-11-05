@@ -259,6 +259,7 @@ $ newstack stacks outdated
 | `astro` | Astro + TS content site: typed frontmatter, Vitest unit tests, `astro check` + static build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `ts-lib` | Publishable TS package: tsup ESM+CJS+`.d.ts`, split `exports` types per format, vitest, publint `--strict` and `npm pack --dry-run` gates | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `data-science` | pandas workspace: testable DataFrame helpers, pytest, sample notebook | `uv` |
+| `sphinx-docs` | Sphinx site over a real package: autodoc, executed doctests, `-W` build, docs tested in CI | `uv` |
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `hono-api` | Hono JSON API: `createApp()` returned as a value so tests use `app.request()` with no socket, `tsc` build (no bundler), `node dist/server.js` | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `nest-api` | NestJS 12 service: module/controller/service wiring, a validating pipe, supertest end-to-end tests, ESM throughout | `node`, `npm`/\\`pnpm\\`/\\`yarn` |

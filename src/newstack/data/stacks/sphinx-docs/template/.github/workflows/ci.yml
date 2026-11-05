@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{{ python_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install
+        run: uv sync --group dev
+      - name: Lint
+        run: uv run ruff check .
+      # -W is the point: a docstring that no longer imports, or a reference to a page
+      # that was renamed, fails the build instead of shipping a broken site.
+      - name: Build docs
+        run: uv run python -m sphinx -W --keep-going -b html docs docs/_build/html
+      - name: Run doctests
+        run: |
+          uv run python -m sphinx -b doctest docs docs/_build/doctest
+          grep -q '0 failures' docs/_build/doctest/output.txt
+      - name: Test
+        run: uv run pytest
+      # The built site is the artifact a deploy would publish; keep a copy so a failure
+      # can be inspected without rebuilding locally.
+      - name: Upload site
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-${{ matrix.python-version }}
+          path: docs/_build/html
+          if-no-files-found: error

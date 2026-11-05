@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`sphinx-docs`**: a documentation site whose docs are tested like code. `autodoc` reads
+  the docstrings from `src/`, the prose in `docs/guides/counting.rst` is executed as
+  doctests, and the build runs with `-W --keep-going` against `nitpicky = True`, so a
+  renamed page, an unimportable module or a dangling `:func:` reference fails CI instead of
+  publishing a broken site. `tests/test_docs.py` rebuilds the site into a temporary
+  directory with `warningiserror=True`, which is the only way to notice that the docs still
+  build after a refactor — `sphinx-build` alone would happily reuse a stale `_build/`.
 - **`hono-api`**: a Hono JSON API on Node with no bundler — `tsc` emits plain ESM and
   `node dist/server.js` serves it. The stack's argument is the test shape: `createApp()`
   returns the app as a value, so `app.request("/stats?text=…")` hands back a real `Response`
