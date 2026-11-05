@@ -48,7 +48,7 @@
     },
     {
       "name": "selftest",
-      "cmd": ".venv/bin/python -m {package_name} --selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} --selftest",
       "tools": [
         "uv"
       ],

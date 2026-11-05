@@ -445,3 +445,31 @@ def test_no_template_curl_fails_on_an_expected_error_status(name):
                 offenders.append(f"{rel}:{lineno}: {line.strip()}")
     message = f"{name}: curl -f on a line that expects a 4xx converts the answer into an error"
     assert not offenders, f"{message}: {offenders}"
+
+SINGLE_BRACE = re.compile(r"(?<![%${])\{([a-z][a-z0-9_]*)\}(?!\})")
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_every_verify_command_uses_double_braces(name):
+    """A verify command is rendered with `{{ }}`, so a single-brace `{key}` survives.
+
+    `next_steps` are the other way round: `cli.py::_format_step` renders them with
+    `str.format_map`, so they need single braces. Mixing the two is silent — the step runs
+    with a literal `{package_name}` and the failure reads like a broken project
+    (`.venv/bin/python: No module named {package_name}`), not like a bad placeholder.
+    Only names from the stack's own render context count: `%{http_code}`, `${var}` and a
+    Python f-string like `{events}` inside a heredoc are real syntax, not placeholders.
+    """
+    from newstack.cli import build_context_for_check
+
+    stack = get_stack(name)
+    keys = build_context_for_check(stack, "demo")
+    offenders = []
+    for step in stack.verify:
+        for match in SINGLE_BRACE.finditer(step.cmd):
+            if match.group(1) in keys:
+                offenders.append(f"{step.name}: {match.group(0)}")
+    assert not offenders, (
+        f"{name}: verify commands render with {{{{ }}}}; these placeholders stay literal: "
+        f"{offenders}"
+    )
