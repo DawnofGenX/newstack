@@ -49,6 +49,7 @@ jobs:
           - flask
           - python-fastapi-sqlite
           - python-sse-api
+          - python-scheduler-api
           - data-science
           - dbt-project
           - sphinx-docs

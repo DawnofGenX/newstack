@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+scheduler.db
+scheduler.db-wal
+scheduler.db-shm
+check.db
+check.db-wal
+check.db-shm
+.scheduler-http.log

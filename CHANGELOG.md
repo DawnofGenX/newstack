@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-scheduler-api` — delayed and repeating jobs with the database as the only
+  state. A tick claims due rows inside `BEGIN IMMEDIATE`: a SELECT-then-UPDATE is not
+  a claim, because with autocommit on, two tickers read the same rows and both run
+  them. An interval job reschedules from *now*, not from its missed slot, so a job
+  that has been overdue for ten intervals owes one run rather than ten; failures
+  double their delay up to `max_attempts` and then stop, and every attempt lands in a
+  run ledger with its counts. The ticker's loop keeps the error of a broken job
+  instead of dying with it.
 - `node-upload-api` — resumable uploads with no dependencies. The client declares a
   size, then sends byte ranges; an offset that is not what the service already holds
   is a `409` carrying the expected value (accepting it would drop or duplicate bytes

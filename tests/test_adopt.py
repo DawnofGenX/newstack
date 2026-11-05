@@ -1562,3 +1562,32 @@ def test_a_plain_node_project_does_not_match_the_upload_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "node-upload-api" not in names, "a bare node server is not an upload service"
+
+def test_a_claiming_scheduler_resolves_to_the_scheduler_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": '[project]\nname = "sched"\n',
+            "src/sched/jobs.py": (
+                'def claim(connection, at):\n'
+                '    connection.execute("BEGIN IMMEDIATE")\n'
+                "    return []\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-scheduler-api"], (
+        "an immediate-transaction claim is the scheduler marker"
+    )
+
+
+def test_a_plain_fastapi_app_does_not_match_the_scheduler_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": '[project]\nname = "app"\n',
+            "app.py": "from fastapi import FastAPI\n\napp = FastAPI()\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-scheduler-api" not in names, "a plain FastAPI app is not a scheduler"

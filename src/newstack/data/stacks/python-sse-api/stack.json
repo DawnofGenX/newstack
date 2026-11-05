@@ -19,13 +19,13 @@
   },
   "next_steps": [
     "cd {path}",
-    "uv venv && uv pip install -e . pytest httpx ruff",
+    "uv venv --allow-existing && uv pip install -e . pytest httpx ruff",
     "uv run uvicorn {package_name}.main:app --reload --port 5454"
   ],
   "verify": [
     {
       "name": "install",
-      "cmd": "uv venv --quiet .venv && uv pip install --quiet --python .venv/bin/python -e . pytest httpx ruff",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest httpx ruff",
       "tools": [
         "uv"
       ],
