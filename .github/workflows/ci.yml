@@ -60,6 +60,7 @@ jobs:
           - go-http
           - rust-cli
           - rust-axum
+          - c-cli
           - cpp-cmake-cli
           - terraform-module
           - ansible-role

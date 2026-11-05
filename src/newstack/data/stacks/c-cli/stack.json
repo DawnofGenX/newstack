@@ -1,0 +1,66 @@
+{
+  "name": "c-cli",
+  "title": "C CLI",
+  "language": "c",
+  "blurb": "C11 CLI: Makefile lib+bin split, assert-based test suite, -Wall -Wextra -Werror",
+  "requires": [
+    "cc",
+    "make"
+  ],
+  "default_description": "A C command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "make",
+    "make test",
+    "./build/{npm_name} --help",
+    "printf 'one two\\nthree\\n' | ./build/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "tools": [
+        "make",
+        "cc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "make",
+        "cc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "cli",
+      "cmd": "out=$(printf 'one two\\nthree\\n' | ./build/{{ npm_name }}); test \"$out\" = \"       2       3      14\"",
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./build/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "timeout": 60
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./build/{{ npm_name }} /nonexistent-file-xyz >/dev/null 2>&1; test $? -eq 1",
+      "timeout": 60
+    }
+  ],
+  "detect": [
+    {
+      "file": "Makefile",
+      "contains": "-std=c11"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "adopt_tests": []
+}

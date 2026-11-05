@@ -204,6 +204,24 @@ def test_an_action_repository_is_recognised_by_action_yml(tmp_path) -> None:
     assert names == ["github-action"]
 
 
+def test_a_c11_makefile_resolves_to_the_c_stack(tmp_path) -> None:
+    """`-std=c11` is the marker: the other Makefile stacks name their own compiler."""
+
+    make_repo(
+        tmp_path,
+        {
+            "Makefile": (
+                "CFLAGS := -std=c11 -O2 -Wall -Wextra -Werror\n"
+                "all:\n"
+                "\tcc -o app src/main.c\n"
+            ),
+            "src/main.c": "int main(void) { return 0; }\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["c-cli"], "a plain C Makefile must not look like Pascal/COBOL/Fortran"
+
+
 def test_unrecognised_directory_yields_no_candidates(tmp_path) -> None:
     (tmp_path / "notes.txt").write_text("nothing here")
     assert detect_stacks(tmp_path) == []

@@ -1,0 +1,12 @@
+# Build output. Anchored so a source directory called "build" is never ignored.
+/build/
+*.o
+*.d
+*.gcda
+*.gcno
+*.gcov
+
+# Editor and OS noise
+*.swp
+.DS_Store
+compile_commands.json

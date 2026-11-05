@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`c-cli`**: a C11 command line tool built by plain GNU make, no dependencies. Counting
+  lives in a `textstat` library so it is testable on its own, argv parsing is hand-rolled
+  (including `--`, a lone `-` for stdin and "later flag wins" like `wc`), and the suite is a
+  small `CHECK`/`CHECK_SIZE`/`CHECK_TEXT` header rather than a framework. The build uses
+  `-Wall -Wextra -Wpedantic -Werror`, so warnings are failures from the first commit, and
+  `make test` plus three shell assertions (exact counts, exit `2` on bad usage, exit `1` on
+  an unreadable file) are verify steps.
 - **`github-action`**: a JavaScript GitHub Action on `node24` with no dependencies.
   Counting is a pure `countText`, the Markdown table and `GITHUB_OUTPUT` writes live in
   `report.js`, and the `node:test` suite spawns the real entry point with temporary
