@@ -48,9 +48,10 @@ jobs:
           kill -0 $server
           test "$(curl -fsS --max-time 2 'http://127.0.0.1:5460/stats?text=a+b%0Ac%0A')" = \
             '{"text":"a b\nc\n","lines":2,"words":3,"bytes":6}'
-          test "$(curl -fsS --max-time 2 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:5460/stats)" = \
+          # `-f` would turn the expected 422 into a curl error and an empty body.
+          test "$(curl -sS --max-time 2 -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:5460/stats)" = \
             '{"error":"missing_text"}'
-          test "$(curl -fsS --max-time 2 -X POST -H 'Content-Type: application/json' -d '{"text":' http://127.0.0.1:5460/stats)" = \
+          test "$(curl -sS --max-time 2 -X POST -H 'Content-Type: application/json' -d '{"text":' http://127.0.0.1:5460/stats)" = \
             '{"error":"invalid_json"}'
           test "$(curl -sS -o /dev/null -w '%{http_code}' --max-time 2 -X DELETE http://127.0.0.1:5460/health)" = 405
           case "$(curl -sS --max-time 2 http://127.0.0.1:5460/nope)" in

@@ -420,3 +420,28 @@ def test_every_uv_install_step_is_idempotent(name: str) -> None:
                 f"{name}: the {step.name} step creates a venv without --allow-existing, "
                 "so running it twice fails"
             )
+
+FOUR_XX = re.compile(r"\b(404|405|409|413|422)\b")
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_no_template_curl_fails_on_an_expected_error_status(name):
+    """`curl -f` swallows the very 4xx a check is asserting.
+
+    Two stacks shipped this: a `curl -fsS … -d '{}'` line expecting a 422 produced
+    `curl: (22) The requested URL returned error: 422` and an empty body, so the step
+    failed on the runner while `newstack check` passed locally (bash does not run the
+    ship-time step). Any line that names a 4xx must use plain `-sS`.
+    """
+    stack = get_stack(name)
+    offenders = []
+    for path in sorted(stack.template_dir.rglob("*")):
+        if not path.is_file() or path.suffix not in {".yml", ".yaml", ".sh"}:
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for lineno, line in enumerate(text.splitlines(), 1):
+            if ("-fsS" in line or "--fail" in line) and FOUR_XX.search(line):
+                rel = path.relative_to(stack.template_dir)
+                offenders.append(f"{rel}:{lineno}: {line.strip()}")
+    message = f"{name}: curl -f on a line that expects a 4xx converts the answer into an error"
+    assert not offenders, f"{message}: {offenders}"
