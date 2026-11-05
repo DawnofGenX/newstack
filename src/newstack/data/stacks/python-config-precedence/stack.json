@@ -1,0 +1,82 @@
+{
+  "name": "python-config-precedence",
+  "title": "Python layered configuration",
+  "language": "python",
+  "blurb": "Layered configuration that can answer 'why is the port 9200 in prod?': a schema table, defaults < TOML file < environment < --set flags, provenance for every value, every problem reported in one run, secrets masked until asked for, and a --strict gate that fails when a secret is still the value that shipped with the code",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "Layered configuration with provenance, redaction and a strict gate for shipped secrets.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    "APP_AUTH__SIGNING_KEY=dev-only .venv/bin/python -m {package_name} show --config fixtures/config.toml",
+    "APP_AUTH__SIGNING_KEY=dev-only APP_DB__URL=postgres://localhost/app .venv/bin/python -m {package_name} check --strict",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a secret that ships with the code is not a secret"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "fixtures/config.toml"
+  ],
+  "adopt_tests": [
+    "tests/test_resolve.py"
+  ]
+}

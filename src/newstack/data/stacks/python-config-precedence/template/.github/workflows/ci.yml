@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test on python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{{ python_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install
+        run: |
+          uv venv --quiet --allow-existing .venv
+          uv pip install --quiet --python .venv/bin/python -e . pytest ruff
+      - name: Lint
+        run: .venv/bin/ruff check .
+      - name: Test
+        run: .venv/bin/python -m pytest
+      - name: Selftest
+        run: .venv/bin/python -m {{ package_name }} selftest
+      - name: Smoke
+        run: PY=.venv/bin/python bash smoke.sh

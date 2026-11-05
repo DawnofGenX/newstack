@@ -1,0 +1,11 @@
+# Every problem here must be reported in one run, not one per attempt.
+
+[server]
+port = 70000
+tymeout = "9s"
+
+[log]
+level = "verbose"
+
+[auth]
+signing_key = 42
