@@ -7,6 +7,15 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `fortran-http-api` — a Fortran JSON service with no bindings and no dependencies:
+  `server_m.f90` declares `socket`, `bind`, `listen`, `accept`, `recv`, `send` and
+  `close` as `bind(c)` interfaces and speaks HTTP/1.1 over an `int8` buffer,
+  `counts_m.f90` counts lines/words/bytes over raw bytes, `json_m.f90` decodes
+  `\u` escapes and surrogate pairs into UTF-8 (and keeps the last `text` member),
+  and `main.f90` adds a `--selftest` mode (38 checks) so `make test` needs no
+  framework. The `sockaddr_in` is filled in byte by byte, so there is no struct
+  layout to guess, and `SO_REUSEADDR` is set before `bind` so a restart never
+  trips over a port still in `TIME_WAIT`.
 - `fsharp-http-api` — an F# JSON service on .NET 8 with no web framework. `Server.fs`
   accepts a `TcpListener` connection and reads the head byte by byte until CRLFCRLF
   (`ReadByte()` returning `-1` is the only end-of-stream signal), reads exactly

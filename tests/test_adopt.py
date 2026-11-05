@@ -1281,3 +1281,31 @@ def test_a_plain_sml_program_still_resolves_to_the_sml_cli(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["sml-cli"], "the sml service must not claim a plain program"
+
+
+def test_a_fortran_socket_server_resolves_to_the_fortran_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "Makefile": "all:\n\tgfortran -o app src/main.f90\n",
+            "src/server.f90": (
+                'interface\n'
+                '  function c_socket(domain, kind, protocol) bind(c, name="socket")\n'
+                'end interface\n'
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["fortran-http-api"], "a bind(c) socket call marks a service, not a CLI"
+
+
+def test_a_plain_fortran_program_still_resolves_to_the_fortran_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "Makefile": "all:\n\tgfortran -o app src/main.f90\n",
+            "src/main.f90": "program main\nend program main\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["fortran-cli"], "the fortran service must not claim a plain program"

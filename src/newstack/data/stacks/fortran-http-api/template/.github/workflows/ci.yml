@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install gfortran
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gfortran make curl
+          gfortran --version | head -1
+      - name: Build
+        run: make -s build
+      - name: Self test
+        run: make -s test
+      - name: HTTP contract
+        run: |
+          PORT=5448 ./build/{{ npm_name }} > .fortran-http.log 2>&1 &
+          server=$!
+          trap 'kill -TERM -"$server" 2>/dev/null || kill $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT
+          for _ in $(seq 1 120); do
+            if curl --max-time 2 -fsS http://127.0.0.1:5448/health > /dev/null 2>&1; then break; fi
+            sleep 0.25
+          done
+          kill -0 $server 2>/dev/null || { cat .fortran-http.log; exit 1; }
+          test "$(curl --max-time 10 -fsS http://127.0.0.1:5448/health)" = '{"status":"ok"}'
+          test "$(curl --max-time 10 -fsS 'http://127.0.0.1:5448/stats?text=hello%20world%0A')" \
+            = '{"text":"hello world\n","lines":1,"words":2,"bytes":12}'
+          test "$(curl --max-time 10 -s -o /dev/null -w '%{http_code}' -X POST --data-binary '{"text":1}' http://127.0.0.1:5448/stats)" = 422

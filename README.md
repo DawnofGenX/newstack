@@ -339,6 +339,7 @@ $ newstack stacks outdated
 | `deno-api` | Deno 2 JSON service: one `Request`→`Response` handler, `Deno.serve`, std assertions, check/fmt/lint gates and a real socket smoke test | `deno` |
 | `vhdl-sim` | VHDL design with a self-checking testbench on GHDL: one clocked process, assertion-driven simulation, a run script that fails CI on a wrong design | `ghdl` |
 | `fortran-cli` | Fortran CLI on `gfortran` and `make`: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, output units injected | `gfortran`, `make` |
+| `fortran-http-api` | Fortran JSON service on `gfortran`: libc sockets through `ISO_C_BINDING`, a hand-written JSON reader over `int8` bytes, and a dependency-free `--selftest` mode | `gfortran`, `make`, `curl` |
 | `ada-cli` | Ada CLI on GNAT: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, output through two subprogram parameters | `gnatmake`, `make` |
 | `ada-http-api` | Ada JSON service on `GNAT.Sockets`: pure counting and contract packages, one pure `Route (method, path, query, body)` covering every status code, and a validating JSON reader that keeps a number apart from a string | `gnatmake`, `make` |
 | `octave-cli` | Octave CLI on plain `octave`: counting core in a `+textstat` package, hand-rolled argv parser, dependency-free suite, environment injected as function handles | `octave` |

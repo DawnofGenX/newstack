@@ -133,6 +133,7 @@ jobs:
           - deno-api
           - vhdl-sim
           - fortran-cli
+          - fortran-http-api
           - ada-cli
           - ada-http-api
           - octave-cli
@@ -341,10 +342,10 @@ jobs:
           rebar3-version: "3.28.0"
 
       - name: Install gfortran
-        if: matrix.stack == 'fortran-cli'
+        if: contains(fromJSON('["fortran-cli","fortran-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends gfortran make
+          sudo apt-get install -y --no-install-recommends gfortran make curl
           gfortran --version | head -1
 
       - name: Install GNAT
