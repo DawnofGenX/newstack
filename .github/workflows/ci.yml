@@ -90,6 +90,7 @@ jobs:
           - python-dependency-resolver
           - python-crdt
           - python-bloom-filter
+          - python-consistent-hashing
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
