@@ -1954,7 +1954,9 @@ def test_a_cpython_extension_resolves_to_the_c_extension_stack(tmp_path):
         tmp_path,
         {
             "setup.py": "from setuptools import Extension, setup\n",
-            "src/fast/_speedups.c": 'if (!PyArg_ParseTuple(args, "y*:count", &view)) return NULL;\n',
+            "src/fast/_speedups.c": (
+                'if (!PyArg_ParseTuple(args, "y*:count", &view)) return NULL;\n'
+            ),
         },
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
