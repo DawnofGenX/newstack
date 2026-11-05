@@ -55,6 +55,7 @@ jobs:
           - mkdocs-site
           - node-express-ts
           - node-ws-api
+          - node-upload-api
           - hono-api
           - openapi-spec
           - graphql-api

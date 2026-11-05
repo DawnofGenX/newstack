@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      # No lockfile ships with a fresh scaffold, so `cache: {{ package_manager }}`
+      # and `{{ package_manager_ci }}` would both fail until you commit one.
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - run: {{ package_manager_test }}
+      - name: Upload contract over a real socket
+        # The tests already drive a real server on port 0, but they never exercise
+        # curl's chunked framing or a multi-part upload from the outside.
+        run: |
+          if curl -fsS --max-time 2 http://127.0.0.1:5456/health >/dev/null 2>&1; then
+            echo "port 5456 is already answering - stop that process before running this step"
+            exit 1
+          fi
+          work=$(mktemp -d)
+          UPLOAD_DIR=$work/data PORT=5456 node src/main.js >.node-upload.log 2>&1 &
+          server=$!
+          set -e
+          trap 'kill -TERM $server 2>/dev/null || true; wait $server 2>/dev/null || true; rm -rf "$work"' EXIT
+          for _ in $(seq 1 120); do
+            if curl -fsS --max-time 2 http://127.0.0.1:5456/health >/dev/null 2>&1; then break; fi
+            sleep 0.25
+          done
+          kill -0 $server
+          printf 'hello resumable world\n' >"$work/source.txt"
+          size=$(wc -c <"$work/source.txt")
+          id=$(curl -fsS --max-time 10 -X POST -H 'Content-Type: application/json' \
+            -d "{\"name\":\"source.txt\",\"size\":$size}" http://127.0.0.1:5456/uploads \
+            | sed -n 's/.*"id":"\([0-9a-f]*\)".*/\1/p')
+          test -n "$id"
+          head -c 8 "$work/source.txt" >"$work/part1"
+          tail -c +9 "$work/source.txt" >"$work/part2"
+          curl -fsS --max-time 10 -X PUT --data-binary @"$work/part1" "http://127.0.0.1:5456/uploads/$id?offset=0" >/dev/null
+          done_body=$(curl -fsS --max-time 10 -X PUT --data-binary @"$work/part2" "http://127.0.0.1:5456/uploads/$id?offset=8")
+          want=$(sha256sum "$work/source.txt" | cut -d' ' -f1)
+          case "$done_body" in *"$want"*) ;; *) echo "digest missing: $done_body"; exit 1 ;; esac
+          curl -fsS --max-time 10 "http://127.0.0.1:5456/uploads/$id/content" -o "$work/download.bin"
+          cmp "$work/source.txt" "$work/download.bin"

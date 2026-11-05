@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `node-upload-api` — resumable uploads with no dependencies. The client declares a
+  size, then sends byte ranges; an offset that is not what the service already holds
+  is a `409` carrying the expected value (accepting it would drop or duplicate bytes
+  while the length still looked right), the running SHA-256 is rebuilt from the file
+  *before* the next chunk lands so a resumed upload can never hash bytes twice, and
+  the index is written through a temp file and a rename so a crash cannot leave a
+  truncated ledger next to real bytes. `DELETE` sends no body at all, and `stop()`
+  closes idle sockets so keep-alive clients cannot hold the process open.
 - `go-jwt-api` — the registry's first stack with accounts. Passwords are
   PBKDF2-HMAC-SHA256 with the iteration count and salt stored inside the digest,
   tokens are HMAC-SHA256 with an absolute `exp` (a duration would be read against

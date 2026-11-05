@@ -1535,3 +1535,30 @@ def test_a_go_worker_does_not_match_the_jwt_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "go-jwt-api" not in names, "a plain Go module is not a token service"
+
+def test_a_resumable_upload_service_resolves_to_the_upload_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"name": "uploads", "type": "module"}\n',
+            "src/routes.js": (
+                "export function route(store) {\n"
+                '  throw new Error("offset_mismatch");\n'
+                "}\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["node-upload-api"], "an offset-checking upload service is its own stack"
+
+
+def test_a_plain_node_project_does_not_match_the_upload_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"name": "plain", "type": "module"}\n',
+            "src/index.js": 'import { createServer } from "node:http";\n',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "node-upload-api" not in names, "a bare node server is not an upload service"

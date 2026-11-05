@@ -265,6 +265,7 @@ $ newstack stacks outdated
 | `mkdocs-site` | MkDocs Material site whose Markdown examples are executed by a tested checker (`tools/check_fences.py`), `mkdocs build --strict` as the link gate | `uv` |
 | `node-express-ts` | Express 5 API, typed handlers, supertest tests | `node`, `npm`/\`pnpm`/\`yarn` |
 | `node-ws-api` | WebSocket service on bare Node: `ws` upgrade on one path only, presence broadcast on join/leave, count frames, live two-client contract test, SIGTERM drain | `node`, `npm`/\`pnpm`/\`yarn` |
+| `node-upload-api` | Resumable uploads on bare Node: declared size, byte ranges at client-supplied offsets, `409 offset_mismatch` with the expected value, SHA-256 of the finished file, delete frees the bytes | `node`, `npm`/\`pnpm`/\`yarn` |
 | `hono-api` | Hono JSON API: `createApp()` returned as a value so tests use `app.request()` with no socket, `tsc` build (no bundler), `node dist/server.js` | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `openapi-spec` | OpenAPI 3.1 first: spectral lint with warnings as failures, redocly bundle + HTML reference, contract tests validating live responses against the bundle | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `graphql-api` | GraphQL Yoga with schema-first SDL: typed resolvers, a depth-limit plugin that answers `QUERY_TOO_DEEP` instead of hanging, `yoga.fetch()` tests with no socket, `tsc` build | `node`, `npm`/\`pnpm\`/\`yarn` |

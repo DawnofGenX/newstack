@@ -1,0 +1,54 @@
+{
+  "name": "node-upload-api",
+  "title": "Node resumable uploads",
+  "language": "node",
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "blurb": "A resumable upload service with no dependencies: the client declares a name and a size, sends byte ranges at offsets it has to get right, and gets a SHA-256 of the whole file when the last byte lands.",
+  "default_description": "A resumable upload service.",
+  "requires": [
+    "node",
+    "npm",
+    "curl"
+  ],
+  "port": 5456,
+  "next_steps": [
+    "cd {path}",
+    "UPLOAD_DIR=uploads PORT=8080 node src/main.js",
+    "curl -sS -X POST -H 'Content-Type: application/json' -d '{{\"name\":\"notes.txt\",\"size\":11}}' http://127.0.0.1:8080/uploads"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "node --test tests/*.test.js"
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5456/health >/dev/null 2>&1; then\n  echo \"port 5456 is already answering - stop that process before running this step\" >&2\n  exit 1\nfi\nwork=$(mktemp -d)\nlog=$(mktemp)\nserver=\"\"\ntrap 'kill -TERM $server 2>/dev/null || true; wait $server 2>/dev/null || true; rm -rf \"$work\" \"$log\"' EXIT\nUPLOAD_DIR=$work/data PORT=5456 node src/main.js >\"$log\" 2>&1 &\nserver=$!\nready=0\nfor _ in $(seq 1 120); do\n  if curl -fsS --max-time 2 http://127.0.0.1:5456/health >/dev/null 2>&1; then ready=1; break; fi\n  sleep 0.25\ndone\nif [ \"$ready\" != 1 ]; then cat \"$log\" >&2; exit 1; fi\nkill -0 \"$server\"\nbody=$work/body.json\nfail=0\ncheck() {\n  if [ \"$2\" = \"$3\" ]; then echo \"ok $1\"; else echo \"FAIL $1: want [$3] got [$2]\"; fail=1; fi\n}\nhas() { if grep -Fq -- \"$2\" \"$body\"; then echo yes; else echo no; fi; }\nstatus() { curl -sS -o \"$body\" -w '%{http_code}' \"$@\"; }\nbase=http://127.0.0.1:5456\nprintf 'hello resumable world\\n' >\"$work/source.txt\"\nsize=$(wc -c <\"$work/source.txt\")\ncheck health \"$(status \"$base/health\")\" 200\ncheck create \"$(status -X POST -H 'Content-Type: application/json' -d \"{\\\"name\\\":\\\"source.txt\\\",\\\"size\\\":$size}\" \"$base/uploads\")\" 201\nid=$(sed -n 's/.*\"id\":\"\\([0-9a-f]*\\)\".*/\\1/p' \"$body\")\nif [ -n \"$id\" ]; then echo \"ok created_id\"; else echo \"FAIL created_id: empty\"; fail=1; fi\ncheck missing_name \"$(status -X POST -H 'Content-Type: application/json' -d '{\"size\":4}' \"$base/uploads\")\" 422\ncheck too_large \"$(status -X POST -H 'Content-Type: application/json' -d '{\"name\":\"x\",\"size\":2097152}' \"$base/uploads\")\" 413\ncheck invalid_json \"$(status -X POST -d '{oops' \"$base/uploads\")\" 422\nhead -c 8 \"$work/source.txt\" >\"$work/part1\"\ntail -c +9 \"$work/source.txt\" >\"$work/part2\"\ncheck wrong_offset \"$(status -X PUT --data-binary @\"$work/part1\" \"$base/uploads/$id?offset=8\")\" 409\ncheck wrong_offset_expected \"$(has expected '\"expected\":0')\" yes\ncheck chunk1 \"$(status -X PUT --data-binary @\"$work/part1\" \"$base/uploads/$id?offset=0\")\" 200\ncheck content_incomplete \"$(status \"$base/uploads/$id/content\")\" 409\ncheck chunk2 \"$(status -X PUT --data-binary @\"$work/part2\" \"$base/uploads/$id?offset=8\")\" 200\nwant=$(sha256sum \"$work/source.txt\" | cut -d' ' -f1)\ncheck digest \"$(has \"$want\" \"$want\")\" yes\ncheck content \"$(status \"$base/uploads/$id/content\")\" 200\nif cmp -s \"$body\" \"$work/source.txt\"; then echo \"ok content_bytes\"; else echo \"FAIL content_bytes: differs\"; fail=1; fi\ncheck unknown \"$(status \"$base/uploads/deadbeefdeadbeef\")\" 404\ncheck not_found \"$(status \"$base/nope\")\" 404\ncheck not_found_detail \"$(has 'no route for GET /nope' 'no route for GET /nope')\" yes\ncheck wrong_method \"$(status -X POST \"$base/health\")\" 405\ncheck delete \"$(status -X DELETE \"$base/uploads/$id\")\" 204\ncheck deleted \"$(status \"$base/uploads/$id\")\" 404\nif [ \"$fail\" -ne 0 ]; then echo \"upload contract failed\" >&2; exit 1; fi\n"
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.js",
+      "contains": "offset_mismatch"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/routes.test.js"
+  ]
+}
