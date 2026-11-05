@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `node-cli`: a streaming counter whose contract is the shell — byte-accurate UTF-8, a carried word across chunk boundaries, logical lines, `EPIPE` as exit 0, unknown flags as exit 2, and tests that pipe a real child process into `head`.
 - `python-graceful-shutdown`: a SIGTERM path as a tested contract — non-daemon request threads, a drain watcher off the serving thread, the listener closed mid-drain, `503 draining` for keep-alive, a deadline that exits 1 immediately, and a second signal that exits 130.
 - `python-rag-eval` — a retrieval evaluation harness whose numbers can be defended. The chunk
   windows are word-aligned with stable `doc#offset` ids and a coverage check, because a step

@@ -1,0 +1,22 @@
+{
+  "name": "{{ npm_name }}",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "{{ description }}",
+  "keywords": ["cli", "exit-code", "epipe"],
+  "engines": {
+    "node": ">={{ node_version }}"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/src/{{ package_name }}/main.js",
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "selftest": "npm run build && node dist/src/{{ package_name }}/main.js --selftest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^22.10.0"
+  }
+}

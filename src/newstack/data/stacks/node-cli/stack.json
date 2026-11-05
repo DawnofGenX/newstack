@@ -1,0 +1,83 @@
+{
+  "name": "node-cli",
+  "title": "Node CLI",
+  "language": "node",
+  "blurb": "A streaming text counter whose contract is the command line: bytes measured on the buffer rather than the string so a split UTF-8 character cannot corrupt a word count, a carried word so a buffer boundary cannot split one, logical lines instead of newline counts, an EPIPE that exits 0 so `prog | head -1` is not a crash, unknown flags exit 2 rather than rendered output, `?` instead of a zero for a file it could not read, and tests that pipe a real child process into head",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "default_description": "A command-line text counter.",
+  "next_steps": [
+    "cd {path}",
+    "npm install --no-audit --no-fund",
+    "npm run build",
+    "node dist/src/{{ package_name }}/main.js README.md"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "npm run selftest",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "node"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/**/*.ts",
+      "contains": "push() after end()"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json"
+  ],
+  "adopt_tests": [
+    "tests/count.test.ts"
+  ]
+}
