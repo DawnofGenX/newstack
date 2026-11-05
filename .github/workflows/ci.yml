@@ -78,6 +78,7 @@ jobs:
           - python-outbox-pattern
           - python-schema-evolution
           - python-idempotency-keys
+          - python-counter-rollup
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
