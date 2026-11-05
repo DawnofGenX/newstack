@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Build once, then exec so signals reach the server itself.
+set -euo pipefail
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${root}"
+mkdir -p build
+go build -o build/{{ npm_name }} .
+exec "./build/{{ npm_name }}" "$@"

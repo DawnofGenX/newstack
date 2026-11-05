@@ -2091,3 +2091,28 @@ def test_a_plain_go_service_does_not_match_the_wal_stack(tmp_path):
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "go-wal-kv" not in names
+
+
+def test_a_hand_rolled_ring_hash_resolves_to_the_consistent_hash_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module cache\n\ngo 1.24\n",
+            "ring.go": "package main\n\nimport \"hash/fnv\"\n\nfunc Hash(s string) uint64 {\n\th := fnv.New64a()\n\th.Write([]byte(s))\n\treturn h.Sum64()\n}\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "go-consistent-hash" in names
+    assert names.count("go-consistent-hash") == 1
+
+
+def test_a_plain_go_service_does_not_match_the_consistent_hash_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module svc\n\ngo 1.24\n",
+            "main.go": "package main\n\nfunc main() {\n\tprintln(\"cache cluster\")\n}\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "go-consistent-hash" not in names

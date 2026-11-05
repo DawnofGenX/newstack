@@ -1,0 +1,57 @@
+{
+  "name": "go-consistent-hash",
+  "title": "Go consistent-hash cache cluster",
+  "language": "go",
+  "blurb": "Three in-process cache nodes behind a consistent-hash ring with virtual nodes, replication and ring-order failover, all stdlib.",
+  "default_description": "A sharded cache where adding or removing a node moves only its own share of keys.",
+  "port": 5490,
+  "requires": [
+    "go",
+    "curl"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "timeout": 600
+    },
+    {
+      "name": "race test",
+      "cmd": "go test -race ./...",
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": "mkdir -p build && go build -o build/{{ npm_name }} . && ./build/{{ npm_name }} --selftest",
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "mkdir -p build && go build -o build/{{ npm_name }} . && bash smoke.sh",
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.go",
+      "contains": "fnv.New64a"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "make build",
+    "./bin/{npm_name} --replicas 2",
+    "curl -sS http://127.0.0.1:5490/health"
+  ]
+}
