@@ -79,6 +79,7 @@ jobs:
           - python-schema-evolution
           - python-idempotency-keys
           - python-counter-rollup
+          - python-single-flight
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
