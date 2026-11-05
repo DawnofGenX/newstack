@@ -7,6 +7,11 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `erlang-cowboy-api` — an Erlang JSON service on Cowboy, built with rebar3 and shipped as
+  an escript so the run step starts and stops exactly one process. `contract:route/4` is a
+  pure function over `(Method, Path, Query, Body)`, so the eunit suites pin every status
+  code without a socket and only the verify step binds a port. `rebar.lock` is committed and
+  `warnings_as_errors` turns the build into the lint gate.
 - `r-plumber-api`: a plumber service in R. The route table is one pure function
   (`textstat_route()`), so the base-R suite pins every status code without binding a
   socket; `bin/serve.R` adds the two things plumber does not default to — an unboxed

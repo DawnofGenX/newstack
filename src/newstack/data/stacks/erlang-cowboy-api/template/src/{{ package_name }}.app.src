@@ -1,0 +1,7 @@
+{application, {{ package_name }}, [
+    {description, "counts"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {mod, {{{ package_name }}_app, []}},
+    {applications, [kernel, stdlib, cowboy]}
+]}.

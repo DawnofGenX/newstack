@@ -1,0 +1,63 @@
+{
+  "name": "erlang-cowboy-api",
+  "title": "Erlang Cowboy API",
+  "language": "erlang",
+  "blurb": "Erlang JSON service on Cowboy: pure request contract, eunit suites, escript release, checked over a real socket",
+  "requires": [
+    "erl",
+    "rebar3",
+    "curl"
+  ],
+  "default_description": "An Erlang JSON web service on Cowboy.",
+  "next_steps": [
+    "cd {path}",
+    "rebar3 escriptize",
+    "rebar3 eunit",
+    "PORT=8080 ./_build/default/bin/{npm_name}",
+    "curl 'localhost:8080/stats?text=hello%20world%0A'"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "rebar3 escriptize",
+      "tools": [
+        "erl",
+        "rebar3"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "test",
+      "cmd": "rebar3 eunit",
+      "tools": [
+        "erl",
+        "rebar3"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "http",
+      "cmd": "if curl -fsS --max-time 2 http://127.0.0.1:5424/health >/dev/null 2>&1; then\n  echo 'port 5424 is already answering - stop that process before running this step'\n  exit 1\nfi\nPORT=5424 ./_build/default/bin/{{ npm_name }} > .erlang.log 2>&1 &\nserver=$!\nready=1\nfor _ in $(seq 1 240); do\n  if curl -fsS --max-time 2 http://127.0.0.1:5424/health >/dev/null 2>&1; then ready=0; break; fi\n  sleep 0.5\ndone\nkill -0 $server 2>/dev/null || { cat .erlang.log; echo \"the server exited before it answered\"; exit 1; }\nif [ \"$ready\" != 0 ]; then\n  cat .erlang.log\n  kill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true\n  wait $server 2>/dev/null || true\n  exit 1\nfi\nhealth=$(curl -fsS --max-time 10 http://127.0.0.1:5424/health)\nstats=$(curl -fsS --max-time 10 'http://127.0.0.1:5424/stats?text=hello%20world%0A')\nposted=$(curl -fsS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5424/stats)\nmissing=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5424/stats)\nbroken=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5424/stats)\ngone=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5424/nope)\nkill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true\nwait $server 2>/dev/null || true\ntest \"$health\" = '{\"status\":\"ok\"}' || { echo \"health: $health\"; exit 1; }\nprintf '%s' \"$stats\" | grep -q '\"lines\":1' || { echo \"stats: $stats\"; exit 1; }\nprintf '%s' \"$stats\" | grep -q '\"bytes\":12' || { echo \"stats: $stats\"; exit 1; }\nprintf '%s' \"$posted\" | grep -q '\"words\":3' || { echo \"posted: $posted\"; exit 1; }\ntest \"$missing\" = 422 || { echo \"missing: $missing\"; exit 1; }\ntest \"$broken\" = 422 || { echo \"broken: $broken\"; exit 1; }\ntest \"$gone\" = 404 || { echo \"gone: $gone\"; exit 1; }\necho \"the service answered every check\"\n",
+      "tools": [
+        "erl",
+        "rebar3",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "rebar.config",
+      "contains": "cowboy"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "test/contract_tests.erl"
+  ]
+}

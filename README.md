@@ -322,6 +322,7 @@ $ newstack stacks outdated
 | `swift-cli` | Swift 6 CLI on SwiftPM: pure counting core, hand-rolled argv parser, XCTest suites, I/O behind a struct of closures | `swift` |
 | `tcl-cli` | Tcl CLI on plain `tclsh`: byte-level counting core, hand-rolled argv parser, dependency-free test harness, I/O behind a dictionary | `tclsh` |
 | `erlang-cli` | Erlang CLI on plain OTP and `make`: byte-level counting core, hand-rolled argv parser, eunit suites, I/O behind a map of funs | `erl`, `erlc`, `make` |
+| `erlang-cowboy-api` | Erlang JSON service on Cowboy: pure `route(Method, Path, Query, Body)` covering every status code, eunit suites, an escript release, and a real-socket verify step | `erl`, `rebar3` |
 | `racket-cli` | Racket CLI on the core distribution: byte-counting core, struct-based argv parser, `rackunit` suites, I/O behind a struct of funs | `racket`, `raco` |
 | `deno-cli` | TypeScript CLI on Deno: byte-counting core, pure argv parser, `Deno.test` suites, I/O behind an object of functions | `deno` |
 | `deno-api` | Deno 2 JSON service: one `Request`→`Response` handler, `Deno.serve`, std assertions, check/fmt/lint gates and a real socket smoke test | `deno` |

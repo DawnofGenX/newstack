@@ -795,3 +795,22 @@ def test_a_plain_r_package_still_resolves_to_the_r_cli(tmp_path) -> None:
     make_repo(tmp_path, {"DESCRIPTION": "Package: blogcount\nTitle: x\n", "R/counts.R": "x <- 1\n"})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["r-cli"], "a package with no entry point is the CLI stack"
+
+
+def test_a_cowboy_rebar_config_resolves_to_the_erlang_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "rebar.config": "{deps, [{cowboy, \"2.13.0\"}]}.\n",
+            "src/blog_count_app.erl": "-module(blog_count_app).\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["erlang-cowboy-api"]
+
+
+def test_a_rebar_project_without_cowboy_is_not_claimed_by_the_service(tmp_path) -> None:
+    """rebar.config alone says nothing about a web service, and erlang-cli is Makefile-based."""
+    make_repo(tmp_path, {"rebar.config": "{deps, [{jsx, \"3.1.0\"}]}.\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == []
