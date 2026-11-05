@@ -322,6 +322,7 @@ $ newstack stacks outdated
 | `dart-shelf-api` | Dart 3 JSON service on `shelf`: a `Handler` the tests call in-process, `shelf_router` routes, real-socket smoke test | `dart` |
 | `kotlin-cli` | Kotlin CLI on Maven (no Gradle wrapper to ship): pure counting core, JUnit 5 suite, shaded runnable jar | `java`, `mvn` |
 | `kotlin-http-api` | Kotlin JSON service on the JDK `HttpServer`: the counting core and router are pure Kotlin, `--selftest` replaces the test runner, one shaded jar to run | `java`, `mvn`, `curl` |
+| `kotlin-ktor-api` | Ktor 3 service on JDK 21: raw `Application` interception instead of routing so 404/405 bodies stay byte-exact, a hand-rolled strict JSON scanner (kotlinx accepts `"text":42`), a Maven Kotlin build that wires the serialization compiler plugin, and a shaded jar that keeps the engine's `META-INF/services` | `java`, `mvn`, `curl` |
 | `zig-cli` | Zig 0.17 CLI: counting module with in-source test blocks, `zig build test`, no runtime | `zig` |
 | `zig-http-api` | Zig 0.17 JSON service on `std.http`: `contract.route` is pure so every status code is tested without a socket, `build.zig` ships the binary plus one test binary per module, real-socket verify step | `zig`, `curl` |
 | `julia-cli` | Julia CLI: pure counting module, `Test` stdlib suite, zero external packages | `julia` |

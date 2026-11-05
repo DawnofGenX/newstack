@@ -1,0 +1,71 @@
+{
+  "name": "kotlin-ktor-api",
+  "title": "Ktor 3 service",
+  "language": "kotlin",
+  "blurb": "Ktor 3 + kotlinx.serialization on JDK 21 built into one shaded jar: raw application interception instead of routing so 404/405 bodies stay byte-exact, a hand-rolled strict JSON scanner because kotlinx accepts \"text\":42, and a Maven Kotlin build that wires the serialization compiler plugin and shades the engine's service files",
+  "default_description": "A Ktor 3 text-statistics service.",
+  "port": 5472,
+  "requires": [
+    "java",
+    "mvn",
+    "curl"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "make build",
+    "PORT=5472 ./bin/{npm_name}",
+    "bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "mvn -q -B -DskipTests package",
+      "tools": [
+        "java",
+        "mvn"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "test",
+      "cmd": "mvn -B test",
+      "tools": [
+        "java",
+        "mvn"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "selftest",
+      "cmd": "java -jar target/{{ npm_name }}.jar --selftest",
+      "tools": [
+        "java"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "java",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.kt",
+      "contains": "io.ktor.server"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "adopt_tests": [
+    "src/test/kotlin/textstat/ContractTest.kt"
+  ]
+}

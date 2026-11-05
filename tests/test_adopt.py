@@ -1875,3 +1875,33 @@ def test_a_plain_go_program_does_not_match_the_trace_stack(tmp_path):
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["go-cli", "go-http"]
+
+
+def test_a_ktor_service_resolves_to_the_ktor_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "pom.xml": "<project><artifactId>svc</artifactId></project>\n",
+            "src/main/kotlin/textstat/Server.kt": (
+                "package textstat\n\n"
+                "import io.ktor.server.engine.embeddedServer\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["kotlin-ktor-api"]
+
+
+def test_a_jdk_http_server_kotlin_project_does_not_match_the_ktor_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "pom.xml": "<project><artifactId>svc</artifactId></project>\n",
+            "src/main/kotlin/textstat/Server.kt": (
+                "package textstat\n\n"
+                "import com.sun.net.httpserver.HttpServer\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["kotlin-http-api"]

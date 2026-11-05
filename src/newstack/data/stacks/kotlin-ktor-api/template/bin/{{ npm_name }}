@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Build on first use, then exec the JVM so PORT reaches the server.
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$here"
+[[ -f target/{{ npm_name }}.jar ]] || mvn -q -B -DskipTests package
+exec java -jar "target/{{ npm_name }}.jar" "$@"

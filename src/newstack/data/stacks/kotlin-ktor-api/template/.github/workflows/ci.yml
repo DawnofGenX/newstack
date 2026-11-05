@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - run: mvn -B -DskipTests package
+      - run: java -jar target/{{ npm_name }}.jar --selftest
+      - run: mvn -B test
+      # The real socket is the only place the shaded jar's engine discovery and the
+      # exact wire bytes can both be checked.
+      - name: Contract over a real socket
+        run: bash smoke.sh

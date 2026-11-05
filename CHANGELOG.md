@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `kotlin-ktor-api` — Ktor 3 + kotlinx.serialization on JDK 21, one shaded jar. Ktor routes answer
+  unknown paths with their own plain-text body, so the service intercepts `Setup` on the raw
+  `Application` instead: that keeps `{"error":"not_found","detail":"no route for GET /nope"}`
+  byte-exact and makes `/health/` a 404 rather than a rewrite. kotlinx silently accepts
+  `"text":42`, so the discriminator between `missing_text` and `invalid_json` comes from a
+  hand-rolled scanner, and the shade plugin keeps `ServicesResourceTransformer` (Ktor discovers
+  engines through `META-INF/services`) while `dependency-reduced-pom.xml` stays out of the repo.
 - `go-trace-api` — a text-stats service that emits W3C trace context without OpenTelemetry or
   any other SDK. The `traceparent` parser is strict (four fields, version `00`, lowercase hex,
   no all-zero ids) and answers `400` instead of silently minting a new root; every response names
