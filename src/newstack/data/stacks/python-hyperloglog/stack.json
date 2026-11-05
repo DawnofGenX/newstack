@@ -1,0 +1,82 @@
+{
+  "name": "python-hyperloglog",
+  "title": "HyperLogLog",
+  "language": "python",
+  "blurb": "How many distinct things did you see, from a fixed bag of registers? The sketch answers with an estimate and prints the error it promises beside it, then measures itself at four scales and five precisions so the promise is checked instead of asserted. Two halves merge into one pass because union is a register-wise maximum, duplicates provably do not move the number, and a hash with no entropy in the bits the index reads is shown collapsing the sketch into a single register.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A HyperLogLog sketch that prints its promised error beside every estimate, measures that promise, and shows what a bad hash does to it.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    "printf 'a\\nb\\na\\n' | .venv/bin/python -m {package_name} build --sketch /tmp/seen.json",
+    ".venv/bin/python -m {package_name} estimate --sketch /tmp/seen.json --expect 2",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the register index comes from the TOP bits of the hash"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_hll.py"
+  ]
+}
