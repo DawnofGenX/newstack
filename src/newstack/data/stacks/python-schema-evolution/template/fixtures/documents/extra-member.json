@@ -1,0 +1,10 @@
+{
+  "id": "ord_4",
+  "type": "order.created",
+  "amount": 10,
+  "status": "pending",
+  "currency": "USD",
+  "meta": {
+    "source": "crm"
+  }
+}

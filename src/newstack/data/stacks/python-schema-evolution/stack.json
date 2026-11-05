@@ -1,0 +1,82 @@
+{
+  "name": "python-schema-evolution",
+  "title": "Python schema evolution",
+  "language": "python",
+  "blurb": "Classify a JSON Schema change as breaking, risky or safe, and prove every breaking claim with a document that passed the old schema and fails the new one.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "Classify a JSON Schema change: every breaking claim is proved with a real document that validated against the old schema and fails the new one, reader claims name the field that disappears, and a document from the old schema is never silently rejected.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} diff --old fixtures/v1.json --new fixtures/v2.json",
+    ".venv/bin/python -m {package_name} demo",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a reader that uses it gets nothing"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "fixtures/v1.json"
+  ],
+  "adopt_tests": [
+    "tests/test_compare.py"
+  ]
+}

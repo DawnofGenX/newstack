@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "order event",
+  "description": "The payload an order service publishes, with a currency.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "type",
+    "amount",
+    "status",
+    "currency"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ord_[0-9]+$"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "order.created"
+      ]
+    },
+    "amount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "currency": {
+      "type": "string",
+      "enum": [
+        "USD",
+        "EUR"
+      ]
+    }
+  }
+}

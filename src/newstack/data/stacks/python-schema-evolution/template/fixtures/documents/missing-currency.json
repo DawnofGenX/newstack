@@ -1,0 +1,6 @@
+{
+  "id": "ord_5",
+  "type": "order.created",
+  "amount": 10,
+  "status": "pending"
+}

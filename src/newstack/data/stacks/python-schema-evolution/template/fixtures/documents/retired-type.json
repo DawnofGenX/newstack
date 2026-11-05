@@ -1,0 +1,7 @@
+{
+  "id": "ord_2",
+  "type": "order.paid",
+  "amount": 900,
+  "status": "paid",
+  "currency": "USD"
+}

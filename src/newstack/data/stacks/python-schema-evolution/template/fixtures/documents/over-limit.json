@@ -1,0 +1,7 @@
+{
+  "id": "ord_3",
+  "type": "order.created",
+  "amount": 2500000,
+  "status": "pending",
+  "currency": "EUR"
+}

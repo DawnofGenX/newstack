@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "order event",
+  "description": "Only rules a tool cannot decide: pattern, format, default, deprecation.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "id",
+    "type",
+    "amount",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ORD-[0-9]+$",
+      "format": "uuid"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "order.created",
+        "order.paid"
+      ]
+    },
+    "amount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid"
+      ],
+      "default": "pending"
+    },
+    "note": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "deprecated": true
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

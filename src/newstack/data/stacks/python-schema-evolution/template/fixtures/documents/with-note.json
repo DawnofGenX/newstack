@@ -1,0 +1,11 @@
+{
+  "id": "ord_1",
+  "type": "order.created",
+  "amount": 500,
+  "status": "pending",
+  "currency": "USD",
+  "note": "ring the bell",
+  "tags": [
+    "gift"
+  ]
+}
