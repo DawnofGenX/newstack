@@ -2116,3 +2116,33 @@ def test_a_plain_go_service_does_not_match_the_consistent_hash_stack(tmp_path):
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "go-consistent-hash" not in names
+
+def test_a_websocket_handshake_resolves_to_the_websocket_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": "[project]\nname = \"ws\"\n",
+            "src/ws/handshake.py": (
+                "GUID = \"258EAFA5-E914-47DA-95CA-C5AB0DC85B11\"\n"
+                "ACCEPT = \"Sec-WebSocket-Accept\"\n\n\n"
+                "def accept(key: str) -> str:\n"
+                "    digest = hashlib.sha1((key + GUID).encode()).digest()\n"
+                "    return base64.b64encode(digest).decode()\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-websocket-server" in names
+    assert names.count("python-websocket-server") == 1
+
+
+def test_a_plain_python_service_does_not_match_the_websocket_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": "[project]\nname = \"svc\"\n",
+            "src/svc/main.py": "def main():\n    print(\"websocket docs live elsewhere\")\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-websocket-server" not in names
