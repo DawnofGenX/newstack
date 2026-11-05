@@ -41,4 +41,7 @@ bash smoke.sh                     # suite + proves the fixture port is released
   a mobile-only spec; it then reports as "1 skipped", hiding a green suite behind a skip.
   `testIgnore: /mobile\.spec\.ts/` on the desktop project is the fix.
 - `getByLabel("Text")` is the assertion that catches an unassociated `<label>`; a
-  `getByTestId` check passes on markup no screen reader can use.
+  `getByTestId` check passes on markup no screen reader can use.- Pin `@playwright/test` to an exact version. A caret range resolves to a release
+  whose `playwright-core` may not be on the registry yet (a mid-publish window),
+  and the install dies `npm error notarget No matching version found for
+  playwright-core@1.65.0` while the runner itself is fine.
