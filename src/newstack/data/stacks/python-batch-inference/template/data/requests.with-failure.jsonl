@@ -1,0 +1,3 @@
+{"id": "cap-1", "prompt": "Say hello"}
+{"id": "flaky-3", "prompt": "FAIL429 retry me"}
+{"id": "bad-4", "prompt": "FAIL400 doomed"}

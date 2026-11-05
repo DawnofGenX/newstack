@@ -7,6 +7,18 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-batch-inference` — a resumable batch inference runner. The results file *is* the
+  checkpoint: it is append-only and flushed per line, a torn final line is discarded on the next
+  run, and ids already present are skipped instead of sent twice — so a `kill -9` costs one
+  request, not the run. Failures are written as records (`ok: false` plus the reason) rather than
+  raised, because a run of 10 000 prompts must not lose its first 9 000 to one 400. Retries are
+  limited to 408/429/5xx and network errors with exponential back-off; every other 4xx fails on the
+  first attempt, since retrying a malformed request only spends quota. `attempts` sits in each
+  record, so a retry is visible in the data instead of buried in a log. Exit codes are the contract:
+  0 answered, 1 permanent failure, 2 unusable batch (missing, not JSONL, duplicate ids). It has no
+  runtime dependencies, and `tests/stub.py` is a real HTTP server that misbehaves on demand
+  (`FAIL429` answers 429 twice, `FAIL400` answers 400 forever), so the retry and failure paths are
+  proven against a socket.
 - `python-eval-harness` — an offline evaluation harness, and the first stack in the registry that is
   about measuring rather than serving. Three rules are enforced by the code, because each is a way
   published numbers go wrong: a **missing prediction scores zero** (dropping it shrinks the

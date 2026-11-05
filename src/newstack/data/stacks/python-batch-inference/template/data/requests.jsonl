@@ -1,0 +1,3 @@
+{"id": "cap-1", "prompt": "Say hello"}
+{"id": "math-2", "prompt": "What is 2 + 2"}
+{"id": "flaky-3", "prompt": "FAIL429 retry me"}

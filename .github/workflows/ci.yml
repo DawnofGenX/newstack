@@ -52,6 +52,7 @@ jobs:
           - python-scheduler-api
           - python-litestar-api
           - python-eval-harness
+          - python-batch-inference
           - data-science
           - dbt-project
           - sphinx-docs

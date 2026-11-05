@@ -1,0 +1,99 @@
+{
+  "name": "python-batch-inference",
+  "title": "Python batch inference runner",
+  "language": "python",
+  "blurb": "Resumable batch inference over any OpenAI-compatible endpoint: JSONL in and out, bounded concurrency, exponential back-off on 408/429/5xx, failures recorded instead of thrown, and a rerun that skips what is already answered",
+  "requires": [
+    "uv",
+    "python3",
+    "curl"
+  ],
+  "default_description": "A resumable batch inference runner for chat models.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "port": 5468,
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} run --requests data/requests.jsonl --out results.jsonl --base-url http://127.0.0.1:5468/v1",
+    ".venv/bin/python -m pytest"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "stdin",
+      "cmd": "printf '{\"id\":\"s1\",\"prompt\":\"hi\"}\\n' | .venv/bin/python -m {{ package_name }} run --requests - --out /tmp/batch-stdin-check.jsonl --base-url http://127.0.0.1:9/v1 --max-attempts 1 --backoff 0 --timeout 1 >/tmp/batch-stdin-check.log 2>&1; status=$?; rm -f /tmp/batch-stdin-check.jsonl /tmp/batch-stdin-check.log; test \"$status\" -eq 1",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "missing-file",
+      "cmd": ".venv/bin/python -m {{ package_name }} run --requests data/nope.jsonl --out /tmp/batch-nope.jsonl >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "Batch inference that survives being interrupted"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tests/stub.py"
+  ],
+  "adopt_tests": [
+    "tests/test_cli.py"
+  ]
+}
