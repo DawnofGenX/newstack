@@ -2033,3 +2033,19 @@ def test_a_plain_python_project_does_not_match_the_resp_stack(tmp_path):
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "python-resp-server" not in names
 
+
+def test_a_dns_server_resolves_to_the_dns_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "src/zone/protocol.py": 'HEADER = struct.Struct("!HHHHHH")\n',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-dns-server"]
+
+
+def test_a_plain_python_project_does_not_match_the_dns_stack(tmp_path):
+    make_repo(tmp_path, {"src/app/main.py": "print('hello')\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-dns-server" not in names

@@ -28,6 +28,14 @@ All notable changes to this project are documented here. The format follows
   because `isinstance(True, int)` is true, so `true` never satisfies an integer schema; path
   values are percent-encoded so `id=a/b` cannot invent a segment; and `validate --operation getNote
   --response saved.json` re-checks a captured body offline with no server anywhere.
+- `python-dns-server` — an authoritative DNS server for one zone over UDP **and** TCP on the
+  same port: the wire format is hand-written, so the traps are the protocol's. Binding UDP and
+  TCP separately with port 0 picks two different ephemeral ports and every TCP client gets
+  `ECONNREFUSED`; EDNS0's advertised payload size arrives in the OPT record's CLASS field and
+  must raise the datagram ceiling rather than be minimised away; a CNAME belongs in the answer
+  before the chain is followed; pointers that do not point backwards are a format error, not a
+  loop; TXT rdata is chunked at 255 bytes; and `dig` silently retries over TCP after a
+  truncated answer, so a truncation check needs `+ignore` or it asserts the full answer.
 - `python-resp-server` — a RESP2 key-value server whose parser is the point: TCP splits a
   command wherever it likes (the reader buffers and only consumes a whole frame, and the selftest
   feeds one command one byte at a time), two commands in one write owe two replies in order,

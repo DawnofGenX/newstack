@@ -63,6 +63,7 @@ jobs:
           - python-c-extension
           - python-smtp-sink
           - python-resp-server
+          - python-dns-server
           - data-science
           - dbt-project
           - sphinx-docs

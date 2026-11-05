@@ -1,0 +1,84 @@
+{
+  "name": "python-dns-server",
+  "title": "Python DNS server",
+  "language": "python",
+  "blurb": "An authoritative DNS server for one zone on UDP and TCP at the same time: hand-written wire format with compression-pointer limits, CNAME chains, NXDOMAIN and REFUSED with the SOA in authority, EDNS0 payload sizes, and TC truncation for datagrams that do not fit",
+  "default_description": "An authoritative DNS server for one small zone.",
+  "requires": [
+    "python",
+    "uv",
+    "dig"
+  ],
+  "python": {
+    "minimum": "3.10",
+    "versions": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13"
+    ]
+  },
+  "port": 5487,
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e \".[dev]\"",
+    ".venv/bin/python -m {package_name} --port 5487",
+    "dig +short @127.0.0.1 -p 5487 www.example.test A"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e \".[dev]\"",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "ruff",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "pytest",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} --selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "!HHHHHH"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_server.py"
+  ]
+}
