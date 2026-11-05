@@ -70,12 +70,14 @@ jobs:
           - python-config-precedence
           - python-task-queue
           - python-circuit-breaker
+          - python-money-allocation
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
           - python-resp-server
           - python-dns-server
           - python-mqtt-broker
+          - python-websocket-server
           - data-science
           - dbt-project
           - sphinx-docs
