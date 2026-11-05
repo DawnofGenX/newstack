@@ -7,6 +7,11 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `ada-http-api` — an Ada JSON service on `GNAT.Sockets`, with no web framework and no
+  JSON library: the counting rules, a validating reader that keeps a number apart from
+  a string, and the whole HTTP contract are separate packages, so the 34 checks run
+  without opening a socket. Child units live in `textstat-server.ads`, because GNAT
+  looks for the dash form and needs the parent `textstat.ads` to exist first.
 - `pascal-http-api` — a Free Pascal JSON service on the fcl-web listener, the third
   language in the registry whose service builds on a hand-written JSON reader rather
   than its library's `fpjson`: that reader hands strings back in the system codepage,

@@ -1144,3 +1144,25 @@ def test_a_plain_pascal_project_still_resolves_to_the_pascal_cli(tmp_path):
         },
     )
     assert [stack.name for stack in detect_stacks(tmp_path)] == ["pascal-cli"]
+
+
+def test_an_ada_socket_server_resolves_to_the_ada_service(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "Makefile": "all:\n\tgnatmake src/app.adb\n",
+            "src/textstat-server.adb": "with GNAT.Sockets;\n",
+        },
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["ada-http-api"]
+
+
+def test_a_plain_ada_project_still_resolves_to_the_ada_cli(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "Makefile": "all:\n\tgnatmake src/app.adb\n",
+            "src/app.adb": "procedure App is begin null; end App;\n",
+        },
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["ada-cli"]

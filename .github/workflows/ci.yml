@@ -131,6 +131,7 @@ jobs:
           - vhdl-sim
           - fortran-cli
           - ada-cli
+          - ada-http-api
           - octave-cli
           - prolog-cli
           - prolog-http-api
@@ -334,10 +335,10 @@ jobs:
           gfortran --version | head -1
 
       - name: Install GNAT
-        if: matrix.stack == 'ada-cli'
+        if: contains(fromJSON('["ada-cli","ada-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends gnat make
+          sudo apt-get install -y --no-install-recommends gnat make curl
           gnatmake --version | head -1
 
       - name: Install Free Pascal
