@@ -61,7 +61,7 @@
     },
     {
       "name": "endpoint",
-      "cmd": "set +e; PORT=18084 node dist/main.js > server.log 2>&1 & server=$!; ready=0; for attempt in $(seq 1 60); do if curl -fsS http://127.0.0.1:18084/ >/dev/null 2>&1; then ready=1; break; fi; sleep 1; done; body=$(curl -fsS 'http://127.0.0.1:18084/stats?text=alpha%20beta%0Agamma%0A'); code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18084/stats); kill $server 2>/dev/null; wait $server 2>/dev/null; test \"$ready\" -eq 1 && test \"$body\" = '{\"lines\":2,\"words\":3,\"bytes\":17}' && test \"$code\" = 400",
+      "cmd": "if curl -fsS --max-time 2 http://127.0.0.1:18084/ >/dev/null 2>&1; then echo 'port 18084 is already answering - stop that process before running this step'; exit 1; fi; set +e; PORT=18084 node dist/main.js > server.log 2>&1 & server=$!; ready=0; for attempt in $(seq 1 60); do if curl --max-time 2 -fsS http://127.0.0.1:18084/ >/dev/null 2>&1; then ready=1; break; fi; sleep 1; done; kill -0 $server 2>/dev/null || { echo 'the server exited before it answered'; exit 1; }; body=$(curl --max-time 10 -fsS 'http://127.0.0.1:18084/stats?text=alpha%20beta%0Agamma%0A'); code=$(curl --max-time 10 -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18084/stats); kill $server 2>/dev/null; wait $server 2>/dev/null; test \"$ready\" -eq 1 && test \"$body\" = '{\"lines\":2,\"words\":3,\"bytes\":17}' && test \"$code\" = 400",
       "tools": [
         "npm",
         "curl"

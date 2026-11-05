@@ -49,7 +49,7 @@
     },
     {
       "name": "endpoint",
-      "cmd": "set +e; PORT=18082 bin/rails server > log/verify-server.log 2>&1 & server=$!; ready=1; for _ in $(seq 1 60); do if curl -fsS -o /dev/null http://127.0.0.1:18082/up; then ready=0; break; fi; sleep 1; done; body=$(curl -sS 'http://127.0.0.1:18082/stats?text=alpha+beta%0Agamma%0A'); status=$?; code=$(curl -sS -o /dev/null -w '%{http_code}' 'http://127.0.0.1:18082/stats'); kill \"$server\" 2>/dev/null; wait \"$server\" 2>/dev/null; echo \"ready=$ready body=$body code=$code\"; test \"$ready\" -eq 0; test \"$status\" -eq 0; test \"$body\" = '{\"lines\":2,\"words\":3,\"bytes\":17}'; test \"$code\" = 400",
+      "cmd": "if curl -fsS --max-time 2 http://127.0.0.1:18082/up >/dev/null 2>&1; then echo 'port 18082 is already answering - stop that process before running this step'; exit 1; fi; set +e; PORT=18082 bin/rails server > log/verify-server.log 2>&1 & server=$!; ready=1; for _ in $(seq 1 60); do if curl --max-time 2 -fsS -o /dev/null http://127.0.0.1:18082/up; then ready=0; break; fi; sleep 1; done; kill -0 $server 2>/dev/null || { echo 'the server exited before it answered'; exit 1; }; body=$(curl --max-time 10 -sS 'http://127.0.0.1:18082/stats?text=alpha+beta%0Agamma%0A'); status=$?; code=$(curl --max-time 10 -sS -o /dev/null -w '%{http_code}' 'http://127.0.0.1:18082/stats'); kill \"$server\" 2>/dev/null; wait \"$server\" 2>/dev/null; echo \"ready=$ready body=$body code=$code\"; test \"$ready\" -eq 0; test \"$status\" -eq 0; test \"$body\" = '{\"lines\":2,\"words\":3,\"bytes\":17}'; test \"$code\" = 400",
       "tools": [
         "bundle"
       ],

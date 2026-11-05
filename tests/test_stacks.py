@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from newstack.registry import load_stacks, search_roots
+from newstack.registry import get_stack, load_stacks, search_roots
 from newstack.verify import check_stack, missing_tools
 
 USES_RE = re.compile(r"^\s*(?:-\s*)?uses:\s*([^\s#]+)\s*$", re.MULTILINE)
@@ -206,6 +206,25 @@ def test_node_workflow_never_needs_a_missing_lockfile(tmp_path, name: str) -> No
                 "ships no package-lock.json, so the generated project's first CI run fails "
                 "in actions/setup-node before any install happens"
             )
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_every_http_step_only_trusts_the_listener_it_started(name: str) -> None:
+    """A step that curls a port must prove it is talking to its own server.
+
+    Without the pre-flight probe a stale process on the same port answers every
+    request and the step passes while the stack is broken; without ``kill -0`` a
+    server that died on boot is indistinguishable from one that is slow; without
+    ``--max-time`` a half-open connection waits until the step times out.
+    """
+    stack = get_stack(name)
+    for step in stack.verify:
+        cmd = step.cmd
+        if "curl" not in cmd:
+            continue
+        assert "already" in cmd, f"{name}: step {step.name!r} never checks the port is free"
+        assert "kill -0" in cmd, f"{name}: step {step.name!r} never checks its server is alive"
+        assert "--max-time" in cmd, f"{name}: step {step.name!r} can hang on a stalled server"
 
 
 @pytest.mark.parametrize("name", STACK_NAMES)

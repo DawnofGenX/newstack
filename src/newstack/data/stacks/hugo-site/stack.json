@@ -58,7 +58,7 @@
     },
     {
       "name": "serve",
-      "cmd": "set +e\nhugo server --bind 127.0.0.1 --port 18087 --logLevel error > .serve.log 2>&1 &\nserver=$!\nready=1\ni=0\nwhile [ \"$i\" -lt 60 ]; do\n  if curl -fsS http://127.0.0.1:18087/ -o .serve-home.html 2>/dev/null; then ready=0; break; fi\n  i=$((i + 1))\n  sleep 1\ndone\ncode=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18087/posts/welcome/)\nkill \"$server\" 2>/dev/null\nwait \"$server\" 2>/dev/null\ntest \"$ready\" -eq 0 && test \"$code\" = 200 && grep -qF 'class=\"post-list\"' .serve-home.html",
+      "cmd": "if curl -fsS --max-time 2 http://127.0.0.1:18087/ >/dev/null 2>&1; then echo 'port 18087 is already answering - stop that process before running this step'; exit 1; fi; set +e\nhugo server --bind 127.0.0.1 --port 18087 --logLevel error > .serve.log 2>&1 &\nserver=$!\nready=1\ni=0\nwhile [ \"$i\" -lt 60 ]; do\n  if curl --max-time 2 -fsS http://127.0.0.1:18087/ -o .serve-home.html 2>/dev/null; then ready=0; break; fi\n  i=$((i + 1))\n  sleep 1\ndone; kill -0 $server 2>/dev/null || { echo 'the server exited before it answered'; exit 1; };\ncode=$(curl --max-time 10 -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18087/posts/welcome/)\nkill \"$server\" 2>/dev/null\nwait \"$server\" 2>/dev/null\ntest \"$ready\" -eq 0 && test \"$code\" = 200 && grep -qF 'class=\"post-list\"' .serve-home.html",
       "tools": [
         "hugo",
         "curl"
