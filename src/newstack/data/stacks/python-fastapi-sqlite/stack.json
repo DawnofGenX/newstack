@@ -1,0 +1,84 @@
+{
+  "name": "python-fastapi-sqlite",
+  "title": "FastAPI + SQLite service",
+  "language": "python",
+  "blurb": "Stateful JSON API: notes CRUD over a SQLite file, ordered SQL migrations applied once, per-request connections with WAL",
+  "requires": [
+    "uv",
+    "git"
+  ],
+  "python": {
+    "minimum": "3.10",
+    "versions": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13"
+    ]
+  },
+  "default_description": "A notes API backed by SQLite.",
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run uvicorn {package_name}.main:app --reload",
+    "curl -s -X POST localhost:8000/notes -H 'content-type: application/json' -d '{{\"title\":\"shopping\",\"body\":\"milk\"}}'"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv -q .venv && uv pip install -q --python .venv/bin/python -e . pytest httpx ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "ruff",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "migrate",
+      "cmd": ".venv/bin/python -c \"from {{ package_name }}.db import connect, migrate; c = connect(':memory:'); first = migrate(c); second = migrate(c); assert first == ['001_notes.sql'], first; assert second == [], second; print('migrations applied once:', first)\"",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "pytest",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5452/health >/dev/null 2>&1; then\n  echo \"port 5452 is already answering - stop that process before running this step\"\n  exit 1\nfi\nwork=$(mktemp -d)\nDB_PATH=\"$work/notes.db\" PORT=5452 .venv/bin/uvicorn {{ package_name }}.main:app --host 127.0.0.1 --port 5452 > \"$work/server.log\" 2>&1 &\nserver=$!\ntrap 'kill -TERM $server 2>/dev/null || true; for _ in $(seq 1 20); do kill -0 $server 2>/dev/null || break; sleep 0.1; done; kill -KILL $server 2>/dev/null || true; wait $server 2>/dev/null || true; rm -rf \"$work\"' EXIT\nready=1\nfor _ in $(seq 1 200); do\n  if curl --max-time 2 -fsS http://127.0.0.1:5452/health >/dev/null 2>&1; then ready=0; break; fi\n  sleep 0.25\ndone\nif [ \"$ready\" -ne 0 ]; then cat \"$work/server.log\"; echo \"the server did not answer in time\"; exit 1; fi\nkill -0 $server 2>/dev/null || { cat \"$work/server.log\"; echo \"the server exited\"; exit 1; }\n\ncheck() {\n  name=$1\n  want=$2\n  got=$3\n  if [ \"$want\" != \"$got\" ]; then\n    echo \"FAIL $name: want [$want] got [$got]\"\n    exit 1\n  fi\n  echo \"ok $name\"\n}\nstatus() { curl --max-time 10 -s -o /dev/null -w '%{http_code}' \"$@\"; }\njson() { curl --max-time 10 -fsS \"$@\" | python3 -c 'import json,sys; print(json.dumps(json.load(sys.stdin), separators=(\",\",\":\")))'; }\n\ncheck health '{\"status\":\"ok\",\"notes\":0}' \"$(curl --max-time 10 -fsS http://127.0.0.1:5452/health)\"\ncheck create 201 \"$(status -X POST -H 'content-type: application/json' --data-binary '{\"title\":\"shopping\",\"body\":\"milk\"}' http://127.0.0.1:5452/notes)\"\ncheck list '1:shopping:milk' \"$(curl --max-time 10 -fsS http://127.0.0.1:5452/notes | python3 -c 'import json,sys; print(\",\".join(\"%d:%s:%s\" % (n[\"id\"], n[\"title\"], n[\"body\"]) for n in json.load(sys.stdin)[\"notes\"]))')\"\ncheck fetched '{\"id\":1,\"title\":\"shopping\",\"body\":\"milk\"}' \"$(curl --max-time 10 -fsS http://127.0.0.1:5452/notes/1 | python3 -c 'import json,sys; d=json.load(sys.stdin); print(json.dumps({k:d[k] for k in (\"id\",\"title\",\"body\")}, separators=(\",\",\":\")))')\"\ncheck patched 'shopping-final' \"$(curl --max-time 10 -fsS -X PATCH -H 'content-type: application/json' --data-binary '{\"title\":\"shopping-final\"}' http://127.0.0.1:5452/notes/1 | python3 -c 'import json,sys; print(json.load(sys.stdin)[\"title\"])')\"\ncheck blank_title 422 \"$(status -X POST -H 'content-type: application/json' --data-binary '{\"title\":\"   \"}' http://127.0.0.1:5452/notes)\"\ncheck missing_field 422 \"$(status -X POST -H 'content-type: application/json' --data-binary '{}' http://127.0.0.1:5452/notes)\"\ncheck delete 204 \"$(status -X DELETE http://127.0.0.1:5452/notes/1)\"\ncheck get_deleted 404 \"$(status http://127.0.0.1:5452/notes/1)\"\ncheck not_found_detail '{\"error\":\"not_found\",\"detail\":\"no note with id 1\"}' \"$(curl --max-time 10 -sS http://127.0.0.1:5452/notes/1 | python3 -c 'import json,sys; print(json.dumps(json.load(sys.stdin)[\"detail\"], separators=(\",\",\":\")))')\"\ntest -f \"$work/notes.db\" || { echo \"the database file was never created\"; exit 1; }\necho \"all contract checks passed\"\n",
+      "tools": [
+        "uv",
+        "curl",
+        "python3"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "journal_mode=WAL"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_api.py"
+  ]
+}

@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-fastapi-sqlite` — the registry's first stateful service: FastAPI over
+  SQLite with numbered SQL migrations that run in `lifespan` and are recorded in
+  a `schema_migrations` table (so a second boot applies nothing), WAL plus a busy
+  timeout set per connection, typed request models that reject a blank title, and
+  rows that survive a restart. `migrate()` wraps each script in an explicit
+  transaction because `executescript` commits before it runs, and the suite
+  proves idempotence by applying the migrations twice and diffing `sqlite_master`.
 - `kotlin-http-api` — a Kotlin JSON service on the JDK's own `HttpServer`, so the
   only dependency is the standard library. `Counts.kt`, `Json.kt` and
   `Contract.kt` are pure Kotlin (byte-exact counting, a hand-written JSON reader

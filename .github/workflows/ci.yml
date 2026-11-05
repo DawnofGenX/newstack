@@ -47,6 +47,7 @@ jobs:
           - fastapi
           - django
           - flask
+          - python-fastapi-sqlite
           - data-science
           - dbt-project
           - sphinx-docs

@@ -140,6 +140,33 @@ def test_generated_project_has_no_unresolved_placeholders(tmp_path) -> None:
                 assert not re.search(r"(?<!\$)\{\{", text), f"{stack}:{path}"
 
 
+def test_every_stack_renders(tmp_path, capsys) -> None:
+    """Rendering is the cheapest way to keep every manifest honest.
+
+    A next step with a literal brace (a JSON body, say) is formatted with
+    ``str.format_map``; before the braces were doubled it crashed ``newstack new``
+    for that stack only, and ``check --all`` never noticed because it renders
+    through ``verify`` instead of through the CLI.
+    """
+
+    from newstack.registry import load_stacks
+
+    failures: list[str] = []
+    for name in sorted(load_stacks()):
+        dest = tmp_path / name
+        try:
+            code = main(["new", name, str(dest), "--no-git", "--json"])
+        except Exception as error:  # noqa: BLE001 - the report wants every stack
+            failures.append(f"{name}: {type(error).__name__}: {error}")
+            continue
+        if code != 0:
+            failures.append(f"{name}: exit {code}")
+        elif not any(dest.iterdir()):
+            failures.append(f"{name}: rendered nothing")
+    capsys.readouterr()
+    assert not failures, "\n".join(failures)
+
+
 def _half_built_stack(tmp_path, monkeypatch):
     root = tmp_path / "stacks"
     broken = root / "half-built"

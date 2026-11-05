@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{{ python_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install
+        run: uv sync --group dev
+      - name: Lint
+        run: uv run ruff check .
+      - name: Migrations are idempotent
+        run: uv run python -c "from {{ package_name }}.db import connect, migrate; c = connect(':memory:'); assert migrate(c) == ['001_notes.sql']; assert migrate(c) == []"
+      - name: Test
+        run: uv run pytest

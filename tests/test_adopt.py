@@ -1362,3 +1362,47 @@ def test_a_plain_kotlin_project_still_resolves_to_the_kotlin_cli(tmp_path) -> No
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["kotlin-cli"], "the kotlin service must not claim a plain project"
+
+def test_a_fastapi_service_with_wal_sqlite_resolves_to_the_sqlite_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": (
+                "[project]\n"
+                'name = "notes"\n'
+                'dependencies = ["fastapi>=0.115", "uvicorn[standard]>=0.30"]\n'
+            ),
+            "src/notes/db.py": (
+                "import sqlite3\n"
+                "\n"
+                "\n"
+                "def connect(path):\n"
+                "    connection = sqlite3.connect(path)\n"
+                '    connection.execute("PRAGMA journal_mode=WAL")\n'
+                "    return connection\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-fastapi-sqlite"], "WAL is the marker of the stateful service"
+
+
+def test_a_plain_fastapi_project_still_resolves_to_the_fastapi_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": (
+                "[project]\n"
+                'name = "api"\n'
+                'dependencies = ["fastapi>=0.115"]\n'
+            ),
+            "src/api/main.py": (
+                "from fastapi import FastAPI\n"
+                "\n"
+                "app = FastAPI()\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["fastapi"], "a service without SQLite must not adopt the schema stack"
+

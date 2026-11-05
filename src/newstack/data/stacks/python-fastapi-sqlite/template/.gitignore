@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.DS_Store
+
+# the database and its write-ahead log
+notes.db
+notes.db-wal
+notes.db-shm

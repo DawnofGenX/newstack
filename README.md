@@ -252,6 +252,7 @@ $ newstack stacks outdated
 | `fastapi` | typed JSON API, pydantic models, TestClient tests, Dockerfile | `uv` |
 | `django` | Django 6.1 app: config/core split, SQLite, pytest-django, migration drift check | `uv` |
 | `flask` | Flask app factory: JSON routes, pytest fixtures, ruff, CI | `uv` |
+| `python-fastapi-sqlite` | FastAPI over SQLite: numbered SQL migrations applied in `lifespan`, WAL + busy timeout on every connection, typed request models, restart-safe rows | `uv` |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `next-app-ts` | Next.js App Router + TS + Tailwind 4, Vitest + Testing Library | `node`, `npm`/\`pnpm\`/\`yarn` |
