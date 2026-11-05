@@ -1,0 +1,12 @@
+# Generated protobuf code: `buf generate` recreates it, and a stale copy under version
+# control is how a contract and its stubs drift apart.
+/gen/
+
+# Build output and local binaries
+/bin/
+*.test
+*.out
+*.log
+
+# Lint/CI artifacts
+coverage.txt

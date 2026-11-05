@@ -481,3 +481,24 @@ def test_a_dbt_project_resolves_to_the_dbt_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["dbt-project"]
+
+
+def test_a_buf_workspace_resolves_to_the_grpc_stack(tmp_path) -> None:
+    """`buf.yaml` is the marker: a protobuf module is a contract, not just a Go binary."""
+
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module example.com/demo\n\ngo 1.24\n",
+            "buf.yaml": "version: v2\nmodules:\n  - path: proto\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["go-cli", "go-http", "grpc-go"]
+
+
+def test_a_buf_workspace_without_go_still_resolves(tmp_path) -> None:
+    """The contract is the marker on its own; the Go toolchain comes from requirements."""
+
+    make_repo(tmp_path, {"buf.yaml": "version: v2\n"})
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["grpc-go"]

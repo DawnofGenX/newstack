@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+// Package textstat.v1 is the wire contract. It is the only file a client needs in order to
+// call this service; the Go types under gen/ are generated from it, never edited by hand.
+package textstat.v1;
+
+option go_package = "{{ npm_name }}/gen/textstat/v1;textstatv1";
+
+// TextStat counts a document the way `wc` does: a line is a newline, a word is a run of
+// non-whitespace, and bytes are UTF-8 bytes rather than characters.
+service TextStatService {
+  // Count returns the counts for one document.
+  rpc Count(CountRequest) returns (CountResponse);
+}
+
+// CountRequest carries the document to measure.
+message CountRequest {
+  // The text to count. May be empty; must be valid UTF-8.
+  string text = 1;
+}
+
+// CountResponse echoes the text back with its counts, so a client can log what it sent.
+message CountResponse {
+  // The text that was counted.
+  string text = 1;
+  // Number of newline characters.
+  int64 lines = 2;
+  // Number of maximal runs of non-whitespace.
+  int64 words = 3;
+  // Number of UTF-8 bytes.
+  int64 bytes = 4;
+}

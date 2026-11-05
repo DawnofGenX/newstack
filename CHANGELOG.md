@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`grpc-go`**: protobuf-first Go service where the `.proto` is the source of truth. `buf lint` enforces the contract style rules (including the `Service` suffix), `buf generate` builds the stubs locally via `protoc-gen-go`, and the generated code is
+  gitignored so a contract and its stubs cannot drift. Tests run over `bufconn` — the real
+  gRPC stack without a socket — with one case that dials TCP so listener setup is not
+  untested, and the smoke test builds a `probe` client and talks to a live server. Two
+  details the suite documents: invalid UTF-8 is rejected by protobuf marshalling before the
+  handler sees it, and newer gRPC releases raise the `go` directive, so the module pins
+  gRPC rather than floating.
 - **`dbt-project`**: analytics engineering where the dataset is the thing under test. A seed
   CSV, a staging view that restores real newlines, and a mart that computes `lines`/`words`/
   `bytes` in SQL — `strlen()` for UTF-8 bytes, `length()` for characters, because DuckDB's

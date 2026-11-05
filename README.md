@@ -270,6 +270,7 @@ $ newstack stacks outdated
 | `github-action` | JavaScript action on `node24` (no Docker, zero deps): pure counting core, Markdown step summary, `GITHUB_OUTPUT` writes, `node:test` suite that spawns the real entry point | `node` |
 | `go-cli` | stdlib-only Go CLI: `flag` parsing, table tests, vet/test/build gates | `go` |
 | `go-http` | Go HTTP service on `net/http`: JSON routes, `httptest` suite, graceful shutdown | `go` |
+| `grpc-go` | Protobuf-first Go service: `buf` lint/codegen, `bufconn` tests, real-socket smoke test, health service and reflection | `go` |
 | `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
 | `rust-axum` | axum service: typed routes, shared state, `tower` oneshot tests, fmt/clippy | `cargo` |
 | `c-cli` | C11 CLI: Makefile lib+bin split, assert-header test suite, `-Wall -Wextra -Wpedantic -Werror` from the first commit | `cc`, `make` |

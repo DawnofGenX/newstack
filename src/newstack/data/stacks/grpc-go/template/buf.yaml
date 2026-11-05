@@ -1,0 +1,12 @@
+# buf replaces protoc for this project: one binary that lints, builds and generates, with no
+# include paths to get wrong. `buf lint` is wired into CI, so the contract cannot regress
+# silently.
+version: v2
+modules:
+  - path: proto
+lint:
+  use:
+    - STANDARD
+breaking:
+  use:
+    - FILE

@@ -1,0 +1,83 @@
+{
+  "name": "grpc-go",
+  "title": "gRPC Go Service",
+  "language": "go",
+  "blurb": "Protobuf-first Go service: buf for lint/build/codegen, bufconn in-process tests plus a real TCP dial, standard health service and reflection",
+  "requires": [
+    "go",
+    "git",
+    "curl"
+  ],
+  "default_description": "A gRPC service in Go, generated from a protobuf contract.",
+  "next_steps": [
+    "cd {path}",
+    "export PATH=\"$(go env GOPATH)/bin:$PATH\"",
+    "go install github.com/bufbuild/buf/cmd/buf@v1.61.0 google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.10 google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.1",
+    "go mod download && buf lint && buf generate",
+    "go test ./... && go build ./..."
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "go install github.com/bufbuild/buf/cmd/buf@v1.61.0 && go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.10 && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.6.1",
+      "tools": [
+        "go"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "generate",
+      "cmd": "export PATH=\"$(go env GOPATH)/bin:$PATH\" && go mod download && buf lint && buf generate",
+      "tools": [
+        "go"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "format",
+      "cmd": "unformatted=$(gofmt -l cmd internal); if [ -n \"$unformatted\" ]; then echo \"$unformatted\"; exit 1; fi",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "run",
+      "cmd": "export PATH=\"$(go env GOPATH)/bin:$PATH\"; go build -o bin/probe ./cmd/probe && go build -o bin/server ./cmd/{{ npm_name }} && PORT=50071 ./bin/server >.grpc.log 2>&1 & srv=$!; ok=1; for _ in $(seq 1 60); do if ./bin/probe -addr 127.0.0.1:50071 >.probe.out 2>/dev/null; then ok=0; break; fi; sleep 0.5; done; if [ $ok -ne 0 ]; then cat .grpc.log .probe.out 2>/dev/null; kill $srv 2>/dev/null; exit 1; fi; ./bin/probe -addr 127.0.0.1:50071 -text 'a b\nc\n' >.probe2.out 2>&1; kill $srv 2>/dev/null; wait $srv 2>/dev/null; grep -q 'lines=1 words=2 bytes=12' .probe.out && grep -q 'lines=2 words=3 bytes=6' .probe2.out",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "buf.yaml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "buf.gen.yaml"
+  ],
+  "adopt_tests": [
+    "internal/server/server_test.go"
+  ]
+}
