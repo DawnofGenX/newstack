@@ -7,6 +7,23 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `node-http2-api` — an h2c service written straight on `http2`, with no HTTP/1 fallback left
+  on by accident: the server listens on the raw `stream` event (the argument to `createServer`
+  is the HTTP/1-compatible pair, which is why `stream.respond` is missing there), the body cap
+  is enforced while the stream is still arriving, and the contract refuses to pass unless
+  `curl --http2-prior-knowledge -w '%{http_version}'` reports `2` rather than a 200 on a
+  downgraded connection.
+- `node-load-test` — an HTTP load generator plus the thresholds that make it a gate.
+  Latency is measured from the instant a request was *due*, not from the instant a socket
+  freed up: the second reading is coordinated omission, and it makes a stalled server look
+  fast. Percentiles are nearest-rank, so every number is a latency that happened (p95 of
+  1..100 is 95, not 95.05) and the method is printed in the report. Warm-up samples are
+  excluded *and counted*, durations come from `process.hrtime.bigint()` rather than a wall
+  clock that can jump, and every response body is drained - an undrained body never returns
+  its socket, so a keep-alive run silently measures connection setup. Throughput is printed
+  but never thresholded, because it depends on the machine next to yours. With no
+  `--threshold` the run still gates `errorRate <= 0`, and `replay` re-derives the summary
+  from an archived sample file with no network, which is what makes the arithmetic testable.
 - `latex-paper` — a two-page article built with `latexmk` and `bibtex`, and gated on the PDF
   instead of the sources: `pdftotext` must show the title, every heading, the `[1]` citation and
   the bibliography entry, `pdfinfo` must report two pages, and `build/paper.log` must contain no

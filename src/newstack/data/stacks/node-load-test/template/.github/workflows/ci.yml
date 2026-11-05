@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      # A fresh scaffold ships no lockfile, so `cache: {{ package_manager }}` and
+      # `{{ package_manager_ci }}` would both fail until you commit one.
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - run: {{ package_manager_run }} typecheck
+      - run: {{ package_manager_test }}
+      - name: Offline checks
+        run: {{ package_manager_run }} selftest
+      - name: Load the local stub and gate it
+        # Latency and error rate are gated; throughput is printed but never
+        # thresholded, because it depends on the machine next to yours.
+        run: |
+          if ss -ltn | grep -q "[:.]5471 "; then
+            echo "port 5471 is already in use - stop that process first"
+            exit 1
+          fi
+          node dist/src/stub.js --port 5471 >.stub.log 2>&1 &
+          stub=$!
+          set -e
+          trap 'kill -TERM $stub 2>/dev/null || true; wait $stub 2>/dev/null || true' EXIT
+          for _ in $(seq 1 120); do
+            if curl -fsS --max-time 2 http://127.0.0.1:5471/ok >/dev/null 2>&1; then break; fi
+            sleep 0.25
+          done
+          kill -0 $stub
+          node dist/src/main.js run --target http://127.0.0.1:5471/ok \
+            --requests 100 --concurrency 4 --warmup 5 \
+            --threshold p95=2000 --threshold errorRate=0 --json load-report.json
+          node -e 'const r = require("./load-report.json");
+            if (r.summary.count !== 95 || r.passed !== true) process.exit(1)'
+          # The flaky route must fail an error-rate gate, or the gate is decoration.
+          set +e
+          node dist/src/main.js run --target http://127.0.0.1:5471/flaky \
+            --requests 20 --warmup 0 --threshold errorRate=0.1
+          status=$?
+          set -e
+          test "$status" -eq 1
+      - name: Live contract over a real socket
+        run: bash smoke.sh
+        env:
+          PORT: '5471'
