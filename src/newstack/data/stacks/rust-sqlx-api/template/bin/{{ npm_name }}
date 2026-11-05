@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Build once (cargo is incremental) and hand the process over to the server.
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+cargo build --release >/dev/null
+exec ./target/release/{{ npm_name }} "$@"

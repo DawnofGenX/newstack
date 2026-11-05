@@ -82,6 +82,7 @@ jobs:
           - rust-cli
           - rust-axum
           - actix-web
+          - rust-sqlx-api
           - c-cli
           - c-http-api
           - cpp-cmake-cli
@@ -225,7 +226,7 @@ jobs:
           go-version: "1.24"
           cache: false
       - name: Set up Rust
-        if: contains(fromJSON('["rust-cli","rust-axum","actix-web"]'), matrix.stack)
+        if: contains(fromJSON('["rust-cli","rust-axum","actix-web","rust-sqlx-api"]'), matrix.stack)
         uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable

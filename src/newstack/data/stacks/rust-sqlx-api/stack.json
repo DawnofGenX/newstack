@@ -1,0 +1,84 @@
+{
+  "name": "rust-sqlx-api",
+  "title": "Rust notes service",
+  "language": "rust",
+  "blurb": "axum + sqlx/SQLite notes API with embedded migrations, hand-owned 404/405 JSON, struct-ordered responses, four integration tests over a real database file, 41 offline self-checks and a live curl contract that reaps its own server",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust notes service backed by SQLite.",
+  "port": 5470,
+  "next_steps": [
+    "cd {path}",
+    "cargo build --release",
+    "PORT=5470 ./bin/{npm_name}",
+    "bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "selftest",
+      "cmd": "./target/release/{{ npm_name }} --selftest",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "cargo",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml",
+      "contains": "sqlx"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "adopt_tests": [
+    "tests/store_test.rs"
+  ]
+}

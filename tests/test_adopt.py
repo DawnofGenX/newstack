@@ -1717,3 +1717,26 @@ def test_a_plain_cargo_project_does_not_match_the_actix_stack(tmp_path) -> None:
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "actix-web" not in names
 
+
+def test_a_sqlx_service_resolves_to_the_sqlx_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "Cargo.toml": (
+                '[package]\nname = "svc"\n\n'
+                '[dependencies]\naxum = "0.8"\nsqlx = { version = "0.8", features = ["sqlite"] }\n'
+            ),
+            "src/main.rs": "fn main() {}\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["rust-sqlx-api"]
+
+
+def test_a_plain_axum_project_does_not_match_the_sqlx_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {"Cargo.toml": '[package]\nname = "demo"\n\n[dependencies]\naxum = "0.8"\n'},
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "rust-sqlx-api" not in names

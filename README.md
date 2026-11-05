@@ -288,6 +288,7 @@ $ newstack stacks outdated
 | `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
 | `rust-axum` | axum service: typed routes, shared state, `tower` oneshot tests, fmt/clippy | `cargo` |
 | `actix-web` | actix-web 4 service with hand-owned routing: an any-method route so the `405`/`404` bodies are JSON of the app's own, a struct (not `json!`) so the key order is byte-exact, a percent decoder that returns bytes, 39 offline self-checks plus a live curl contract that reaps its own server | `cargo`, `git` |
+| `rust-sqlx-api` | notes API on axum + sqlx/SQLite: migrations embedded in the binary, `rows_affected() == 0` as the only honest 404, struct-ordered JSON, four integration tests against a real database file, 41 offline self-checks plus a live curl contract | `cargo`, `git` |
 | `c-cli` | C11 CLI: Makefile lib+bin split, assert-header test suite, `-Wall -Wextra -Wpedantic -Werror` from the first commit | `cc`, `make` |
 | `c-http-api` | C11 JSON service on POSIX sockets: pure `textstat_route`, a hand-written JSON reader that keeps strings and numbers apart, and a socket loop with 5 s read timeouts | `cc`, `make` |
 | `cpp-cmake-cli` | C++20 CLI: CMake lib+bin split, CTest suite, warning-clean GCC/Clang build | `cmake`, `g++` |

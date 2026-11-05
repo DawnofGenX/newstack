@@ -1,0 +1,5 @@
+/target/
+/notes.db
+/notes.db-wal
+/notes.db-shm
+/.rust-sqlx.log

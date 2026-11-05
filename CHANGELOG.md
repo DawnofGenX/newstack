@@ -7,6 +7,17 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `rust-sqlx-api` — axum + sqlx on SQLite, with the schema *in* the binary: `sqlx::migrate!`
+  embeds `migrations/`, so a shipped release can never drift from the tables it was built
+  against. The macro is gated behind the `macros` feature — `["runtime-tokio","sqlite","migrate"]`
+  alone fails `error[E0433]: cannot find migrate in sqlx`, which is the first wall this stack
+  hits. Deletes are decided by `rows_affected() == 0` (SQL does not error on a missing row) and
+  a non-numeric `/notes/{id}` is answered by the handler as `404 no route for GET /notes/abc`
+  rather than by an extractor as a 400. Responses are structs because serde emits declaration
+  order while `json!` sorts keys, and `text.len()` — not `text.as_bytes().len()` — is what
+  clippy's `needless_as_bytes` insists a byte count is. Its four integration tests open a real
+  database file, so the migrator, the pool and the queries are exercised together against a
+  temp dir rather than a mock.
 - `ruby-cli` — the missing scripting-language CLI, in the shape a gem takes. `bin/{{ npm_name }}`
   is three lines because the whole program is `CLI#run(argv)`: stdin, stdout, stderr and the
   file reader all arrive as keyword arguments, so the suite drives the real CLI through
