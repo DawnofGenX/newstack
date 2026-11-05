@@ -15,5 +15,5 @@ node_modules/
 
 # tooling
 .DS_Store
-.idea/
-.vscode/
+/.idea/
+/.vscode/
