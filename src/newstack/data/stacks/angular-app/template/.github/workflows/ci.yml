@@ -20,6 +20,11 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
+          # The scaffold's package.json carries a `packageManager` field, which makes
+          # setup-node turn automatic npm caching ON — and with no committed lockfile it
+          # fails the job with "Dependencies lock file is not found". Either commit a
+          # lockfile or keep this off.
+          package-manager-cache: false
       # No lockfile ships with a fresh scaffold, so `cache: {{ package_manager }}`
       # and `{{ package_manager_ci }}` would both fail until you commit one.
       - name: Prepare {{ package_manager }}
