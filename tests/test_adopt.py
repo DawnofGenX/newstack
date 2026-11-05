@@ -1974,3 +1974,27 @@ def test_a_plain_python_package_does_not_match_the_c_extension_stack(tmp_path):
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "python-c-extension" not in names
 
+
+def test_a_framed_tcp_service_resolves_to_the_framing_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module svc\n\ngo 1.24\n",
+            "framing.go": "var ErrFrameTooLarge = errors.New(\"too large\")\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["go-tcp-framing"]
+
+
+def test_a_plain_go_service_does_not_match_the_framing_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module svc\n\ngo 1.24\n",
+            "main.go": "package main\n\nfunc main() {}\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "go-tcp-framing" not in names
+

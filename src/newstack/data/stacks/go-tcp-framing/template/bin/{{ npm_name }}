@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+# Build on first use, then hand the process over so the EXIT trap in a smoke
+# step signals the server itself rather than this wrapper.
+set -e
+cd "$(dirname "$0")/.."
+if [ ! -x "build/{{ npm_name }}" ]; then
+  mkdir -p build
+  go build -o "build/{{ npm_name }}" .
+fi
+exec "./build/{{ npm_name }}" "$@"

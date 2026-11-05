@@ -1,0 +1,69 @@
+{
+  "name": "go-tcp-framing",
+  "title": "Go TCP framing service",
+  "language": "go",
+  "blurb": "A non-HTTP service: length-prefixed JSON frames over raw TCP, with the frame cap checked before allocation, idle connections dropped, a protocol error answered without closing the stream, and a smoke test written against the wire format rather than a shared library",
+  "requires": [
+    "go",
+    "python3"
+  ],
+  "default_description": "A length-prefixed TCP text-statistics service.",
+  "next_steps": [
+    "cd {path}",
+    "go build -o build/{npm_name} .",
+    "./build/{npm_name} --selftest",
+    "./build/{npm_name}",
+    "go test ./..."
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "mkdir -p build && go build -o build/{{ npm_name }} . && ./build/{{ npm_name }} --selftest",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "go",
+        "python3"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.go",
+      "contains": "ErrFrameTooLarge"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "adopt_tests": [
+    "framing_test.go"
+  ],
+  "port": 5481
+}

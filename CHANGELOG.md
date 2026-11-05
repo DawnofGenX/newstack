@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `go-tcp-framing` — a service that is not HTTP: 4-byte big-endian length prefixes in
+  front of JSON payloads over raw TCP. The cap is enforced before the length prefix can
+  allocate, a zero-length frame is refused instead of read as an empty message, protocol
+  errors are answered without dropping the connection, and `Shutdown` closes parked
+  clients so Ctrl-C is immediate. The smoke test speaks the byte format from Python
+  rather than reusing the server's own encoder, so a framing bug shared by both ends
+  cannot pass.
 - `python-c-extension` — a CPython extension module built by `setuptools`, with the
   reference implementation kept as the test oracle: `y*` (not `y#`, which refuses a
   `bytearray`) fills a `Py_buffer` so embedded NUL bytes are counted rather than
