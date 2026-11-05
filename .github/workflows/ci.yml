@@ -58,6 +58,7 @@ jobs:
           - python-migrations
           - python-pdf-report
           - python-property-tests
+          - python-c-extension
           - data-science
           - dbt-project
           - sphinx-docs

@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-c-extension` — a CPython extension module built by `setuptools`, with the
+  reference implementation kept as the test oracle: `y*` (not `y#`, which refuses a
+  `bytearray`) fills a `Py_buffer` so embedded NUL bytes are counted rather than
+  truncating the input, `view.len` is copied before `PyBuffer_Release` may clear it, and
+  one test asserts that `import` really loaded a compiled `.so` so a future "pure Python
+  fallback" cannot pass quietly. Compile flags live in `setup.py` because the
+  `pyproject.toml` extension table does not carry them portably.
 - `node-http2-api` — an h2c service written straight on `http2`, with no HTTP/1 fallback left
   on by accident: the server listens on the raw `stream` event (the argument to `createServer`
   is the HTTP/1-compatible pair, which is why `stream.respond` is missing there), the body cap

@@ -1948,3 +1948,27 @@ def test_a_plain_websocket_service_does_not_match_the_http2_stack(tmp_path):
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "node-http2-api" not in names
 
+
+def test_a_cpython_extension_resolves_to_the_c_extension_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "setup.py": "from setuptools import Extension, setup\n",
+            "src/fast/_speedups.c": 'if (!PyArg_ParseTuple(args, "y*:count", &view)) return NULL;\n',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-c-extension"]
+
+
+def test_a_plain_python_package_does_not_match_the_c_extension_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": '[project]\nname = "pkg"\n',
+            "src/pkg/__init__.py": "def count(data):\n    return (0, 0, len(data))\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-c-extension" not in names
+
