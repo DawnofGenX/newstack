@@ -62,7 +62,7 @@ jobs:
           fi
           ./bin/probe -addr 127.0.0.1:50071 -text 'a b\nc\n' >.probe2.out 2>&1
           kill $server 2>/dev/null
-          wait $server 2>/dev/null
+          wait $server 2>/dev/null || true
           cat .probe.out .probe2.out
           grep -q 'lines=1 words=2 bytes=12' .probe.out
           grep -q 'lines=2 words=3 bytes=6' .probe2.out

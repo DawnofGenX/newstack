@@ -45,7 +45,7 @@ jobs:
           bad=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5413/stats)
           missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5413/nope)
           kill $server 2>/dev/null
-          wait $server 2>/dev/null
+          wait $server 2>/dev/null || true
           cat .bun.log
           printf '%s\n' "$stats" "$posted"
           printf '%s' "$stats" | grep -q '"lines":1'

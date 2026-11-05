@@ -2,7 +2,7 @@
   "name": "deno-api",
   "title": "Deno API",
   "language": "typescript",
-  "blurb": "Deno 2 JSON service: one Request→Response handler, Deno.serve, std assertions, check/fmt/lint gates and a real socket smoke test",
+  "blurb": "Deno 2 JSON service: one Request\u2192Response handler, Deno.serve, std assertions, check/fmt/lint gates and a real socket smoke test",
   "requires": [
     "deno",
     "curl"
@@ -49,7 +49,7 @@
     },
     {
       "name": "http",
-      "cmd": "PORT=5412 deno run --allow-env --allow-net src/server.ts >.deno.log 2>&1 & srv=$!; ready=1; for _ in $(seq 1 60); do if curl -fsS http://127.0.0.1:5412/health >/dev/null 2>&1; then ready=0; break; fi; sleep 0.5; done; if [ $ready -ne 0 ]; then cat .deno.log; kill $srv 2>/dev/null; exit 1; fi; health=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5412/health); stats=$(curl -s 'http://127.0.0.1:5412/stats?text=hello%20world%0A'); posted=$(curl -s -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5412/stats); bad=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5412/stats); missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5412/nope); kill $srv 2>/dev/null; wait $srv 2>/dev/null; cat .deno.log; test \"$health\" = 200 && printf '%s' \"$stats\" | grep -q '\"lines\":1' && printf '%s' \"$stats\" | grep -q '\"bytes\":12' && printf '%s' \"$posted\" | grep -q '\"words\":3' && test \"$bad\" = 422 && test \"$missing\" = 404",
+      "cmd": "PORT=5412 deno run --allow-env --allow-net src/server.ts >.deno.log 2>&1 & srv=$!; ready=1; for _ in $(seq 1 60); do if curl -fsS http://127.0.0.1:5412/health >/dev/null 2>&1; then ready=0; break; fi; sleep 0.5; done; if [ $ready -ne 0 ]; then cat .deno.log; kill $srv 2>/dev/null; exit 1; fi; health=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5412/health); stats=$(curl -s 'http://127.0.0.1:5412/stats?text=hello%20world%0A'); posted=$(curl -s -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5412/stats); bad=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5412/stats); missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5412/nope); kill $srv 2>/dev/null; wait $srv 2>/dev/null || true; cat .deno.log; test \"$health\" = 200 && printf '%s' \"$stats\" | grep -q '\"lines\":1' && printf '%s' \"$stats\" | grep -q '\"bytes\":12' && printf '%s' \"$posted\" | grep -q '\"words\":3' && test \"$bad\" = 422 && test \"$missing\" = 404",
       "tools": [
         "deno",
         "curl"
