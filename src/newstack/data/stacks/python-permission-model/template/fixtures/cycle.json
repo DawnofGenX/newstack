@@ -1,0 +1,36 @@
+{
+  "roles": {
+    "a": {
+      "inherits": [
+        "b"
+      ]
+    },
+    "b": {
+      "inherits": [
+        "c"
+      ]
+    },
+    "c": {
+      "inherits": [
+        "a"
+      ]
+    }
+  },
+  "assignments": [
+    {
+      "subject": "alice",
+      "role": "a"
+    }
+  ],
+  "rules": [
+    {
+      "id": "allow-anything",
+      "effect": "allow",
+      "action": "**",
+      "resource": "**",
+      "roles": [
+        "a"
+      ]
+    }
+  ]
+}

@@ -84,6 +84,7 @@ jobs:
           - python-html-sanitizer
           - python-cron-schedule
           - python-retry-budget
+          - python-permission-model
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

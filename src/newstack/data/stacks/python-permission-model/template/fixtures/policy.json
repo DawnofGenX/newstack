@@ -1,0 +1,73 @@
+{
+  "roles": {
+    "viewer": {},
+    "editor": {
+      "inherits": [
+        "viewer"
+      ]
+    },
+    "auditor": {
+      "inherits": [
+        "viewer"
+      ]
+    }
+  },
+  "assignments": [
+    {
+      "subject": "alice",
+      "role": "editor",
+      "scope": "project:acme"
+    },
+    {
+      "subject": "carol",
+      "role": "viewer"
+    },
+    {
+      "subject": "dave",
+      "role": "auditor"
+    }
+  ],
+  "rules": [
+    {
+      "id": "allow-read",
+      "effect": "allow",
+      "action": "docs:read",
+      "resource": "project:**",
+      "roles": [
+        "viewer"
+      ]
+    },
+    {
+      "id": "allow-write",
+      "effect": "allow",
+      "action": "docs:write",
+      "resource": "project:**",
+      "roles": [
+        "editor"
+      ]
+    },
+    {
+      "id": "allow-comment",
+      "effect": "allow",
+      "action": "comments:create",
+      "resource": "project:**",
+      "roles": [
+        "viewer"
+      ],
+      "condition": {
+        "left": "$resource.owner",
+        "op": "eq",
+        "right": "$subject.id"
+      }
+    },
+    {
+      "id": "deny-secret",
+      "effect": "deny",
+      "action": "docs:*",
+      "resource": "**/secret",
+      "subjects": [
+        "*"
+      ]
+    }
+  ]
+}

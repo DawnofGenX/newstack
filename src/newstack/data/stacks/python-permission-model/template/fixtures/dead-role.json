@@ -1,0 +1,38 @@
+{
+  "roles": {
+    "viewer": {},
+    "editor": {
+      "inherits": [
+        "viewer"
+      ]
+    },
+    "audit-ghost": {}
+  },
+  "assignments": [
+    {
+      "subject": "alice",
+      "role": "editor",
+      "scope": "project:acme"
+    }
+  ],
+  "rules": [
+    {
+      "id": "allow-read",
+      "effect": "allow",
+      "action": "docs:read",
+      "resource": "project:**",
+      "roles": [
+        "viewer"
+      ]
+    },
+    {
+      "id": "allow-audit",
+      "effect": "allow",
+      "action": "audit:read",
+      "resource": "**",
+      "roles": [
+        "audit-ghost"
+      ]
+    }
+  ]
+}
