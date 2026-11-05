@@ -69,6 +69,21 @@ def test_the_default_project_is_pure_npm(stack_name: str, tmp_path) -> None:
     assert record["context"]["package_manager"] == "npm"
 
 
+@pytest.mark.parametrize("stack_name", JS_STACKS)
+def test_every_javascript_workflow_installs_its_dependencies(
+    stack_name: str, tmp_path
+) -> None:
+    """A workflow that runs tests before installing them tests nothing.
+
+    ``node --test`` needs no packages, so a stack can look green on the runner
+    while its npm dependencies were never installed -- and then the first
+    dependency it gains fails CI instead of the code.
+    """
+    project = _new(tmp_path, stack_name)
+    workflow = (project / ".github/workflows/ci.yml").read_text()
+    assert packagemanager.BY_NAME["npm"].install in workflow
+
+
 @pytest.mark.parametrize("manager", ["pnpm", "yarn"])
 def test_choosing_a_manager_rewrites_every_command(manager: str, tmp_path) -> None:
     project = _new(tmp_path, "react-vite-ts", "--package-manager", manager)

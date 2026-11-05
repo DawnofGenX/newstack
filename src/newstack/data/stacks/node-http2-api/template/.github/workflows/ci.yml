@@ -17,6 +17,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           package-manager-cache: false
+      - name: Install
+        run: {{ package_manager_install }}
       - name: Self-check the modules
         run: node src/main.js --selftest
       - name: Unit tests
