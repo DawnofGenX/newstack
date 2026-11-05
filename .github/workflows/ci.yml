@@ -53,6 +53,7 @@ jobs:
           - sphinx-docs
           - mkdocs-site
           - node-express-ts
+          - node-ws-api
           - hono-api
           - openapi-spec
           - graphql-api

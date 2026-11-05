@@ -1,0 +1,72 @@
+{
+  "name": "node-ws-api",
+  "title": "Node WebSocket API",
+  "language": "node",
+  "blurb": "WebSocket service on bare Node: ws upgrade on one path, presence broadcast, live two-client contract test, SIGTERM drain",
+  "requires": [
+    "node",
+    "npm",
+    "curl"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A WebSocket service with presence.",
+  "port": 5453,
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "PORT=8080 {package_manager_run} start"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "if curl -fsS --max-time 2 http://127.0.0.1:5453/health >/dev/null 2>&1; then echo 'port 5453 is already answering - stop that process before running this step'; exit 1; fi; PORT=5453 node src/main.js >.node-ws.log 2>&1 & srv=$!; ok=1; for _ in $(seq 1 120); do if curl --max-time 2 -fsS http://127.0.0.1:5453/health >/dev/null 2>&1; then ok=0; break; fi; sleep 0.5; done; kill -0 $srv 2>/dev/null || { echo 'the server exited before it answered'; cat .node-ws.log; exit 1; }; if [ $ok -ne 0 ]; then cat .node-ws.log; kill $srv 2>/dev/null; exit 1; fi; health=$(curl --max-time 10 -fsS http://127.0.0.1:5453/health); gone=$(curl --max-time 10 -s http://127.0.0.1:5453/nope); wrong=$(curl --max-time 10 -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:5453/health); PORT=5453 node tools/contract.mjs; rc=$?; kill $srv 2>/dev/null; wait $srv 2>/dev/null; test $rc -eq 0 && test \"$health\" = '{\"status\":\"ok\",\"clients\":0}' && test \"$gone\" = '{\"error\":\"not_found\",\"detail\":\"no route for GET /nope\"}' && test \"$wrong\" = 405",
+      "tools": [
+        "node",
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.js",
+      "contains": "WebSocketServer"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/server.test.js"
+  ]
+}

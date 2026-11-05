@@ -1406,3 +1406,35 @@ def test_a_plain_fastapi_project_still_resolves_to_the_fastapi_stack(tmp_path) -
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["fastapi"], "a service without SQLite must not adopt the schema stack"
 
+def test_a_websocket_server_resolves_to_the_node_ws_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"name": "chat", "type": "module", "dependencies": {"ws": "^8"}}\n',
+            "src/server.js": (
+                'import { WebSocketServer } from "ws";\n'
+                "\n"
+                "export const sockets = new WebSocketServer({ noServer: true });\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["node-ws-api"], "an upgrade server is not an HTTP-only API"
+
+
+def test_a_plain_javascript_project_does_not_match_the_ws_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"name": "tool", "type": "module", "dependencies": {"ws": "^8"}}\n',
+            "src/client.js": (
+                'import { WebSocket } from "ws";\n'
+                "\n"
+                "export const socket = new WebSocket(process.env.URL);\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == [], "a client that consumes ws must not claim the server stack"
+
+

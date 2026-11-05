@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      # No lockfile ships with a fresh scaffold, so {{ package_manager_ci }} and
+      # `cache: {{ package_manager }}` would both fail until you commit one.
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - run: {{ package_manager_test }}
+      - name: Contract over a real socket
+        # A WebSocket server cannot be exercised in-process the way an HTTP app
+        # can, so this step talks to the running server through `tools/contract.mjs`.
+        run: |
+          if curl -fsS --max-time 2 http://127.0.0.1:5453/health >/dev/null 2>&1; then
+            echo "port 5453 is already answering - stop that process before running this step"
+            exit 1
+          fi
+          PORT=5453 node src/main.js >.node-ws.log 2>&1 &
+          server=$!
+          set -e
+          trap 'kill -TERM -"$server" 2>/dev/null || kill $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT
+          for _ in $(seq 1 120); do
+            if curl -fsS --max-time 2 http://127.0.0.1:5453/health >/dev/null 2>&1; then break; fi
+            sleep 0.25
+          done
+          kill -0 $server
+          test "$(curl -fsS --max-time 10 http://127.0.0.1:5453/health)" = '{"status":"ok","clients":0}'
+          test "$(curl -s --max-time 10 http://127.0.0.1:5453/nope)" = '{"error":"not_found","detail":"no route for GET /nope"}'
+          PORT=5453 node tools/contract.mjs

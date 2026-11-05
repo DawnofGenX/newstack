@@ -7,6 +7,12 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `node-ws-api` — the registry's first non-HTTP service. `ws` runs with
+  `noServer: true` and its own `upgrade` handler, because the default
+  `new WebSocketServer({ server })` hijacks every upgrade and would accept
+  `/anything`; `src/room.js` owns presence and broadcasts join/leave frames to
+  open clients only; `tools/contract.mjs` is a live two-client checker, since a
+  socket server cannot be exercised in-process the way an HTTP app can.
 - `python-fastapi-sqlite` — the registry's first stateful service: FastAPI over
   SQLite with numbered SQL migrations that run in `lifespan` and are recorded in
   a `schema_migrations` table (so a second boot applies nothing), WAL plus a busy
