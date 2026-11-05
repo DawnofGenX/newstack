@@ -85,6 +85,7 @@ jobs:
           - python-cron-schedule
           - python-retry-budget
           - python-permission-model
+          - python-saga-compensation
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

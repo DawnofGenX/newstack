@@ -1,0 +1,82 @@
+{
+  "name": "python-saga-compensation",
+  "title": "Sagas with reverse-order compensation and a crash-safe journal",
+  "language": "python",
+  "blurb": "A saga is a sequence of local transactions with a compensating action each, and the only honest way to run one: steps forward, compensations in reverse, a journal that survives a crash, and an incomplete rollback that says what is still standing. A compensation that keeps failing does not stop the others, a step with no compensation makes the rollback incomplete rather than 'rolled back', and an interrupted step is retried with the same idempotency key instead of being assumed to have worked.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "Run a saga forward, unwind it backwards, and journal every step.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} run --journal saga.jsonl",
+    ".venv/bin/python -m {package_name} journal --journal saga.jsonl",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a compensation that keeps failing does not stop the others"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_runner.py"
+  ]
+}
