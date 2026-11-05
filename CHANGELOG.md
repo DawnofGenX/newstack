@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `sml-http-api` — a Standard ML JSON service on `INetSock.TCP`, compiled by MLton
+  into one native binary with `-warnings-as-errors`-grade hygiene and no packages to
+  install. MLton's basis has no `Posix.Socket`: the socket is
+  `INetSock.TCP.socket ()`, `Socket.recvVec`/`sendVec` take and return `Word8VectorSlice`
+  values, and `Socket.Ctl.setREUSEADDR` must be set or the port sits in TIME_WAIT.
+  The JSON reader is hand-written (surrogate pairs re-encoded as UTF-8, `\u00e9`
+  becomes two bytes), the router is pure, and the harness runs 51 checks without a
+  framework.
 - `raku-http-api` — a Raku JSON service on Rakudo's own `IO::Socket::INET`, with no
   `zef` and no CPAN: Rakudo ships no JSON parser, so the reader is a small
   recursive-descent parser that keeps a string apart from a number (`{"text": 42}`

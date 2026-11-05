@@ -160,6 +160,7 @@ jobs:
           - haxe-cli
           - haxe-http-api
           - sml-cli
+          - sml-http-api
           - d-cli
           - d-http-api
           - jsonnet-config
@@ -459,10 +460,10 @@ jobs:
           ldc2 --version | head -1
 
       - name: Install MLton
-        if: matrix.stack == 'sml-cli'
+        if: contains(fromJSON('["sml-cli","sml-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends mlton
+          sudo apt-get install -y --no-install-recommends mlton curl
           mlton
 
       - name: Install Groovy

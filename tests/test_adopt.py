@@ -1233,3 +1233,27 @@ def test_a_swift_package_still_resolves_to_the_swift_cli(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["swift-cli"], "the swift service must not claim a plain package"
+
+
+def test_an_sml_socket_server_resolves_to_the_sml_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "app.mlb": "$(SML_LIB)/basis/basis.mlb\n",
+            "src/server.sml": (
+                "val listener : Socket.passive INetSock.stream_sock = "
+                "INetSock.TCP.socket ()\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["sml-http-api"], "INetSock marks a socket server, not a CLI"
+
+
+def test_a_plain_sml_program_still_resolves_to_the_sml_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {"app.mlb": "$(SML_LIB)/basis/basis.mlb\n", "src/main.sml": 'val () = print "hi\\n"\n'},
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["sml-cli"], "the sml service must not claim a plain program"
