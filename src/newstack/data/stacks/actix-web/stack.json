@@ -1,0 +1,84 @@
+{
+  "name": "actix-web",
+  "title": "Rust actix-web service",
+  "language": "rust",
+  "blurb": "actix-web 4 service with hand-owned routing: any-method routes so the 405/404 bodies are JSON, a struct (not json!) for byte-exact key order, a raw query decoder, 39 offline self-checks and a live curl contract that reaps its own server",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust actix-web service.",
+  "port": 5462,
+  "next_steps": [
+    "cd {path}",
+    "cargo build --release",
+    "PORT=5462 ./bin/{npm_name}",
+    "bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "selftest",
+      "cmd": "./target/release/{{ npm_name }} --selftest",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "cargo",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml",
+      "contains": "actix-web"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "adopt_tests": [
+    "tests/selftest.rs"
+  ]
+}

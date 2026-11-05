@@ -1,0 +1,4 @@
+#!/bin/sh
+# Thin dispatcher: exec the release binary relative to this wrapper's dir.
+dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec "$dir/target/release/{{ npm_name }}" "$@"

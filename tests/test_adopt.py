@@ -1699,3 +1699,21 @@ def test_a_plain_node_project_does_not_match_the_e2e_stack(tmp_path) -> None:
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "playwright-e2e" not in names
 
+
+def test_an_actix_service_resolves_to_the_actix_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "Cargo.toml": '[package]\nname = "svc"\n\n[dependencies]\nactix-web = "4"\n',
+            "src/main.rs": "fn main() {}\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["actix-web"]
+
+
+def test_a_plain_cargo_project_does_not_match_the_actix_stack(tmp_path) -> None:
+    make_repo(tmp_path, {"Cargo.toml": '[package]\nname = "demo"\n'})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "actix-web" not in names
+
