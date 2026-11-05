@@ -75,6 +75,7 @@ jobs:
           - python-audit-log
           - python-feature-flags
           - python-keyset-pagination
+          - python-outbox-pattern
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

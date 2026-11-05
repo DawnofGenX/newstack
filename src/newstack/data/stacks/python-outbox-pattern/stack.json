@@ -1,0 +1,83 @@
+{
+  "name": "python-outbox-pattern",
+  "title": "Python transactional outbox",
+  "language": "python",
+  "blurb": "A transactional outbox: the business row and the event commit together, and the consumer is proven to apply duplicates once.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A transactional outbox over SQLite: the order row and its event commit in one transaction, a crash between publish and mark is proven to cost a duplicate rather than an event, and the consumer applies it once.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} place --amount 1200",
+    ".venv/bin/python -m {package_name} relay",
+    ".venv/bin/python -m {package_name} show",
+    ".venv/bin/python -m {package_name} demo",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "At-least-once delivery means the same event can arrive twice"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_relay.py"
+  ]
+}
