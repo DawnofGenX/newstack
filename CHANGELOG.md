@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `bun-sqlite-api` — a notes API on Bun with no dependencies. `bun:sqlite` has no `db.pragma()`
+  helper and `exec("PRAGMA …")` throws the result away, so every connection reads the mode
+  back through `query("PRAGMA journal_mode = WAL").get()` and the selftest asserts the value;
+  migrations run inside `db.transaction()`, which is synchronous — an `await` inside it commits
+  early and leaves half a schema — and `Bun.scanDir` does not exist in 1.4.x, so discovery uses
+  `node:fs`. The smoke step stops the process and boots a second server on the same database
+  file to prove the rows are persisted and that no phantom row appeared.
 - `python-duckdb-report` — a reporting CLI that treats the report as the product, so the numbers
   are exact and the output is diffable. Two rules do the heavy lifting: money is summed as
   `DECIMAL(18, 4)` and never as a binary float (`0.10 + 0.20` is `0.30`, not `0.30000000000000004`),

@@ -127,6 +127,7 @@ jobs:
           - crystal-kemal-api
           - bun-cli
           - bun-api
+          - bun-sqlite-api
           - r-cli
           - r-plumber-api
           - ocaml-cli
@@ -638,7 +639,7 @@ jobs:
         with:
           crystal: "1.11"
       - name: Set up Bun
-        if: contains(fromJSON('["bun-cli","bun-api"]'), matrix.stack)
+        if: contains(fromJSON('["bun-cli","bun-api","bun-sqlite-api"]'), matrix.stack)
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2

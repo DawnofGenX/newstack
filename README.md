@@ -333,6 +333,7 @@ $ newstack stacks outdated
 | `crystal-kemal-api` | Crystal service on Kemal: counting rules and the whole route table are pure functions under `crystal spec`, plus a real socket check | `crystal`, `shards` |
 | `bun-cli` | Bun CLI: pure counting module, hand-written option parser, zero-dependency `bun:test` suite | `bun` |
 | `bun-api` | Bun JSON service: one `Request`→`Response` handler, `Bun.serve`, `bun:test` suites, `tsc --noEmit` via `bun run typecheck`, real socket smoke test | `bun` |
+| `bun-sqlite-api` | Bun with zero dependencies: `Bun.serve` routes, `bun:sqlite` with per-connection PRAGMAs read back through `query` (not `exec`), numbered migrations inside `db.transaction()`, `bun:test` over a real port, and a restart that proves the rows are in the file, not in the process | `bun` |
 | `r-cli` | R CLI on base R only: pure counting function, hand-written option parser, dependency-free test harness | `Rscript` |
 | `r-plumber-api` | Plumber JSON service in R: annotated routes, a pure `textstat_route(method, path, query, body)` covering every status code, a base-R test harness, and a JSON 404 built into `bin/serve.R` | `Rscript`, `plumber` |
 | `ocaml-cli` | OCaml CLI on dune: pure counting library, hand-written option parser, stdlib-only test harness, zero opam dependencies | `ocaml`, `dune` |

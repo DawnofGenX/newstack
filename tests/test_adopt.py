@@ -1769,3 +1769,30 @@ def test_a_plain_fastapi_app_does_not_match_the_webhook_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "python-webhook-receiver" not in names
+
+
+def test_a_bun_sqlite_service_resolves_to_the_bun_sqlite_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"name": "notes", "type": "module"}\n',
+            "src/db.js": (
+                'import { Database } from "bun:sqlite";\n'
+                'export const open = () => new Database("x.db");\n'
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["bun-sqlite-api"]
+
+
+def test_a_plain_bun_service_does_not_match_the_bun_sqlite_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"name": "api", "type": "module"}\n',
+            "src/server.js": "export default { fetch: () => new Response('ok') };\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "bun-sqlite-api" not in names

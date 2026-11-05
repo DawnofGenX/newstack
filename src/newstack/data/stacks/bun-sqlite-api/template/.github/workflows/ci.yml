@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: install, test, selftest, smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install
+        run: bun install
+      - name: Test
+        run: bun test
+      - name: Selftest (no socket)
+        run: bun run src/main.js --selftest
+      - name: Contract over a real socket
+        # smoke.sh owns the whole dance: pre-flight port probe, readiness poll that
+        # also proves the child is alive, and an EXIT trap that escalates to SIGKILL
+        # so a stuck listener cannot fail the next run.
+        run: bash smoke.sh

@@ -1,0 +1,12 @@
+node_modules/
+bun.lock
+bun.lockb
+
+# the database and its write-ahead log
+notes.db
+notes.db-wal
+notes.db-shm
+
+# server logs from the smoke and serve steps
+.bun.log
+/.bun-sqlite.log

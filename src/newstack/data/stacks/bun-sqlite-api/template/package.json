@@ -1,0 +1,16 @@
+{
+  "name": "{{ npm_name }}",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "{{ description }}",
+  "engines": {
+    "bun": ">=1.1"
+  },
+  "scripts": {
+    "start": "bun run src/main.js",
+    "test": "bun test",
+    "selftest": "bun run src/main.js --selftest",
+    "smoke": "bash smoke.sh"
+  }
+}
