@@ -1,0 +1,81 @@
+{
+  "name": "python-cron-schedule",
+  "title": "Cron schedule whose runs you can name",
+  "language": "python",
+  "blurb": "Parse a five-field cron expression into the set of values it means, then answer the only question that matters at 03:00: which UTC instants does it fire at, in a named time zone? Day-of-month and day-of-week are joined with OR when both are restricted, a local time that DST skips has no run, and a local time that DST repeats runs twice.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A cron expression evaluator that makes DST visible instead of surprising.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} next \"30 2 * * *\" --after 2026-03-07T12:00:00Z --tz America/New_York --count 3",
+    ".venv/bin/python -m {package_name} demo",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a moment must carry an offset"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_dst.py"
+  ]
+}

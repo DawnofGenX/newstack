@@ -82,6 +82,7 @@ jobs:
           - python-single-flight
           - python-text-diff
           - python-html-sanitizer
+          - python-cron-schedule
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
