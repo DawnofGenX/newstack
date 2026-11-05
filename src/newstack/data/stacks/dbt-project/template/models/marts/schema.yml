@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: doc_stats
+    description: >
+      One row per seeded document, with `wc`-compatible counts. Consumed by the singular
+      test in tests/ and by scripts/check_counts.py, so a change in DuckDB's string
+      functions would break the build, not a dashboard.
+    columns:
+      - name: id
+        description: Seed primary key.
+        data_tests:
+          - unique
+          - not_null
+      - name: title
+        description: Human label for the document.
+        data_tests:
+          - not_null
+      - name: text
+        description: The document with real newlines restored.
+        data_tests:
+          - not_null
+      - name: lines
+        description: Number of chr(10) characters.
+        data_tests:
+          - not_null
+      - name: words
+        description: Number of maximal runs of non-whitespace.
+        data_tests:
+          - not_null
+      - name: bytes
+        description: UTF-8 byte length, which is not the character count.
+        data_tests:
+          - not_null

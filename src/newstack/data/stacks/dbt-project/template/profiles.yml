@@ -1,0 +1,13 @@
+# Committed on purpose: this project's only target is a local DuckDB file, so there is no
+# secret to keep out of git. Run dbt with --profiles-dir . (every command in the README and
+# in CI does) and the file is picked up from the project root.
+{{ package_name }}:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: target/{{ package_name }}.duckdb
+      extensions:
+        - json
+  config:
+    send_anonymous_usage_stats: false

@@ -467,3 +467,17 @@ def test_a_plain_graphql_dependency_is_not_enough(tmp_path) -> None:
         {"package.json": '{"name": "demo", "dependencies": {"graphql": "^17.1.0"}}\n'},
     )
     assert [stack.name for stack in detect_stacks(tmp_path)] == []
+
+
+def test_a_dbt_project_resolves_to_the_dbt_stack(tmp_path) -> None:
+    """`dbt_project.yml` is the marker; the SQL under models/ is what the stack owns."""
+
+    make_repo(
+        tmp_path,
+        {
+            "dbt_project.yml": "name: demo\nversion: '0.1.0'\nconfig-version: 2\n",
+            "models/marts/doc_stats.sql": "select 1 as id\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["dbt-project"]

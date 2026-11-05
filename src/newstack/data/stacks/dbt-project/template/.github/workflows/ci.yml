@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{{ python_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Install dbt and the DuckDB adapter
+        run: uv sync --quiet
+      - name: Lint the Python
+        run: .venv/bin/ruff check .
+      - name: dbt build (models and tests)
+        run: .venv/bin/dbt build --profiles-dir . --no-write-json
+      # The build succeeding is not the same as the numbers being right; this reads the
+      # DuckDB file the build produced, with no dbt code in the path.
+      - name: Check the mart's counts
+        run: .venv/bin/python scripts/check_counts.py
+      - name: dbt docs generate
+        run: .venv/bin/dbt docs generate --profiles-dir . --no-write-json

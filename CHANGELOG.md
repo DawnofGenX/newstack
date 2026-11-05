@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`dbt-project`**: analytics engineering where the dataset is the thing under test. A seed
+  CSV, a staging view that restores real newlines, and a mart that computes `lines`/`words`/
+  `bytes` in SQL — `strlen()` for UTF-8 bytes, `length()` for characters, because DuckDB's
+  `length()` counts characters and getting that backwards is the classic analytics bug. A
+  singular test encodes the documented numbers and fails the build when a model drifts, and
+  `scripts/check_counts.py` re-reads the DuckDB file with no dbt code in the path, so the
+  pipeline is checked by something that does not share its code. `+schema` gives each layer
+  its own schema (`main_staging`, `main_marts`), which is what makes the mart addressable.
 - **`graphql-api`**: schema-first GraphQL on GraphQL Yoga. `src/schema.ts` is SDL, `src/resolvers.ts` resolves it, and `createSchema()` fails at boot if the two drift. Two
   things are worth copying: the depth-limit plugin (`src/limits.ts`) walks the document with
   `visit` and reports `QUERY_TOO_DEEP` *before* execution, so a cyclic client cannot pin a

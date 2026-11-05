@@ -1,0 +1,27 @@
+# A dbt project is data, not a Python package: `[tool.uv] package = false` keeps `uv sync`
+# from trying to build a wheel for a directory that only holds YAML and SQL. The one Python
+# file is scripts/check_counts.py, which is why ruff is a dependency of this project too.
+[project]
+name = "{{ package_name }}"
+version = "0.1.0"
+description = "{{ description }}"
+readme = "README.md"
+requires-python = ">={{ python_version }}"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "{{ author }}", email = "{{ email }}" }]
+
+dependencies = [
+    # dbt-duckdb 1.11.x is built for dbt-core 1.12; the pair moves together.
+    "dbt-duckdb>=1.11,<1.12",
+]
+
+[dependency-groups]
+dev = ["ruff>=0.14"]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py{{ python_tag }}"

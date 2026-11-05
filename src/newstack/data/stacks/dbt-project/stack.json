@@ -1,0 +1,81 @@
+{
+  "name": "dbt-project",
+  "title": "dbt Project",
+  "language": "python",
+  "blurb": "Analytics engineering with dbt + DuckDB: seed, staging (view), marts (table), generic + singular tests, and a read-only script that re-checks the numbers",
+  "requires": [
+    "uv",
+    "git"
+  ],
+  "python": {
+    "minimum": "3.10",
+    "versions": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13"
+    ]
+  },
+  "default_description": "A dbt project that builds a tested mart on DuckDB.",
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    ".venv/bin/dbt build --profiles-dir .",
+    ".venv/bin/python scripts/check_counts.py"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv sync --quiet",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/dbt build --profiles-dir . --no-write-json",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "counts",
+      "cmd": ".venv/bin/python scripts/check_counts.py",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "docs",
+      "cmd": ".venv/bin/dbt docs generate --profiles-dir . --no-write-json",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "ruff",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "dbt_project.yml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/assert_counts_match_expected.sql"
+  ]
+}

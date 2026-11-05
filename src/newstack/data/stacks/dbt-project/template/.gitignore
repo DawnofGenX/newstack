@@ -1,0 +1,14 @@
+# dbt build artifacts and the local warehouse file.
+/target/
+/logs/
+/dbt_packages/
+*.duckdb
+*.duckdb.wal
+
+# dbt writes this when a profile is created with a name conflict
+.user.yml
+
+# Python
+/.venv/
+__pycache__/
+*.pyc

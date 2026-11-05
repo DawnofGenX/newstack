@@ -1,0 +1,41 @@
+# Analytics-engineering layout: seeds → staging (typed, renamed) → marts (the table a
+# dashboard or an analyst queries). `name` must match the profile in profiles.yml, which
+# is why both use the generated project name.
+name: '{{ package_name }}'
+version: '0.1.0'
+config-version: 2
+
+profile: '{{ package_name }}'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+models:
+  {{ package_name }}:
+    staging:
+      # Views, so a staging change costs nothing to rebuild.
+      +materialized: view
+      # A schema per layer: `main_staging` and `main_marts` in the warehouse, so a
+      # consumer can build a dashboard against `main_marts` without reaching into raw data.
+      +schema: staging
+    marts:
+      # Tables: the mart is read far more often than it is written.
+      +materialized: table
+      +schema: marts
+    +persist_docs:
+      relation: true
+      columns: true
+
+seeds:
+  {{ package_name }}:
+    documents:
+      +column_types:
+        id: integer
+        raw_text: varchar

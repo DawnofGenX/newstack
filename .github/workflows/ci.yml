@@ -48,6 +48,7 @@ jobs:
           - django
           - flask
           - data-science
+          - dbt-project
           - sphinx-docs
           - node-express-ts
           - hono-api
