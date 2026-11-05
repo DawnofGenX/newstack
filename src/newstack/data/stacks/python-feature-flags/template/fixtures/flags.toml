@@ -1,0 +1,28 @@
+# Every flag needs its own salt: sharing one makes the same users land in every rollout.
+
+[[flag]]
+name = "checkout-redesign"
+rollout = 10
+salt = "checkout-2026-11"
+
+[[flag]]
+name = "new-search"
+rollout = 50
+salt = "search-2026-11"
+
+[[flag]]
+name = "dark-mode"
+rollout = 100
+salt = "dark-2026-01"
+
+[[flag]]
+name = "kill-switch-test"
+enabled = false
+rollout = 100
+salt = "kill-2026-11"
+
+[[flag]]
+name = "vip-access"
+rollout = 0
+salt = "vip-2026-11"
+targets = ["alice", "bob"]

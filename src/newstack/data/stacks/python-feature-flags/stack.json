@@ -1,0 +1,83 @@
+{
+  "name": "python-feature-flags",
+  "title": "Python feature flags",
+  "language": "python",
+  "blurb": "Feature flags that can say why: SHA-256 buckets instead of hash() (which Python re-randomises per process), integer percentages with an off-by-one-proof cutoff, targeting that beats the rollout, and a kill switch that beats both",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "Feature flags with stable integer buckets, an explicit precedence table, and a reason for every decision.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} list",
+    ".venv/bin/python -m {package_name} explain checkout-redesign --user alice",
+    ".venv/bin/python -m {package_name} distribution",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "Python randomises string hashing per process"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "fixtures/flags.toml"
+  ],
+  "adopt_tests": [
+    "tests/test_bucket.py"
+  ]
+}

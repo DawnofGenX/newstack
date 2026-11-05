@@ -73,6 +73,7 @@ jobs:
           - python-money-allocation
           - python-rate-limiter
           - python-audit-log
+          - python-feature-flags
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
