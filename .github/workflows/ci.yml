@@ -121,6 +121,7 @@ jobs:
           - clojure-cli
           - clojure-ring-api
           - swift-cli
+          - swift-http-api
           - tcl-cli
           - tcl-http-api
           - erlang-cli
@@ -294,7 +295,7 @@ jobs:
       # pinned release and puts `swift` on PATH. No package dependencies, so
       # nothing to resolve over the network.
       - name: Set up Swift
-        if: matrix.stack == 'swift-cli'
+        if: contains(fromJSON('["swift-cli","swift-http-api"]'), matrix.stack)
         uses: swift-actions/setup-swift@v2
         with:
           swift-version: "6.2"

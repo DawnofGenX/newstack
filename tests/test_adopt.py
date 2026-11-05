@@ -1171,7 +1171,11 @@ def test_a_plain_ada_project_still_resolves_to_the_ada_cli(tmp_path):
 def test_a_jdk_http_server_resolves_to_the_java_service(tmp_path) -> None:
     make_repo(
         tmp_path,
-        {"src/main/java/demo/Server.java": "import com.sun.net.httpserver.HttpServer;\nclass Server {}\n"},
+        {
+            "src/main/java/demo/Server.java": (
+                "import com.sun.net.httpserver.HttpServer;\nclass Server {}\n"
+            )
+        },
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["java-httpserver-api"], "com.sun.net.httpserver marks the java service"
@@ -1187,3 +1191,25 @@ def test_plain_java_without_the_jdk_server_stays_a_maven_cli(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["java-maven-cli"], "the java service rule must need its own marker"
+
+
+def test_a_swift_socket_server_resolves_to_the_swift_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "Sources/Server.swift": (
+                "import Glibc\nsetsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &on, 4)\n"
+            )
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["swift-http-api"], "SO_REUSEADDR marks a socket server, not a CLI"
+
+
+def test_a_swift_package_still_resolves_to_the_swift_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {"Package.swift": "// swift-tools-version:5.9\n", "Sources/main.swift": "print(1)\n"},
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["swift-cli"], "the swift service must not claim a plain package"

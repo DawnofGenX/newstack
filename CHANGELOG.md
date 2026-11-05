@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `swift-http-api` — a Swift 6 JSON service on POSIX sockets, built by `swiftc`
+  straight from `src/` and `tests/` into one binary: no `Package.swift`, no
+  dependency graph, and `-warnings-as-errors` as the gate. The harness is compiled
+  into the binary and runs from `--selftest`, so `make test` needs no test framework.
+  Two Swift traps are documented in the README because both cost a live run: a
+  `String.UTF8View` index is not an `Int`, and `send` through `&out[sent]` ships the
+  array's buffer metadata instead of the bytes.
 - `java-httpserver-api` — a Java 21 JSON service on the JDK's own
   `com.sun.net.httpserver`, so the whole dependency list is the JDK and a `Makefile`
   over `javac -Xlint:all -Werror`. The JSON reader is hand-written, because the JDK

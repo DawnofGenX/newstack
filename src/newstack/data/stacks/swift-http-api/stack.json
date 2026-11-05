@@ -1,0 +1,60 @@
+{
+  "name": "swift-http-api",
+  "title": "Swift HTTP API",
+  "language": "swift",
+  "blurb": "Swift 6 JSON service on POSIX sockets with no package manifest: swiftc builds src/ and tests/ into one binary, so the 34 checks run from --selftest, and a hand-written JSON reader keeps a number apart from a string",
+  "requires": [
+    "swift",
+    "make",
+    "curl"
+  ],
+  "default_description": "A Swift 6 JSON service on POSIX sockets.",
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "PORT=8080 ./build/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "tools": [
+        "swift",
+        "make"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "swift",
+        "make"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5443/health >/dev/null 2>&1; then\n  echo 'port 5443 is already answering - stop that process before running this step'\n  exit 1\nfi\nPORT=5443 ./build/{{ npm_name }} > .swift-http.log 2>&1 &\nserver=$!\ntrap 'kill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT\ni=0\nwhile [ $i -lt 120 ]; do\n  if curl -fsS --max-time 2 http://127.0.0.1:5443/health >/dev/null 2>&1; then\n    break\n  fi\n  i=$((i + 1))\n  sleep 0.25\ndone\nif [ $i -ge 120 ]; then\n  cat .swift-http.log\n  echo 'the server did not answer in time'\n  exit 1\nfi\nkill -0 $server 2>/dev/null || { cat .swift-http.log; echo 'the server exited before it answered'; exit 1; }\nhealth=$(curl -sS --max-time 10 http://127.0.0.1:5443/health)\ntest \"$health\" = '{\"status\":\"ok\"}'\nget=$(curl -sS --max-time 10 'http://127.0.0.1:5443/stats?text=hello%20world%0A')\nprintf '%s' \"$get\" | grep -q '\"lines\":1'\nprintf '%s' \"$get\" | grep -q '\"bytes\":12'\nposted=$(curl -sS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5443/stats)\nprintf '%s' \"$posted\" | grep -q '\"words\":3'\nmissing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5443/stats)\ntest \"$missing\" = 422\nbroken=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5443/stats)\ntest \"$broken\" = 422\nnumber=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary '{\"text\":42}' http://127.0.0.1:5443/stats)\ntest \"$number\" = 422\ngone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5443/nope)\ntest \"$gone\" = 404\nwrong=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5443/health)\ntest \"$wrong\" = 405",
+      "tools": [
+        "swift",
+        "curl"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.swift",
+      "contains": "SO_REUSEADDR"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/Tests.swift"
+  ]
+}
