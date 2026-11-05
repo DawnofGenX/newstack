@@ -529,3 +529,58 @@ def test_a_long_project_name_still_fits_the_line_length(tmp_path, name: str) -> 
         f"{name}: lines wider than {columns} columns once the project name is "
         f"{len(PROOF_PROJECT_NAME)} characters: {offenders}"
     )
+
+
+def _uploaded_file_targets(text: str) -> list[str]:
+    """Every single-file path an upload-artifact step names (directories are skipped)."""
+    targets: list[str] = []
+    lines = text.splitlines()
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if not stripped.startswith("path:"):
+            continue
+        value = stripped[len("path:"):].strip()
+        if value in {"|", ">", "|-", ">-"}:
+            indent = len(line) - len(line.lstrip())
+            for follow in lines[index + 1:]:
+                if not follow.strip():
+                    continue
+                if len(follow) - len(follow.lstrip()) <= indent:
+                    break
+                targets.append(follow.strip())
+        elif value:
+            targets.append(value)
+    return [
+        target
+        for target in targets
+        if not target.endswith("/") and "*" not in target and "." in target.rsplit("/", 1)[-1]
+    ]
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_every_uploaded_artifact_is_created_by_the_same_workflow(name: str) -> None:
+    """An upload that names a file nothing produces fails only on the runner.
+
+    `newstack check` never executes the workflow, so a `path: report.pdf` whose file is
+    built and cleaned up inside a temp directory looks fine locally and turns the job red
+    with "No files were found with the provided path". Directory uploads (a test report a
+    tool writes itself) are out of scope; single files are not.
+    """
+    stack = get_stack(name)
+    workflows = stack.template_dir / ".github" / "workflows"
+    if not workflows.is_dir():
+        pytest.skip(f"{name} ships no workflow")
+    for workflow in sorted(workflows.glob("*.yml")):
+        text = workflow.read_text(encoding="utf-8")
+        if "actions/upload-artifact" not in text:
+            continue
+        for target in _uploaded_file_targets(text):
+            creators = [
+                line
+                for line in text.splitlines()
+                if target in line and not line.strip().startswith("path:")
+            ]
+            assert creators, (
+                f"{name}/{workflow.name} uploads {target!r} but nothing in that workflow "
+                "creates it"
+            )

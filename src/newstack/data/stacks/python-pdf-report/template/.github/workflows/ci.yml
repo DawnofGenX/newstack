@@ -27,6 +27,16 @@ jobs:
         run: .venv/bin/python -m pytest -q
       - name: Report end to end
         run: PY=.venv/bin/python bash smoke.sh
+      # smoke.sh builds inside a temp directory and cleans up, so the artifact needs its
+      # own documented command — which is also the only place the CLI is used exactly as
+      # the README tells a reader to use it.
+      - name: Build the sample report
+        run: |
+          .venv/bin/python -m {{ package_name }}.cli \
+            --input fixtures/records.ndjson \
+            --output report.pdf \
+            --title "Text statistics" \
+            --subtitle "built by CI"
       - name: Keep the report as an artifact
         uses: actions/upload-artifact@v5
         with:
