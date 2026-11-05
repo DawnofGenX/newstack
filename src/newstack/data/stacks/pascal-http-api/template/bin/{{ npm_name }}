@@ -1,0 +1,4 @@
+#!/bin/sh
+# Serves the JSON service on HOST:PORT (both optional). Run `make` first.
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec "$root/build/{{ npm_name }}"

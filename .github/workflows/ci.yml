@@ -137,6 +137,7 @@ jobs:
           - lisp-cli
           - lisp-http-api
           - pascal-cli
+          - pascal-http-api
           - bash-cli
           - cobol-cli
           - guile-cli
@@ -340,10 +341,14 @@ jobs:
           gnatmake --version | head -1
 
       - name: Install Free Pascal
-        if: matrix.stack == 'pascal-cli'
+        if: contains(fromJSON('["pascal-cli","pascal-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends fp-compiler make
+          packages="fp-compiler make"
+          if [ "${{ matrix.stack }}" = "pascal-http-api" ]; then
+            packages="$packages fp-units-fcl fp-units-net"
+          fi
+          sudo apt-get install -y --no-install-recommends $packages
           fpc -iV
 
       - name: Install shellcheck

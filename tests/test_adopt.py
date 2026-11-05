@@ -1122,3 +1122,25 @@ def test_a_plain_haxe_project_still_resolves_to_the_haxe_cli(tmp_path):
     )
     assert [stack.name for stack in detect_stacks(tmp_path)] == ["haxe-cli"]
 
+
+
+def test_a_pascal_http_server_resolves_to_the_pascal_service(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "Makefile": "FPC ?= fpc\nall:\n\t$(FPC) src/app.pas\n",
+            "src/server.pas": "uses fphttpserver;\n",
+        },
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["pascal-http-api"]
+
+
+def test_a_plain_pascal_project_still_resolves_to_the_pascal_cli(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "Makefile": "FPC ?= fpc\nall:\n\t$(FPC) src/app.pas\n",
+            "src/app.pas": "program app;\nbegin\nend.\n",
+        },
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["pascal-cli"]

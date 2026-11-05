@@ -343,6 +343,7 @@ $ newstack stacks outdated
 | `lisp-cli` | Common Lisp CLI on SBCL: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, I/O through a structure of functions | `sbcl` |
 | `lisp-http-api` | Common Lisp JSON service on SBCL: pure `route` function, a hand-written JSON reader that keeps strings and numbers apart, and an HTTP loop on `sb-bsd-sockets` | `sbcl` |
 | `pascal-cli` | Free Pascal CLI on FPC and `make`: byte-exact counting unit, hand-written argv parser, dependency-free test suite, terminal behind a record of function pointers | `fpc`, `make` |
+| `pascal-http-api` | Free Pascal JSON service on the fcl-web listener: pure counting and contract units, one pure `Route(method, path, query, body)` covering every status code, and a JSON reader that decodes `\u` escapes into UTF-8 itself | `fpc`, `make`, `fp-units-fcl` |
 | `bash-cli` | Bash CLI on plain `bash` and `shellcheck`: counting in bash itself (no `wc`, no `awk`), hand-rolled argv parser, dependency-free test harness, terminal behind sourced functions | `bash`, `shellcheck` |
 | `cobol-cli` | COBOL CLI on GNUCOBOL: byte-exact counting over a one-byte sequential read, hand-rolled argv parser reading `/proc/self/cmdline`, a COBOL unit driver plus a shell suite, I/O in one program | `cobc`, `make` |
 | `guile-cli` | Scheme CLI on GNU Guile: bytevector counting core, hand-rolled argv parser, dependency-free harness, ports behind a record of procedures | `guile` |

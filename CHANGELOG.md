@@ -7,6 +7,12 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `pascal-http-api` — a Free Pascal JSON service on the fcl-web listener, the third
+  language in the registry whose service builds on a hand-written JSON reader rather
+  than its library's `fpjson`: that reader hands strings back in the system codepage,
+  so `\u00e9` would count as one byte instead of two and a surrogate pair would become
+  two question marks. Every route is one pure `Route(method, path, query, body)` call,
+  so the 58 checks run without a socket, and `make test` is the gate.
 
 - **`haxe-http-api`**: the Haxe service for the eval target (`haxe --interp`,
   no build step, no haxelib). Haxe cannot ask `sys.net.Socket` for
