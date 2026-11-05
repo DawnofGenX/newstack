@@ -110,6 +110,7 @@ jobs:
           - node-cli
           - node-event-sourcing
           - node-stream-backpressure
+          - node-worker-pool
           - hono-api
           - fastify-api
           - prisma-api

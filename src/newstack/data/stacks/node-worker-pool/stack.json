@@ -1,0 +1,84 @@
+{
+  "name": "node-worker-pool",
+  "title": "Node worker pool",
+  "language": "node",
+  "blurb": "A fixed-size worker-thread pool with a bounded queue: workers are reused instead of spawned per task, the event loop keeps ticking while CPU work runs, ArrayBuffers are transferred rather than copied, a full queue refuses instead of growing, and a worker that dies rejects its task instead of leaving it hanging",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "default_description": "A worker-thread pool with a bounded queue.",
+  "next_steps": [
+    "cd {path}",
+    "npm install --no-audit --no-fund",
+    "npm run build",
+    "node dist/src/main.js demo",
+    "node dist/src/main.js bench --size 4 --tasks 64"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "npm run selftest",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "pool",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "node"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/**/*.ts",
+      "contains": "the worker exited with code"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json"
+  ],
+  "adopt_tests": [
+    "tests/pool.test.ts"
+  ]
+}

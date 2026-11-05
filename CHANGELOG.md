@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `node-worker-pool`: a fixed-size worker-thread pool with a bounded queue, where the numbers come from live runs — reuse versus a worker per task, the main-thread timer that keeps ticking, a 1 MiB buffer detached by its transfer list, a refusal that names the queue depth, and a crashed worker that rejects with its exit code and is replaced.
 - `node-stream-backpressure`: the same chunk series through the same slow sink four ways, with `writableLength` sampled after every write — ignoring a refusal, awaiting a kept promise, waiting for `drain`, and `pipeline()` — so the 4 MiB vs 16 KiB peak is a measurement, plus the forgotten-callback stall and the doubled-callback error that make a Node process hang.
 - `python-bloom-filter`: bit-array membership sized from the math, with the measured false-positive rate, a broken removal next to a counting filter that survives it, and a saturation verdict instead of a silent yes.
 - `python-crdt`: counters, a last-write-wins register and an observed-remove set whose merge laws are checked on real states, with a gossip simulation that shuffles and duplicates every delivery.
