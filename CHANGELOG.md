@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Add `python-hybrid-clock`: a hybrid logical clock that proves a wall clock stepping backwards cannot move a stamp, that a receipt never sorts before its send, and that skew past a bound is refused rather than reported.
 - Add `python-backoff-jitter`: a retry simulator that measures the pile-up each backoff policy creates, instead of assuming jitter helps.
 - **python-hyperloglog** — estimate distinct counts from a fixed bag of registers, with the promised error printed beside the estimate, measured at four scales and five precisions, and a demonstration of the hash bias that collapses the sketch into one register.
 - `node-http-cache`: conditional requests, measured. The RFC 9110 comparison rules are proved by a live server: a weak tag answers `304` for `If-None-Match` and `412` for `If-Match`, a matching tag outranks an old `If-Modified-Since`, a 304 returns zero bytes, `Vary: accept` shows a URL keyed cache serving the wrong representation, a cache that copies the 304 body empties its own entry (shown, then read back), and a 20-round run counts 323 of 340 bytes saved.

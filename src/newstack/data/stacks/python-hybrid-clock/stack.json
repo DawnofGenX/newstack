@@ -1,0 +1,81 @@
+{
+  "name": "python-hybrid-clock",
+  "title": "Hybrid logical clock",
+  "language": "python",
+  "blurb": "Wall clocks go backwards, and a distributed system cannot afford to. This stack implements a hybrid logical clock and proves the two invariants it exists for: every stamp a node hands out is strictly later than its last one whatever the wall clock does, and a message never arrives stamped before it was sent, even when the receiver's clock runs 500 ms slow. It also measures the cost of the guarantee: skew in milliseconds per node, a bound that turns skew into a refusal, and the inversions a naive wall-clock sort produces on the same events.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A hybrid logical clock that keeps causality across skewed wall clocks, with the skew measured rather than assumed.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} plan --plan fixtures/handoff.jsonl",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a wall clock that steps backwards cannot move a stamp"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_clock.py"
+  ]
+}

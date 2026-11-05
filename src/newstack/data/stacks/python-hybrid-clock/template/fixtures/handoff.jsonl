@@ -1,0 +1,6 @@
+{"type": "offset", "node": "a", "ms": 500}
+{"type": "offset", "node": "b", "ms": 0}
+{"type": "local", "node": "b", "detail": "order placed"}
+{"type": "send", "from": "a", "to": "b", "detail": "ping"}
+{"type": "tick", "ms": 5}
+{"type": "local", "node": "a", "detail": "settled"}

@@ -95,6 +95,7 @@ jobs:
           - python-count-min-sketch
           - python-hyperloglog
           - python-backoff-jitter
+          - python-hybrid-clock
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

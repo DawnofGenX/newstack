@@ -1,0 +1,4 @@
+{"type": "offset", "node": "a", "ms": 0}
+{"type": "local", "node": "a", "detail": "before the step"}
+{"type": "back", "node": "a", "ms": 400}
+{"type": "local", "node": "a", "detail": "after the step"}
