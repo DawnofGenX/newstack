@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# Build once, then hand the process over so signals reach the server itself.
+set -eu
+cd "$(dirname "$0")/.."
+if [ ! -x "build/{{ npm_name }}" ]; then
+    mkdir -p build
+    go build -o build/{{ npm_name }} .
+fi
+exec ./build/{{ npm_name }} "$@"

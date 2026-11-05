@@ -1,0 +1,55 @@
+{
+  "name": "go-wal-kv",
+  "title": "Go write-ahead-log key/value store",
+  "language": "go",
+  "blurb": "A key/value HTTP service whose every write is framed, checksummed and fsynced to an append-only log before it answers.",
+  "default_description": "A small key/value service that survives a hard restart.",
+  "port": 5491,
+  "requires": [
+    "go",
+    "curl"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "mkdir -p build && go build -o build/{{ npm_name }} . && ./build/{{ npm_name }} --selftest",
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "mkdir -p build && go build -o build/{{ npm_name }} . && bash smoke.sh",
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.go",
+      "contains": "wal-%06d.log"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "adopt_tests": [
+    "wal_test.go"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "make build",
+    "./bin/{npm_name} --dir wal --addr 127.0.0.1:5491",
+    "curl -X PUT --data-binary hello http://127.0.0.1:5491/kv/greeting"
+  ]
+}

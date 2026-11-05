@@ -2066,3 +2066,28 @@ def test_a_plain_python_project_does_not_match_the_mqtt_stack(tmp_path):
     make_repo(tmp_path, {"src/app/main.py": "print('hello')\n"})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "python-mqtt-broker" not in names
+
+
+def test_a_segmented_write_ahead_log_resolves_to_the_wal_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module svc\n\ngo 1.24\n",
+            "store.go": 'package main\n\nfunc segmentName(index int) string {\n\treturn fmt.Sprintf("wal-%06d.log", index)\n}\n',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "go-wal-kv" in names
+    assert names.count("go-wal-kv") == 1
+
+
+def test_a_plain_go_service_does_not_match_the_wal_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module svc\n\ngo 1.24\n",
+            "main.go": "package main\n\nfunc main() {\n\tprintln(\"wal cache\")\n}\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "go-wal-kv" not in names
