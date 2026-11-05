@@ -152,6 +152,30 @@ jobs:
           - github-action
     steps:
       - uses: actions/checkout@v7
+      # GitHub's release CDN answered 504 twice mid-transfer, which fails an
+      # install step that trusts a single curl. Every tarball download in this
+      # job goes through `fetch`, which retries and never leaves a partial file
+      # behind for the next step to execute.
+      - name: Add a retrying download helper
+        run: |
+          sudo tee /usr/local/bin/fetch >/dev/null <<'SH'
+          #!/usr/bin/env bash
+          # fetch OUT URL - download with retries and no partial files.
+          set -euo pipefail
+          out=$1
+          url=$2
+          for attempt in 1 2 3 4; do
+            if curl -sSLf --retry 2 --retry-delay 3 --max-time 300 -o "$out" "$url"; then
+              exit 0
+            fi
+            echo "download of $url failed (attempt $attempt)" >&2
+            rm -f "$out"
+            sleep $((attempt * 5))
+          done
+          echo "could not download $url after 4 attempts" >&2
+          exit 1
+          SH
+          sudo chmod +x /usr/local/bin/fetch
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.3.3
         with:
@@ -225,7 +249,7 @@ jobs:
       - name: Install scala-cli
         if: contains(fromJSON('["scala-cli","scala-cask-api"]'), matrix.stack)
         run: |
-          curl -sSLf -o scala-cli.gz https://github.com/VirtusLab/scala-cli/releases/download/v1.18.0/scala-cli-x86_64-pc-linux.gz
+          fetch scala-cli.gz https://github.com/VirtusLab/scala-cli/releases/download/v1.18.0/scala-cli-x86_64-pc-linux.gz
           gzip -d scala-cli.gz
           chmod +x scala-cli
           sudo mv scala-cli /usr/local/bin/scala-cli
@@ -242,7 +266,7 @@ jobs:
       - name: Install the Clojure CLI
         if: contains(fromJSON('["clojure-cli","clojure-ring-api"]'), matrix.stack)
         run: |
-          curl -sSLf -o linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
+          fetch linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
           chmod +x linux-install.sh
           sudo ./linux-install.sh
           clojure -Sdescribe
@@ -284,7 +308,9 @@ jobs:
       - name: Install rebar3
         if: matrix.stack == 'erlang-cowboy-api'
         run: |
-          sudo curl -fsSL -o /usr/local/bin/rebar3 https://s3.amazonaws.com/rebar3/rebar3
+          # The s3 mirror once served a truncated escript, so the release asset
+          # is pinned and the binary is exercised before anything trusts it.
+          sudo fetch /usr/local/bin/rebar3 https://github.com/erlang/rebar3/releases/download/3.28.0/rebar3
           sudo chmod +x /usr/local/bin/rebar3
           rebar3 --version
 
@@ -355,7 +381,7 @@ jobs:
         if: contains(fromJSON('["powershell-cli","powershell-api"]'), matrix.stack)
         run: |
           if ! command -v pwsh >/dev/null 2>&1; then
-            curl -sSLf -o /tmp/pwsh.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz
+            fetch /tmp/pwsh.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz
             sudo mkdir -p /opt/microsoft/powershell/7
             sudo tar -xzf /tmp/pwsh.tar.gz -C /opt/microsoft/powershell/7
             sudo chmod +x /opt/microsoft/powershell/7/pwsh
@@ -376,7 +402,7 @@ jobs:
         if: matrix.stack == 'mdbook-docs'
         run: |
           if ! command -v mdbook >/dev/null 2>&1; then
-            curl -sSLf -o /tmp/mdbook.tar.gz https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-gnu.tar.gz
+            fetch /tmp/mdbook.tar.gz https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-gnu.tar.gz
             tar -xzf /tmp/mdbook.tar.gz -C /tmp
             sudo install -m755 /tmp/mdbook /usr/local/bin/mdbook
           fi
@@ -506,13 +532,23 @@ jobs:
         uses: azure/setup-helm@v4
         with:
           version: v4.3.1
-      - name: Set up Gleam
+      # setup-beam is reliable for OTP and rebar3, but its own Gleam download
+      # answered 504 twice in a row; the pinned release asset behind `fetch`
+      # keeps a CDN hiccup from failing the job.
+      - name: Set up Erlang for Gleam
         if: contains(fromJSON('["gleam-cli","gleam-mist-api"]'), matrix.stack)
         uses: erlef/setup-beam@v1
         with:
           otp-version: "27.3"
-          gleam-version: 1.19.2
           rebar3-version: "3.28.0"
+      - name: Install Gleam
+        if: contains(fromJSON('["gleam-cli","gleam-mist-api"]'), matrix.stack)
+        run: |
+          tools=$(mktemp -d)
+          fetch "$tools/gleam.tar.gz" https://github.com/gleam-lang/gleam/releases/download/v1.19.2/gleam-v1.19.2-x86_64-unknown-linux-musl.tar.gz
+          tar -xzf "$tools/gleam.tar.gz" -C "$tools"
+          sudo install -m755 "$tools/gleam" /usr/local/bin/gleam
+          gleam --version
       - name: Set up Julia
         if: contains(fromJSON('["julia-cli","julia-api"]'), matrix.stack)
         uses: julia-actions/setup-julia@v2
