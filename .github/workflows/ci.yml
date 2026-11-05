@@ -69,6 +69,7 @@ jobs:
           - python-pytest-plugin
           - python-config-precedence
           - python-task-queue
+          - python-circuit-breaker
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
