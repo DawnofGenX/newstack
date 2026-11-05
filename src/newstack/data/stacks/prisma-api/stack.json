@@ -1,0 +1,84 @@
+{
+  "name": "prisma-api",
+  "title": "Prisma notes API",
+  "language": "node",
+  "blurb": "Prisma 6 over SQLite with Express 5: a migration you can read, a store interface the routes do not know, 422/404/405 answers of its own, and a smoke test that restarts the server to prove the rows survive",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A notes API backed by Prisma and SQLite.",
+  "port": 5467,
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_run} build",
+    "{package_manager_run} migrate",
+    "PORT=5467 {package_manager_run} start",
+    "bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"@prisma/client\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "prisma/schema.prisma"
+  ],
+  "adopt_tests": [
+    "tests/contract.test.ts"
+  ]
+}

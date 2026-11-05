@@ -60,13 +60,15 @@ jobs:
           - node-upload-api
           - hono-api
           - fastify-api
+          - prisma-api
           - openapi-spec
           - graphql-api
+          - playwright-e2e
           - nest-api
           - react-vite-ts
           - angular-app
           - vue-vite-ts
-          - angular-app
+          - nuxt-app
           - next-app-ts
           - chrome-extension
           - astro
@@ -79,6 +81,8 @@ jobs:
           - go-jwt-api
           - rust-cli
           - rust-axum
+          - actix-web
+          - actix-web
           - c-cli
           - c-http-api
           - cpp-cmake-cli
@@ -221,7 +225,7 @@ jobs:
           go-version: "1.24"
           cache: false
       - name: Set up Rust
-        if: matrix.stack == 'rust-cli'
+        if: contains(fromJSON('["rust-cli","rust-axum","actix-web"]'), matrix.stack)
         uses: dtolnay/rust-toolchain@v1
         with:
           toolchain: stable

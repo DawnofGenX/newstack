@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "$0")" && pwd)
-PORT=${PORT:-5464}
+PORT=${PORT:-5466}
 cd "$ROOT"
 
 if curl -fsS --max-time 2 "http://127.0.0.1:${PORT}/api/health" >/dev/null 2>&1; then

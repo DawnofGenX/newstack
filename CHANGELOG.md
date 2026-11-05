@@ -7,18 +7,49 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
-- `angular-app` — Angular 22 standalone component driven by a signal. `ng test` runs Vitest
-  in jsdom, so the suite needs no browser and no Karma launcher; the built bundle is served by
-  a small static server that has to answer the SPA fallback for a deep link and a real `404`
-  for a missing asset, which is what `smoke.sh` checks. `npm` 11 warns that `esbuild`'s
-  postinstall did not run, and the build still works — the platform binary arrives as an
-  optional dependency.
-- `angular-app` — Angular 22 standalone component with `signal`/`computed` counters.
-  Angular 22 scaffolds Vitest + jsdom, so `ng test` needs no browser; the built bundle is
-  served by a zero-dependency static server that falls back to `index.html` only for
-  extension-less paths, and `smoke.sh` asserts the page, the hashed bundle and the 404
-  rule. `ng build` emits a *relative* script `src`, which is why a bundle check has to
-  add the leading slash.
+- `actix-web` — actix-web 4 with no framework magic. `web::route()` (any method) per path
+  instead of `web::get()`/`web::post()` is what lets an unsupported method answer the
+  app's own `405` JSON rather than actix's `404`; replies are built from a `struct` so the
+  `text, lines, words, bytes` key order is byte-exact (`serde_json::json!` alone is not
+  ordered); the query decoder returns `bytes`, because `%C3%A9` is one character but two
+  bytes and the counter must see two. Its `detect` rule carries `actix-web` as content, which
+  is what keeps a real actix project from coming out ambiguous against the bare-`Cargo.toml`
+  Rust stacks.
+- `actix-web` — the service owns its routing: `web::route()` (there is no `web::any()`
+  in actix 4) with a manual method check, plus `default_service`, because actix's own
+  405/404 bodies are plain text. `serde_json::json!` sorts keys, so a byte-compared
+  response must come from a struct; and `query_string()` arrives raw, so `+` and `%C3`
+  are the app's job.
+- `prisma-api` — Prisma 6 + SQLite + Express 5. The CLI resolves `file:./dev.db` relative to
+  `schema.prisma`, so the runtime default has to resolve the *same* absolute file or
+  `migrate deploy` looks like a no-op against a database the app never opens. `app.all()`
+  instead of `app.get()` is what makes an unsupported method a `405` rather than Express's
+  own `404`; `express.json()`'s `SyntaxError` is mapped to `422 invalid_json`; and `PATCH`
+  only writes the members that were sent, so an untouched `body` survives. The smoke test
+  kills the server and asks again, because "the row is in memory" and "the row is in SQLite"
+  answer identically until a restart.
+- `playwright-e2e` — a browser suite where Playwright owns the server (`webServer`), so
+  one command is self-contained; `reuseExistingServer: false` stops a stale process from
+  making the suite pass against old code. A project-level `testMatch` alone does not keep
+  the desktop project from collecting a mobile-only spec — it reports as "1 skipped" and
+  hides a green suite behind a skip, so the desktop project needs `testIgnore`. CI must
+  run `npx playwright install --with-deps chromium` (the browser alone lacks libnss3).
+- `nuxt-app` — Nuxt 4 SSR app. Without a `pages/` directory Nuxt renders `app.vue` for
+  *every* path, so no request is ever a 404; adding `pages/index.vue` is what makes the
+  router answer one. `server/api/stats.get.ts` only claims `GET`, and an unmatched method
+  falls through to the page renderer as `200` HTML, so the route is one file for every
+  method that returns `405` (with `allow: GET`) itself. `tsconfig.json` extends
+  `./.nuxt/tsconfig.json`, which does not exist until `nuxt prepare` runs — vitest therefore
+  dies with `TSCONFIG_ERROR` on a fresh clone unless `postinstall` prepares the types.
+  Vue's `{{ … }}` interpolation cannot be written in the template verbatim (newstack renders
+  those), so the page binds with `v-text`.
+- `angular-app` — Angular 22 standalone component driven by `signal`/`computed` counters.
+  `ng test` runs Vitest in jsdom, so the suite needs no browser and no Karma launcher; the
+  built bundle is served by a small static server that has to answer the SPA fallback for a
+  deep link and a real `404` for a missing asset, which is what `smoke.sh` checks. `ng build`
+  emits a *relative* script `src`, so a bundle check has to add the leading slash. `npm` 11
+  warns that `esbuild`'s postinstall did not run, and the build still works — the platform
+  binary arrives as an optional dependency.
 - `python-litestar-api` — Litestar 2 service. A declared `text: str` handler parameter makes
   Litestar answer `400` with its own envelope before the handler runs, so the handler takes
   `Request` and the contract decides `422`; `request.scope["raw_path"]` already ends with

@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      # No lockfile ships with a fresh scaffold, so `cache: {{ package_manager }}`
+      # and `{{ package_manager_ci }}` would both fail until you commit one.
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - run: {{ package_manager_test }}
+      - run: {{ package_manager_run }} build
+      - name: Serve the nitro build and assert it
+        run: bash smoke.sh
+        env:
+          PORT: "5465"

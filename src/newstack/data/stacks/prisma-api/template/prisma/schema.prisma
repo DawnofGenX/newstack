@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  // literal, not env("DATABASE_URL"): .env is gitignored, so `prisma migrate
+  // deploy` on a clean clone must still resolve the DB path. Relative to this
+  // schema file => prisma/dev.db. Runtime override lives in src/db.ts.
+  url      = "file:./dev.db"
+}
+
+model Note {
+  id        Int      @id @default(autoincrement())
+  title     String
+  body      String
+  createdAt DateTime @default(now())
+}

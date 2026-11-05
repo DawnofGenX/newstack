@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 5464;
+const PORT = 5466;
 
 /**
  * The fixture server is started by Playwright itself (`webServer`), so the suite is

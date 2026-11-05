@@ -21,7 +21,7 @@
     "yarn"
   ],
   "default_description": "A Playwright browser test suite.",
-  "port": 5464,
+  "port": 5466,
   "next_steps": [
     "cd {path}",
     "{package_manager_install}",

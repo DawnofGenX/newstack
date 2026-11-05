@@ -22,7 +22,7 @@ bash smoke.sh                     # suite + proves the fixture port is released
 | `fixtures/app/` | the page under test (`index.html`, `app.js`, `lib/counts.mjs`) |
 | `tests/stats.spec.ts` | the suite: UI, network, label association, 404, client route |
 | `tests/mobile.spec.ts` | phone viewport: still counts, and nothing overflows horizontally |
-| `smoke.sh` | runs the suite and then asserts nothing is still listening on 5464 |
+| `smoke.sh` | runs the suite and then asserts nothing is still listening on 5466 |
 
 ## Traps this starter already paid for
 

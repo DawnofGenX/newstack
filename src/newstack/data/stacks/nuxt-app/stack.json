@@ -1,0 +1,83 @@
+{
+  "name": "nuxt-app",
+  "title": "Nuxt 4 app",
+  "language": "node",
+  "blurb": "Nuxt 4: SSR page over a shared counter, a Nitro API route that owns its 422/405, Vitest tests, curl-checked build",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A Nuxt application.",
+  "port": 5465,
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_run} build",
+    "PORT=3000 {package_manager_run} start",
+    "bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"nuxt\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "nuxt.config.ts",
+    "tsconfig.json"
+  ],
+  "adopt_tests": [
+    "tests/counts.test.ts"
+  ]
+}

@@ -257,9 +257,9 @@ $ newstack stacks outdated
 | `python-scheduler-api` | A durable scheduler: due jobs claimed under `BEGIN IMMEDIATE`, interval jobs rescheduled from *now* so an overdue job does not stampede, exponential back-off capped by `max_attempts`, and a run ledger with the counts of every attempt | `uv` |
 | `python-litestar-api` | Litestar 2 text-statistics API: the handler takes `Request` instead of a validated parameter so `422` stays the project's answer, `raw_path` already carries the query string, and every rule lives in a pure `route()` function with a TestClient suite on top | `uv` |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
-| `angular-app` | Angular 22 standalone component with signals: Vitest + jsdom instead of Karma, `ng build` bundle served by a zero-dependency static server with an SPA fallback, curl-checked in `smoke.sh` | `node`, `npm`/\`pnpm`/\`yarn` |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
-| `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle, static server with SPA fallback, bundle asserted by curl | `node`, `npm`/`\`pnpm`/`\`yarn` |
+| `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle served by a zero-dependency static server with an SPA fallback, page/bundle/404 asserted by curl in `smoke.sh` | `node`, `npm`/`\`pnpm`\`/`\`yarn` |
+| `nuxt-app` | Nuxt 4 SSR app over a shared counter: `pages/` for a real 404, one `server/api/stats.ts` for every method so `405` is the app's answer, Nitro `node-server` build, Vitest with no browser | `node`, `npm`/`\`pnpm`\`/\`yarn` |
 | `next-app-ts` | Next.js App Router + TS + Tailwind 4, Vitest + Testing Library | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `chrome-extension` | MV3 extension: popup + service worker + content script, `npm run pack` → extension.zip | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `astro` | Astro + TS content site: typed frontmatter, Vitest unit tests, `astro check` + static build | `node`, `npm`/\`pnpm\`/\`yarn` |
@@ -272,8 +272,10 @@ $ newstack stacks outdated
 | `node-upload-api` | Resumable uploads on bare Node: declared size, byte ranges at client-supplied offsets, `409 offset_mismatch` with the expected value, SHA-256 of the finished file, delete frees the bytes | `node`, `npm`/\`pnpm`/\`yarn` |
 | `hono-api` | Hono JSON API: `createApp()` returned as a value so tests use `app.request()` with no socket, `tsc` build (no bundler), `node dist/server.js` | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `fastify-api` | Fastify 5 API: the built-in JSON parser is removed so the raw body distinguishes `missing_text` from `invalid_json`, one catch-all route keeps the 404/405 table in a pure function, hand-serialised replies keep the key order | `node`, `npm`/`\`pnpm`/`\`yarn` |
+| `prisma-api` | Prisma 6 over SQLite with Express 5: a readable initial migration replayed by `migrate deploy`, a `NoteStore` interface so the routes never import Prisma, `422`/`404`/`405` answers of the app's own, and a smoke test that restarts the server to prove the rows survive | `node`, `npm`/`\`pnpm`\`/\`yarn` |
 | `openapi-spec` | OpenAPI 3.1 first: spectral lint with warnings as failures, redocly bundle + HTML reference, contract tests validating live responses against the bundle | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `graphql-api` | GraphQL Yoga with schema-first SDL: typed resolvers, a depth-limit plugin that answers `QUERY_TOO_DEEP` instead of hanging, `yoga.fetch()` tests with no socket, `tsc` build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `playwright-e2e` | Browser-level suite: Playwright starts the fixture server itself (`webServer`, `reuseExistingServer: false`), chromium + a Pixel 7 project, `getByLabel` so an unassociated `<label>` fails, a horizontal-overflow check on mobile, traces kept on failure | `node`, `npm`/`\`pnpm`/`\`yarn` |
 | `dbt-project` | Analytics engineering on dbt + DuckDB: seed → staging view → mart table, `+schema` per layer, generic + singular tests, `dbt build` runs models and tests, and a read-only script re-checks the numbers | `uv`, `git` |
 | `nest-api` | NestJS 12 service: module/controller/service wiring, a validating pipe, supertest end-to-end tests, ESM throughout | `node`, `npm`/\\`pnpm\\`/\\`yarn` |
 | `svelte-kit-ts` | SvelteKit + TS, Svelte 5 runes component, Vitest, static adapter build | `node`, `npm`/\`pnpm\`/\`yarn` |
@@ -285,6 +287,8 @@ $ newstack stacks outdated
 | `go-jwt-api` | Go token service: PBKDF2 password digests, HMAC-signed bearer tokens with an absolute deadline, constant-time comparisons, an account store that writes atomically, and one indistinguishable 401 for expired-vs-forged | `go` |
 | `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
 | `rust-axum` | axum service: typed routes, shared state, `tower` oneshot tests, fmt/clippy | `cargo` |
+| `actix-web` | actix-web 4 service with hand-owned routing: an any-method route so the `405`/`404` bodies are JSON of the app's own, a struct (not `json!`) so the key order is byte-exact, a percent decoder that returns bytes, 39 offline self-checks plus a live curl contract that reaps its own server | `cargo`, `git` |
+| `actix-web` | actix-web 4 service that owns its routing (`web::route()` any-method, JSON 405/404), struct-ordered JSON, raw query decoding, 39 offline checks | `cargo` |
 | `c-cli` | C11 CLI: Makefile lib+bin split, assert-header test suite, `-Wall -Wextra -Wpedantic -Werror` from the first commit | `cc`, `make` |
 | `c-http-api` | C11 JSON service on POSIX sockets: pure `textstat_route`, a hand-written JSON reader that keeps strings and numbers apart, and a socket loop with 5 s read timeouts | `cc`, `make` |
 | `cpp-cmake-cli` | C++20 CLI: CMake lib+bin split, CTest suite, warning-clean GCC/Clang build | `cmake`, `g++` |

@@ -1,0 +1,23 @@
+{
+  "name": "{{ npm_name }}",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">={{ node_version }}"
+  },
+  "scripts": {
+    "postinstall": "nuxt prepare",
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "start": "node .output/server/index.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "nuxt": "^4.6.4",
+    "vue": "^3.5.45"
+  },
+  "devDependencies": {
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
+  }
+}
