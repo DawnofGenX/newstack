@@ -1,0 +1,81 @@
+{
+  "name": "python-leases-fences",
+  "title": "Leases with fencing tokens",
+  "language": "python",
+  "blurb": "A lease is a deadline, and a deadline cannot stop a holder that was paused past it. This stack builds both halves: a store that grants one lease at a time with a strictly increasing token, renews from now (never from the old expiry, which would pay a paused holder for time it never used), and treats its own clock as the only authority; and a fenced resource that refuses any write from a token older than the last one it accepted. The same pause is run twice, against a fenced and an unfenced value, so the lost update is printed instead of described.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A lease with a strictly increasing fencing token, and a resource that refuses the ghost of an expired holder.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} model --ttl-ms 1000 --pause-ms 1500",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "never from the old expiry"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_lease.py"
+  ]
+}
