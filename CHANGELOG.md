@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`hono-api`**: a Hono JSON API on Node with no bundler — `tsc` emits plain ESM and
+  `node dist/server.js` serves it. The stack's argument is the test shape: `createApp()`
+  returns the app as a value, so `app.request("/stats?text=…")` hands back a real `Response`
+  in-process and the suite needs no port, no server start and no teardown. A missing field,
+  a non-string and a non-JSON body are all `422`, an unknown route is a JSON `404`, and the
+  verify step still boots the built server and curls it, because a route that only works
+  through `app.request()` would pass the unit tests and fail the deploy.
 - **`ts-lib`**: a publishable TypeScript package, and the first stack whose subject is the
   *published shape* rather than the code. `countText`/`formatCounts` are ordinary, but
   `package.json` splits `exports` per condition (`import` → `.d.ts`, `require` → `.d.cts`)

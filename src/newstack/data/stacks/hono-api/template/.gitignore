@@ -1,0 +1,12 @@
+# Dependencies and build output. Both anchored, so a source directory named
+# "dist" is never ignored by accident.
+/node_modules/
+/dist/
+/coverage/
+
+# Package manager and editor noise
+*.log
+.npm/
+.pnpm-store/
+.DS_Store
+*.tsbuildinfo

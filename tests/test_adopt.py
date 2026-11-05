@@ -395,3 +395,20 @@ def test_a_tsup_package_resolves_to_the_ts_library_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["ts-lib"]
+
+
+def test_a_hono_package_resolves_to_the_hono_stack(tmp_path) -> None:
+    """`hono` in dependencies is the marker; the app stacks look for their own framework."""
+
+    make_repo(
+        tmp_path,
+        {
+            "package.json": (
+                '{"name": "demo",\n'
+                ' "dependencies": {"hono": "^4.13.16", "@hono/node-server": "^2.1.6"}}\n'
+            ),
+            "src/app.ts": 'export const app = 1;\n',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["hono-api"]

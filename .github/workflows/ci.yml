@@ -49,6 +49,7 @@ jobs:
           - flask
           - data-science
           - node-express-ts
+          - hono-api
           - nest-api
           - react-vite-ts
           - vue-vite-ts

@@ -1,0 +1,89 @@
+{
+  "name": "hono-api",
+  "title": "Hono API",
+  "language": "node",
+  "blurb": "Hono JSON API on Node: typed routes, in-memory app.request() tests, tsc build, no bundler",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A Hono JSON API.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_run} test",
+    "{package_manager_run} dev"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "PORT=5321 node dist/server.js >.hono.log 2>&1 & srv=$!; ok=1; for _ in $(seq 1 120); do if curl -fsS http://127.0.0.1:5321/health >/dev/null 2>&1; then ok=0; break; fi; sleep 0.5; done; if [ $ok -ne 0 ]; then cat .hono.log; kill $srv 2>/dev/null; exit 1; fi; body=$(curl -fsS 'http://127.0.0.1:5321/stats?text=hello%20world%0A'); post=$(curl -fsS -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5321/stats); bad=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -d '{}' http://127.0.0.1:5321/stats); missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5321/nope); kill $srv 2>/dev/null; wait $srv 2>/dev/null; printf '%s' \"$body\" | grep -q '\"lines\":1' && printf '%s' \"$body\" | grep -q '\"bytes\":12' && printf '%s' \"$post\" | grep -q '\"lines\":2' && printf '%s' \"$post\" | grep -q '\"words\":3' && test \"$bad\" = 422 && test \"$missing\" = 404",
+      "tools": [
+        "node",
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"hono\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "tsconfig.build.json"
+  ],
+  "adopt_tests": [
+    "test/app.test.ts"
+  ]
+}

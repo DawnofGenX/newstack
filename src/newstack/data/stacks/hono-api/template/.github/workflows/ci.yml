@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      # No lockfile is shipped with a fresh scaffold, so `cache: {{ package_manager }}`
+      # and `{{ package_manager_ci }}` would both fail here: they require a committed
+      # {{ package_manager_lock }}. Run `{{ package_manager_install }}` once and commit
+      # the lockfile, then you can switch to `{{ package_manager_ci }}` and re-add
+      # `cache: {{ package_manager }}` for reproducible, cached installs.
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - name: Typecheck
+        run: {{ package_manager_run }} typecheck
+      - name: Test
+        run: {{ package_manager_test }}
+      - name: Build
+        run: {{ package_manager_run }} build
+      # The build is what ships, so start it and talk to it over HTTP: a route that only
+      # works through `app.request()` would pass the unit tests and fail the deploy.
+      - name: Serves HTTP
+        run: |
+          PORT=5321 node dist/server.js &
+          server=$!
+          trap 'kill $server 2>/dev/null' EXIT
+          for _ in $(seq 1 120); do
+            curl -fsS http://127.0.0.1:5321/health >/dev/null 2>&1 && break
+            sleep 0.5
+          done
+          curl -fsS http://127.0.0.1:5321/health
+          curl -fsS 'http://127.0.0.1:5321/stats?text=hello%20world%0A'
+          curl -fsS -X POST -H 'content-type: application/json' \
+            --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5321/stats
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+            -H 'content-type: application/json' -d '{}' http://127.0.0.1:5321/stats)" = 422
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5321/nope)" = 404
