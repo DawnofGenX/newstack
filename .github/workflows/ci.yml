@@ -80,6 +80,7 @@ jobs:
           - python-idempotency-keys
           - python-counter-rollup
           - python-single-flight
+          - python-text-diff
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
