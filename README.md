@@ -343,6 +343,7 @@ $ newstack stacks outdated
 | `ada-cli` | Ada CLI on GNAT: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, output through two subprogram parameters | `gnatmake`, `make` |
 | `ada-http-api` | Ada JSON service on `GNAT.Sockets`: pure counting and contract packages, one pure `Route (method, path, query, body)` covering every status code, and a validating JSON reader that keeps a number apart from a string | `gnatmake`, `make` |
 | `octave-cli` | Octave CLI on plain `octave`: counting core in a `+textstat` package, hand-rolled argv parser, dependency-free suite, environment injected as function handles | `octave` |
+| `octave-http-api` | Octave JSON service on the bundled JVM bridge: `java.net.ServerSocket`, a hand-written JSON reader over `uint8` bytes, and a framework-free self test | `octave`, `curl` |
 | `prolog-cli` | SWI-Prolog CLI: byte-exact counting over a stream, hand-rolled argv parser, a four-predicate test harness, output behind two writer closures | `swipl` |
 | `prolog-http-api` | SWI-Prolog JSON service on `library(http/http_server)`: the route table is one pure predicate, a plain Prolog script tests it, one module binds the port | `swipl` |
 | `lisp-cli` | Common Lisp CLI on SBCL: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, I/O through a structure of functions | `sbcl` |

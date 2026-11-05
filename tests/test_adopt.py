@@ -1309,3 +1309,25 @@ def test_a_plain_fortran_program_still_resolves_to_the_fortran_cli(tmp_path) -> 
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["fortran-cli"], "the fortran service must not claim a plain program"
+
+
+def test_an_octave_socket_server_resolves_to_the_octave_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "main.m": "addpath('lib');\nserve('127.0.0.1', 8080);\n",
+            "lib/serve.m": (
+                "function serve(host, port)\n"
+                "  s = javaObject('java.net.ServerSocket');\n"
+                "end\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["octave-http-api"], "the JVM server socket marks a service, not a CLI"
+
+
+def test_a_plain_octave_script_still_resolves_to_the_octave_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"main.m": "printf('hi\\n');\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["octave-cli"], "the octave service must not claim a plain script"

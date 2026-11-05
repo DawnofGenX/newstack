@@ -56,7 +56,7 @@
       "file": "main.m"
     }
   ],
-  "detect_fallback": false,
+  "detect_fallback": true,
   "adopt": [
     ".github/workflows/ci.yml",
     ".gitignore"

@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `octave-http-api` — an Octave JSON service with no packages to install. Octave
+  has no sockets, so `lib/serve.m` drives `java.net.ServerSocket` through the
+  bundled JVM bridge, reads the head byte by byte with
+  `InputStream.read()` (which returns `-1` at end of stream) and answers with a
+  pure-Octave router; `lib/jsonread.m` keeps the last `text` member and decodes
+  `\u` escapes and surrogate pairs; `lib/selftest.m` is the entire suite (27
+  checks). Octave passes structs BY VALUE, so the JSON reader threads its cursor
+  through every helper's return values instead of mutating it in place.
 - `fortran-http-api` — a Fortran JSON service with no bindings and no dependencies:
   `server_m.f90` declares `socket`, `bind`, `listen`, `accept`, `recv`, `send` and
   `close` as `bind(c)` interfaces and speaks HTTP/1.1 over an `int8` buffer,

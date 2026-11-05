@@ -137,6 +137,7 @@ jobs:
           - ada-cli
           - ada-http-api
           - octave-cli
+          - octave-http-api
           - prolog-cli
           - prolog-http-api
           - lisp-cli
@@ -497,10 +498,10 @@ jobs:
           swipl --version
 
       - name: Install Octave
-        if: matrix.stack == 'octave-cli'
+        if: contains(fromJSON('["octave-cli","octave-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends octave
+          sudo apt-get install -y --no-install-recommends octave curl
           octave --version | head -1
 
       - name: Install Tcl
