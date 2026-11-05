@@ -1474,4 +1474,37 @@ def test_a_plain_go_program_still_resolves_to_the_go_cli(tmp_path) -> None:
     assert names == ["go-cli", "go-http"], "the worker must not claim every Go project"
 
 
+def test_a_server_sent_events_server_resolves_to_the_sse_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": (
+                "[project]\n"
+                'name = "events"\n'
+                'dependencies = ["fastapi", "uvicorn"]\n'
+            ),
+            "src/events/routes.py": (
+                "from fastapi.responses import StreamingResponse\n"
+                "\n"
+                'MEDIA = "text/event-stream"\n'
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-sse-api"], "a stream is not a plain FastAPI app"
 
+
+def test_a_plain_fastapi_app_does_not_match_the_sse_stack(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pyproject.toml": (
+                "[project]\n"
+                'name = "api"\n'
+                'dependencies = ["fastapi"]\n'
+            ),
+            "app.py": "from fastapi import FastAPI\n\napp = FastAPI()\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-sse-api" not in names, "the sse stack must not claim every FastAPI app"

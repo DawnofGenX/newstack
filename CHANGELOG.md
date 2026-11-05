@@ -7,6 +7,14 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-sse-api` — the registry's first streaming response. `GET /stream` holds
+  the connection open and writes one event per tick, `Last-Event-ID` resumes
+  instead of replaying, and `src/<pkg>/wire.py` is the only place that knows the
+  field format (a newline inside `data:` splits the event, so a multi-line value
+  repeats the field name). The `http` step times the first event with a raw
+  `http.client` read: curl piped into grep reports the end of the pipe, not the
+  arrival of the line, and a server that builds the whole body as one string
+  passes every other test.
 - `go-worker` — the registry's first batch worker and the first stack with no
   port at all. `job.go` splits failures into permanent (`invalid_json`,
   `missing_id`, `unknown_op`) and `transient`, so only a retryable failure spends
