@@ -92,6 +92,7 @@ jobs:
           - python-bloom-filter
           - python-consistent-hashing
           - python-leases-fences
+          - python-count-min-sketch
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
