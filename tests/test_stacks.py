@@ -584,3 +584,51 @@ def test_every_uploaded_artifact_is_created_by_the_same_workflow(name: str) -> N
                 f"{name}/{workflow.name} uploads {target!r} but nothing in that workflow "
                 "creates it"
             )
+
+STDLIB_IMPORTS = frozenset(
+    {
+        "__future__",
+        "collections",
+        "csv",
+        "dataclasses",
+        "datetime",
+        "json",
+        "logging",
+        "os",
+        "pathlib",
+        "re",
+        "shutil",
+        "sqlite3",
+        "subprocess",
+        "sys",
+        "tempfile",
+        "time",
+        "typing",
+        "urllib",
+    }
+)
+IMPORT_LINE = re.compile(r"(?m)^\s*(?:import|from)\s+([A-Za-z_][A-Za-z0-9_]*)")
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_python_workflows_import_the_rendered_package(name: str) -> None:
+    """A workflow that imports the sample module only works for the sample.
+
+    ``newstack check`` never runs the workflow, so a hardcoded ``import
+    textstat`` in a CI step stays invisible until the runner renders a project
+    with a different name and dies with ModuleNotFoundError.
+    """
+    stack = get_stack(name)
+    if stack.language != "python":
+        pytest.skip("not a python stack")
+    workflow = stack.directory / "template/.github/workflows/ci.yml"
+    if not workflow.exists():
+        return
+    text = workflow.read_text(encoding="utf-8")
+    imported = {match.group(1) for match in IMPORT_LINE.finditer(text)}
+    offenders = sorted(imported - STDLIB_IMPORTS)
+    assert not offenders, (
+        f"{name} imports {offenders} in its workflow; "
+        "use {{ package_name }} so the rendered project works"
+    )
+
