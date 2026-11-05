@@ -7,10 +7,13 @@
     <RootNamespace>{{ package_name }}</RootNamespace>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- The test project lives under tests/; keep its sources AND its build output
+         out of this project's default items, otherwise the app build tries to copy
+         tests/bin/** into bin/Debug/net8.0/tests/bin/** and dies with MSB3026. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- The test project lives under tests/; keep its sources out of the app build. -->
     <Compile Remove="tests/**" />
   </ItemGroup>
 
