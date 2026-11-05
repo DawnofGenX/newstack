@@ -69,6 +69,7 @@ jobs:
           - spring-boot
           - php-composer-cli
           - symfony-app
+          - laravel-app
           - csharp-cli
           - dotnet-cli
           - elixir-mix-cli
@@ -417,11 +418,11 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["php-composer-cli","symfony-app"]'), matrix.stack)
+        if: contains(fromJSON('["php-composer-cli","symfony-app","laravel-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
-          extensions: ctype, mbstring, xml
+          extensions: ctype, fileinfo, mbstring, tokenizer, xml
           coverage: none
       - name: Set up .NET
         if: contains(fromJSON('["csharp-cli","fsharp-cli","dotnet-cli"]'), matrix.stack)

@@ -1,0 +1,23 @@
+# Composer dependencies and the local environment file
+/vendor/
+/.env
+/.env.backup
+/.env.production
+
+# Laravel's writable directories
+/bootstrap/cache/*.php
+/storage/*.key
+/storage/framework/cache/data/*
+/storage/framework/views/*.php
+/storage/logs/*.log
+
+# phpunit cache
+/.phpunit.cache
+/.phpunit.result.cache
+
+# editor and OS noise
+/.idea
+/.vscode
+*.swp
+*~
+.DS_Store

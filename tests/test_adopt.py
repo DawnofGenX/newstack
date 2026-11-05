@@ -121,6 +121,24 @@ def test_symfony_app_wins_over_the_composer_fallback(tmp_path) -> None:
     assert names == ["symfony-app"], "php-composer-cli must not compete with a Symfony project"
 
 
+def test_laravel_app_wins_over_the_composer_fallback(tmp_path) -> None:
+    """A Laravel project is also a Composer project.
+
+    php-composer-cli detects a bare composer.json; it is a fallback, so the more specific
+    `artisan` marker must decide, or a Laravel repo exits 2 as ambiguous.
+    """
+
+    make_repo(
+        tmp_path,
+        {
+            "composer.json": '{"require": {"laravel/framework": "^13.17"}}',
+            "artisan": "#!/usr/bin/env php\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["laravel-app"], "php-composer-cli must not compete with a Laravel project"
+
+
 def test_plain_composer_project_still_resolves_to_php_composer_cli(tmp_path) -> None:
     make_repo(tmp_path, {"composer.json": '{"require": {"php": "^8.3"}}'})
     names = [stack.name for stack in detect_stacks(tmp_path)]

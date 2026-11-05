@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`laravel-app`**: a Laravel 13 JSON service on PHP 8.3. Counting lives in a pure
+  `App\Support\TextStat` class, `StatController` is a thin route handler, and a PHPUnit 12
+  suite proves routing, JSON encoding, the 422 and 404 paths — plus a test that Laravel's
+  global `TrimStrings` / `ConvertEmptyStringsToNull` middleware, removed in
+  `bootstrap/app.php`, no longer eats the trailing newline that makes a line count wrong.
 - **`jsonnet-config`**: a service manifest in Jsonnet where the rules are data too.
   `check` prints `ok` or one line per problem, `render` sorts services and sums
   replicas, and an 18-check suite builds deliberately broken manifests so a validator

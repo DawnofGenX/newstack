@@ -274,6 +274,7 @@ $ newstack stacks outdated
 | `spring-boot` | Java 21 Spring Boot 3 web service on Maven: a wc-style `/stats` endpoint, a pure service, and a JUnit 5 + MockMvc suite | `java`, `mvn` |
 | `php-composer-cli` | PHP 8.3 CLI on Composer: PSR-4 autoloading, a PHPUnit 11 suite, and a wc-style text counter | `php`, `composer` |
 | `symfony-app` | Symfony 7 web app on PHP 8.3: a JSON route wired to a pure service, kernel-level PHPUnit test, working `bin/console` | `php`, `composer` |
+| `laravel-app` | Laravel 13 JSON service on PHP 8.3: pure counting class, route + controller, PHPUnit 12 suite covering 422/404 and the input-trimming trap | `php`, `composer` |
 | `csharp-cli` | C# 12 CLI on .NET 8: pure counting library, xUnit suite, exit codes as a contract | `dotnet` |
 | `dotnet-cli` | .NET 8 C# CLI with a solution file: counting core, hand-written argv parser, xUnit suite, exit codes as a contract | `dotnet` |
 | `elixir-mix-cli` | Elixir CLI on Mix: pure counting module, ExUnit suite, escript binary | `elixir`, `mix` |
