@@ -1,0 +1,87 @@
+{
+  "name": "node-http-cache",
+  "title": "Node HTTP conditional requests",
+  "language": "node",
+  "blurb": "A cache is a bet about the future, settled by a conditional request. This stack implements RFC 9110 ETags and proves the rules with a real server: If-None-Match compares WEAKLY so a weak tag answers 304, If-Match compares STRONGLY so the same tag answers 412, a 304 carries no body and must refresh freshness rather than empty the stored copy, If-None-Match outranks If-Modified-Since, and Vary: accept means the URL alone is not a cache key.",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "default_description": "An HTTP cache that measures what it saves.",
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "npm install --no-audit --no-fund",
+    "npm run build",
+    "node dist/src/main.js demo",
+    "node dist/src/main.js serve --port 5479"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "node",
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": "npm run selftest",
+      "tools": [
+        "node",
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "node",
+        "npm",
+        "bash"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/**/*.ts",
+      "contains": "If-None-Match compares weakly, If-Match strongly"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json"
+  ],
+  "adopt_tests": [
+    "tests/etag.test.ts"
+  ]
+}

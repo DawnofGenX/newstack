@@ -114,6 +114,7 @@ jobs:
           - node-event-sourcing
           - node-stream-backpressure
           - node-worker-pool
+          - node-http-cache
           - hono-api
           - fastify-api
           - prisma-api
