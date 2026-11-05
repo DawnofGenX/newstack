@@ -1,0 +1,68 @@
+{
+  "name": "nim-http-api",
+  "title": "Nim HTTP API",
+  "language": "nim",
+  "blurb": "Nim 1.6+ JSON service: a pure counting core, a pure router, asynchttpserver on top, and a unittest suite behind nimble build/test",
+  "requires": [
+    "nim",
+    "nimble",
+    "curl"
+  ],
+  "default_description": "A Nim JSON service that counts lines, words and bytes.",
+  "next_steps": [
+    "cd {path}",
+    "nimble build",
+    "PORT=8080 ./{package_name}",
+    "curl 'http://127.0.0.1:8080/stats?text=hello%20world%0A'",
+    "nimble test"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "nimble build -d:release",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "nimble test",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "check",
+      "cmd": "nim check --hints:off src/{{ package_name }}.nim",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "http",
+      "cmd": "PORT=5415 ./{{ package_name }} >.nim.log 2>&1 & srv=$!; ready=1; for _ in $(seq 1 120); do if curl -fsS http://127.0.0.1:5415/health >/dev/null 2>&1; then ready=0; break; fi; sleep 0.5; done; if [ $ready -ne 0 ]; then cat .nim.log; kill $srv 2>/dev/null; exit 1; fi; health=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5415/health); stats=$(curl -s 'http://127.0.0.1:5415/stats?text=hello%20world%0A'); posted=$(curl -s -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5415/stats); bad=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5415/stats); missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5415/nope); kill $srv 2>/dev/null; wait $srv 2>/dev/null || true; cat .nim.log; test \"$health\" = 200 && printf '%s' \"$stats\" | grep -q '\"lines\":1' && printf '%s' \"$stats\" | grep -q '\"bytes\":12' && printf '%s' \"$posted\" | grep -q '\"words\":3' && test \"$bad\" = 422 && test \"$missing\" = 404",
+      "tools": [
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/server.nim"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_all.nim"
+  ]
+}

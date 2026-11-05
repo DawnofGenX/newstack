@@ -89,6 +89,7 @@ jobs:
           - zig-cli
           - julia-cli
           - nim-cli
+          - nim-http-api
           - perl-cli
           - lua-cli
           - fsharp-cli
@@ -490,7 +491,7 @@ jobs:
         with:
           version: "1.13"
       - name: Set up Nim
-        if: matrix.stack == 'nim-cli'
+        if: contains(fromJSON('["nim-cli","nim-http-api"]'), matrix.stack)
         uses: jiro4989/setup-nim-action@v2
         with:
           nim-version: "2.2.4"

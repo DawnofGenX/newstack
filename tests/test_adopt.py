@@ -603,3 +603,28 @@ def test_a_plain_deps_file_still_resolves_to_the_clojure_cli(tmp_path) -> None:
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["clojure-cli"]
 
+
+
+def test_a_nim_server_resolves_to_the_nim_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "blog_count.nimble": 'version = "0.1.0"\nrequires "nim >= 1.6.0"\n',
+            "src/server.nim": "import std/asynchttpserver\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["nim-http-api"]
+
+
+def test_a_plain_nim_project_still_resolves_to_the_nim_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "blog_count.nimble": 'version = "0.1.0"\nrequires "nim >= 1.6.0"\n',
+            "nim.cfg": "--path:src\n",
+            "src/blog_count.nim": "echo \"hello\"\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["nim-cli"]

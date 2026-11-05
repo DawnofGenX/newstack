@@ -1,0 +1,4 @@
+/{{ package_name }}
+/tests/test_all
+nimcache/
+*.log

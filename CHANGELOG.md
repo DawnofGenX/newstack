@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`nim-http-api`**: Nim service that needs no package manager at all — the counting core
+  and the router are plain modules, so `nimble test` exercises every status code through a
+  pure `route(method, path, query, body)` function while `std/asynchttpserver` adapts real
+  requests to it. Two Nim facts are baked in: `method` is a reserved word (the parameter is
+  `httpMethod`), and `std/uri` has no `parseQuery` on 1.6, so the query string is split and
+  `decodeUrl`-ed by hand. `requires "nim >= 1.6.0"` must be call syntax in a `.nimble` file;
+  the `= @[...]` form fails `nimble build` with "'requires' cannot be assigned to".
 - **`clojure-ring-api`**: Ring on `deps.edn`, and the lesson is that a Ring handler is
   already a testable function — `ring.mock.request` builds the request map, so the suite
   covers every route with no port and `ring/ring-mock` sits in the `:test` alias rather
