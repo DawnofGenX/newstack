@@ -527,3 +527,29 @@ def test_a_plain_pubspec_still_resolves_to_the_dart_cli(tmp_path) -> None:
         {"pubspec.yaml": 'name: demo\nenvironment:\n  sdk: ">=3.5.0 <4.0.0"\n'},
     )
     assert [stack.name for stack in detect_stacks(tmp_path)] == ["dart-cli"]
+
+
+def test_a_deno_config_with_std_http_resolves_to_the_deno_service(tmp_path) -> None:
+    """`@std/http` in the import map means a server, not a script runner."""
+
+    make_repo(
+        tmp_path,
+        {
+            "deno.json": '{"imports": {"@std/http": "jsr:@std/http@^1.0.0"}}',
+            "src/server.ts": "Deno.serve(handler);\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["deno-api"]
+
+
+def test_a_plain_deno_config_still_resolves_to_the_deno_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "deno.json": '{"imports": {"@std/assert": "jsr:@std/assert@^1.0.0"}}',
+            "src/main.ts": "console.log('hi');\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["deno-cli"]

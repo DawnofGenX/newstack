@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`deno-api`**: Deno 2 service with no framework — `handler` is a plain
+  `(Request) => Response` function, so `Deno.test` builds requests and awaits
+  responses with no port to bind, while `Deno.serve` in `src/server.ts` and a curl
+  step in the verify manifest still exercise a real socket. Permissions are least
+  privilege: `--allow-env --allow-net` only, so a dependency cannot touch the disk.
+  `deno fmt --check` is a gate, which means the template ships already-formatted
+  files (`deno fmt` rewraps object literals and generic parameters).
 - **`dart-shelf-api`**: the registry's first Dart service, and the shape is worth
   copying: `buildHandler()` returns a `Handler`, so tests call the exact function the
   socket drives — no port, no readiness loop, no flaky `SocketException` on a busy

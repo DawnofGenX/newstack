@@ -108,6 +108,7 @@ jobs:
           - erlang-cli
           - racket-cli
           - deno-cli
+          - deno-api
           - vhdl-sim
           - fortran-cli
           - ada-cli
@@ -238,7 +239,7 @@ jobs:
           ghdl --version | head -1
 
       - name: Set up Deno
-        if: matrix.stack == 'deno-cli'
+        if: contains(fromJSON('["deno-cli","deno-api"]'), matrix.stack)
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x

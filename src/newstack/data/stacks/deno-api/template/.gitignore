@@ -1,0 +1,6 @@
+# Deno caches remotely-fetched dependencies in DENO_DIR, not in the project, so there is
+# nothing to ignore here beyond editor and coverage clutter.
+coverage/
+.idea/
+.vscode/
+*.log
