@@ -326,6 +326,7 @@ $ newstack stacks outdated
 | `erlang-cli` | Erlang CLI on plain OTP and `make`: byte-level counting core, hand-rolled argv parser, eunit suites, I/O behind a map of funs | `erl`, `erlc`, `make` |
 | `erlang-cowboy-api` | Erlang JSON service on Cowboy: pure `route(Method, Path, Query, Body)` covering every status code, eunit suites, an escript release, and a real-socket verify step | `erl`, `rebar3` |
 | `racket-cli` | Racket CLI on the core distribution: byte-counting core, struct-based argv parser, `rackunit` suites, I/O behind a struct of funs | `racket`, `raco` |
+| `racket-api` | Racket JSON service on the built-in web server: the route table is one pure function, `rackunit` tests with no socket, and a single file binds the port | `racket`, `raco` |
 | `deno-cli` | TypeScript CLI on Deno: byte-counting core, pure argv parser, `Deno.test` suites, I/O behind an object of functions | `deno` |
 | `deno-api` | Deno 2 JSON service: one `Request`→`Response` handler, `Deno.serve`, std assertions, check/fmt/lint gates and a real socket smoke test | `deno` |
 | `vhdl-sim` | VHDL design with a self-checking testbench on GHDL: one clocked process, assertion-driven simulation, a run script that fails CI on a wrong design | `ghdl` |
@@ -333,11 +334,13 @@ $ newstack stacks outdated
 | `ada-cli` | Ada CLI on GNAT: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, output through two subprogram parameters | `gnatmake`, `make` |
 | `octave-cli` | Octave CLI on plain `octave`: counting core in a `+textstat` package, hand-rolled argv parser, dependency-free suite, environment injected as function handles | `octave` |
 | `prolog-cli` | SWI-Prolog CLI: byte-exact counting over a stream, hand-rolled argv parser, a four-predicate test harness, output behind two writer closures | `swipl` |
+| `prolog-http-api` | SWI-Prolog JSON service on `library(http/http_server)`: the route table is one pure predicate, a plain Prolog script tests it, one module binds the port | `swipl` |
 | `lisp-cli` | Common Lisp CLI on SBCL: byte-exact counting core, hand-rolled argv parser, dependency-free test harness, I/O through a structure of functions | `sbcl` |
 | `pascal-cli` | Free Pascal CLI on FPC and `make`: byte-exact counting unit, hand-written argv parser, dependency-free test suite, terminal behind a record of function pointers | `fpc`, `make` |
 | `bash-cli` | Bash CLI on plain `bash` and `shellcheck`: counting in bash itself (no `wc`, no `awk`), hand-rolled argv parser, dependency-free test harness, terminal behind sourced functions | `bash`, `shellcheck` |
 | `cobol-cli` | COBOL CLI on GNUCOBOL: byte-exact counting over a one-byte sequential read, hand-rolled argv parser reading `/proc/self/cmdline`, a COBOL unit driver plus a shell suite, I/O in one program | `cobc`, `make` |
 | `guile-cli` | Scheme CLI on GNU Guile: bytevector counting core, hand-rolled argv parser, dependency-free harness, ports behind a record of procedures | `guile` |
+| `guile-http-api` | Guile JSON service on the built-in web server: counting over the UTF-8 bytes, the route table as one pure procedure, a framework-free test suite, one script binds the socket | `guile`, `guile-json` |
 | `raku-cli` | Raku CLI on Rakudo: `Buf` counting core, hand-rolled argv parser, dependency-free harness, the four side effects handed in as closures | `raku` |
 | `groovy-cli` | Groovy CLI on the plain Groovy runtime: byte-array counting core, hand-rolled argv parser, dependency-free harness, the four side effects handed in as closures | `groovy`, `java` |
 | `awk-cli` | awk CLI on `gawk`: counting with `RS="\0"` so each file is one record, hand-rolled argv parser, dependency-free harness, the report built before anything is printed | `gawk` |
@@ -345,6 +348,7 @@ $ newstack stacks outdated
 | `sqlite-sql` | SQL reporting project on SQLite: schema with `CHECK` constraints, views that hold the arithmetic, one `SELECT` per report, assertions over exact cents | `sqlite3`, `make` |
 | `jq-report` | Reports over a JSON access log as plain jq programs: status counts, busiest paths, slowest requests, bytes per day, error rate, behind a shell command with a tested exit-code contract | `jq`, `make` |
 | `powershell-cli` | PowerShell 7 CLI: byte loop over the payload, hand-rolled argv parser, I/O behind a hashtable of scriptblocks, a harness with no gallery modules | `pwsh` |
+| `powershell-api` | PowerShell 7 JSON service on `HttpListener`: counting and the route table in a module, a framework-free test script, one script binds the socket | `pwsh` |
 | `docker-compose-svc` | A small HTTP service shipped as a container: non-root image with a real HEALTHCHECK, compose file driven by `PORT`, pure-function contract with unit tests that need no Docker, and a smoke test that starts the container, checks every answer and leaves nothing running | `docker`, `make` |
 | `jsonnet-config` | A service manifest in Jsonnet with its rules as data: validators that name every problem, a renderer that sorts and sums, and an 18-check suite that proves each rule fires | `jsonnet`, `make` |
 | `d-cli` | D compiled with LDC: counting over `ubyte[]`, hand-written argv parser, report building behind an `Io` struct of function pointers, a 37-assertion harness and a parity suite that diffs the output against `wc` | `ldc2`, `make` |

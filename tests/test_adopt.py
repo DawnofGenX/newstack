@@ -856,3 +856,74 @@ def test_a_plain_cabal_project_still_resolves_to_the_haskell_cli(tmp_path) -> No
     make_repo(tmp_path, {"blog-count.cabal": "name: blog-count\nbuild-depends: base\n"})
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["haskell-cli"], "cabal without warp is the CLI stack"
+
+
+def test_a_racket_web_server_resolves_to_the_racket_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "src/server.rkt": '#lang racket/base\n(require web-server/servlet-env)\n',
+            "src/counts.rkt": "#lang racket/base\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["racket-api"], "the web server require is the service marker"
+
+
+def test_a_plain_racket_script_still_resolves_to_the_racket_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"main.rkt": '#lang racket/base\n(displayln 1)\n'})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["racket-cli"], "a script with no web server is the CLI stack"
+
+
+def test_a_prolog_http_server_resolves_to_the_prolog_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "src/server.pl": (
+                ":- use_module(library(http/http_dispatch)).\n"
+                ":- use_module(library(http/thread_httpd)).\n"
+            )
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["prolog-http-api"], "http_dispatch is the service marker"
+
+
+def test_a_plain_prolog_script_still_resolves_to_the_prolog_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"main.pl": ":- initialization(main, main).\nmain :- writeln(hi).\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["prolog-cli"], "a script with no http library is the CLI stack"
+
+
+def test_a_http_listener_script_resolves_to_the_powershell_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {"src/server.ps1": "$listener = [System.Net.HttpListener]::new()\n$listener.Start()\n"},
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["powershell-api"], "HttpListener is the service marker"
+
+
+def test_a_plain_powershell_script_still_resolves_to_the_powershell_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"main.ps1": "Write-Output 'hello'\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["powershell-cli"], "a script with no listener is the CLI stack"
+
+
+def test_a_guile_web_server_resolves_to_the_guile_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "src/server.scm": "(use-modules (web server))\n(display \"hello\")\n",
+            "lib/textstat/counts.scm": "(define-module (textstat counts))\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["guile-http-api"], "(web server) is the service marker"
+
+
+def test_a_plain_guile_script_still_resolves_to_the_guile_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"main.scm": "(display \"hello\")\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["guile-cli"], "a script with no web server is the CLI stack"

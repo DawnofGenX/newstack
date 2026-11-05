@@ -1,0 +1,58 @@
+{
+  "name": "guile-http-api",
+  "title": "Guile HTTP API",
+  "language": "scheme",
+  "blurb": "Guile JSON service on the built-in web server: counting over the UTF-8 bytes, the route table as one pure procedure, a framework-free test suite, one script binds the socket",
+  "requires": [
+    "guile",
+    "guile-json",
+    "curl"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "env GUILE_AUTO_COMPILE=0 guile --no-auto-compile -L lib -L tests -s tests/run-tests.scm",
+    "PORT=8080 env GUILE_AUTO_COMPILE=0 guile --no-auto-compile -L lib main.scm",
+    "curl -sS 'http://127.0.0.1:8080/stats?text=hello%20world%0A'"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "guile -c '(use-modules (json)) (display \"guile-json is installed\") (newline)'",
+      "timeout": 300,
+      "tools": [
+        "guile"
+      ]
+    },
+    {
+      "name": "test",
+      "cmd": "env GUILE_AUTO_COMPILE=0 guile --no-auto-compile -L lib -L tests -s tests/run-tests.scm",
+      "timeout": 600,
+      "tools": [
+        "guile"
+      ]
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5431/health >/dev/null 2>&1; then echo 'port 5431 is already answering - stop that process before running this step'; exit 1; fi\nPORT=5431 env GUILE_AUTO_COMPILE=0 guile --no-auto-compile -L lib main.scm > .guile.log 2>&1 &\nserver=$!\ntrap 'kill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true' EXIT\nok=0\nfor _ in $(seq 1 120); do\n  if curl -fsS --max-time 2 http://127.0.0.1:5431/health >/dev/null 2>&1; then ok=1; break; fi\n  sleep 0.5\ndone\nif [ $ok -ne 1 ]; then echo 'the service never answered'; cat .guile.log; kill $server 2>/dev/null || true; exit 1; fi\nkill -0 $server 2>/dev/null || { cat .guile.log; echo 'the service exited before it answered'; exit 1; }\nhealth=$(curl -sS --max-time 10 http://127.0.0.1:5431/health)\ntest \"$health\" = '{\"status\":\"ok\"}'\nget=$(curl -sS --max-time 10 'http://127.0.0.1:5431/stats?text=hello%20world%0A')\nprintf '%s' \"$get\" | grep -q '\"lines\":1'\nprintf '%s' \"$get\" | grep -q '\"bytes\":12'\nprintf '%s' \"$get\" | grep -q '\"words\":2'\nposted=$(curl -sS --max-time 10 -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5431/stats)\nprintf '%s' \"$posted\" | grep -q '\"lines\":2'\nprintf '%s' \"$posted\" | grep -q '\"words\":3'\nmissing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5431/stats)\ntest \"$missing\" = 422\nbroken=$(curl -sS --max-time 10 -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5431/stats)\nprintf '%s' \"$broken\" | grep -q 'invalid_json'\ngone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5431/nope)\ntest \"$gone\" = 404\nwrong=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5431/health)\ntest \"$wrong\" = 405\nkill $server 2>/dev/null || true\nwait $server 2>/dev/null || true",
+      "timeout": 600,
+      "tools": [
+        "guile",
+        "curl"
+      ]
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.scm",
+      "contains": "(web server)"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/contract-tests.scm"
+  ]
+}

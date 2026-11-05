@@ -120,6 +120,7 @@ jobs:
           - erlang-cli
           - erlang-cowboy-api
           - racket-cli
+          - racket-api
           - deno-cli
           - deno-api
           - vhdl-sim
@@ -127,17 +128,20 @@ jobs:
           - ada-cli
           - octave-cli
           - prolog-cli
+          - prolog-http-api
           - lisp-cli
           - pascal-cli
           - bash-cli
           - cobol-cli
           - guile-cli
+          - guile-http-api
           - raku-cli
           - groovy-cli
           - awk-cli
           - forth-cli
           - sqlite-sql
           - powershell-cli
+          - powershell-api
           - jq-report
           - mdbook-docs
           - docker-compose-svc
@@ -264,7 +268,7 @@ jobs:
           deno-version: v2.x
 
       - name: Install Racket
-        if: matrix.stack == 'racket-cli'
+        if: contains(fromJSON('["racket-cli","racket-api"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends racket
@@ -313,10 +317,10 @@ jobs:
           shellcheck --version | head -2
 
       - name: Install Guile
-        if: matrix.stack == 'guile-cli'
+        if: contains(fromJSON('["guile-cli","guile-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends guile-3.0
+          sudo apt-get install -y --no-install-recommends guile-3.0 guile-json
           guile --version | head -1
 
       - name: Install Rakudo
@@ -348,7 +352,7 @@ jobs:
           sqlite3 --version
 
       - name: Set up PowerShell
-        if: matrix.stack == 'powershell-cli'
+        if: contains(fromJSON('["powershell-cli","powershell-api"]'), matrix.stack)
         run: |
           if ! command -v pwsh >/dev/null 2>&1; then
             curl -sSLf -o /tmp/pwsh.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz
@@ -429,7 +433,7 @@ jobs:
           sbcl --version
 
       - name: Install SWI-Prolog
-        if: matrix.stack == 'prolog-cli'
+        if: contains(fromJSON('["prolog-cli","prolog-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends swi-prolog-nox

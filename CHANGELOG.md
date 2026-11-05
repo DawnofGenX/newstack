@@ -7,6 +7,16 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `guile-http-api` — the Guile service: `(web server)` and `(json)` from
+  guile-json, counting over the UTF-8 bytes, the route table as one pure
+  procedure tested without a socket, and `set -e` plus an `EXIT` trap so a
+  failed assertion stops the server instead of being masked by `wait`.
+- `prolog-http-api`, `racket-api`, `powershell-api` — services for the three
+  scripting runtimes whose only template so far was a CLI. Each keeps the
+  route table in a pure function (a Prolog predicate, a Racket function, a
+  PowerShell function) so the tests need no socket, and each flips its CLI
+  stack to `detect_fallback` because the CLI marker matches any file of the
+  language.
 - `haskell-warp-api`, `perl-mojolicious-api` — the last two runtimes that had a CLI stack
   and no service. Both keep the whole route table in a pure function (`Contract.route` /
   `Textstat::Contract->route`) so every status code is pinned by the unit suite and only the
