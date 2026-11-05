@@ -1,0 +1,4 @@
+#!/bin/sh
+# Runs the service on the Haxe eval target: no compiler output, no haxelib.
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec haxe --interp -cp "$root/src" --main textstat.App "$@"

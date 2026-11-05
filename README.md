@@ -362,6 +362,7 @@ $ newstack stacks outdated
 | `d-http-api` | D JSON service on `std.socket`: pure `route`, `std.json` for the body, one request per connection, and the total absence of a test framework — the tests are `unittest` blocks | `ldc2`, `make` |
 | `sml-cli` | Standard ML compiled with MLton to a single native binary: counting over `Word8Vector`, hand-written argv parser, a 37-assertion SML harness and a parity suite that diffs the output against `wc` | `mlton`, `make` |
 | `haxe-cli` | Haxe command line tool compiled to Neko: byte-accurate `wc`-style counting, hand-written option parser, dependency-free Haxe test suite plus a parity suite that diffs the output against `wc` | `haxe`, `neko`, `make` |
+| `haxe-http-api` | Haxe JSON service on the eval target: no build step, a hand-written JSON reader that keeps a number apart from a string, and a blocking `sys.net.Socket` loop that waits for the client to hang up so the port is free for the next run | `haxe` |
 | `mdbook-docs` | An mdBook site with a shell link checker wired into CI: relative links and images must exist, every page must be listed in `src/SUMMARY.md`, and 25 assertions prove it catches broken links, missing images and orphan pages | `mdbook`, `make` |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a

@@ -1100,3 +1100,25 @@ def test_a_plain_cmake_project_still_resolves_to_the_cmake_cli(tmp_path) -> None
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["cpp-cmake-cli"], "a CMake tree with no socket is the CLI stack"
 
+
+def test_a_haxe_socket_server_resolves_to_the_haxe_service(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "build.hxml": "-cp src\n--main textstat.App\n",
+            "src/textstat/Server.hx": "import sys.net.Socket;\nclass Server {}\n",
+        },
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["haxe-http-api"]
+
+
+def test_a_plain_haxe_project_still_resolves_to_the_haxe_cli(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "build.hxml": "-cp src\n--main Main\n",
+            "src/Main.hx": "class Main { static function main() {} }\n",
+        },
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == ["haxe-cli"]
+

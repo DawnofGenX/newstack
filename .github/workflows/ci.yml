@@ -153,6 +153,7 @@ jobs:
           - mdbook-docs
           - docker-compose-svc
           - haxe-cli
+          - haxe-http-api
           - sml-cli
           - d-cli
           - d-http-api
@@ -419,7 +420,7 @@ jobs:
           mdbook --version
 
       - name: Install Haxe
-        if: matrix.stack == 'haxe-cli'
+        if: contains(fromJSON('["haxe-cli","haxe-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends haxe neko

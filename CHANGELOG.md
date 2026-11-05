@@ -7,6 +7,15 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+
+- **`haxe-http-api`**: the Haxe service for the eval target (`haxe --interp`,
+  no build step, no haxelib). Haxe cannot ask `sys.net.Socket` for
+  `SO_REUSEADDR`, so the server drains the connection until the client hangs up
+  before closing its own side — otherwise the listening port sits in `TIME_WAIT`
+  for a minute and the next run dies with
+  `Unix.Unix_error(Unix.EADDRINUSE, "bind", "")` while `ss -ltn` shows it free.
+  The JSON reader is hand-written because a number must not pass for a string
+  (`{"text": 42}` is `422 missing_text`).
 - `cpp-http-api` — C++17 with a plain Makefile instead of CMake: POSIX sockets,
   a validating JSON reader that keeps a JSON number apart from a JSON string, and
   `make test` running a hand-rolled harness.
