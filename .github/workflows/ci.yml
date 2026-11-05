@@ -50,6 +50,7 @@ jobs:
           - python-fastapi-sqlite
           - python-sse-api
           - python-scheduler-api
+          - python-litestar-api
           - data-science
           - dbt-project
           - sphinx-docs
@@ -63,7 +64,9 @@ jobs:
           - graphql-api
           - nest-api
           - react-vite-ts
+          - angular-app
           - vue-vite-ts
+          - angular-app
           - next-app-ts
           - chrome-extension
           - astro

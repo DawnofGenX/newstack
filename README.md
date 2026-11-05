@@ -255,8 +255,11 @@ $ newstack stacks outdated
 | `python-fastapi-sqlite` | FastAPI over SQLite: numbered SQL migrations applied in `lifespan`, WAL + busy timeout on every connection, typed request models, restart-safe rows | `uv` |
 | `python-sse-api` | Server-sent events: an endless `text/event-stream` response, `Last-Event-ID` resume, proxy-proof headers, and a socket test that fails if the body is buffered | `uv` |
 | `python-scheduler-api` | A durable scheduler: due jobs claimed under `BEGIN IMMEDIATE`, interval jobs rescheduled from *now* so an overdue job does not stampede, exponential back-off capped by `max_attempts`, and a run ledger with the counts of every attempt | `uv` |
+| `python-litestar-api` | Litestar 2 text-statistics API: the handler takes `Request` instead of a validated parameter so `422` stays the project's answer, `raw_path` already carries the query string, and every rule lives in a pure `route()` function with a TestClient suite on top | `uv` |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `angular-app` | Angular 22 standalone component with signals: Vitest + jsdom instead of Karma, `ng build` bundle served by a zero-dependency static server with an SPA fallback, curl-checked in `smoke.sh` | `node`, `npm`/\`pnpm`/\`yarn` |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle, static server with SPA fallback, bundle asserted by curl | `node`, `npm`/`\`pnpm`/`\`yarn` |
 | `next-app-ts` | Next.js App Router + TS + Tailwind 4, Vitest + Testing Library | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `chrome-extension` | MV3 extension: popup + service worker + content script, `npm run pack` → extension.zip | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `astro` | Astro + TS content site: typed frontmatter, Vitest unit tests, `astro check` + static build | `node`, `npm`/\`pnpm\`/\`yarn` |

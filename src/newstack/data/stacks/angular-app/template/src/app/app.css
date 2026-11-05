@@ -1,0 +1,57 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 40rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.lede {
+  color: #52525b;
+  margin: 0;
+}
+
+textarea {
+  font-family: ui-monospace, monospace;
+  padding: 0.5rem;
+  border: 1px solid #d4d4d8;
+  border-radius: 0.5rem;
+}
+
+.summary {
+  font-weight: 600;
+}
+
+.counts {
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+}
+
+.counts div {
+  display: flex;
+  flex-direction: column;
+}
+
+.counts dt {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.counts dd {
+  margin: 0;
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+button {
+  align-self: flex-start;
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d4d4d8;
+  background: #f4f4f5;
+  cursor: pointer;
+}

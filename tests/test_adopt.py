@@ -1663,3 +1663,21 @@ def test_an_express_project_does_not_match_the_fastify_stack(tmp_path) -> None:
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "fastify-api" not in names
 
+
+def test_an_angular_workspace_resolves_to_the_angular_app(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "package.json": '{"dependencies": {"@angular/core": "^22.2.0"}}',
+            "angular.json": '{"version": 1, "projects": {"demo": {}}}',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["angular-app"]
+
+
+def test_a_react_project_does_not_match_the_angular_app(tmp_path) -> None:
+    make_repo(tmp_path, {"package.json": '{"dependencies": {"react": "^19"}}'})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "angular-app" not in names
+

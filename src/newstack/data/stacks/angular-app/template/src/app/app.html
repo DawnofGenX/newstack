@@ -1,0 +1,24 @@
+<main class="page">
+  <h1>{{ title() }}</h1>
+  <p class="lede">Type or paste text; the counters are recomputed on every keystroke.</p>
+
+  <label for="input">Text</label>
+  <textarea
+    id="input"
+    data-testid="input"
+    rows="6"
+    placeholder="a b&#10;c"
+    [value]="text()"
+    (input)="update($any($event.target).value)"
+  ></textarea>
+
+  <p class="summary" data-testid="summary">{{ summary() }}</p>
+
+  <dl class="counts">
+    <div><dt>Lines</dt><dd data-testid="lines">{{ counts().lines }}</dd></div>
+    <div><dt>Words</dt><dd data-testid="words">{{ counts().words }}</dd></div>
+    <div><dt>Bytes</dt><dd data-testid="bytes">{{ counts().bytes }}</dd></div>
+  </dl>
+
+  <button type="button" (click)="clear()">Clear</button>
+</main>

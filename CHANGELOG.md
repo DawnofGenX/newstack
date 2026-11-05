@@ -7,6 +7,23 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `angular-app` — Angular 22 standalone component driven by a signal. `ng test` runs Vitest
+  in jsdom, so the suite needs no browser and no Karma launcher; the built bundle is served by
+  a small static server that has to answer the SPA fallback for a deep link and a real `404`
+  for a missing asset, which is what `smoke.sh` checks. `npm` 11 warns that `esbuild`'s
+  postinstall did not run, and the build still works — the platform binary arrives as an
+  optional dependency.
+- `angular-app` — Angular 22 standalone component with `signal`/`computed` counters.
+  Angular 22 scaffolds Vitest + jsdom, so `ng test` needs no browser; the built bundle is
+  served by a zero-dependency static server that falls back to `index.html` only for
+  extension-less paths, and `smoke.sh` asserts the page, the hashed bundle and the 404
+  rule. `ng build` emits a *relative* script `src`, which is why a bundle check has to
+  add the leading slash.
+- `python-litestar-api` — Litestar 2 service. A declared `text: str` handler parameter makes
+  Litestar answer `400` with its own envelope before the handler runs, so the handler takes
+  `Request` and the contract decides `422`; `request.scope["raw_path"]` already ends with
+  `?query`, and appending `query_string` as well counts `"a b?text=a b"`. Litestar answers
+  `HEAD` for `GET` routes itself — the catch-all claims it and returns `405`.
 - `fastify-api` — Fastify 5 service. Fastify's built-in `application/json` parser takes
   precedence over an added `*` parser, so `{}` arrived as an object and every request
   without a `text` member answered `invalid_json` instead of `missing_text`;

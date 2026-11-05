@@ -1,0 +1,81 @@
+{
+  "name": "angular-app",
+  "title": "Angular 22 standalone app",
+  "language": "node",
+  "blurb": "Angular 22: standalone component with signals, Vitest + jsdom tests, static SPA server, curl-checked bundle",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "An Angular single page application.",
+  "port": 5461,
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_run} start",
+    "bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"@angular/core\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tools/serve.mjs"
+  ],
+  "adopt_tests": [
+    "src/app/stats.spec.ts"
+  ]
+}

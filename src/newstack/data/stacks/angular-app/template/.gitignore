@@ -1,0 +1,6 @@
+# Angular build output
+/dist
+/.angular
+node_modules/
+/.angular-http.log
+npm-debug.log*
