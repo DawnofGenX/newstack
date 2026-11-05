@@ -7,7 +7,8 @@ from {{ package_name }} import orset
 
 
 def _canon(state: object) -> str:
-    return json.dumps(state.as_dict(), sort_keys=True, separators=(",", ":"))  # type: ignore[attr-defined]
+    dumped = state.as_dict()  # type: ignore[attr-defined]
+    return json.dumps(dumped, sort_keys=True, separators=(",", ":"))
 
 
 def test_gossip_converges() -> None:

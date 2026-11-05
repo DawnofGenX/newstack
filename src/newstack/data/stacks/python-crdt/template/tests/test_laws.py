@@ -8,7 +8,8 @@ from {{ package_name }} import orset, register
 def _canon(state: object) -> str:
     import json
 
-    return json.dumps(state.as_dict(), sort_keys=True, separators=(",", ":"))  # type: ignore[attr-defined]
+    dumped = state.as_dict()  # type: ignore[attr-defined]
+    return json.dumps(dumped, sort_keys=True, separators=(",", ":"))
 
 
 def test_a_counter_keeps_the_laws() -> None:
