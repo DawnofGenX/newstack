@@ -27,9 +27,9 @@ jobs:
       - name: The import is the compiled module, not a fallback
         run: |
           .venv/bin/python - <<'PY'
-          import textstat
+          import {{ package_name }}
 
-          shared = textstat._speedups.__file__
+          shared = {{ package_name }}._speedups.__file__
           assert shared.endswith((".so", ".pyd")), shared
           print("compiled:", shared)
           PY
