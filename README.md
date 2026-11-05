@@ -293,6 +293,7 @@ $ newstack stacks outdated
 | `dart-shelf-api` | Dart 3 JSON service on `shelf`: a `Handler` the tests call in-process, `shelf_router` routes, real-socket smoke test | `dart` |
 | `kotlin-cli` | Kotlin CLI on Maven (no Gradle wrapper to ship): pure counting core, JUnit 5 suite, shaded runnable jar | `java`, `mvn` |
 | `zig-cli` | Zig 0.17 CLI: counting module with in-source test blocks, `zig build test`, no runtime | `zig` |
+| `zig-http-api` | Zig 0.17 JSON service on `std.http`: `contract.route` is pure so every status code is tested without a socket, `build.zig` ships the binary plus one test binary per module, real-socket verify step | `zig`, `curl` |
 | `julia-cli` | Julia CLI: pure counting module, `Test` stdlib suite, zero external packages | `julia` |
 | `nim-cli` | Nim CLI: pure counting module, `unittest` suite that also checks exit codes, `nimble build` binary | `nim`, `nimble` |
 | `nim-http-api` | Nim JSON service: counting core, a pure `route()` covering every status code, `asynchttpserver` on top — no dependencies at all | `nim`, `nimble` |

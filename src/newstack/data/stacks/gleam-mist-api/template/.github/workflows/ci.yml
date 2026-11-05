@@ -22,30 +22,33 @@ jobs:
         run: gleam test
       - name: Serve
         run: |
-          PORT=5416 gleam run > .gleam.log 2>&1 &
+          setsid env PORT=5416 gleam run > .gleam.log 2>&1 &
           server=$!
           ready=1
           for _ in $(seq 1 240); do
-            if curl -fsS http://127.0.0.1:5416/health >/dev/null 2>&1; then ready=0; break; fi
+            if curl -fsS --max-time 2 http://127.0.0.1:5416/health >/dev/null 2>&1; then ready=0; break; fi
             sleep 0.5
           done
+          kill -0 $server 2>/dev/null || { cat .gleam.log; echo "the server exited before it answered"; exit 1; }
           if [ "$ready" != 0 ]; then
             cat .gleam.log
-            kill $server 2>/dev/null || true
+            kill -TERM -"$server" 2>/dev/null || kill $server 2>/dev/null || true
             wait $server 2>/dev/null || true
             exit 1
           fi
-          health=$(curl -fsS http://127.0.0.1:5416/health)
-          stats=$(curl -fsS 'http://127.0.0.1:5416/stats?text=hello%20world%0A')
-          posted=$(curl -fsS -X POST -H 'content-type: application/json' --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5416/stats)
-          missing=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5416/stats)
-          gone=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5416/nope)
-          kill $server 2>/dev/null || true
+          health=$(curl -fsS --max-time 10 http://127.0.0.1:5416/health)
+          stats=$(curl -fsS --max-time 10 'http://127.0.0.1:5416/stats?text=hello%20world%0A')
+          posted=$(curl -fsS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5416/stats)
+          missing=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5416/stats)
+          broken=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5416/stats)
+          gone=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5416/nope)
+          kill -TERM -"$server" 2>/dev/null || kill $server 2>/dev/null || true
           wait $server 2>/dev/null || true
           test "$health" = '{"status":"ok"}'
           printf '%s' "$stats" | grep -q '"lines":1'
           printf '%s' "$stats" | grep -q '"bytes":12'
           printf '%s' "$posted" | grep -q '"words":3'
           test "$missing" = 422
+          test "$broken" = 422
           test "$gone" = 404
           echo "the service answered every check"

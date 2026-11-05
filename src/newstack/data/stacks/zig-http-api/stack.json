@@ -1,0 +1,64 @@
+{
+  "name": "zig-http-api",
+  "title": "Zig HTTP API",
+  "language": "zig",
+  "blurb": "Zig 0.17 JSON service on std.http: zig build ships the server, zig build test covers the routing",
+  "requires": [
+    "zig",
+    "curl"
+  ],
+  "default_description": "A JSON service in Zig.",
+  "next_steps": [
+    "cd {path}",
+    "zig build",
+    "PORT=8080 ./zig-out/bin/{npm_name}",
+    "curl http://127.0.0.1:8080/stats?text=hello%20world%0A"
+  ],
+  "verify": [
+    {
+      "name": "format",
+      "cmd": "zig fmt --check build.zig src",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "zig build test",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "zig build",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "http",
+      "cmd": "if curl -fsS --max-time 2 http://127.0.0.1:5421/health >/dev/null 2>&1; then\n  echo \"port 5421 is already serving something else - stop it before running this step\"\n  exit 1\nfi\nPORT=5421 ./zig-out/bin/{{ npm_name }} > .zig.log 2>&1 &\nserver=$!\nready=1\nfor _ in $(seq 1 240); do\n  if curl -fsS --max-time 2 http://127.0.0.1:5421/health >/dev/null 2>&1; then ready=0; break; fi\n  sleep 0.5\ndone\nkill -0 $server 2>/dev/null || { cat .zig.log; echo \"the server exited before it answered\"; exit 1; }\nif [ \"$ready\" != 0 ]; then\n  cat .zig.log\n  kill $server 2>/dev/null || true\n  wait $server 2>/dev/null || true\n  exit 1\nfi\nhealth=$(curl -fsS --max-time 10 http://127.0.0.1:5421/health)\nstats=$(curl -fsS --max-time 10 'http://127.0.0.1:5421/stats?text=hello%20world%0A')\nposted=$(curl -fsS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5421/stats)\nmissing=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5421/stats)\nbroken=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5421/stats)\ngone=$(curl -s -o /dev/null --max-time 10 -w '%{http_code}' http://127.0.0.1:5421/nope)\nkill $server 2>/dev/null || true\nwait $server 2>/dev/null || true\ntest \"$health\" = '{\"status\":\"ok\"}' || { echo \"health: $health\"; exit 1; }\nprintf '%s' \"$stats\" | grep -q '\"lines\":1' || { echo \"stats: $stats\"; exit 1; }\nprintf '%s' \"$stats\" | grep -q '\"bytes\":12' || { echo \"stats: $stats\"; exit 1; }\nprintf '%s' \"$posted\" | grep -q '\"words\":3' || { echo \"posted: $posted\"; exit 1; }\ntest \"$missing\" = 422 || { echo \"missing: $missing\"; exit 1; }\ntest \"$broken\" = 422 || { echo \"broken: $broken\"; exit 1; }\ntest \"$gone\" = 404 || { echo \"gone: $gone\"; exit 1; }\necho \"the service answered every check\"\n",
+      "tools": [
+        "zig",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/server.zig"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "build.zig"
+  ],
+  "adopt_tests": []
+}

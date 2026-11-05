@@ -87,6 +87,7 @@ jobs:
           - dart-shelf-api
           - kotlin-cli
           - zig-cli
+          - zig-http-api
           - julia-cli
           - nim-cli
           - nim-http-api
@@ -460,7 +461,7 @@ jobs:
         with:
           sdk: "3.13.7"
       - name: Set up Zig
-        if: matrix.stack == 'zig-cli'
+        if: contains(fromJSON('["zig-cli","zig-http-api"]'), matrix.stack)
         uses: mlugg/setup-zig@v2
         with:
           version: "0.17.0"

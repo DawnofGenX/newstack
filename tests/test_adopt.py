@@ -703,3 +703,29 @@ def test_a_plain_scala_project_still_resolves_to_the_scala_cli(tmp_path) -> None
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["scala-cli"]
+
+
+def test_a_zig_server_resolves_to_the_zig_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "build.zig.zon": '.{ .name = .textstat, .version = "0.1.0" }\n',
+            "build.zig": "pub fn build(b: *std.Build) void {}\n",
+            "src/server.zig": "const std = @import(\"std\");\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["zig-http-api"]
+
+
+def test_a_plain_zig_package_still_resolves_to_the_zig_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "build.zig.zon": '.{ .name = .textstat, .version = "0.1.0" }\n',
+            "build.zig": "pub fn build(b: *std.Build) void {}\n",
+            "src/main.zig": "const std = @import(\"std\");\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["zig-cli"]
