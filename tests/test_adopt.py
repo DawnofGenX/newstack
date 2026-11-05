@@ -1166,3 +1166,24 @@ def test_a_plain_ada_project_still_resolves_to_the_ada_cli(tmp_path):
         },
     )
     assert [stack.name for stack in detect_stacks(tmp_path)] == ["ada-cli"]
+
+
+def test_a_jdk_http_server_resolves_to_the_java_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {"src/main/java/demo/Server.java": "import com.sun.net.httpserver.HttpServer;\nclass Server {}\n"},
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["java-httpserver-api"], "com.sun.net.httpserver marks the java service"
+
+
+def test_plain_java_without_the_jdk_server_stays_a_maven_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "pom.xml": "<project><artifactId>plain</artifactId></project>",
+            "src/main/java/demo/App.java": "class App {}\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["java-maven-cli"], "the java service rule must need its own marker"

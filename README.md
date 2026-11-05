@@ -284,6 +284,7 @@ $ newstack stacks outdated
 | `rails-app` | Rails 8 JSON app: a service object for the counting, an integration test that goes through the router, SQLite, committed lockfile | `ruby`, `bundle` |
 | `java-maven-cli` | Java 21 CLI on Maven: pure counting logic, 21 JUnit 5 tests, runnable jar | `java`, `mvn` |
 | `spring-boot` | Java 21 Spring Boot 3 web service on Maven: a wc-style `/stats` endpoint, a pure service, and a JUnit 5 + MockMvc suite | `java`, `mvn` |
+| `java-httpserver-api` | Java 21 JSON service on the JDK's own `com.sun.net.httpserver`: counting and contract classes with no framework, a hand-written JSON reader, and a Makefile over `javac -Xlint:all -Werror` | `java`, `make` |
 | `php-composer-cli` | PHP 8.3 CLI on Composer: PSR-4 autoloading, a PHPUnit 11 suite, and a wc-style text counter | `php`, `composer` |
 | `symfony-app` | Symfony 7 web app on PHP 8.3: a JSON route wired to a pure service, kernel-level PHPUnit test, working `bin/console` | `php`, `composer` |
 | `laravel-app` | Laravel 13 JSON service on PHP 8.3: pure counting class, route + controller, PHPUnit 12 suite covering 422/404 and the input-trimming trap | `php`, `composer` |

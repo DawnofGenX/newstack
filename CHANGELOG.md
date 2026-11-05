@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `java-httpserver-api` — a Java 21 JSON service on the JDK's own
+  `com.sun.net.httpserver`, so the whole dependency list is the JDK and a `Makefile`
+  over `javac -Xlint:all -Werror`. The JSON reader is hand-written, because the JDK
+  ships no JSON API and a number must not pass for a string (`{"text": 42}` is
+  `422 missing_text`). `-Werror` also turns a private `RuntimeException` without a
+  `serialVersionUID` into a build failure, which is exactly the kind of thing a
+  service skeleton should teach.
 - `ada-http-api` — an Ada JSON service on `GNAT.Sockets`, with no web framework and no
   JSON library: the counting rules, a validating reader that keeps a number apart from
   a string, and the whole HTTP contract are separate packages, so the 34 checks run

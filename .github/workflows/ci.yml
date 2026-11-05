@@ -78,6 +78,7 @@ jobs:
           - rails-app
           - java-maven-cli
           - spring-boot
+          - java-httpserver-api
           - php-composer-cli
           - symfony-app
           - laravel-app
@@ -249,6 +250,14 @@ jobs:
       - name: Update the cabal package index
         if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
         run: cabal update
+      # The JDK HTTP server needs nothing but a JDK, and there is no pom to
+      # prime a Maven cache with.
+      - name: Set up Java (java-httpserver-api)
+        if: matrix.stack == 'java-httpserver-api'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
       # scala-cli is one binary, so installing it is the whole toolchain; no
       # Maven cache here because there is no pom (scala-cli fetches its own deps).
       - name: Set up Java (scala-cli)
