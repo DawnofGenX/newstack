@@ -87,6 +87,7 @@ jobs:
           - python-permission-model
           - python-saga-compensation
           - python-time-series-window
+          - python-dependency-resolver
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
