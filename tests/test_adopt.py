@@ -440,3 +440,30 @@ def test_an_openapi_document_resolves_to_the_contract_stack(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["openapi-spec"]
+
+
+def test_a_yoga_package_resolves_to_the_graphql_stack(tmp_path) -> None:
+    """`graphql-yoga` is the marker; the schema-first server is what the stack owns."""
+
+    make_repo(
+        tmp_path,
+        {
+            "package.json": (
+                '{"name": "demo",\n'
+                ' "dependencies": {"graphql": "^17.1.0", "graphql-yoga": "^6.0.1"}}\n'
+            ),
+            "src/yoga.ts": "export const yoga = 1;\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["graphql-api"]
+
+
+def test_a_plain_graphql_dependency_is_not_enough(tmp_path) -> None:
+    """`graphql` alone is a library, not a server: only the Yoga runtime marks this stack."""
+
+    make_repo(
+        tmp_path,
+        {"package.json": '{"name": "demo", "dependencies": {"graphql": "^17.1.0"}}\n'},
+    )
+    assert [stack.name for stack in detect_stacks(tmp_path)] == []

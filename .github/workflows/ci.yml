@@ -52,6 +52,7 @@ jobs:
           - node-express-ts
           - hono-api
           - openapi-spec
+          - graphql-api
           - nest-api
           - react-vite-ts
           - vue-vite-ts

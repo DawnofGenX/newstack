@@ -8,6 +8,13 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`graphql-api`**: schema-first GraphQL on GraphQL Yoga. `src/schema.ts` is SDL, `src/resolvers.ts` resolves it, and `createSchema()` fails at boot if the two drift. Two
+  things are worth copying: the depth-limit plugin (`src/limits.ts`) walks the document with
+  `visit` and reports `QUERY_TOO_DEEP` *before* execution, so a cyclic client cannot pin a
+  worker; and the tests drive `yoga.fetch()` — the exact handler the HTTP server mounts — so
+  they test the real pipeline without opening a port. The suite also documents the status-code
+  split clients trip over: a malformed request (missing variable) is `400`, a malformed query
+  (bad literal, missing argument) is `200` with an `errors` array and no `data`.
 - **`openapi-spec`**: contract-first in the literal sense — `openapi.yaml` (3.1, so JSON
   Schema 2020-12) is written before the handler, `spectral` lints it with warnings promoted
   to failures, `redocly` bundles it and renders an HTML reference, and the tests validate

@@ -1,0 +1,30 @@
+{
+  "name": "{{ npm_name }}",
+  "version": "0.1.0",
+  "private": true,
+  "description": "{{ description }}",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">={{ node_version }}"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "graphql": "^17.1.0",
+    "graphql-yoga": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
+  }
+}

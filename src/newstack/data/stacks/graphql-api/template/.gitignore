@@ -1,0 +1,8 @@
+# Dependencies
+/node_modules/
+
+# Build output
+/dist/
+
+# Local server log written by the verify step
+.graphql.log

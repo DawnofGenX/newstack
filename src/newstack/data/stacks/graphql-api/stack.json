@@ -1,0 +1,89 @@
+{
+  "name": "graphql-api",
+  "title": "GraphQL API",
+  "language": "node",
+  "blurb": "GraphQL Yoga on Node: SDL schema, typed resolvers, depth-limited queries, in-process yoga.fetch() tests and a real socket check",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A GraphQL API with a schema-first SDL and query depth limits.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_run} test",
+    "{package_manager_run} dev"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "npm run build",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "PORT=5441 node dist/server.js >.graphql.log 2>&1 & srv=$!\nok=1\nfor _ in $(seq 1 120); do\n  if curl -fsS -X POST -H 'content-type: application/json' -d '{\"query\":\"{health{status}}\"}' http://127.0.0.1:5441/graphql >/dev/null 2>&1; then ok=0; break; fi\n  sleep 0.5\ndone\nif [ $ok -ne 0 ]; then cat .graphql.log; kill $srv 2>/dev/null; exit 1; fi\nhealth=$(curl -fsS -X POST -H 'content-type: application/json' -d '{\"query\":\"{health{status}}\"}' http://127.0.0.1:5441/graphql)\nstats=$(curl -fsS -X POST -H 'content-type: application/json' -d '{\"query\":\"query($t:String!){stats(text:$t){text lines words bytes}}\",\"variables\":{\"t\":\"hello world\\n\"}}' http://127.0.0.1:5441/graphql)\ndeep=$(curl -fsS -X POST -H 'content-type: application/json' -d '{\"query\":\"{a{b{c{d{e{f{g}}}}}}}\"}' http://127.0.0.1:5441/graphql)\nmissing=$(curl -fsS -X POST -H 'content-type: application/json' -d '{\"query\":\"{stats{bytes}}\"}' http://127.0.0.1:5441/graphql)\nbadvar=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -d '{\"query\":\"query($t:String!){stats(text:$t){bytes}}\"}' http://127.0.0.1:5441/graphql)\nkill $srv 2>/dev/null; wait $srv 2>/dev/null\nprintf '%s' \"$health\" | grep -q '\"status\":\"ok\"' \\\n  && printf '%s' \"$stats\" | grep -q '\"lines\":1' \\\n  && printf '%s' \"$stats\" | grep -q '\"bytes\":12' \\\n  && printf '%s' \"$deep\" | grep -q 'QUERY_TOO_DEEP' \\\n  && printf '%s' \"$missing\" | grep -q 'is required' \\\n  && test \"$badvar\" = 400\n",
+      "tools": [
+        "node",
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "package.json",
+      "contains": "\"graphql-yoga\""
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json",
+    "tsconfig.build.json"
+  ],
+  "adopt_tests": [
+    "test/graphql.test.ts"
+  ]
+}

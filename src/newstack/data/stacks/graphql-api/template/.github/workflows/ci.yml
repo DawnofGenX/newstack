@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Prepare {{ package_manager }}
+        run: {{ package_manager_setup }}
+      - run: {{ package_manager_install }}
+      - name: Typecheck
+        run: {{ package_manager_run }} typecheck
+      - name: Test
+        run: {{ package_manager_test }}
+      - name: Build
+        run: {{ package_manager_run }} build
+      # `yoga.fetch()` proves the handler; this proves the socket. A query that only works
+      # in-process would pass the suite and fail the first real client.
+      - name: Serves GraphQL over HTTP
+        run: |
+          PORT=5441 node dist/server.js &
+          server=$!
+          trap 'kill $server 2>/dev/null' EXIT
+          ready=1
+          for _ in $(seq 1 120); do
+            if curl -fsS -X POST -H 'content-type: application/json' \
+              -d '{"query":"{health{status}}"}' http://127.0.0.1:5441/graphql >/dev/null 2>&1; then
+              ready=0
+              break
+            fi
+            sleep 0.5
+          done
+          test "$ready" = 0
+          health=$(curl -fsS -X POST -H 'content-type: application/json' \
+            -d '{"query":"{health{status}}"}' http://127.0.0.1:5441/graphql)
+          stats=$(curl -fsS -X POST -H 'content-type: application/json' \
+            -d '{"query":"query($t:String!){stats(text:$t){text lines words bytes}}","variables":{"t":"hello world\n"}}' \
+            http://127.0.0.1:5441/graphql)
+          deep=$(curl -fsS -X POST -H 'content-type: application/json' \
+            -d '{"query":"{a{b{c{d{e{f{g}}}}}}}"}' http://127.0.0.1:5441/graphql)
+          missing=$(curl -fsS -X POST -H 'content-type: application/json' \
+            -d '{"query":"{stats{bytes}}"}' http://127.0.0.1:5441/graphql)
+          badvar=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' \
+            -d '{"query":"query($t:String!){stats(text:$t){bytes}}"}' http://127.0.0.1:5441/graphql)
+          printf '%s' "$health" | grep -q '"status":"ok"'
+          printf '%s' "$stats" | grep -q '"lines":1'
+          printf '%s' "$stats" | grep -q '"bytes":12'
+          printf '%s' "$deep" | grep -q 'QUERY_TOO_DEEP'
+          printf '%s' "$missing" | grep -q 'is required'
+          test "$badvar" = 400
