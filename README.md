@@ -352,6 +352,7 @@ $ newstack stacks outdated
 | `guile-cli` | Scheme CLI on GNU Guile: bytevector counting core, hand-rolled argv parser, dependency-free harness, ports behind a record of procedures | `guile` |
 | `guile-http-api` | Guile JSON service on the built-in web server: counting over the UTF-8 bytes, the route table as one pure procedure, a framework-free test suite, one script binds the socket | `guile`, `guile-json` |
 | `raku-cli` | Raku CLI on Rakudo: `Buf` counting core, hand-rolled argv parser, dependency-free harness, the four side effects handed in as closures | `raku` |
+| `raku-http-api` | Raku JSON service on Rakudo's own `IO::Socket::INET`: a `Buf` counting core, a hand-written JSON reader (no `JSON::Fast`, no `zef`), and the route contract tested without a socket | `raku`, `curl` |
 | `groovy-cli` | Groovy CLI on the plain Groovy runtime: byte-array counting core, hand-rolled argv parser, dependency-free harness, the four side effects handed in as closures | `groovy`, `java` |
 | `groovy-http-api` | Groovy JSON service on the JDK's `com.sun.net.httpserver`: pure `route`, `JsonSlurper` keeping a number apart from a string, and a plain-script test gate — no Gradle, no JUnit | `groovy` |
 | `awk-cli` | awk CLI on `gawk`: counting with `RS="\0"` so each file is one record, hand-rolled argv parser, dependency-free harness, the report built before anything is printed | `gawk` |

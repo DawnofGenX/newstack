@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MLton
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends mlton curl
+          mlton
+
+      - name: Build
+        run: make build
+
+      - name: Unit tests
+        run: make test
+
+      - name: Serve and check the contract
+        run: |
+          set -e
+          if curl -fsS --max-time 2 http://127.0.0.1:5445/health >/dev/null 2>&1; then
+            echo "port 5445 is already answering - stop that process first"
+            exit 1
+          fi
+          PORT=5445 ./bin/{{ npm_name }} > .sml-http.log 2>&1 &
+          server=$!
+          trap 'kill -TERM -"$server" 2>/dev/null || kill $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT
+          ready=1
+          for _ in $(seq 1 120); do
+            if curl --max-time 2 -fsS http://127.0.0.1:5445/health >/dev/null 2>&1; then ready=0; break; fi
+            sleep 0.25
+          done
+          test "$ready" -eq 0
+          kill -0 $server
+          test "$(curl --max-time 10 -fsS http://127.0.0.1:5445/health)" = '{"status":"ok"}'
+          test "$(curl --max-time 10 -fsS 'http://127.0.0.1:5445/stats?text=hello%20world%0A')" = '{"text":"hello world\n","lines":1,"words":2,"bytes":12}'
+          test "$(curl --max-time 10 -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary '{}' http://127.0.0.1:5445/stats)" = 422
+          test "$(curl --max-time 10 -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5445/nope)" = 404

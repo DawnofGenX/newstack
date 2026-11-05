@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `raku-http-api` — a Raku JSON service on Rakudo's own `IO::Socket::INET`, with no
+  `zef` and no CPAN: Rakudo ships no JSON parser, so the reader is a small
+  recursive-descent parser that keeps a string apart from a number (`{"text": 42}`
+  is `422 missing_text`). Three Raku traps are documented in the README: a literal
+  space inside a character class is ignored (`/^<[ \t]>$/` never matches a space,
+  write `\x20`), `\x0bb` parses as hex `0xBB` (use `\x[0b]`), and a `Nil` from
+  `index` cannot be unboxed into an `int`.
 - `swift-http-api` — a Swift 6 JSON service on POSIX sockets, built by `swiftc`
   straight from `src/` and `tests/` into one binary: no `Package.swift`, no
   dependency graph, and `-warnings-as-errors` as the gate. The harness is compiled

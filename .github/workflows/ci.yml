@@ -146,6 +146,7 @@ jobs:
           - guile-cli
           - guile-http-api
           - raku-cli
+          - raku-http-api
           - groovy-cli
           - groovy-http-api
           - awk-cli
@@ -377,10 +378,10 @@ jobs:
           guile --version | head -1
 
       - name: Install Rakudo
-        if: matrix.stack == 'raku-cli'
+        if: contains(fromJSON('["raku-cli","raku-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends rakudo
+          sudo apt-get install -y --no-install-recommends rakudo curl
           raku --version
 
       - name: Install gawk

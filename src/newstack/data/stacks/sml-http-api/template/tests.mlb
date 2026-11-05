@@ -1,0 +1,9 @@
+$(SML_LIB)/basis/basis.mlb
+
+src/counts.sml
+src/json.sml
+src/contract.sml
+
+tests/harness.sml
+tests/tests.sml
+tests/test_main.sml

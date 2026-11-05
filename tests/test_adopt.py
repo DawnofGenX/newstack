@@ -976,6 +976,26 @@ def test_a_plain_tcl_script_still_resolves_to_the_tcl_cli(tmp_path) -> None:
     assert names == ["tcl-cli"], "a script with no socket is the CLI stack"
 
 
+def test_a_raku_socket_server_resolves_to_the_raku_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "lib/Server.rakumod": (
+                "unit module Server;\n"
+                "my $listener = IO::Socket::INET.new(:listen, :localport(0));\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["raku-http-api"], "IO::Socket::INET is the service marker"
+
+
+def test_a_plain_raku_script_still_resolves_to_the_raku_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"main.raku": "say \"hello\";\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["raku-cli"], "a script with no socket is the CLI stack"
+
+
 def test_a_lisp_socket_server_resolves_to_the_lisp_service(tmp_path) -> None:
     make_repo(
         tmp_path,

@@ -1,0 +1,47 @@
+{
+  "name": "sml-http-api",
+  "title": "Standard ML HTTP service",
+  "language": "sml",
+  "blurb": "Standard ML JSON service compiled with MLton: INetSock.TCP sockets, a hand-written JSON reader and router, and an SML test harness with no dependencies",
+  "requires": [
+    "mlton",
+    "make",
+    "curl"
+  ],
+  "default_description": "A Standard ML HTTP service.",
+  "port": 5445,
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "PORT=8080 ./bin/{npm_name}",
+    "curl -s 'http://127.0.0.1:8080/stats?text=hello%20world%0A'"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make build"
+    },
+    {
+      "name": "test",
+      "cmd": "make test"
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5445/health >/dev/null 2>&1; then\n  echo \"port 5445 is already answering - stop that process before running this step\"\n  exit 1\nfi\nmake build >/dev/null\nPORT=5445 ./bin/{{ npm_name }} > .sml-http.log 2>&1 &\nserver=$!\ntrap 'kill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT\nready=1\nfor _ in $(seq 1 120); do\n  if curl --max-time 2 -fsS http://127.0.0.1:5445/health >/dev/null 2>&1; then ready=0; break; fi\n  sleep 0.25\ndone\nif [ \"$ready\" -ne 0 ]; then cat .sml-http.log; echo \"the server did not answer in time\"; exit 1; fi\nkill -0 $server 2>/dev/null || { cat .sml-http.log; echo \"the server exited\"; exit 1; }\n\ncheck() {\n  name=$1\n  want=$2\n  got=$3\n  if [ \"$want\" != \"$got\" ]; then\n    echo \"FAIL $name: want [$want] got [$got]\"\n    exit 1\n  fi\n  echo \"ok $name\"\n}\n\ncheck health '{\"status\":\"ok\"}' \"$(curl --max-time 10 -fsS http://127.0.0.1:5445/health)\"\ncheck get '{\"text\":\"hello world\\n\",\"lines\":1,\"words\":2,\"bytes\":12}' \\\n  \"$(curl --max-time 10 -fsS 'http://127.0.0.1:5445/stats?text=hello%20world%0A')\"\ncheck utf8 '{\"text\":\"h\u00e9llo w\u00f6rld\\n\",\"lines\":1,\"words\":2,\"bytes\":14}' \\\n  \"$(curl --max-time 10 -fsS 'http://127.0.0.1:5445/stats?text=h%C3%A9llo%20w%C3%B6rld%0A')\"\ncheck post '{\"text\":\"a b\\nc\\n\",\"lines\":2,\"words\":3,\"bytes\":6}' \\\n  \"$(curl --max-time 10 -fsS -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5445/stats)\"\ncheck escape '{\"text\":\"caf\u00e9\",\"lines\":0,\"words\":1,\"bytes\":5}' \\\n  \"$(curl --max-time 10 -fsS -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"caf\\u00e9\"}' http://127.0.0.1:5445/stats)\"\ncheck empty '{\"text\":\"\",\"lines\":0,\"words\":0,\"bytes\":0}' \\\n  \"$(curl --max-time 10 -fsS 'http://127.0.0.1:5445/stats?text=')\"\n\nstatus() { curl --max-time 10 -s -o /dev/null -w '%{http_code}' \"$@\"; }\ncheck missing_text 422 \"$(status -X POST -H 'content-type: application/json' --data-binary '{}' http://127.0.0.1:5445/stats)\"\ncheck non_string 422 \"$(status -X POST -H 'content-type: application/json' --data-binary '{\"text\":42}' http://127.0.0.1:5445/stats)\"\ncheck invalid_json 422 \"$(status -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5445/stats)\"\ncheck unknown_route 404 \"$(status http://127.0.0.1:5445/nope)\"\ncheck wrong_method 405 \"$(status -X DELETE http://127.0.0.1:5445/health)\"\ncheck not_found_detail '{\"error\":\"not_found\",\"detail\":\"no route for GET /nope\"}' \\\n  \"$(curl --max-time 10 -sS http://127.0.0.1:5445/nope)\"\n\necho \"all contract checks passed\"\n"
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.sml",
+      "contains": "INetSock"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_main.sml"
+  ]
+}

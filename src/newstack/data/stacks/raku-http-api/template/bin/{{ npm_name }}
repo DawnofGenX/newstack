@@ -1,0 +1,13 @@
+#!/usr/bin/env raku
+# The service entry point: read the environment, then block.
+use lib $*PROGRAM.parent(2).add('lib').Str;
+use Server;
+
+my %env = %*ENV;
+my Str $host = %env<HOST> // '127.0.0.1';
+my Str $raw = %env<PORT> // '8080';
+unless $raw ~~ /^ \d+ $/ && 1 <= +$raw <= 65535 {
+    note "PORT must be a number between 1 and 65535, got $raw";
+    exit 2;
+}
+serve($host, +$raw);
