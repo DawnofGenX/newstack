@@ -8,7 +8,14 @@ from decimal import Decimal
 import pytest
 
 from {{ package_name }}.dataset import Dataset
-from {{ package_name }}.report import Report, as_csv, as_json, as_markdown, build, render
+from {{ package_name }}.report import (
+    Report,
+    as_csv,
+    as_json,
+    as_markdown,
+    build,
+    render,
+)
 
 CSV = "region,revenue\nnorth,0.10\nsouth,0.20\nnorth,0.20\nwest,\neast,5.00\n"
 
@@ -102,12 +109,13 @@ def test_a_parquet_copy_reports_the_same_numbers(tmp_path) -> None:
     csv = tmp_path / "rows.csv"
     csv.write_text(CSV, encoding="utf-8")
     parquet = tmp_path / "rows.parquet"
-    duckdb.connect(":memory:").execute(
-        f"COPY (SELECT * FROM read_csv_auto({csv.as_posix()!r})) TO {parquet.as_posix()!r} "
-        "(FORMAT parquet)"
-    )
-    from_csv = build(Dataset(csv), group_by="region", metric="revenue", title="t")
-    from_parquet = build(Dataset(parquet), group_by="region", metric="revenue", title="t")
-    assert as_markdown(from_parquet) == as_markdown(from_csv)
-    assert from_parquet.scanned == from_csv.scanned
-    assert from_parquet.skipped == from_csv.skipped
+    with duckdb.connect(":memory:") as builder:
+        builder.execute(
+            f"COPY (SELECT * FROM read_csv_auto({csv.as_posix()!r})) TO {parquet.as_posix()!r} "
+            "(FORMAT parquet)"
+        )
+    csv_report = build(Dataset(csv), group_by="region", metric="revenue", title="t")
+    parquet_report = build(Dataset(parquet), group_by="region", metric="revenue", title="t")
+    assert as_markdown(parquet_report) == as_markdown(csv_report)
+    assert parquet_report.scanned == csv_report.scanned
+    assert parquet_report.skipped == csv_report.skipped

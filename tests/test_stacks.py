@@ -473,3 +473,59 @@ def test_every_verify_command_uses_double_braces(name):
         f"{name}: verify commands render with {{{{ }}}}; these placeholders stay literal: "
         f"{offenders}"
     )
+
+
+# scripts/proof_stack.sh scaffolds into `newstack-smoke-<stack>-<epoch>`, so the
+# rendered package name is 44 characters. A line that fits at `demo` can therefore
+# break in the one place a stack's CI actually runs.
+PROOF_PROJECT_NAME = "newstack-smoke-python-duckdb-report-1793898647"
+DEFAULT_COLUMNS = 100
+
+
+def _configured_columns(project: Path) -> int | None:
+    """The line length ruff would enforce in the rendered project, if it enforces one.
+
+    ruff's default rule set stops at E4/E7/E9, which excludes E501 - a stack that
+    lists `E` (or `E501`) in `select` is the only kind that can fail on a long line.
+    Parsed as text because the CLI itself still runs on Python 3.10, where `tomllib`
+    does not exist.
+    """
+    manifest = project / "pyproject.toml"
+    if not manifest.is_file():
+        return None
+    text = manifest.read_text(encoding="utf-8")
+    selected = " ".join(
+        match.group(1) for match in re.finditer(r"(?:extend-)?select\s*=\s*\[([^\]]*)\]", text)
+    )
+    if not re.search(r'"(?:E|E5[0-9]{2})"', selected):
+        return None
+    columns = re.search(r"^line[-_]length\s*=\s*([0-9]+)", text, re.MULTILINE)
+    return int(columns.group(1)) if columns else DEFAULT_COLUMNS
+
+
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_a_long_project_name_still_fits_the_line_length(tmp_path, name: str) -> None:
+    """A proof run renders a 44-character project name, so templates are linted at that size.
+
+    `from {{ package_name }}.module import a, b, c` grows with the package name: at
+    `demo` it fits, at a proof-run name it is 117 columns, and the hosted run then dies
+    in Lint before a single test executes.
+    """
+    from newstack.cli import build_context_for_check
+    from newstack.render import generate
+
+    stack = get_stack(name)
+    context = build_context_for_check(stack, PROOF_PROJECT_NAME)
+    generate(stack.template_dir, tmp_path, context)
+    columns = _configured_columns(tmp_path)
+    if columns is None:
+        pytest.skip("this stack does not lint for long lines")
+    offenders = []
+    for path in sorted(tmp_path.rglob("*.py")):
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if len(line) > columns:
+                offenders.append(f"{path.relative_to(tmp_path).as_posix()}:{number} ({len(line)})")
+    assert not offenders, (
+        f"{name}: lines wider than {columns} columns once the project name is "
+        f"{len(PROOF_PROJECT_NAME)} characters: {offenders}"
+    )

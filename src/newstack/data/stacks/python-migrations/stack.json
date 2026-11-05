@@ -1,0 +1,92 @@
+{
+  "name": "python-migrations",
+  "title": "Python SQL migrations",
+  "language": "python",
+  "blurb": "Forward-only SQLite migrations with a checksum ledger: an applied file that changed is drift and blocks the run, a pending migration older than the newest applied one is refused, and each file runs in one real transaction because sqlite3 never wraps DDL in one",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A forward-only SQL migration runner for SQLite, with a ledger that proves a file changed.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} up",
+    ".venv/bin/python -m {package_name} status",
+    ".venv/bin/python -m pytest"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "drift-exits-1",
+      "cmd": "d=$(mktemp -d); set +e; cp -r migrations \"$d/m\"; .venv/bin/python -m {{ package_name }} up --db \"$d/app.db\" --dir \"$d/m\" >/dev/null; printf -- '-- edited\\n' >> \"$d/m/0001_create_notes.sql\"; .venv/bin/python -m {{ package_name }} up --db \"$d/app.db\" --dir \"$d/m\" >/dev/null 2>&1; s=$?; rm -rf \"$d\"; test \"$s\" -eq 1",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "which migration ran, when, and what it hashed to"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "migrations/0001_create_notes.sql",
+    "migrations/0002_add_pinned.sql",
+    "migrations/0003_notes_by_title.sql"
+  ],
+  "adopt_tests": [
+    "tests/test_runner.py"
+  ]
+}

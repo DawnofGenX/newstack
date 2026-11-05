@@ -65,10 +65,13 @@ def test_parquet_is_read_with_the_parquet_reader(tmp_path) -> None:
     csv = tmp_path / "rows.csv"
     csv.write_text(CSV, encoding="utf-8")
     parquet = tmp_path / "rows.parquet"
-    duckdb.connect(":memory:").execute(
-        f"COPY (SELECT * FROM read_csv_auto({csv.as_posix()!r})) TO {parquet.as_posix()!r} "
-        "(FORMAT parquet)"
-    )
+    # `with` matters: an unclosed duckdb connection is collected at a random moment,
+    # and a ResourceWarning raised mid-test is an error under `filterwarnings = error`.
+    with duckdb.connect(":memory:") as builder:
+        builder.execute(
+            f"COPY (SELECT * FROM read_csv_auto({csv.as_posix()!r})) TO {parquet.as_posix()!r} "
+            "(FORMAT parquet)"
+        )
     with Dataset(parquet) as opened:
         assert opened.source.startswith("read_parquet(")
         assert opened.columns == ["region", "revenue"]

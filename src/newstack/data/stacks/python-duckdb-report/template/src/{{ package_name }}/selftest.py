@@ -7,7 +7,14 @@ from decimal import Decimal
 from pathlib import Path
 
 from {{ package_name }}.dataset import Dataset, DatasetError, quote
-from {{ package_name }}.report import Report, as_csv, as_json, as_markdown, build, render
+from {{ package_name }}.report import (
+    Report,
+    as_csv,
+    as_json,
+    as_markdown,
+    build,
+    render,
+)
 
 CSV = "region,revenue\nnorth,10.10\nsouth,20.20\nnorth,0.05\nwest,\n"
 

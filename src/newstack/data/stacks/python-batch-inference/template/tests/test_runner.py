@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 from {{ package_name }}.client import RequestFailed
-from {{ package_name }}.records import Request, ResultWriter, load_results
+from {{ package_name }}.records import (
+    Request,
+    ResultWriter,
+    load_results,
+)
 from {{ package_name }}.runner import Summary, run
 
 
@@ -56,8 +60,9 @@ def test_a_failure_is_recorded_and_the_run_continues(tmp_path) -> None:
 
 
 def test_resumed_counts_are_carried_through(tmp_path) -> None:
+    pending = [Request(id="a", prompt="p")]
     with ResultWriter(tmp_path / "results.jsonl") as writer:
-        summary = run([Request(id="a", prompt="p")], Counter(), writer, total=5, resumed=4)  # type: ignore[arg-type]
+        summary = run(pending, Counter(), writer, total=5, resumed=4)  # type: ignore[arg-type]
     assert summary.total == 5
     assert summary.resumed == 4
     assert summary.worked == 1
@@ -72,8 +77,9 @@ def test_an_empty_batch_does_no_work(tmp_path) -> None:
 def test_a_bad_concurrency_is_rejected(tmp_path) -> None:
     import pytest
 
+    pending = [Request(id="a", prompt="p")]
     with ResultWriter(tmp_path / "results.jsonl") as writer, pytest.raises(ValueError):
-        run([Request(id="a", prompt="p")], Counter(), writer, concurrency=0)  # type: ignore[arg-type]
+        run(pending, Counter(), writer, concurrency=0)  # type: ignore[arg-type]
 
 
 def test_summary_lines_are_greppable() -> None:
