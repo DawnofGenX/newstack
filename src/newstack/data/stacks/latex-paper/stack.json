@@ -23,7 +23,7 @@
       "timeout": 600
     },
     {
-      "name": "check",
+      "name": "test",
       "cmd": "bash check.sh",
       "timeout": 600
     },

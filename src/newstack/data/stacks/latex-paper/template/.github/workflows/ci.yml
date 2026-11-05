@@ -15,7 +15,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             texlive-latex-base texlive-latex-recommended latexmk poppler-utils
       - name: Build the paper
-        run: make build
+        run: make build && test -s build/paper.pdf
       - name: Check the text a reader gets
         run: bash check.sh
       - name: Keep the pdf
