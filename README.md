@@ -295,6 +295,7 @@ $ newstack stacks outdated
 | `zig-cli` | Zig 0.17 CLI: counting module with in-source test blocks, `zig build test`, no runtime | `zig` |
 | `zig-http-api` | Zig 0.17 JSON service on `std.http`: `contract.route` is pure so every status code is tested without a socket, `build.zig` ships the binary plus one test binary per module, real-socket verify step | `zig`, `curl` |
 | `julia-cli` | Julia CLI: pure counting module, `Test` stdlib suite, zero external packages | `julia` |
+| `julia-api` | Julia JSON service on HTTP.jl: pure `route(method, path, query, body)`, `Test` suite covering every status code plus one real-port case, 18-package instantiate once | `julia`, `curl` |
 | `nim-cli` | Nim CLI: pure counting module, `unittest` suite that also checks exit codes, `nimble build` binary | `nim`, `nimble` |
 | `nim-http-api` | Nim JSON service: counting core, a pure `route()` covering every status code, `asynchttpserver` on top — no dependencies at all | `nim`, `nimble` |
 | `perl-cli` | Perl CLI on core modules only: `Makefile.PL` + `Test::More` suite, no CPAN install step | `perl`, `make` |

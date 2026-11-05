@@ -89,6 +89,7 @@ jobs:
           - zig-cli
           - zig-http-api
           - julia-cli
+          - julia-api
           - nim-cli
           - nim-http-api
           - perl-cli
@@ -491,7 +492,7 @@ jobs:
           gleam-version: 1.19.2
           rebar3-version: "3.28.0"
       - name: Set up Julia
-        if: matrix.stack == 'julia-cli'
+        if: contains(fromJSON('["julia-cli","julia-api"]'), matrix.stack)
         uses: julia-actions/setup-julia@v2
         with:
           version: "1.13"

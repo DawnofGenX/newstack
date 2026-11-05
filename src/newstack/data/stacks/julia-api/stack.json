@@ -1,0 +1,67 @@
+{
+  "name": "julia-api",
+  "title": "Julia JSON API",
+  "language": "julia",
+  "blurb": "Julia JSON service on HTTP.jl: pure request contract, Test suite with a real-socket case, no hand-written HTTP parsing",
+  "requires": [
+    "julia",
+    "curl"
+  ],
+  "default_description": "A Julia JSON web service on HTTP.jl.",
+  "next_steps": [
+    "cd {path}",
+    "julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'",
+    "julia --project=. test/runtests.jl",
+    "PORT=8080 julia --project=. src/main.jl"
+  ],
+  "verify": [
+    {
+      "name": "instantiate",
+      "cmd": "julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "test",
+      "cmd": "julia --project=. test/runtests.jl",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "load",
+      "cmd": "julia --project=. --depwarn=error -e 'using TextstatApi'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "http",
+      "cmd": "if curl -fsS --max-time 2 http://127.0.0.1:5422/health >/dev/null 2>&1; then echo 'port 5422 is already serving something else - stop it before running this step'; exit 1; fi; PORT=5422 julia --project=. src/main.jl > .julia.log 2>&1 & server=$!; ready=1; for _ in $(seq 1 240); do if curl -fsS --max-time 2 http://127.0.0.1:5422/health >/dev/null 2>&1; then ready=0; break; fi; sleep 0.5; done; if [ \"$ready\" != 0 ]; then cat .julia.log; echo 'the server did not answer'; kill $server 2>/dev/null || true; wait $server 2>/dev/null || true; exit 1; fi; kill -0 $server 2>/dev/null || { cat .julia.log; echo 'the server exited before it answered'; exit 1; }; health=$(curl -fsS --max-time 10 http://127.0.0.1:5422/health); got=$(curl -fsS --max-time 10 'http://127.0.0.1:5422/stats?text=hello%20world%0A'); posted=$(curl -fsS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5422/stats); missing=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1:5422/stats); broken=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{not json' http://127.0.0.1:5422/stats); gone=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1:5422/nope); kill $server 2>/dev/null || true; wait $server 2>/dev/null || true; test \"$health\" = '{\"status\":\"ok\"}'; echo \"$got\" | grep -q '\"lines\":1'; echo \"$got\" | grep -q '\"bytes\":12'; echo \"$posted\" | grep -q '\"words\":3'; test \"$missing\" = 422; test \"$broken\" = 422; test \"$gone\" = 404",
+      "tools": [
+        "julia",
+        "curl"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "Project.toml",
+      "contains": "HTTP = "
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Project.toml"
+  ],
+  "adopt_tests": [
+    "test/runtests.jl"
+  ]
+}

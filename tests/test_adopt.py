@@ -729,3 +729,30 @@ def test_a_plain_zig_package_still_resolves_to_the_zig_cli(tmp_path) -> None:
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["zig-cli"]
+
+
+
+def test_a_julia_web_project_resolves_to_the_julia_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "Project.toml": 'name = "BlogApi"\n\n[deps]\n'
+            'HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"\n',
+            "src/BlogApi.jl": "module BlogApi\nend\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["julia-api"]
+
+
+def test_a_plain_julia_project_still_resolves_to_the_julia_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            # `julia-cli` matches any Project.toml that mentions julia, e.g. a compat entry
+            "Project.toml": 'name = "Textstat"\n\n[deps]\n\n[compat]\njulia = "1.6"\n',
+            "src/Textstat.jl": "module Textstat\nend\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["julia-cli"]

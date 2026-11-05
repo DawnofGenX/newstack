@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.13'
+      - uses: julia-actions/cache@v2
+      - name: Instantiate and precompile
+        run: julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+      - name: Test
+        run: julia --project=. test/runtests.jl
+      - name: Serve
+        run: |
+          PORT=5422 julia --project=. src/main.jl > .julia.log 2>&1 &
+          server=$!
+          ready=1
+          for _ in $(seq 1 240); do
+            if curl -fsS --max-time 2 http://127.0.0.1:5422/health >/dev/null 2>&1; then ready=0; break; fi
+            sleep 0.5
+          done
+          if [ "$ready" != 0 ]; then cat .julia.log; echo "the server did not answer"; exit 1; fi
+          health=$(curl -fsS --max-time 10 http://127.0.0.1:5422/health)
+          got=$(curl -fsS --max-time 10 'http://127.0.0.1:5422/stats?text=hello%20world%0A')
+          posted=$(curl -fsS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5422/stats)
+          missing=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1:5422/stats)
+          broken=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{not json' http://127.0.0.1:5422/stats)
+          gone=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1:5422/nope)
+          kill $server 2>/dev/null || true
+          wait $server 2>/dev/null || true
+          test "$health" = '{"status":"ok"}'
+          echo "$got" | grep -q '"lines":1'
+          echo "$got" | grep -q '"bytes":12'
+          echo "$posted" | grep -q '"words":3'
+          test "$missing" = 422
+          test "$broken" = 422
+          test "$gone" = 404
