@@ -302,6 +302,7 @@ $ newstack stacks outdated
 | `perl-cli` | Perl CLI on core modules only: `Makefile.PL` + `Test::More` suite, no CPAN install step | `perl`, `make` |
 | `perl-mojolicious-api` | Mojolicious JSON service on Perl 5: a pure `Textstat::Contract->route(method, path, query, body)` covering every status code, a `Test::More` suite, and a numeric-vs-string check that survives `JSON::PP` | `perl`, `make`, `Mojolicious` |
 | `lua-cli` | Lua 5.4 CLI: stdlib-only modules, a hand-rolled spec harness, zero luarocks dependencies | `lua5.4` |
+| `lua-http-api` | JSON service on LuaSocket: the route table as one pure function, JSON written by hand so the key order is stable, a framework-free suite, one script binds the socket | `lua5.4`, `lua-socket`, `lua-cjson` |
 | `fsharp-cli` | F# on .NET 8: pure counting core, `Mode` discriminated union parser, xUnit suite that launches the binary for its exit codes | `dotnet` |
 | `crystal-cli` | Crystal CLI: stdlib-only modules, `crystal spec` suite, compiled binary with a 0/2/1 exit contract | `crystal` |
 | `crystal-kemal-api` | Crystal service on Kemal: counting rules and the whole route table are pure functions under `crystal spec`, plus a real socket check | `crystal`, `shards` |

@@ -1,0 +1,59 @@
+{
+  "name": "lua-http-api",
+  "title": "Lua HTTP API",
+  "language": "lua",
+  "blurb": "Lua 5.4 JSON service on LuaSocket: the route table as one pure function, JSON written by hand so key order is stable, a test suite with no framework, one script binds the socket",
+  "requires": [
+    "lua5.4",
+    "lua-socket",
+    "lua-cjson",
+    "curl"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "lua5.4 tests/run.lua",
+    "PORT=8080 ./bin/{npm_name}",
+    "curl -sS 'http://127.0.0.1:8080/stats?text=hello%20world%0A'"
+  ],
+  "verify": [
+    {
+      "name": "syntax",
+      "cmd": "for f in src/*.lua tests/run.lua bin/{{ npm_name }}; do luac5.4 -p \"$f\"; done",
+      "timeout": 300,
+      "tools": [
+        "luac5.4"
+      ]
+    },
+    {
+      "name": "test",
+      "cmd": "lua5.4 tests/run.lua",
+      "timeout": 600,
+      "tools": [
+        "lua5.4"
+      ]
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5427/health >/dev/null 2>&1; then echo 'port 5427 is already answering - stop that process before running this step'; exit 1; fi\nPORT=5427 ./bin/{{ npm_name }} > .lua.log 2>&1 &\nserver=$!\ntrap 'kill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true' EXIT\nok=0\nfor _ in $(seq 1 120); do\n  if curl -fsS --max-time 2 http://127.0.0.1:5427/health >/dev/null 2>&1; then ok=1; break; fi\n  sleep 0.5\ndone\nif [ $ok -ne 1 ]; then echo 'the service never answered'; cat .lua.log; kill $server 2>/dev/null || true; exit 1; fi\nkill -0 $server 2>/dev/null || { cat .lua.log; echo 'the service exited before it answered'; exit 1; }\nhealth=$(curl -sS --max-time 10 http://127.0.0.1:5427/health)\ntest \"$health\" = '{\"status\":\"ok\"}'\nget=$(curl -sS --max-time 10 'http://127.0.0.1:5427/stats?text=hello%20world%0A')\nprintf '%s' \"$get\" | grep -q '\"lines\":1'\nprintf '%s' \"$get\" | grep -q '\"words\":2'\nprintf '%s' \"$get\" | grep -q '\"bytes\":12'\nposted=$(curl -sS --max-time 10 -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5427/stats)\nprintf '%s' \"$posted\" | grep -q '\"lines\":2'\nprintf '%s' \"$posted\" | grep -q '\"words\":3'\nmissing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5427/stats)\ntest \"$missing\" = 422\nbroken=$(curl -sS --max-time 10 -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5427/stats)\nprintf '%s' \"$broken\" | grep -q 'invalid_json'\ngone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5427/nope)\ntest \"$gone\" = 404\nwrong=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5427/health)\ntest \"$wrong\" = 405\nkill $server 2>/dev/null || true\nwait $server 2>/dev/null || true",
+      "timeout": 600,
+      "tools": [
+        "lua5.4",
+        "curl"
+      ]
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.lua",
+      "contains": "socket.bind"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/run.lua"
+  ]
+}

@@ -96,6 +96,7 @@ jobs:
           - perl-cli
           - perl-mojolicious-api
           - lua-cli
+          - lua-http-api
           - fsharp-cli
           - crystal-cli
           - crystal-kemal-api
@@ -560,10 +561,16 @@ jobs:
         with:
           nim-version: "2.2.4"
       - name: Install Lua
-        if: matrix.stack == 'lua-cli'
+        if: contains(fromJSON('["lua-cli","lua-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq lua5.4
+          # The service stack needs the two distribution libraries; the CLI
+          # stack does not, and installing them costs a second.
+          if [ "${{ matrix.stack }}" = "lua-http-api" ]; then
+            sudo apt-get install -y -qq lua-socket lua-cjson
+            lua5.4 -e 'print(require("socket")._VERSION, require("cjson")._VERSION)'
+          fi
           lua5.4 -v
       - name: Install Crystal
         if: contains(fromJSON('["crystal-cli","crystal-kemal-api"]'), matrix.stack)

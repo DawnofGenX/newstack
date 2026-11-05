@@ -1,0 +1,18 @@
+#!/usr/bin/env lua5.4
+-- Resolve src/ from this script's own location so the service runs from any
+-- working directory, including the one `newstack check` picks.
+local function script_dir()
+  local source = debug.getinfo(1, "S").source:sub(2)
+  return source:match("^(.*)[/\\][^/\\]*$") or "."
+end
+
+package.path = script_dir() .. "/../src/?.lua;" .. package.path
+
+local server = require("server")
+
+local host = os.getenv("HOST") or "127.0.0.1"
+local port = tonumber(os.getenv("PORT") or "") or 8080
+
+io.stdout:write(string.format("listening on http://%s:%d\n", host, port))
+io.stdout:flush()
+server.serve(host, port)

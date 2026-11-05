@@ -7,6 +7,11 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `lua-http-api` — the Lua service: LuaSocket plus `cjson` from the
+  distribution, 26 checks with no framework, and response documents written
+  by hand because a Lua table has no key order to promise. `cjson` is only
+  used to read a posted body, so `{"text": 42}` stays a 422 while
+  `{"text": "42"}` is counted.
 - `guile-http-api` — the Guile service: `(web server)` and `(json)` from
   guile-json, counting over the UTF-8 bytes, the route table as one pure
   procedure tested without a socket, and `set -e` plus an `EXIT` trap so a

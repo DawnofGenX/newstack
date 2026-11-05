@@ -667,6 +667,35 @@ def test_a_mist_gleam_config_resolves_to_the_gleam_service(tmp_path) -> None:
     assert names == ["gleam-mist-api"]
 
 
+def test_a_luasocket_service_resolves_to_the_lua_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            ".luarc.json": '{"runtime.version": "Lua 5.4"}\n',
+            "src/server.lua": (
+                'local socket = require("socket")\n'
+                "local server = assert(socket.bind(\"127.0.0.1\", 8080))\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["lua-http-api"]
+
+
+def test_the_lua_cli_still_resolves_without_a_socket(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            ".luarc.json": '{"runtime.version": "Lua 5.4"}\n',
+            "src/counts.lua": (
+                "local M = {}\n\nfunction M.count(text) return #text end\n\nreturn M\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["lua-cli"]
+
+
 def test_a_plain_gleam_config_still_resolves_to_the_gleam_cli(tmp_path) -> None:
     make_repo(
         tmp_path,
