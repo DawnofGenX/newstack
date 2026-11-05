@@ -7,7 +7,7 @@ import logging
 import socket
 import threading
 
-from .broker import Broker, DuplicateClientId, Session
+from .broker import Broker, Session
 from .packet import (
     BAD_CLIENT_ID,
     BAD_PROTOCOL,
@@ -107,12 +107,12 @@ class Connection:
             connect = self._handshake()
             if connect is None:
                 return
-            try:
-                session = self.broker.attach(connect.client_id, connect.clean_session, self.send)
-            except DuplicateClientId:
-                self.send(connack(False, BAD_CLIENT_ID))
-                return
-            self.session = session
+            self.session = self.broker.attach(
+                connect.client_id,
+                connect.clean_session,
+                self.send,
+                self._shutdown_socket,
+            )
             self.send(connack(False))
             self.sock.settimeout(connect.keepalive * 1.5 if connect.keepalive else None)
             self._loop()
@@ -123,6 +123,10 @@ class Connection:
                 self.broker.detach(self.session)
             with contextlib.suppress(OSError):
                 self.sock.close()
+
+    def _shutdown_socket(self) -> None:
+        with contextlib.suppress(OSError):
+            self.sock.shutdown(socket.SHUT_RDWR)
 
     def _loop(self) -> None:
         assert self.session is not None

@@ -10,7 +10,6 @@ from .broker import Broker
 from .client import Client
 from .packet import (
     ACCEPTED,
-    BAD_CLIENT_ID,
     BAD_PROTOCOL,
     SUB_FAILURE,
     ProtocolError,
@@ -177,8 +176,13 @@ def run() -> int:
         checks.same("the unsubscribed one does not", chatty.next_publish(0.6), None)
 
         twin = client(port, "talker")
-        checks.same("a duplicate client id is refused", twin.connect(), BAD_CLIENT_ID)
-        twin.close()
+        checks.same("a second connection with a live id is accepted", twin.connect(), ACCEPTED)
+        try:
+            gone = talker.sock.recv(16) == b""
+        except OSError:
+            gone = True
+        checks.that("the broker closes the connection it took the id from", gone)
+        talker = twin
 
         # A clean session forgets everything; a persistent one keeps its filters.
         ephemeral = client(port, "ephemeral", clean=True)

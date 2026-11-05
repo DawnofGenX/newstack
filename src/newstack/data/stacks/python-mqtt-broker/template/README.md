@@ -50,8 +50,11 @@ subscriptions, `$SYS` topics, persistence across restarts.
 8. **Packet ids belong to the connection that writes them.** A QoS 1 delivery
    to a subscriber uses that subscriber's id space, never the publisher's.
 9. **An empty client id requires a clean session.** Otherwise the handshake is
-   refused with CONNACK `0x02`, and a second connection that reuses a live id
-   gets the same code.
+   refused with CONNACK `0x02`. A non-empty id that is already connected is NOT
+   refused: MQTT 3.1.1 section 3.1.4 says the new connection takes the session
+   over, so the server shuts the old socket down. Refusing instead made a client
+   that reconnects right after `disconnect()` fail whenever the old socket's
+   cleanup had not run yet, which was roughly one pytest run in three.
 10. **The remaining-length field is seven bits per byte with a continuation
     bit.** A 20 KB payload needs three length bytes; `len(body)` in one byte
     works for every small test and fails on the first real message.

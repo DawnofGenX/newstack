@@ -12,7 +12,6 @@ from {{ package_name }}.broker import Broker
 from {{ package_name }}.client import Client
 from {{ package_name }}.packet import (
     ACCEPTED,
-    BAD_CLIENT_ID,
     BAD_PROTOCOL,
     SUB_FAILURE,
     utf8,
@@ -130,11 +129,16 @@ def test_unsubscribe_stops_delivery(mk):
     assert reader.next_publish(0.6) is None
 
 
-def test_a_second_connection_with_the_same_id_is_refused(mk):
+def test_a_second_connection_with_the_same_id_takes_the_session_over(mk):
     first = connected(mk, "twin")
     second = mk("twin")
-    assert second.connect() == BAD_CLIENT_ID
-    first.ping()
+    assert second.connect() == ACCEPTED
+    try:
+        gone = first.sock.recv(16) == b""
+    except OSError:
+        gone = True
+    assert gone
+    second.ping()
 
 
 def test_a_clean_session_forgets_its_subscriptions(mk):

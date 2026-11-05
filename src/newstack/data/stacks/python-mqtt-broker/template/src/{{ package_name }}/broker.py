@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import threading
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -12,18 +13,23 @@ from .topics import matches, valid_filter
 Sender = Callable[[bytes], None]
 
 
-class DuplicateClientId(Exception):
-    """A second connection claimed a client id that is already connected."""
-
-
 @dataclass
 class Session:
     client_id: str
     clean: bool
     subscriptions: dict[str, int] = field(default_factory=dict)
     sender: Sender | None = None
+    closer: Callable[[], None] | None = None
     next_packet_id: int = 1
     closed: bool = False
+
+    def shutdown(self) -> None:
+        """Close the socket behind this session; used when an id is taken over."""
+        self.closed = True
+        self.sender = None
+        if self.closer is not None:
+            with contextlib.suppress(OSError):
+                self.closer()
 
     def take_packet_id(self) -> int:
         value = self.next_packet_id
@@ -64,24 +70,40 @@ class Broker:
         self._retained: dict[str, tuple[bytes, int]] = {}
 
     # -- sessions ------------------------------------------------------
-    def attach(self, client_id: str, clean: bool, sender: Sender) -> Session:
+    def attach(
+        self,
+        client_id: str,
+        clean: bool,
+        sender: Sender,
+        closer: Callable[[], None] | None = None,
+    ) -> Session:
+        """Claim a client id. A second connection takes the session over.
+
+        MQTT 3.1.1 section 3.1.4 says the server disconnects the client that
+        already holds the id, so a reconnect that arrives before the old
+        socket's cleanup has run still succeeds instead of being refused.
+        """
+        takeover: Session | None = None
         with self._lock:
             existing = self._sessions.get(client_id)
             if existing is not None and not existing.closed:
-                raise DuplicateClientId(client_id)
-            session = existing if existing is not None and not clean else Session(client_id, clean)
-            session.clean = clean
+                takeover = existing
+            inherited = {} if clean or existing is None else dict(existing.subscriptions)
+            session = Session(client_id, clean, inherited)
             session.sender = sender
-            session.closed = False
-            if clean:
-                session.subscriptions.clear()
+            session.closer = closer
             self._sessions[client_id] = session
-            return session
+        if takeover is not None:
+            takeover.shutdown()
+        return session
 
     def detach(self, session: Session) -> None:
         with self._lock:
             session.closed = True
             session.sender = None
+            if self._sessions.get(session.client_id) is not session:
+                # A newer connection owns the id now; leave its session alone.
+                return
             if session.clean:
                 self._sessions.pop(session.client_id, None)
                 # A clean session leaves nothing behind, not even subscriptions.
