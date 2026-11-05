@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-resp-server` — a RESP2 key-value server whose parser is the point: TCP splits a
+  command wherever it likes (the reader buffers and only consumes a whole frame, and the selftest
+  feeds one command one byte at a time), two commands in one write owe two replies in order,
+  inline and multibulk are separate grammars, `*0\r\n` is ignored rather than answered, a
+  malformed frame answers one `-ERR Protocol error` and then closes the connection, and `INCR` on
+  a non-numeric value must neither answer nor overwrite it. `redis-cli` drives the smoke test, so
+  a real client is the judge.
 - `python-smtp-sink` — a development SMTP capture server: `Controller(port=0)` does not work
   (aiosmtpd probes the server by connecting to port 0 and raises ConnectionRefusedError), the
   size limit can surface as `SMTPSenderRefused` rather than `SMTPDataError` because EHLO

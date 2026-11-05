@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "{{ npm_name }}"
+version = "0.1.0"
+description = "{{ description }}"
+readme = "README.md"
+requires-python = ">={{ python_version }}"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3", "ruff>=0.6"]
+
+[project.scripts]
+{{ npm_name }} = "{{ package_name }}.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/{{ package_name }}"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py{{ python_tag }}"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

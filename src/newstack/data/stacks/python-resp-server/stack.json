@@ -1,0 +1,84 @@
+{
+  "name": "python-resp-server",
+  "title": "Python RESP server",
+  "language": "python",
+  "blurb": "A Redis-protocol (RESP2) key-value server with a hand-written incremental parser: multibulk and inline grammars, pipelining, byte-safe bulk strings, lazy expiry with an injectable clock, one lock over the keyspace, and a malformed frame that answers with one protocol error and then closes",
+  "default_description": "A small RESP2 key-value server with a hand-written parser.",
+  "requires": [
+    "python",
+    "uv",
+    "redis-cli"
+  ],
+  "python": {
+    "minimum": "3.10",
+    "versions": [
+      "3.10",
+      "3.11",
+      "3.12",
+      "3.13"
+    ]
+  },
+  "port": 5486,
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e \".[dev]\"",
+    ".venv/bin/python -m {package_name} --port 5486",
+    "redis-cli -p 5486 ping"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e \".[dev]\"",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "ruff",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "pytest",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} --selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "class CommandReader"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_server.py"
+  ]
+}

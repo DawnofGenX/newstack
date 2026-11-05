@@ -60,6 +60,7 @@ jobs:
           - python-property-tests
           - python-c-extension
           - python-smtp-sink
+          - python-resp-server
           - data-science
           - dbt-project
           - sphinx-docs

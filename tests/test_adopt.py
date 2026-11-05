@@ -2016,3 +2016,20 @@ def test_a_plain_python_service_does_not_match_the_smtp_sink(tmp_path):
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "python-smtp-sink" not in names
 
+
+def test_a_resp_server_resolves_to_the_resp_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "src/kv/protocol.py": "class CommandReader:\n    pass\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["python-resp-server"]
+
+
+def test_a_plain_python_project_does_not_match_the_resp_stack(tmp_path):
+    make_repo(tmp_path, {"src/app/main.py": "print('hello')\n"})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "python-resp-server" not in names
+
