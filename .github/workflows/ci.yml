@@ -104,6 +104,7 @@ jobs:
           - node-http2-api
           - node-load-test
           - node-cli
+          - node-event-sourcing
           - hono-api
           - fastify-api
           - prisma-api

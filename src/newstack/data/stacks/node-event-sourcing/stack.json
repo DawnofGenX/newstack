@@ -1,0 +1,84 @@
+{
+  "name": "node-event-sourcing",
+  "title": "Node event store",
+  "language": "node",
+  "blurb": "An append-only event log whose guarantees are testable: atomic batch appends, optimistic concurrency that names both versions, torn-tail recovery that counts what it dropped, version holes refused at open, and projections required to land on the same state whether rebuilt or caught up from a checkpoint",
+  "requires": [
+    "node",
+    "npm",
+    "git"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "default_description": "An append-only event store.",
+  "next_steps": [
+    "cd {path}",
+    "npm install --no-audit --no-fund",
+    "npm run build",
+    "node dist/src/main.js demo",
+    "node dist/src/main.js append --log events.jsonl --stream acct --expected-version 0 --type deposited --data '{{\"amount\":100}}'"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "typecheck",
+      "cmd": "npm run typecheck",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "npm run selftest",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "node"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/**/*.ts",
+      "contains": "another writer appended first"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tsconfig.json"
+  ],
+  "adopt_tests": [
+    "tests/store.test.ts"
+  ]
+}
