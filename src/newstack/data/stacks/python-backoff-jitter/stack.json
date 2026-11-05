@@ -1,0 +1,82 @@
+{
+  "name": "python-backoff-jitter",
+  "title": "Backoff and jitter",
+  "language": "python",
+  "blurb": "Retries that recover a service and retries that knock it down again look identical in code. This stack simulates 200 clients against one server that is down for one second and measures what each scheduling policy does to the pile-up: fixed and plain exponential delays put the whole population back in one millisecond bucket, full jitter cuts the peak retry wave by an order of magnitude without changing the number of retries, and the cost is paid in wall clock time, which the table prints too. The generator is a 12-line SplitMix64, so every published number is reproducible from the seed.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A retry simulator that measures the pile-up each backoff policy creates, instead of assuming jitter helps.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} compare",
+    ".venv/bin/python -m {package_name} simulate --policy full-jitter --clients 200 --max-peak 50",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the pile-up is what the server sees"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_simulate.py"
+  ]
+}

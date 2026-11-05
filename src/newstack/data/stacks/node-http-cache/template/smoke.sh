@@ -83,7 +83,7 @@ done
 if [ "$ready" = "yes" ]; then
   ok "the server answers on port $PORT"
   headers="$(curl -sS -D - -o "$work/body1" "http://127.0.0.1:$PORT/profile")"
-  check_equal "a plain request answers 200" "$(printf '%s' "$headers" | head -1 | tr -d '\r' | cut -d' ' -f2)" "200"
+  check_equal "a plain request answers 200" "$(printf '%s' "$headers" | tr -d '\r' | awk 'NR==1{print $2}')" "200"
   tag="$(printf '%s' "$headers" | tr -d '\r' | awk 'tolower($1)=="etag:"{print $2}')"
   check_contains "the response carries a tag" "$tag" '"'
   size1="$(wc -c <"$work/body1")"
@@ -98,7 +98,7 @@ if [ "$ready" = "yes" ]; then
   check_equal "an unconditional write answers 428" "$code" "428"
   plain="$(curl -sS -H 'Accept: text/plain' "http://127.0.0.1:$PORT/report")"
   check_contains "the plain representation differs" "$plain" "v1"
-  jsonfirst="$(curl -sS -H 'Accept: application/json' "http://127.0.0.1:$PORT/report" | head -c 1)"
+  jsonfirst="$(curl -sS -H 'Accept: application/json' "http://127.0.0.1:$PORT/report" | cut -c1)"
   check_equal "the json representation is an object" "$jsonfirst" "{"
 else
   bad "the server answers on port $PORT" "$(tail -3 "$work/serve.log")"
