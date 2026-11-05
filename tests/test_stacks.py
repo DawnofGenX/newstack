@@ -476,9 +476,11 @@ def test_every_verify_command_uses_double_braces(name):
 
 
 # scripts/proof_stack.sh scaffolds into `newstack-smoke-<stack>-<epoch>`, so the
-# rendered package name is 44 characters. A line that fits at `demo` can therefore
-# break in the one place a stack's CI actually runs.
-PROOF_PROJECT_NAME = "newstack-smoke-python-duckdb-report-1793898647"
+# rendered package name grows with the stack's own name and a line that fits at
+# `demo` can break in the one place a stack's CI actually runs. The epoch is fixed
+# here so the rendered name is deterministic; its 10 digits are what the real
+# script appends.
+PROOF_EPOCH = "1793898647"
 DEFAULT_COLUMNS = 100
 
 
@@ -515,7 +517,8 @@ def test_a_long_project_name_still_fits_the_line_length(tmp_path, name: str) -> 
     from newstack.render import generate
 
     stack = get_stack(name)
-    context = build_context_for_check(stack, PROOF_PROJECT_NAME)
+    project_name = f"newstack-smoke-{name}-{PROOF_EPOCH}"
+    context = build_context_for_check(stack, project_name)
     generate(stack.template_dir, tmp_path, context)
     columns = _configured_columns(tmp_path)
     if columns is None:
@@ -527,7 +530,7 @@ def test_a_long_project_name_still_fits_the_line_length(tmp_path, name: str) -> 
                 offenders.append(f"{path.relative_to(tmp_path).as_posix()}:{number} ({len(line)})")
     assert not offenders, (
         f"{name}: lines wider than {columns} columns once the project name is "
-        f"{len(PROOF_PROJECT_NAME)} characters: {offenders}"
+        f"{len(project_name)} characters: {offenders}"
     )
 
 

@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 from {{ package_name }} import journal
-from {{ package_name }}.runner import COMPLETED, ROLLED_BACK, Saga, Step
+from {{ package_name }} import runner as subject
+from {{ package_name }}.runner import Saga, Step
+
+COMPLETED = subject.COMPLETED
+ROLLED_BACK = subject.ROLLED_BACK
 
 
 def _saga(path, calls, *, failing=None):
