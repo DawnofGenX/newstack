@@ -293,6 +293,7 @@ $ newstack stacks outdated
 | `grpc-go` | Protobuf-first Go service: `buf` lint/codegen, `bufconn` tests, real-socket smoke test, health service and reflection | `go` |
 | `go-worker` | NDJSON batch worker: retries with backoff for retryable failures only, idempotency ledger written with temp file + rename, SIGTERM drain that does not wait for the producer | `go` |
 | `go-jwt-api` | Go token service: PBKDF2 password digests, HMAC-signed bearer tokens with an absolute deadline, constant-time comparisons, an account store that writes atomically, and one indistinguishable 401 for expired-vs-forged | `go` |
+| `go-trace-api` | W3C trace context without an SDK: a strict `traceparent` parser (lowercase hex, no all-zero ids, version `00`), an answer that names the span that served it, a child span linked to the request span, unsampled traces that propagate but store nothing, and a span export that is a ring reporting what it dropped | `go` |
 | `rust-cli` | std-only Rust CLI: lib+bin split, fmt/clippy/test/release-build gates | `cargo` |
 | `rust-axum` | axum service: typed routes, shared state, `tower` oneshot tests, fmt/clippy | `cargo` |
 | `actix-web` | actix-web 4 service with hand-owned routing: an any-method route so the `405`/`404` bodies are JSON of the app's own, a struct (not `json!`) so the key order is byte-exact, a percent decoder that returns bytes, 39 offline self-checks plus a live curl contract that reaps its own server | `cargo`, `git` |

@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `go-trace-api` — a text-stats service that emits W3C trace context without OpenTelemetry or
+  any other SDK. The `traceparent` parser is strict (four fields, version `00`, lowercase hex,
+  no all-zero ids) and answers `400` instead of silently minting a new root; every response names
+  the span that served it; a child span is recorded whose parent is the request span; a trace
+  whose sampled flag is `00` still propagates ids but stores nothing; and `/spans` keeps a ring
+  of the last 256 spans, reporting how many it evicted. The export is plain JSON, so the whole
+  starter is `go vet ./...` plus `go test ./...`.
 - `python-property-tests` — half-open interval arithmetic with Hypothesis. The properties are
   the point (`normalize` is idempotent, `coverage` agrees with the point set,
   `coverage(left ∩ right) + coverage(left − right) == coverage(left)`), and `CoverageMachine`

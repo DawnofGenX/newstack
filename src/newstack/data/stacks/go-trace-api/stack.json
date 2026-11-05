@@ -1,0 +1,77 @@
+{
+  "name": "go-trace-api",
+  "title": "Go tracing service",
+  "language": "go",
+  "blurb": "A service that emits W3C trace context without an SDK: the traceparent is parsed strictly, every answer names the span that served it, a child span is linked to the request span, unsampled traces propagate but store nothing, and the span export is a ring that admits what it dropped",
+  "default_description": "A tracing text-statistics service.",
+  "port": 5475,
+  "requires": [
+    "go",
+    "curl",
+    "git"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "make build",
+    "PORT=5475 ./bin/{npm_name}",
+    "bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "fmt",
+      "cmd": "test -z \"$(gofmt -l .)\"",
+      "tools": [
+        "go"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "mkdir -p build && go build -o build/{{ npm_name }} . && ./build/{{ npm_name }} --selftest",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "go",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.go",
+      "contains": "ParseTraceparent"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ],
+  "adopt_tests": [
+    "handler_test.go"
+  ]
+}

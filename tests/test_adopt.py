@@ -1848,3 +1848,30 @@ def test_a_plain_python_cli_does_not_match_the_pdf_report_stack(tmp_path):
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "python-pdf-report" not in names
+
+
+def test_a_w3c_trace_service_resolves_to_the_trace_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module trace\n\ngo 1.24\n",
+            "trace.go": (
+                "package main\n\n"
+                "func ParseTraceparent(header string) (string, error) { return header, nil }\n"
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["go-trace-api"]
+
+
+def test_a_plain_go_program_does_not_match_the_trace_stack(tmp_path):
+    make_repo(
+        tmp_path,
+        {
+            "go.mod": "module plain\n\ngo 1.24\n",
+            "main.go": 'package main\n\nimport "fmt"\n\nfunc main() { fmt.Println("hi") }\n',
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["go-cli", "go-http"]

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Build on first use, then hand the process over so PORT reaches the server.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+[ -x build/{{ npm_name }} ] || go build -o build/{{ npm_name }} .
+exec ./build/{{ npm_name }} "$@"
