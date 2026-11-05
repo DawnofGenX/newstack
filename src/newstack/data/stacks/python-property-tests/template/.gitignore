@@ -1,0 +1,21 @@
+# python
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+*.egg-info/
+
+# hypothesis writes a replay database; CI must not inherit it
+.hypothesis/
+
+# tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# editors and os
+.vscode/
+.idea/
+.DS_Store

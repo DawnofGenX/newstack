@@ -7,6 +7,15 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-property-tests` — half-open interval arithmetic with Hypothesis. The properties are
+  the point (`normalize` is idempotent, `coverage` agrees with the point set,
+  `coverage(left ∩ right) + coverage(left − right) == coverage(left)`), and `CoverageMachine`
+  applies random add/remove sequences to both the interval code and a `set[int]` oracle, which
+  is where boundary bugs actually live. Three settings keep CI honest: `derandomize=True`,
+  `database=None` (`.hypothesis/` otherwise makes local and runner results disagree) and
+  `deadline=None` (the 200 ms default measures the machine, not the code). `demo` proves
+  shrinking by searching exhaustively for the smallest input where a naive `sum(length)`
+  disagrees - two identical unit intervals, reported as `naive sum 2   real coverage 1`.
 - `python-pdf-report` — NDJSON records to a PDF report with reportlab. `rl_config.invariant = 1`
   must be set before the first canvas: it pins the creation date and the object ids, so two
   builds of the same input are byte-identical and a golden-file test is possible. Bytes are

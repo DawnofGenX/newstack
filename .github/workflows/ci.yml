@@ -57,6 +57,7 @@ jobs:
           - python-duckdb-report
           - python-migrations
           - python-pdf-report
+          - python-property-tests
           - data-science
           - dbt-project
           - sphinx-docs

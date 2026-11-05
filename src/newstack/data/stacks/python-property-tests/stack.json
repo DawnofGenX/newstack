@@ -1,0 +1,97 @@
+{
+  "name": "python-property-tests",
+  "title": "Python property tests",
+  "language": "python",
+  "blurb": "Half-open interval arithmetic checked with Hypothesis: invariants instead of examples, a stateful machine against a set-of-integers oracle, deterministic CI settings, and a shrinking demo that finds the smallest input which fools a naive sum",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "Interval arithmetic with property-based tests.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . --group dev",
+    ".venv/bin/python -m pytest",
+    ".venv/bin/python -m {package_name} demo"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . hypothesis pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} --selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "no-shrink",
+      "cmd": ".venv/bin/python -m {{ package_name }} demo | grep -q '^naive sum 2   real coverage 1$'",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "backwards-exit",
+      "cmd": ".venv/bin/python -m {{ package_name }} cover 5 2 >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "from hypothesis import given"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "tests/test_properties.py"
+  ],
+  "adopt_tests": [
+    "tests/test_intervals.py"
+  ]
+}
