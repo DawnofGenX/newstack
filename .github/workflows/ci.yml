@@ -118,6 +118,7 @@ jobs:
           - haxe-cli
           - sml-cli
           - d-cli
+          - jsonnet-config
     steps:
       - uses: actions/checkout@v7
       - name: Set up uv
@@ -344,6 +345,13 @@ jobs:
           sudo apt-get install -y --no-install-recommends haxe neko
           haxe --version
           neko -version
+
+      - name: Install Jsonnet
+        if: matrix.stack == 'jsonnet-config'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends jsonnet
+          jsonnet --version
 
       - name: Install LDC
         if: matrix.stack == 'd-cli'

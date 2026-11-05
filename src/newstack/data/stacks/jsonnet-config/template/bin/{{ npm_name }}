@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Renders, validates and tests this project's service manifest.
+set -uo pipefail
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+program="$(basename "$0")"
+
+usage() {
+  cat <<EOF
+Usage: $program COMMAND
+
+Commands:
+  render   compile config/manifest.jsonnet into a deployable document
+  check    validate the manifest against lib/schema.libsonnet
+  test     run the Jsonnet test suite
+  help     show this message
+
+The manifest lives in config/manifest.jsonnet; the rules live in lib/.
+EOF
+}
+
+command="${1:-help}"
+case "$command" in
+  render)
+    exec jsonnet -J "$root/lib" "$root/config/render.jsonnet"
+    ;;
+  check)
+    result="$(jsonnet -S -J "$root/lib" "$root/config/check.jsonnet")"
+    status=$?
+    printf '%s\n' "$result"
+    [ "$status" -eq 0 ] || exit 1
+    [ "$(printf '%s' "$result" | head -1)" = "ok" ] || exit 1
+    ;;
+  test)
+    exec bash "$root/tests/run_tests.sh"
+    ;;
+  help|-h|--help)
+    usage
+    ;;
+  *)
+    printf '%s: unknown command: %s\n\n' "$program" "$command" >&2
+    usage >&2
+    exit 2
+    ;;
+esac

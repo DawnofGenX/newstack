@@ -1,0 +1,79 @@
+{
+  "name": "jsonnet-config",
+  "title": "Jsonnet config",
+  "language": "jsonnet",
+  "blurb": "A service manifest in Jsonnet with its rules as data: schema validators that name every problem, a renderer that sorts and sums, and an 18-check Jsonnet suite that proves each rule still fires",
+  "requires": [
+    "jsonnet",
+    "make"
+  ],
+  "default_description": "A Jsonnet configuration project.",
+  "next_steps": [
+    "cd {path}",
+    "make build",
+    "./bin/{npm_name} check",
+    "./bin/{npm_name} test"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make build",
+      "tools": [
+        "jsonnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "check",
+      "cmd": "./bin/{{ npm_name }} check | grep -qx ok",
+      "tools": [
+        "jsonnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": "./bin/{{ npm_name }} test",
+      "tools": [
+        "jsonnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} help >/dev/null",
+      "tools": [
+        "jsonnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "jsonnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "rejects-bad-input",
+      "cmd": "jsonnet -J lib -e 'local s = import \"schema.libsonnet\"; s.validate({services: [{name: \"Bad_Name\", image: \"\", port: 0, replicas: 99}]})' | grep -q '\"ok\": false'",
+      "tools": [
+        "jsonnet"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "jsonnetfile.json"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "jsonnetfile.json"
+  ],
+  "adopt_tests": []
+}

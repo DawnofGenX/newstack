@@ -1,0 +1,47 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Jsonnet
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends jsonnet
+          jsonnet --version
+
+      - name: Render the manifest
+        run: make build
+
+      - name: Validate the manifest
+        run: make check
+
+      - name: Test suite
+        run: make test
+
+      - name: Help exits 0
+        run: './bin/{{ npm_name }} help'
+
+      - name: Unknown command exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+
+      - name: A broken manifest is rejected
+        run: |
+          set +e
+          jsonnet -J lib -e 'local s = import "schema.libsonnet"; s.validate({services: [{name: "Bad_Name", image: "", port: 0, replicas: 99}]})' > out.json
+          status=$?
+          echo "exit status: $status"
+          cat out.json
+          test "$status" -eq 0
+          grep -q '"ok": false' out.json

@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`jsonnet-config`**: a service manifest in Jsonnet where the rules are data too.
+  `check` prints `ok` or one line per problem, `render` sorts services and sums
+  replicas, and an 18-check suite builds deliberately broken manifests so a validator
+  that accepts everything fails the suite instead of passing it.
 - **`d-cli`**: D compiled with LDC into one native binary. Counting runs over
   `ubyte[]` so it is byte-accurate, report building sits behind an `Io` struct of
   function pointers so 37 assertions never touch the disk, and a parity suite diffs
