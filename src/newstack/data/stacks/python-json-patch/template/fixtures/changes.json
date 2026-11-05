@@ -1,0 +1,39 @@
+[
+  {
+    "op": "test",
+    "path": "/version",
+    "value": 3
+  },
+  {
+    "op": "replace",
+    "path": "/version",
+    "value": 4
+  },
+  {
+    "op": "replace",
+    "path": "/items/1/qty",
+    "value": 5
+  },
+  {
+    "op": "add",
+    "path": "/items/-",
+    "value": {
+      "id": 3,
+      "qty": 1
+    }
+  },
+  {
+    "op": "remove",
+    "path": "/meta/m~0n"
+  },
+  {
+    "op": "copy",
+    "from": "/name",
+    "path": "/slug"
+  },
+  {
+    "op": "move",
+    "from": "/items/0/id",
+    "path": "/items/0/ref"
+  }
+]

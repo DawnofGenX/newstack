@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Add `python-json-patch`: JSON Pointer and JSON Patch where a patch applies whole or not at all, a failing test rolls back its neighbours, and a computed diff is applied and compared before it is printed.
 - Add `python-hybrid-clock`: a hybrid logical clock that proves a wall clock stepping backwards cannot move a stamp, that a receipt never sorts before its send, and that skew past a bound is refused rather than reported.
 - Add `python-backoff-jitter`: a retry simulator that measures the pile-up each backoff policy creates, instead of assuming jitter helps.
 - **python-hyperloglog** — estimate distinct counts from a fixed bag of registers, with the promised error printed beside the estimate, measured at four scales and five precisions, and a demonstration of the hash bias that collapses the sketch into one register.

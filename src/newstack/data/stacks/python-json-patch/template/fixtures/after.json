@@ -1,0 +1,22 @@
+{
+  "version": 4,
+  "name": "orders",
+  "items": [
+    {
+      "qty": 2,
+      "ref": 1
+    },
+    {
+      "id": 2,
+      "qty": 5
+    },
+    {
+      "id": 3,
+      "qty": 1
+    }
+  ],
+  "meta": {
+    "a/b": "slash"
+  },
+  "slug": "orders"
+}

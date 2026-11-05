@@ -1,0 +1,82 @@
+{
+  "name": "python-json-patch",
+  "title": "JSON Patch",
+  "language": "python",
+  "blurb": "JSON Pointer and JSON Patch, implemented against the RFCs rather than against the happy path. Pointers are parsed with their two escapes, so a key that contains a slash or a tilde stays one key; a segment that looks like a number is an object key when the target is an object; add inserts and remove shifts, while '-' only ever means the end of a list. Patches are applied to a copy and thrown away if any operation fails, so a refused patch leaves nothing behind \u2014 the demo shows a failing test operation rolling back two adds, and a computed diff being applied and compared against the document it was taken from.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "JSON Pointer and JSON Patch that refuse to guess, with a diff that proves itself by applying.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} apply --document fixtures/document.json --patch fixtures/changes.json",
+    ".venv/bin/python -m {package_name} diff --before fixtures/document.json --after fixtures/after.json",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a patch that half-applied"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_patch.py"
+  ]
+}
