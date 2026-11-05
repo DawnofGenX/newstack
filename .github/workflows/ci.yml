@@ -81,6 +81,7 @@ jobs:
           - python-counter-rollup
           - python-single-flight
           - python-text-diff
+          - python-html-sanitizer
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

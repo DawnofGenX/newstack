@@ -1,0 +1,81 @@
+{
+  "name": "python-html-sanitizer",
+  "title": "HTML sanitizer that rebuilds instead of filtering",
+  "language": "python",
+  "blurb": "An allowlist HTML sanitizer whose output is written from parsed events, never copied from the input: script bodies dropped with their content, URL schemes checked after the browser's own whitespace stripping, attributes limited per tag, markup rebalanced, everything stable under a second pass, and an audit that reads the OUTPUT for dangerous constructs.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "An allowlist HTML sanitizer that rebuilds markup and audits its own output.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install -e . pytest ruff",
+    "printf '<p onclick=\"x\">hi</p>' | .venv/bin/python -m {package_name} render",
+    ".venv/bin/python -m {package_name} demo",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the output is composed from allowed events only"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_sanitize.py"
+  ]
+}
