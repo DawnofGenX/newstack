@@ -58,6 +58,7 @@ jobs:
           - python-migrations
           - python-pdf-report
           - python-property-tests
+          - python-openapi-client
           - python-c-extension
           - python-smtp-sink
           - python-resp-server

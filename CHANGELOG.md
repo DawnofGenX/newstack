@@ -7,6 +7,15 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-openapi-client` — the OpenAPI document as an executable contract, not a comment. A
+  stdlib-only client reads `fixtures/openapi.json` at run time, validates the request body before
+  a byte leaves the process, and validates each response against the schema attached to that
+  exact status: an undocumented status is drift, a documented `4xx` is a normal answer whose body
+  is checked like any other, and every disagreement is reported at once (`$.tags: expected
+  array, got integer`, `$: unexpected member 'server_side'`). `bool` is named before `int`
+  because `isinstance(True, int)` is true, so `true` never satisfies an integer schema; path
+  values are percent-encoded so `id=a/b` cannot invent a segment; and `validate --operation getNote
+  --response saved.json` re-checks a captured body offline with no server anywhere.
 - `python-resp-server` — a RESP2 key-value server whose parser is the point: TCP splits a
   command wherever it likes (the reader buffers and only consumes a whole frame, and the selftest
   feeds one command one byte at a time), two commands in one write owe two replies in order,

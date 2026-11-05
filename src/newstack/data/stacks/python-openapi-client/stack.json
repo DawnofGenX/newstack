@@ -1,0 +1,90 @@
+{
+  "name": "python-openapi-client",
+  "title": "Python OpenAPI client",
+  "language": "python",
+  "blurb": "A client that reads its OpenAPI document at run time and validates both directions: the request body before it is sent, and the response against the schema for that exact status - an undocumented status is drift, not something to skip",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A stdlib-only HTTP client that fails loudly when the server drifts from its OpenAPI document.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} list",
+    "PY=.venv/bin/python bash smoke.sh",
+    ".venv/bin/python -m pytest"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "drift-exits-1",
+      "cmd": "p=$(.venv/bin/python -c 'import socket; s=socket.socket(); s.bind((\"127.0.0.1\", 0)); print(s.getsockname()[1]); s.close()'); .venv/bin/python fixtures/server.py --port \"$p\" --drift >/dev/null 2>&1 & pid=$!; for i in $(seq 1 50); do .venv/bin/python -c 'import socket,sys; s=socket.socket(); sys.exit(0 if s.connect_ex((\"127.0.0.1\", int(sys.argv[1]))) == 0 else 1)' \"$p\" && break; sleep 0.1; done; set +e; .venv/bin/python -m {{ package_name }} --base-url \"http://127.0.0.1:$p\" call listNotes >/dev/null 2>&1; s=$?; kill $pid 2>/dev/null; test \"$s\" -eq 1",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the response does not fit the document"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "fixtures/openapi.json"
+  ],
+  "adopt_tests": [
+    "tests/test_schema.py"
+  ]
+}
