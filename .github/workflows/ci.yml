@@ -71,6 +71,7 @@ jobs:
           - symfony-app
           - laravel-app
           - csharp-cli
+          - aspnet-api
           - dotnet-cli
           - elixir-mix-cli
           - dart-cli
@@ -425,7 +426,7 @@ jobs:
           extensions: ctype, fileinfo, mbstring, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["csharp-cli","fsharp-cli","dotnet-cli"]'), matrix.stack)
+        if: contains(fromJSON('["csharp-cli","fsharp-cli","dotnet-cli","aspnet-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"

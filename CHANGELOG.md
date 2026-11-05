@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`aspnet-api`**: a minimal ASP.NET Core 8 API. Counting lives in a pure
+  `TextStat.Of(string)` returning a `Counts` record, and `WebApplicationFactory` boots
+  the real pipeline in memory so routing, model binding, 422s and 404s are tested
+  without a port; a live verify step then curls the running binary. `dotnet-cli` became
+  a detection fallback so a Web SDK project no longer matches two stacks.
 - **`laravel-app`**: a Laravel 13 JSON service on PHP 8.3. Counting lives in a pure
   `App\Support\TextStat` class, `StatController` is a thin route handler, and a PHPUnit 12
   suite proves routing, JSON encoding, the 422 and 404 paths — plus a test that Laravel's

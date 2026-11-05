@@ -276,6 +276,7 @@ $ newstack stacks outdated
 | `symfony-app` | Symfony 7 web app on PHP 8.3: a JSON route wired to a pure service, kernel-level PHPUnit test, working `bin/console` | `php`, `composer` |
 | `laravel-app` | Laravel 13 JSON service on PHP 8.3: pure counting class, route + controller, PHPUnit 12 suite covering 422/404 and the input-trimming trap | `php`, `composer` |
 | `csharp-cli` | C# 12 CLI on .NET 8: pure counting library, xUnit suite, exit codes as a contract | `dotnet` |
+| `aspnet-api` | ASP.NET Core 8 minimal API: pure counting core, `/stats` JSON routes, WebApplicationFactory HTTP tests, 422/404 as contract | `dotnet` |
 | `dotnet-cli` | .NET 8 C# CLI with a solution file: counting core, hand-written argv parser, xUnit suite, exit codes as a contract | `dotnet` |
 | `elixir-mix-cli` | Elixir CLI on Mix: pure counting module, ExUnit suite, escript binary | `elixir`, `mix` |
 | `dart-cli` | Dart 3 CLI: pub package with a pure counting library, package:test suite and zero runtime dependencies | `dart` |

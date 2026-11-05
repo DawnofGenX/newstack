@@ -145,6 +145,27 @@ def test_plain_composer_project_still_resolves_to_php_composer_cli(tmp_path) -> 
     assert names == ["php-composer-cli"], "the composer fallback must still catch a plain package"
 
 
+def test_aspnet_api_wins_over_the_dotnet_fallback(tmp_path) -> None:
+    """An ASP.NET project is also a .NET project.
+
+    dotnet-cli matches any `*.csproj`; it is a fallback, so the Web SDK marker on the
+    project file must decide, or every web API exits 2 as ambiguous.
+    """
+
+    make_repo(
+        tmp_path,
+        {"Stats.Api.csproj": '<Project Sdk="Microsoft.NET.Sdk.Web">\n</Project>\n'},
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["aspnet-api"], "dotnet-cli must not compete with a web project"
+
+
+def test_plain_console_project_still_resolves_to_dotnet_cli(tmp_path) -> None:
+    make_repo(tmp_path, {"tool.csproj": '<Project Sdk="Microsoft.NET.Sdk">\n</Project>\n'})
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["dotnet-cli"], "the csproj fallback must still catch a console project"
+
+
 def test_unrecognised_directory_yields_no_candidates(tmp_path) -> None:
     (tmp_path / "notes.txt").write_text("nothing here")
     assert detect_stacks(tmp_path) == []

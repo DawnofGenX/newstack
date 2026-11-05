@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Restore
+        run: dotnet restore --nologo
+      - name: Build
+        run: dotnet build -c Release --nologo --no-restore -warnaserror
+      - name: Test
+        run: dotnet test -c Release --nologo --no-build
+      - name: Serves HTTP
+        run: |
+          set -euo pipefail
+          dotnet bin/Release/net8.0/{{ npm_name }}.dll --urls http://127.0.0.1:5199 >server.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for _ in $(seq 1 120); do
+            if curl -fsS http://127.0.0.1:5199/health >/dev/null 2>&1; then
+              break
+            fi
+            sleep 0.5
+          done
+          body=$(curl -fsS 'http://127.0.0.1:5199/stats?text=hello%20world%0A')
+          echo "GET /stats -> $body"
+          echo "$body" | grep -q '"lines":1'
+          echo "$body" | grep -q '"words":2'
+          echo "$body" | grep -q '"bytes":12'
+          missing=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:5199/stats)
+          echo "POST /stats {} -> $missing"
+          test "$missing" = "422"
