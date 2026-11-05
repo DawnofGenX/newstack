@@ -1,0 +1,81 @@
+{
+  "name": "python-crdt",
+  "title": "Replicas that converge without asking anyone",
+  "language": "python",
+  "blurb": "State-based CRDTs with their laws checked instead of assumed: grow-only and paired counters (where max() over signed counts is shown to lose a concurrent decrement), a last-write-wins register that is honest about the write it drops, and an observed-remove set that keeps an add it never saw. Idempotence, commutativity and associativity are run over real states, and a shuffled, duplicated gossip simulation is what proves the merge converges.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "Merge replicated state, and show what each merge guarantees.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} laws",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "merge only ever grows the sets"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_orset.py"
+  ]
+}

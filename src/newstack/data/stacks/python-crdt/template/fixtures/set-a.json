@@ -1,0 +1,15 @@
+{
+  "type": "or-set",
+  "entries": {
+    "x": [
+      [
+        "a",
+        1
+      ]
+    ]
+  },
+  "tombstones": [],
+  "counters": {
+    "a": 1
+  }
+}
