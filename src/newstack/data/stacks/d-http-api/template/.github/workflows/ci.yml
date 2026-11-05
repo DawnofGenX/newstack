@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install LDC
+        uses: dlang-community/setup-dlang@v2
+        with:
+          compiler: ldc-latest
+      - name: Build
+        run: make
+      - name: Test
+        run: make test
+      - name: Serve
+        run: |
+          set -e
+          if curl -fsS --max-time 2 http://127.0.0.1:5435/health >/dev/null 2>&1; then
+            echo 'port 5435 is already answering - stop that process before running this step'
+            exit 1
+          fi
+          PORT=5435 ./build/{{ npm_name }} > .d-http.log 2>&1 &
+          server=$!
+          trap 'kill -TERM -"$server" 2>/dev/null || kill $server 2>/dev/null || true' EXIT
+          i=0
+          while [ $i -lt 120 ]; do
+            if curl -fsS --max-time 2 http://127.0.0.1:5435/health >/dev/null 2>&1; then
+              break
+            fi
+            i=$((i + 1))
+            sleep 0.25
+          done
+          if [ $i -ge 120 ]; then
+            cat .d-http.log
+            echo 'the server did not answer in time'
+            exit 1
+          fi
+          kill -0 $server 2>/dev/null || { cat .d-http.log; echo 'the server exited before it answered'; exit 1; }
+          health=$(curl -sS --max-time 10 http://127.0.0.1:5435/health)
+          test "$health" = '{"status":"ok"}'
+          get=$(curl -sS --max-time 10 'http://127.0.0.1:5435/stats?text=hello%20world%0A')
+          printf '%s' "$get" | grep -q '"lines":1'
+          printf '%s' "$get" | grep -q '"bytes":12'
+          posted=$(curl -sS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{"text":"a b\nc\n"}' http://127.0.0.1:5435/stats)
+          printf '%s' "$posted" | grep -q '"words":3'
+          missing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5435/stats)
+          test "$missing" = 422
+          broken=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5435/stats)
+          test "$broken" = 422
+          number=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary '{"text":42}' http://127.0.0.1:5435/stats)
+          test "$number" = 422
+          gone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5435/nope)
+          test "$gone" = 404
+          wrong=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5435/health)
+          test "$wrong" = 405

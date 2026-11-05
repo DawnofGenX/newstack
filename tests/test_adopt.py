@@ -1016,3 +1016,26 @@ def test_a_plain_c_project_still_resolves_to_the_c_cli(tmp_path) -> None:
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert names == ["c-cli"], "a Makefile with -std=c11 and no socket is the CLI stack"
 
+def test_a_d_socket_server_resolves_to_the_d_service(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "source/app.d": "void main() {}\n",
+            "source/textstat/server.d": "import std.socket;\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["d-http-api"], "std.socket is the service marker"
+
+
+def test_a_plain_d_project_still_resolves_to_the_d_cli(tmp_path) -> None:
+    make_repo(
+        tmp_path,
+        {
+            "source/app.d": "void main() {}\n",
+            "source/textstat/counts.d": "module textstat.counts;\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["d-cli"], "source/app.d with no socket is the CLI stack"
+

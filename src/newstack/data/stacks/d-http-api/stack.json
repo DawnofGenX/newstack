@@ -1,0 +1,61 @@
+{
+  "name": "d-http-api",
+  "title": "D HTTP API",
+  "language": "d",
+  "blurb": "D JSON service on std.socket: a pure route table, std.json for the body, one request per connection, and unittest blocks instead of a test framework",
+  "requires": [
+    "ldc2",
+    "make",
+    "curl"
+  ],
+  "default_description": "A D JSON service.",
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "PORT=8080 ./build/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "tools": [
+        "ldc2",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "ldc2",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "set -e\nif curl -fsS --max-time 2 http://127.0.0.1:5435/health >/dev/null 2>&1; then\n  echo 'port 5435 is already answering - stop that process before running this step'\n  exit 1\nfi\nPORT=5435 ./build/{{ npm_name }} > .d-http.log 2>&1 &\nserver=$!\ntrap 'kill -TERM -\"$server\" 2>/dev/null || kill $server 2>/dev/null || true' EXIT\ni=0\nwhile [ $i -lt 120 ]; do\n  if curl -fsS --max-time 2 http://127.0.0.1:5435/health >/dev/null 2>&1; then\n    break\n  fi\n  i=$((i + 1))\n  sleep 0.25\ndone\nif [ $i -ge 120 ]; then\n  cat .d-http.log\n  echo 'the server did not answer in time'\n  exit 1\nfi\nkill -0 $server 2>/dev/null || { cat .d-http.log; echo 'the server exited before it answered'; exit 1; }\nhealth=$(curl -sS --max-time 10 http://127.0.0.1:5435/health)\ntest \"$health\" = '{\"status\":\"ok\"}'\nget=$(curl -sS --max-time 10 'http://127.0.0.1:5435/stats?text=hello%20world%0A')\nprintf '%s' \"$get\" | grep -q '\"lines\":1'\nprintf '%s' \"$get\" | grep -q '\"bytes\":12'\nposted=$(curl -sS --max-time 10 -X POST -H 'content-type: application/json' --data-binary '{\"text\":\"a b\\nc\\n\"}' http://127.0.0.1:5435/stats)\nprintf '%s' \"$posted\" | grep -q '\"words\":3'\nmissing=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5435/stats)\ntest \"$missing\" = 422\nbroken=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary 'nope' http://127.0.0.1:5435/stats)\ntest \"$broken\" = 422\nnumber=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary '{\"text\":42}' http://127.0.0.1:5435/stats)\ntest \"$number\" = 422\ngone=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5435/nope)\ntest \"$gone\" = 404\nwrong=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' -X DELETE http://127.0.0.1:5435/health)\ntest \"$wrong\" = 405",
+      "tools": [
+        "ldc2",
+        "make",
+        "curl"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.d",
+      "contains": "std.socket"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "test/runtests.d"
+  ]
+}

@@ -7,6 +7,9 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `d-http-api` — a D JSON service on `std.socket` with a pure route table and
+  `std.json` deciding whether `text` is a string; the tests are ordinary `unittest`
+  blocks run through `-unittest -main`, so no test framework is installed.
 - `c-http-api` — a C11 JSON service on POSIX sockets with no dependencies: the route
   table is a pure function, the JSON reader distinguishes a string from a number, and
   the socket loop sets a read timeout so one stalled client cannot wedge the process.

@@ -152,6 +152,7 @@ jobs:
           - haxe-cli
           - sml-cli
           - d-cli
+          - d-http-api
           - jsonnet-config
           - github-action
     steps:
@@ -430,7 +431,7 @@ jobs:
           jsonnet --version
 
       - name: Install LDC
-        if: matrix.stack == 'd-cli'
+        if: contains(fromJSON('["d-cli","d-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends ldc
