@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `node-metrics-exporter` — a text-stats service that publishes its own Prometheus metrics without `prom-client`. Counter names must end in `_total`, histogram buckets are cumulative and `+Inf` must equal `_count`, label values are escaped (`\\`, `\"`, `\n`), and the scrape is counted before it renders so it never looks a request behind. `src/exposition.js` is a strict reader for the format — `tools/check_scrape.mjs` runs it over the live payload, so the smoke test fails on a malformed scrape instead of importing garbage.
 - `bun-sqlite-api` — a notes API on Bun with no dependencies. `bun:sqlite` has no `db.pragma()`
   helper and `exec("PRAGMA …")` throws the result away, so every connection reads the mode
   back through `query("PRAGMA journal_mode = WAL").get()` and the selftest asserts the value;

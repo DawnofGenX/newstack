@@ -1796,3 +1796,28 @@ def test_a_plain_bun_service_does_not_match_the_bun_sqlite_stack(tmp_path) -> No
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
     assert "bun-sqlite-api" not in names
+
+def test_a_metrics_exporter_resolves_to_the_metrics_stack(tmp_path):
+    write_tree(
+        tmp_path,
+        {
+            "package.json": '{"name": "metrics", "type": "module"}\n',
+            "src/app.js": (
+                'const headers = { "content-type": "text/plain; version=0.0.4; charset=utf-8" };\n'
+            ),
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert names == ["node-metrics-exporter"]
+
+
+def test_a_plain_node_service_does_not_match_the_metrics_stack(tmp_path):
+    write_tree(
+        tmp_path,
+        {
+            "package.json": '{"name": "plain", "type": "module"}\n',
+            "src/server.js": "export default { fetch: () => new Response('ok') };\n",
+        },
+    )
+    names = [stack.name for stack in detect_stacks(tmp_path)]
+    assert "node-metrics-exporter" not in names

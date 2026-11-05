@@ -1,0 +1,7 @@
+node_modules/
+package-lock.json
+.metrics-http.log
+.node-metrics.log
+# a scrape written to disk mid-debug must never be committed
+scrape.txt
+*.prom

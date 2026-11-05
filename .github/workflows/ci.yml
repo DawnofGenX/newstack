@@ -62,6 +62,7 @@ jobs:
           - node-express-ts
           - node-ws-api
           - node-upload-api
+          - node-metrics-exporter
           - hono-api
           - fastify-api
           - prisma-api

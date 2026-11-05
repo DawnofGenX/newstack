@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          package-manager-cache: false
+      - name: Install
+        run: {{ package_manager_install }}
+      - name: Offline contract
+        run: node src/main.js --selftest
+      - name: Contract over a real socket
+        run: {{ package_manager_test }}
+      - name: Scrape is valid exposition
+        # The scrape is validated from a FILE: `$(curl ...)` strips the trailing
+        # newline, and exposition without one is invalid.
+        run: |
+          set -euo pipefail
+          node src/main.js > .node-metrics.log 2>&1 &
+          server=$!
+          trap 'kill -TERM -"$server" 2>/dev/null || kill -TERM "$server" 2>/dev/null || true
+                for _ in $(seq 1 20); do kill -0 "$server" 2>/dev/null || break; sleep 0.1; done
+                kill -KILL "$server" 2>/dev/null || true
+                wait "$server" 2>/dev/null || true' EXIT
+          for _ in $(seq 1 160); do
+            curl -fsS --max-time 2 http://127.0.0.1:5474/health >/dev/null 2>&1 && break
+            sleep 0.25
+          done
+          kill -0 "$server" 2>/dev/null || { cat .node-metrics.log; exit 1; }
+          curl -sS --max-time 5 http://127.0.0.1:5474/stats?text=hi%0Athere > /dev/null
+          curl -sS --max-time 5 -o scrape.txt http://127.0.0.1:5474/metrics
+          node tools/check_scrape.mjs < scrape.txt
+          grep -Fq 'textstat_requests_total{method="GET",route="/stats",status="200"} 1' scrape.txt
+          grep -Fq 'textstat_lines_total 1' scrape.txt
+          echo "scrape: all checks passed"

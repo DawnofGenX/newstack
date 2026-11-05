@@ -1,0 +1,68 @@
+{
+  "name": "node-metrics-exporter",
+  "title": "Node metrics exporter",
+  "language": "node",
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "blurb": "Text stats service that exports its own Prometheus metrics (no prom-client).",
+  "default_description": "Text stats service with a Prometheus metrics endpoint",
+  "port": 5474,
+  "requires": [
+    "node",
+    "curl"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "{{ package_manager_install }}",
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": "node src/main.js --selftest",
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": "{{ package_manager_test }}",
+      "timeout": 300
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.js",
+      "contains": "text/plain; version=0.0.4"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "smoke.sh"
+  ],
+  "adopt_tests": [
+    "tests/exporter.test.js"
+  ],
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "node src/main.js --selftest",
+    "PORT=8080 node src/main.js",
+    "curl -sS http://127.0.0.1:8080/metrics | node tools/check_scrape.mjs"
+  ]
+}
