@@ -54,6 +54,7 @@ jobs:
           - python-litestar-api
           - python-eval-harness
           - python-batch-inference
+          - python-duckdb-report
           - data-science
           - dbt-project
           - sphinx-docs

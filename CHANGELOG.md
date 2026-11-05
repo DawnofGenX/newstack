@@ -7,6 +7,21 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-duckdb-report` — a reporting CLI that treats the report as the product, so the numbers
+  are exact and the output is diffable. Two rules do the heavy lifting: money is summed as
+  `DECIMAL(18, 4)` and never as a binary float (`0.10 + 0.20` is `0.30`, not `0.30000000000000004`),
+  and rows whose metric is null are *counted* and printed as `null revenue skipped 1` instead of
+  being dropped, because a silent drop turns "sum of revenue" into "sum of the revenue we could
+  parse". Groups are ordered by total then by name so two runs over the same file are byte
+  identical, and `expected/report.md` is compared with `diff -u` rather than grepped — a table that
+  reflows or loses a column fails the build. DuckDB cannot bind an identifier as a parameter, so a
+  column or group name has to be interpolated into SQL; `Dataset.column()` is the single gate that
+  checks the name against the file's own `DESCRIBE` and returns it quoted (embedded double quotes
+  escaped), and `--metric revenu` therefore exits 2 naming the columns that do exist instead of
+  raising a binder error. CSV, Parquet and JSON all go through one `READERS` table, and a test
+  copies the shipped CSV to Parquet with `COPY … (FORMAT parquet)` to prove both readers agree.
+  `smoke.sh` defaults to `.venv/bin/python` when that interpreter exists, so it runs with or
+  without `PY` set.
 - `python-webhook-receiver` — a webhook endpoint that trusts only signed bytes. The HMAC is
   computed over the body that actually arrived, before any parser touches it: a receiver that
   hashes `json.dumps(json.loads(body))` rejects every honest sender, because spacing, key order
