@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-expression-parser`: precedence climbing with a printer that keeps a parenthesis exactly when removing it would change the tree, right-associative `^` that binds tighter than unary minus, exact arithmetic that refuses `1 / 3` by name instead of rounding unless `--inexact` is asked for, and errors that name the column they are about with a caret under it.
 - `python-linearizability-checker`: linearizability decided by exhaustive search over programme order and real time, with a replayed witness when the history holds and a minimal core when it does not, a permutation yardstick `compare` holds the search to, and an honest refusal for histories too long to enumerate.
 - `python-three-way-merge`: a three-way merge that conflicts only the disputed region. The same edit on both sides is agreement, two insertions at one point conflict because the base orders nothing, an insertion beside a replacement does not conflict, a span without a final newline still gets markers on their own lines, and `explain` prints every chunk before the text.
 - `python-rrule-recurrence`: RRULE expansion where COUNT counts firings rather than intervals, UNTIL is an inclusive instant, INTERVAL is anchored to the start's own period, ordinal weekdays are counted from the month's edges, DST gaps are skipped and reported, and impossible rules are refused at parse time.

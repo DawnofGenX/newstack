@@ -110,6 +110,7 @@ jobs:
           - python-rrule-recurrence
           - python-three-way-merge
           - python-linearizability-checker
+          - python-expression-parser
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
