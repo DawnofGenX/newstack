@@ -1,0 +1,58 @@
+{
+  "name": "python-interval-tree",
+  "title": "Centered Spans",
+  "language": "python",
+  "blurb": "A centered interval tree over half-open integer spans: stabbing and overlap answers equal the brute-force scan on any seeded corpus, the max-end augmentation is repaired on every delete, and a point at a span's right end stands outside it.",
+  "requires": ["uv", "python3"],
+  "default_description": "A centered interval tree whose stabbing and overlap answers equal the brute-force scan on any seeded corpus, with augmentation repaired after every delete.",
+  "python": {
+    "minimum": "3.12",
+    "versions": ["3.12", "3.13"]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} load --intervals fixtures/spans.txt",
+    "uv run {npm_name} stab --intervals fixtures/spans.txt --point 5",
+    "uv run {npm_name} overlap --intervals fixtures/spans.txt --low 2 --high 8",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    { "file": "**/*.py", "contains": "the right end is never reached" }
+  ],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_tree.py"]
+}

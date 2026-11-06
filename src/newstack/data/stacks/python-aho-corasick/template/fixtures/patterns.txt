@@ -1,0 +1,8 @@
+# one pattern per line; blank lines and # comments are skipped
+# the textbook set: 'he' hides inside 'she', and both ride the same failure chain
+he
+she
+his
+hers
+shore
+herons

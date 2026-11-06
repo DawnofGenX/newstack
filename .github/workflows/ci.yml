@@ -117,6 +117,8 @@ jobs:
           - python-skip-list
           - python-b-tree
           - python-lsm-tree
+          - python-interval-tree
+          - python-aho-corasick
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

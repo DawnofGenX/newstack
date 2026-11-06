@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-aho-corasick` — Multi-pattern matching in one pass: a trie with BFS failure links, suffix outputs that never miss an overlap, and a hit set proven equal to a naive scan on seeded alphabets.
+- `python-interval-tree` — A centered interval tree over half-open integer spans: stabbing and overlap answers equal the brute-force scan on any seeded corpus, the max-end augmentation is repaired on every delete, and a point at a span's right end stands outside it.
 - `python-lsm-tree` — A log-structured merge table of integer keys and string values: a sorted memtable flushes to numbered on-disk level tables, reads fall through newest level first, and compaction merges sorted tables while dropping tombstones.
 - `python-b-tree` — A keyed B-tree of configurable order: insert with splits, delete with borrow and merge, exact lookup and range scan, and a page file that reads back identical after any history.
 - `python-skip-list` — A sorted map that balances on seeded coin flips instead of rotations: insert, delete, rank, and select cost one walk, link widths are repaired on every edit, and rank answers exactly what bisect answers.

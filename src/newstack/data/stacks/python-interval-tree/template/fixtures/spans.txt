@@ -1,0 +1,32 @@
+# start end per line; blank lines and # comments are skipped
+# half-open [start..end): the end never counts; the fixture is the smoke corpus
+-42 -30
+-42 -37
+-17 -3
+-5 4
+0 6
+0 2
+3 9
+6 12
+8 21
+13 15
+19 24
+22 40
+31 44
+40 41
+44 58
+55 72
+70 83
+82 96
+95 110
+108 118
+117 131
+130 142
+141 155
+154 163
+162 178
+177 190
+189 204
+203 219
+-60 -45
+-3 12
