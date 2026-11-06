@@ -1,0 +1,81 @@
+{
+  "name": "python-snowflake-ids",
+  "title": "Snowflake IDs",
+  "language": "python",
+  "blurb": "Time-ordered identifiers whose layout is a promise: 41 bits of milliseconds, 10 bits of worker, 12 bits of sequence, a clock that must not go backwards, a sequence that must not wrap silently, and capacity numbers you can check instead of trusting.",
+  "default_description": "Generate and decode time-ordered 64-bit identifiers with an honest clock, an explicit sequence limit, and uniqueness that survives two workers.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} generate --count 5 --worker 3",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 240
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check . && .venv/bin/ruff format --check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 240
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 240
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 240
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the sequence is a promise the clock cannot keep"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_generator.py"
+  ]
+}

@@ -104,6 +104,7 @@ jobs:
           - python-lru-cache
           - python-version-vectors
           - python-hdr-histogram
+          - python-snowflake-ids
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

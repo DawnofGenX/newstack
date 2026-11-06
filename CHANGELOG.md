@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-snowflake-ids`: a 64-bit layout written down (41/10/12 bits), a generator that refuses a backwards clock or holds its last millisecond, sequence overflow that waits instead of wrapping, an audit that reads order and duplicates back out of a stream, and the capacity budget printed as dates.
 - `python-hdr-histogram`: bucketed latency percentiles with a printed, measured relative error, exact counts and merges, and a demo that shows why percentiles do not average.
 - `python-version-vectors`: one counter per writer, four verdicts (`equal`, `before`, `after`,
   `concurrent`), a merge that is a join, a delivery gate that holds a message until its
