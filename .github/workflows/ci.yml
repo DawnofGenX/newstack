@@ -112,6 +112,7 @@ jobs:
           - python-linearizability-checker
           - python-expression-parser
           - python-route-trie
+          - python-regex-engine
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

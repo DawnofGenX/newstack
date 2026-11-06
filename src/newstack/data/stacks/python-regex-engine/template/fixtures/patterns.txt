@@ -1,0 +1,18 @@
+# pattern<TAB>text<TAB>does the whole text match
+a*b	aaab	yes
+a*b	aaa	no
+a*b	b	yes
+(cat|dog)s?	dogs	yes
+(cat|dog)s?	cat	yes
+(cat|dog)s?	dogss	no
+[a-c]+	cab	yes
+[a-c]+	cad	no
+[^0-9]+	abc	yes
+[^0-9]+	ab1	no
+(a|b)*abb	ababb	yes
+(a|b)*abb	abba	no
+.	x	yes
+.	xy	no
+\d+	2026	yes
+\d+	20a6	no
+\s+	  	yes
