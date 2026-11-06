@@ -101,6 +101,7 @@ jobs:
           - python-merkle-proofs
           - python-ab-test
           - python-minhash-lsh
+          - python-lru-cache
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

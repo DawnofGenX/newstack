@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-lru-cache`: four replacement policies (FIFO, LRU, CLOCK, segmented LRU) over seeded traces, with scan resistance and the frequency ceiling printed beside every hit ratio.
 - `python-minhash-lsh`: MinHash signatures and LSH banding with the predicted banding curve printed beside the measured recall, verified candidate pairs, and a planted-duplicate corpus the demo scores against the exact answer.
 - `python-ab-test`: fixed-horizon two-proportion tests with Wilson intervals, a relative lift interval, a sample-ratio-mismatch gate and a peeking simulation that measures how far a 5% test drifts (18.90% under a flat line, 6.70% under an O'Brien-Fleming boundary) on the same simulated worlds.
 - Add `python-merkle-proofs`: Merkle inclusion proofs with domain-separated hashing, where a node's digest can never pass as a leaf, the tree shape is a named rule instead of a builder's choice, the sibling count comes from the index, and every refusal names the rule a proof broke.

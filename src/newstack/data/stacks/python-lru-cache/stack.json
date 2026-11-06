@@ -1,0 +1,82 @@
+{
+  "name": "python-lru-cache",
+  "title": "Cache Replacement Policies",
+  "language": "python",
+  "blurb": "Four replacement policies under one trace: FIFO, LRU, CLOCK and a segmented LRU. The hit ratio is measured per policy on traces whose shape is known, a sequential scan is shown erasing an LRU while the segmented cache survives it, and every measured hit ratio is printed beside the frequency ceiling that no policy with that capacity can beat - so a cache's number is a claim about a trace, not a property of the code.",
+  "default_description": "Cache replacement policies compared on measured hit ratios, with scan resistance, a CLOCK approximation of LRU, and the frequency ceiling printed beside every result.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} compare --trace zipf --capacity 100",
+    ".venv/bin/python -m {package_name} simulate --trace scan --capacity 100 --policy slru",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the ceiling no policy can beat"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_cache.py"
+  ]
+}
