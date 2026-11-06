@@ -89,8 +89,8 @@ check_contains "the empty verdict is printed" "empty: no version satisfies both"
 out=$(run sort --input fixtures/versions.txt)
 check_status "sorting the fixture exits zero" 0 "$?"
 check_contains "sorting starts at the lowest version" "0.9.9" "$out"
-first=$(printf '%s\n' "$out" | head -n 1)
-last=$(printf '%s\n' "$out" | tail -n 1)
+first=${out%%$'\n'*}
+last=${out##*$'\n'}
 check_contains "the first line is 0.9.9" "0.9.9" "$first"
 check_contains "the last line is 2.0.0" "2.0.0" "$last"
 
