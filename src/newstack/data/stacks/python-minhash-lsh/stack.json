@@ -1,0 +1,82 @@
+{
+  "name": "python-minhash-lsh",
+  "title": "MinHash and LSH",
+  "language": "python",
+  "blurb": "Near-duplicate detection whose error is predicted before it is measured: a MinHash signature agrees on each position with probability equal to the Jaccard similarity of the shingle sets, so the estimate carries a binomial error of 1/sqrt(width); banding turns that signature into a candidate set whose false-negative rate follows an S-curve you choose, and every candidate is verified before two documents are called the same. The demo prints the predicted banding curve beside the recall it actually got.",
+  "default_description": "Near-duplicate detection with MinHash and LSH: signatures whose agreement estimates Jaccard, banding with an S-curve you choose, and recall measured against the exact answer.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} similar --left a.txt --right b.txt",
+    ".venv/bin/python -m {package_name} dedupe --corpus fixtures/corpus.jsonl --threshold 0.8",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the fraction of positions where two signatures agree"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_lsh.py"
+  ]
+}
