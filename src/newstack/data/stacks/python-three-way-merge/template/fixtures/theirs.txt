@@ -1,0 +1,9 @@
+service: checkout
+replicas: 2
+image: checkout:1.5.0
+health:
+  path: /healthz
+  port: 8080
+log:
+  level: warn
+  format: json

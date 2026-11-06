@@ -108,6 +108,7 @@ jobs:
           - python-semver-ranges
           - python-gitignore-matcher
           - python-rrule-recurrence
+          - python-three-way-merge
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
