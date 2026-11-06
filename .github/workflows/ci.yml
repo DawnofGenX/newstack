@@ -106,6 +106,7 @@ jobs:
           - python-hdr-histogram
           - python-snowflake-ids
           - python-semver-ranges
+          - python-gitignore-matcher
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
