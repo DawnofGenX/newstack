@@ -99,6 +99,7 @@ jobs:
           - python-json-patch
           - python-url-signing
           - python-merkle-proofs
+          - python-ab-test
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

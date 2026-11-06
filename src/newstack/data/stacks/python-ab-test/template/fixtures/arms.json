@@ -1,0 +1,5 @@
+{
+  "experiment": "checkout-copy",
+  "control": {"name": "control", "conversions": 100, "visitors": 1000},
+  "treatment": {"name": "treatment", "conversions": 130, "visitors": 1000}
+}

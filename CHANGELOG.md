@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-ab-test`: fixed-horizon two-proportion tests with Wilson intervals, a relative lift interval, a sample-ratio-mismatch gate and a peeking simulation that measures how far a 5% test drifts (18.90% under a flat line, 6.70% under an O'Brien-Fleming boundary) on the same simulated worlds.
 - Add `python-merkle-proofs`: Merkle inclusion proofs with domain-separated hashing, where a node's digest can never pass as a leaf, the tree shape is a named rule instead of a builder's choice, the sibling count comes from the index, and every refusal names the rule a proof broke.
 - Add `python-url-signing`: signed requests over a canonical form, where a reordered query is the same request, an escaped slash stays data, the body is covered by its hash, an expiry and a nonce refuse a replay, and each refusal names the rule that failed.
 - Add `python-json-patch`: JSON Pointer and JSON Patch where a patch applies whole or not at all, a failing test rolls back its neighbours, and a computed diff is applied and compared before it is printed.
