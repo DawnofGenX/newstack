@@ -113,6 +113,7 @@ jobs:
           - python-expression-parser
           - python-route-trie
           - python-regex-engine
+          - python-bk-tree
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

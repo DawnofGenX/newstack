@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-bk-tree` — Edit distance plus a Burkhard-Keller tree: a word is found by distance without comparing it to every word, and the pruning is proved against a full scan on the same corpus.
 - `python-regex-engine` — A pattern compiled to a Thompson NFA and simulated as a set of states, so matching costs one pass and never backtracks; the same pattern is determinised and both machines are proved equal by enumeration.
 - `python-route-trie` — a trie router where the walk order is the documented rule: literal over parameter over catch-all, backtracking on a dead branch, `not-allowed` with an allow list instead of a 404, and a miss that names the segment that ended the search.
 - `python-expression-parser`: precedence climbing with a printer that keeps a parenthesis exactly when removing it would change the tree, right-associative `^` that binds tighter than unary minus, exact arithmetic that refuses `1 / 3` by name instead of rounding unless `--inexact` is asked for, and errors that name the column they are about with a caret under it.
