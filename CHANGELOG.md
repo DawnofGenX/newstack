@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-lsm-tree` — A log-structured merge table of integer keys and string values: a sorted memtable flushes to numbered on-disk level tables, reads fall through newest level first, and compaction merges sorted tables while dropping tombstones.
 - `python-b-tree` — A keyed B-tree of configurable order: insert with splits, delete with borrow and merge, exact lookup and range scan, and a page file that reads back identical after any history.
 - `python-skip-list` — A sorted map that balances on seeded coin flips instead of rotations: insert, delete, rank, and select cost one walk, link widths are repaired on every edit, and rank answers exactly what bisect answers.
 - `python-bk-tree` — Edit distance plus a Burkhard-Keller tree: a word is found by distance without comparing it to every word, and the pruning is proved against a full scan on the same corpus.

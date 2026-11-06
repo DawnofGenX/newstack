@@ -1,0 +1,22 @@
+# one op per line: 'put N text', 'del N', 'get N'
+# blanks and # comments are skipped
+# the replayed answers must equal the plain-dict answers
+put 12 alpha
+put 3 beta
+get 12
+put -4 gamma
+del 3
+put 3 delta
+put 77 epsilon
+del 12
+get 3
+put 12 zeta
+put -40 eta
+del -4
+put 101 theta
+get -40
+put 5 iota
+del 5
+put 88 kappa
+get 88
+put 12 lambda

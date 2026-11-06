@@ -116,6 +116,7 @@ jobs:
           - python-bk-tree
           - python-skip-list
           - python-b-tree
+          - python-lsm-tree
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

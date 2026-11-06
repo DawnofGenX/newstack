@@ -1,0 +1,58 @@
+{
+  "name": "python-lsm-tree",
+  "title": "Tiered Keys",
+  "language": "python",
+  "blurb": "A log-structured merge table of integer keys and string values: a sorted memtable flushes to numbered on-disk level tables, reads fall through newest level first, and compaction merges sorted tables while dropping tombstones.",
+  "requires": ["uv", "python3"],
+  "default_description": "An LSM table whose memtable flushes to numbered level tables, answers newest-level-first, and proves every answer equals the dict answer over seeded workloads.",
+  "python": {
+    "minimum": "3.12",
+    "versions": ["3.12", "3.13"]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} workload --seed 7 --limit 3",
+    "uv run {npm_name} load --ops fixtures/ops.txt --dir .table",
+    "uv run {npm_name} get --dir .table --key 12",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    { "file": "**/*.py", "contains": "a tombstone outranks the value it buries" }
+  ],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_table.py"]
+}
