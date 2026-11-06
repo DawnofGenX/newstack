@@ -2073,7 +2073,10 @@ def test_a_segmented_write_ahead_log_resolves_to_the_wal_stack(tmp_path):
         tmp_path,
         {
             "go.mod": "module svc\n\ngo 1.24\n",
-            "store.go": 'package main\n\nfunc segmentName(index int) string {\n\treturn fmt.Sprintf("wal-%06d.log", index)\n}\n',
+            "store.go": (
+                'package main\n\nfunc segmentName(index int) string {\n'
+                '\treturn fmt.Sprintf("wal-%06d.log", index)\n}\n'
+            ),
         },
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
@@ -2098,7 +2101,11 @@ def test_a_hand_rolled_ring_hash_resolves_to_the_consistent_hash_stack(tmp_path)
         tmp_path,
         {
             "go.mod": "module cache\n\ngo 1.24\n",
-            "ring.go": "package main\n\nimport \"hash/fnv\"\n\nfunc Hash(s string) uint64 {\n\th := fnv.New64a()\n\th.Write([]byte(s))\n\treturn h.Sum64()\n}\n",
+            "ring.go": (
+                "package main\n\nimport \"hash/fnv\"\n\n"
+                "func Hash(s string) uint64 {\n"
+                "\th := fnv.New64a()\n\th.Write([]byte(s))\n\treturn h.Sum64()\n}\n"
+            ),
         },
     )
     names = [stack.name for stack in detect_stacks(tmp_path)]
