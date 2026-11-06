@@ -1,0 +1,26 @@
+# one integer per line; blank lines and # comments are skipped
+# the fixture is the corpus the smoke test walks
+-42
+-7
+0
+3
+11
+16
+23
+34
+47
+58
+61
+77
+85
+90
+103
+118
+126
+140
+155
+163
+178
+190
+204
+219

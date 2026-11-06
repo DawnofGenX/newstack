@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-b-tree` — A keyed B-tree of configurable order: insert with splits, delete with borrow and merge, exact lookup and range scan, and a page file that reads back identical after any history.
+- `python-skip-list` — A sorted map that balances on seeded coin flips instead of rotations: insert, delete, rank, and select cost one walk, link widths are repaired on every edit, and rank answers exactly what bisect answers.
 - `python-bk-tree` — Edit distance plus a Burkhard-Keller tree: a word is found by distance without comparing it to every word, and the pruning is proved against a full scan on the same corpus.
 - `python-regex-engine` — A pattern compiled to a Thompson NFA and simulated as a set of states, so matching costs one pass and never backtracks; the same pattern is determinised and both machines are proved equal by enumeration.
 - `python-route-trie` — a trie router where the walk order is the documented rule: literal over parameter over catch-all, backtracking on a dead branch, `not-allowed` with an allow list instead of a 404, and a miss that names the segment that ended the search.

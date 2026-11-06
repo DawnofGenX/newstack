@@ -114,6 +114,8 @@ jobs:
           - python-route-trie
           - python-regex-engine
           - python-bk-tree
+          - python-skip-list
+          - python-b-tree
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
