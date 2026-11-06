@@ -105,6 +105,7 @@ jobs:
           - python-version-vectors
           - python-hdr-histogram
           - python-snowflake-ids
+          - python-semver-ranges
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
