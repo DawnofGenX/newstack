@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- Add `python-url-signing`: signed requests over a canonical form, where a reordered query is the same request, an escaped slash stays data, the body is covered by its hash, an expiry and a nonce refuse a replay, and each refusal names the rule that failed.
 - Add `python-json-patch`: JSON Pointer and JSON Patch where a patch applies whole or not at all, a failing test rolls back its neighbours, and a computed diff is applied and compared before it is printed.
 - Add `python-hybrid-clock`: a hybrid logical clock that proves a wall clock stepping backwards cannot move a stamp, that a receipt never sorts before its send, and that skew past a bound is refused rather than reported.
 - Add `python-backoff-jitter`: a retry simulator that measures the pile-up each backoff policy creates, instead of assuming jitter helps.

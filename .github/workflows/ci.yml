@@ -97,6 +97,7 @@ jobs:
           - python-backoff-jitter
           - python-hybrid-clock
           - python-json-patch
+          - python-url-signing
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
