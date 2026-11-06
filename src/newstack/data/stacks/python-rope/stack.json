@@ -1,0 +1,57 @@
+{
+  "name": "python-rope",
+  "title": "Cached-Length Chunks",
+  "language": "python",
+  "blurb": "A binary rope of short leaf chunks with cached lengths: insert, delete, slice, and concat walk the spine instead of copying the text, and to_string is the join of the leaves in order.",
+  "requires": ["uv", "python3"],
+  "default_description": "A balanced rope of cached-length chunks that edits by walking, joins without copying, and proves every slice against a plain string.",
+  "python": {
+    "minimum": "3.12",
+    "versions": ["3.12", "3.13"]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} load --text fixtures/text.txt",
+    "uv run {npm_name} slice --text fixtures/text.txt --start 6 --stop 11",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    { "file": "**/*.py", "contains": "a rope edits by walking" }
+  ],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_rope.py"]
+}

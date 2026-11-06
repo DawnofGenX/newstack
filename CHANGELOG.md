@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-rope` — A binary rope of short leaf chunks with cached lengths: insert, delete, slice, and concat walk the spine instead of copying the text, and to_string is the join of the leaves in order.
+- `python-treap` — A binary search tree that is also a heap on seeded draws: insert, delete, rank, and select run through split and merge, heap and search order are re-checked after every mixed workload, and answers equal bisect's.
 - `python-aho-corasick` — Multi-pattern matching in one pass: a trie with BFS failure links, suffix outputs that never miss an overlap, and a hit set proven equal to a naive scan on seeded alphabets.
 - `python-interval-tree` — A centered interval tree over half-open integer spans: stabbing and overlap answers equal the brute-force scan on any seeded corpus, the max-end augmentation is repaired on every delete, and a point at a span's right end stands outside it.
 - `python-lsm-tree` — A log-structured merge table of integer keys and string values: a sorted memtable flushes to numbered on-disk level tables, reads fall through newest level first, and compaction merges sorted tables while dropping tombstones.

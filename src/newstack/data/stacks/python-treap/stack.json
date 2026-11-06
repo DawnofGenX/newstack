@@ -1,0 +1,82 @@
+{
+  "name": "python-treap",
+  "title": "Treap",
+  "language": "python",
+  "blurb": "A binary search tree that is also a heap on seeded draws: insert, delete, rank, and select run through split and merge, heap and search order are re-checked after every mixed workload, and answers equal bisect's.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A search tree that is simultaneously a heap on seeded draws, with split, merge, and rank proved against bisect on mixed workloads.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} demo",
+    "uv run {npm_name} rank --keys fixtures/keys.txt 30",
+    "uv run {npm_name} select --count 64 3",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a draw decides who stands above"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_treap.py"
+  ]
+}
