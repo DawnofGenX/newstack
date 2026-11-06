@@ -1,0 +1,86 @@
+{
+  "name": "python-scapegoat-tree",
+  "title": "Scapegoat Tree",
+  "language": "python",
+  "blurb": "A binary search tree that rebuilds instead of rotating: the 0.7 alpha rule decides every repair, depth stays under log base 1/alpha of n, rebuilds are lossless against bisect, and the work counter settles at n log n.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A search tree whose repairs are whole-subtree rebuilds, with the alpha rule, the depth promise, and the amortized bill proved against bisect on mixed workloads.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} demo",
+    "uv run {npm_name} rank --keys fixtures/keys.txt 30",
+    "uv run {npm_name} select --count 64 3",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a tipped subtree is flattened and rebuilt whole"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_cli.py",
+    "tests/test_keys.py",
+    "tests/test_rules.py",
+    "tests/test_streams.py",
+    "tests/test_tree.py"
+  ]
+}

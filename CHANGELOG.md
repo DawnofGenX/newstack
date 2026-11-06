@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-scapegoat-tree` — A binary search tree that rebuilds instead of rotating: the 0.7 alpha rule decides every repair, depth stays under log base 1/alpha of n, rebuilds are lossless against bisect, and the work counter settles at n log n.
+- `python-radix-heap` — An integer min-heap that never compares keys: buckets follow the keys' bits, pop-min drains sorted on monotone and mixed streams, and the bucket invariant is re-checked after every op against the sorted corpus.
 - `python-rope` — A binary rope of short leaf chunks with cached lengths: insert, delete, slice, and concat walk the spine instead of copying the text, and to_string is the join of the leaves in order.
 - `python-treap` — A binary search tree that is also a heap on seeded draws: insert, delete, rank, and select run through split and merge, heap and search order are re-checked after every mixed workload, and answers equal bisect's.
 - `python-aho-corasick` — Multi-pattern matching in one pass: a trie with BFS failure links, suffix outputs that never miss an overlap, and a hit set proven equal to a naive scan on seeded alphabets.

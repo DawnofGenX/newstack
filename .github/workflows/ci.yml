@@ -119,6 +119,8 @@ jobs:
           - python-lsm-tree
           - python-interval-tree
           - python-aho-corasick
+          - python-radix-heap
+          - python-scapegoat-tree
           - python-treap
           - python-rope
           - python-graceful-shutdown
