@@ -1,0 +1,81 @@
+{
+  "name": "python-rrule-recurrence",
+  "title": "Recurrence Rules",
+  "language": "python",
+  "blurb": "Expand a recurrence rule into instants, with the zone's gaps and the count semantics spelled out.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A recurrence rule expanded into instants, with a reason for every firing and every skip.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} demo",
+    "uv run {npm_name} next --rule 'FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=5' --start 2026-01-05T09:00 --zone America/New_York",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv sync",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": "uv run ruff check . && uv run ruff format --check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "uv run pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "selftest",
+      "cmd": "uv run {{ npm_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "so the nth weekday is not"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_expand.py"
+  ]
+}

@@ -107,6 +107,7 @@ jobs:
           - python-snowflake-ids
           - python-semver-ranges
           - python-gitignore-matcher
+          - python-rrule-recurrence
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

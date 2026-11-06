@@ -1,0 +1,6 @@
+# rule | start | zone | note
+FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=5 | 2026-01-05T09:00 | America/New_York | standup three times a week
+FREQ=MONTHLY;BYDAY=-1FR;COUNT=4 | 2026-01-01T17:00 | Europe/Berlin | last friday review
+FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;COUNT=3 | 2024-02-29T00:00 | UTC | leap day only
+FREQ=DAILY;COUNT=5 | 2026-03-06T02:30 | America/New_York | crosses the spring gap
+FREQ=DAILY;UNTIL=20260303T033000Z | 2026-03-01T09:00 | Asia/Kolkata | until is an instant
