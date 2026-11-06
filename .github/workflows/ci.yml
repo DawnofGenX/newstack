@@ -103,6 +103,7 @@ jobs:
           - python-minhash-lsh
           - python-lru-cache
           - python-version-vectors
+          - python-hdr-histogram
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

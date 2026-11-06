@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-hdr-histogram`: bucketed latency percentiles with a printed, measured relative error, exact counts and merges, and a demo that shows why percentiles do not average.
 - `python-version-vectors`: one counter per writer, four verdicts (`equal`, `before`, `after`,
   `concurrent`), a merge that is a join, a delivery gate that holds a message until its
   dependencies arrive, and compaction measured for where it is exact and where it
