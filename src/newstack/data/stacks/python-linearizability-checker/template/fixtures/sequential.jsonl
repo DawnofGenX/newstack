@@ -1,0 +1,4 @@
+{"initial": 0}
+{"client": 0, "op": "write", "value": 5, "start": 0, "end": 2}
+{"client": 0, "op": "read", "value": 5, "start": 3, "end": 4}
+{"client": 0, "op": "write", "value": 7, "start": 5, "end": 6}

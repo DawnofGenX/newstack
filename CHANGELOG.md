@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-linearizability-checker`: linearizability decided by exhaustive search over programme order and real time, with a replayed witness when the history holds and a minimal core when it does not, a permutation yardstick `compare` holds the search to, and an honest refusal for histories too long to enumerate.
 - `python-three-way-merge`: a three-way merge that conflicts only the disputed region. The same edit on both sides is agreement, two insertions at one point conflict because the base orders nothing, an insertion beside a replacement does not conflict, a span without a final newline still gets markers on their own lines, and `explain` prints every chunk before the text.
 - `python-rrule-recurrence`: RRULE expansion where COUNT counts firings rather than intervals, UNTIL is an inclusive instant, INTERVAL is anchored to the start's own period, ordinal weekdays are counted from the month's edges, DST gaps are skipped and reported, and impossible rules are refused at parse time.
 - `python-gitignore-matcher`: contains-a-slash anchoring, directory-only rules, last-match-wins, `**` versus `*`, escapes and character classes, and the ancestor rule that stops a negation from rescuing a file inside an excluded directory.

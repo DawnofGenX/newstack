@@ -1,0 +1,83 @@
+{
+  "name": "python-linearizability-checker",
+  "title": "Linearizability Checker",
+  "language": "python",
+  "blurb": "A register history decided rather than sampled: the search respects programme order and real time, a refusal comes with a core that cannot shrink, and the pruning is measured against every permutation.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "Decide whether a history of register operations is linearizable, with a witness order when it is and a minimal core when it is not.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} demo",
+    "uv run {npm_name} check --history fixtures/stale-read.jsonl",
+    "uv run {npm_name} compare --history fixtures/straddle.jsonl",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 240
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "ruff"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "pytest"
+      ],
+      "timeout": 240
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "python3"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash",
+        "python3"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "A read is only allowed where the"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_check.py"
+  ]
+}
