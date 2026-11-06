@@ -7,6 +7,10 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-version-vectors`: one counter per writer, four verdicts (`equal`, `before`, `after`,
+  `concurrent`), a merge that is a join, a delivery gate that holds a message until its
+  dependencies arrive, and compaction measured for where it is exact and where it
+  silently changes the answer.
 - `python-lru-cache`: four replacement policies (FIFO, LRU, CLOCK, segmented LRU) over seeded traces, with scan resistance and the frequency ceiling printed beside every hit ratio.
 - `python-minhash-lsh`: MinHash signatures and LSH banding with the predicted banding curve printed beside the measured recall, verified candidate pairs, and a planted-duplicate corpus the demo scores against the exact answer.
 - `python-ab-test`: fixed-horizon two-proportion tests with Wilson intervals, a relative lift interval, a sample-ratio-mismatch gate and a peeking simulation that measures how far a 5% test drifts (18.90% under a flat line, 6.70% under an O'Brien-Fleming boundary) on the same simulated worlds.

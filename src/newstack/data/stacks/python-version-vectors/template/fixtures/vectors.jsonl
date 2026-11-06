@@ -1,0 +1,5 @@
+{"name": "a-only", "vector": "a:2"}
+{"name": "b-only", "vector": "b:5"}
+{"name": "both-a-first", "vector": "a:3,b:1"}
+{"name": "both-b-first", "vector": "a:1,b:6"}
+{"name": "all-three", "vector": "a:4,b:6,c:1"}

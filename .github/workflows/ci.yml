@@ -102,6 +102,7 @@ jobs:
           - python-ab-test
           - python-minhash-lsh
           - python-lru-cache
+          - python-version-vectors
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
