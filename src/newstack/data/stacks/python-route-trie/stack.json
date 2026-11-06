@@ -1,0 +1,82 @@
+{
+  "name": "python-route-trie",
+  "title": "Route Trie",
+  "language": "python",
+  "blurb": "Request paths matched against a trie where the walk's order is the rule: a literal beats a parameter, a parameter beats a catch-all, a dead branch is abandoned rather than forced, and a miss explains which segment stopped it.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "A path router where the matching order is the rule, and a miss says which segment stopped it.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} demo",
+    "uv run {npm_name} table --routes fixtures/routes.txt",
+    "uv run {npm_name} match --routes fixtures/routes.txt --path /users/42/posts",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "at every segment, a literal"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_router.py"
+  ]
+}

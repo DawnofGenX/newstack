@@ -111,6 +111,7 @@ jobs:
           - python-three-way-merge
           - python-linearizability-checker
           - python-expression-parser
+          - python-route-trie
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink

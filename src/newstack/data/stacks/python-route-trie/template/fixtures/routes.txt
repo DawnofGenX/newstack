@@ -1,0 +1,11 @@
+# method and pattern, one route per line; blanks and # lines are skipped
+GET     /
+GET     /health
+GET     /users/me
+GET     /users/{id}
+PUT     /users/{id}
+DELETE  /users/{id}
+GET     /users/{id}/posts
+POST    /users/{id}/posts
+GET     /files/{name}
+GET     /files/*rest
