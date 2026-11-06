@@ -1,0 +1,82 @@
+{
+  "name": "python-merkle-proofs",
+  "title": "Merkle Proofs",
+  "language": "python",
+  "blurb": "Merkle inclusion proofs where a leaf and an internal node can never be confused. Leaves are hashed with a 0x00 prefix and nodes with a 0x01 prefix, so a node's digest is not a valid leaf digest and the classic second-preimage forgery stops working; the tree splits at the largest power of two below the leaf count, so its shape - and therefore its root - does not depend on how the builder felt about odd counts. A proof carries one sibling per level and is bound to an index and a size: move it to another slot and the recomputed root disagrees. The demo measures the forgery, the tampered leaf, the moved index and the two competing shapes.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "default_description": "Merkle inclusion proofs with domain-separated hashing, a fixed tree shape, and verifiers that name which rule a proof broke.",
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv venv --allow-existing .venv && uv pip install --python .venv/bin/python -e . pytest ruff",
+    ".venv/bin/python -m {package_name} demo",
+    ".venv/bin/python -m {package_name} root --leaves fixtures/entries.txt",
+    ".venv/bin/python -m {package_name} prove --leaves fixtures/entries.txt --index 3",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --quiet --allow-existing .venv && uv pip install --quiet --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a node's digest was a valid leaf digest"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_tree.py"
+  ]
+}

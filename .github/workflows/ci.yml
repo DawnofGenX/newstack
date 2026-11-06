@@ -98,6 +98,7 @@ jobs:
           - python-hybrid-clock
           - python-json-patch
           - python-url-signing
+          - python-merkle-proofs
           - python-graceful-shutdown
           - python-c-extension
           - python-smtp-sink
