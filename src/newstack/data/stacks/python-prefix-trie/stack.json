@@ -1,0 +1,53 @@
+{
+  "name": "python-prefix-trie",
+  "title": "Prefix Trie",
+  "language": "python",
+  "blurb": "A string-keyed trie over lowercase words: membership answers equal a set's, every prefix listing equals the sorted scan of the corpus, delete drops only the exact word, and the empty prefix lists every word exactly once.",
+  "default_description": "A string-keyed trie over lowercase words whose prefix listing equals the sorted scan on any seeded corpus.",
+  "requires": ["uv", "python3"],
+  "python": {"minimum": "3.12", "versions": ["3.12", "3.13"]},
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} count --words fixtures/words.txt",
+    "uv run {npm_name} has --words fixtures/words.txt cart",
+    "uv run {npm_name} prefix --words fixtures/words.txt --prefix car",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [{ "file": "**/*.py", "contains": "a word ends where it is whole" }],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_trie.py"]
+}

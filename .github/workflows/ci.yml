@@ -123,6 +123,8 @@ jobs:
           - python-scapegoat-tree
           - python-union-find
           - python-fenwick-tree
+          - python-binomial-heap
+          - python-prefix-trie
           - python-treap
           - python-rope
           - python-graceful-shutdown

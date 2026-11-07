@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-prefix-trie` — A string-keyed trie over lowercase words: membership answers equal a set's, every prefix listing equals the sorted scan of the corpus, delete drops only the exact word, and the empty prefix lists every word exactly once.
+- `python-binomial-heap` — A mergeable integer min-heap of binomial trees: a tree of rank k holds exactly 2^k keys, the forest keeps one tree per rank, size follows the bit pattern of the count, and meld unions two heaps -- what plain heaps refuse.
 - `python-fenwick-tree` — A binary indexed tree over integer values: point adds climb the lowest bit, prefix and range sums walk it back, and every answer is checked against the running list-sum reference the walk visits at most bit-length(n) cells.
 - `python-union-find` — A disjoint-set forest over integer elements: union by size keeps depth logarithmic, find compresses on the way back, and the partition equals a dict-of-parents reference after any seeded workload.
 - `python-scapegoat-tree` — A binary search tree that rebuilds instead of rotating: the 0.7 alpha rule decides every repair, depth stays under log base 1/alpha of n, rebuilds are lossless against bisect, and the work counter settles at n log n.
