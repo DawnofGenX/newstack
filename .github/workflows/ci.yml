@@ -152,6 +152,8 @@ jobs:
           - python-topological-sort
           - python-floyd-warshall
           - python-kruskal-mst
+          - python-boruvka-mst
+          - python-boruvka-mst
           - python-maximum-flow
           - python-treap
           - python-rope
