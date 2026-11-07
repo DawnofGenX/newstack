@@ -1,0 +1,17 @@
+# one lowercase-letter pattern per line; blanks and # comments skipped
+a
+ab
+aa
+ana
+abra
+anana
+abab
+banana
+abra
+cab
+cabana
+rab
+cad
+abra
+cadabra
+ban

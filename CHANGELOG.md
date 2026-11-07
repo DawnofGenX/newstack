@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-z-function` — The Z-array over lowercase words: the array equals the naive per-position LCP scan on seeded corpora, the concatenated occurrences equal the naive scan's starts, and z[0], the single letter, and the empty word stay honest.
+- `python-rabin-karp` — Rabin-Karp over lowercase text: the scan's start list equals the naive scan's on seeded corpora, the roll equals a fresh weigh on shipped windows, and collisions stay honest under a letter-check.
 - `python-count-min` — A count-min sketch over [0, 256): the min of rows never dips under the ledger truth on seeded streams, the audit runs after every update, and the shipped grid answers its corpora exactly.
 - `python-binary-heap` — A min-heap over integer keys, sift-up and sift-down hand-rolled on a plain list: the drain equals sorted(pushed) on seeded push/pop storms, and the parent rule is walked by a shipped checker after every op.
 - `python-levenshtein` — Unit-cost edit distance over lowercase strings: the row walk equals a shipped exponential oracle on short pairs, reads the same from either side, never beats a detour, and nearest equals the scan's argmin with ties first by letters.

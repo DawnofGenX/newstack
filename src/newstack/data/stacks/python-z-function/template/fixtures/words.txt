@@ -1,0 +1,17 @@
+# one lowercase-letter word per line; blanks and # comments skipped
+a
+ab
+aa
+ana
+abra
+anana
+abab
+banana
+aabaaa
+abracadabra
+aaaa
+mississippi
+abcababcabcab
+banananananas
+cabana
+cadabra

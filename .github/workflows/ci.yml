@@ -138,6 +138,8 @@ jobs:
           - python-levenshtein
           - python-binary-heap
           - python-count-min
+          - python-rabin-karp
+          - python-z-function
           - python-treap
           - python-rope
           - python-graceful-shutdown

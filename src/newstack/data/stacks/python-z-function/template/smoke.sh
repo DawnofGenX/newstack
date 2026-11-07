@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+# The smoke test runs the tool the way a user would and checks what it says.
+# PY points at the interpreter that has this package installed.
+set -uo pipefail
+
+PY="${PY:-python3}"
+MODULE="{{ package_name }}"
+PROGRAM="{{ npm_name }}"
+PASSED=0
+FAILED=0
+
+ok() { PASSED=$((PASSED + 1)); printf '  ok   %s\n' "$1"; }
+bad() { FAILED=$((FAILED + 1)); printf '  FAIL %s\n' "$1"; }
+
+check_contains() {
+  local name="$1" needle="$2" text="$3"
+  if [[ "$text" == *"$needle"* ]]; then
+    ok "$name"
+  else
+    bad "$name"
+    printf '       wanted %q in %q\n' "$needle" "${text:0:200}"
+  fi
+}
+
+check_equal() {
+  local name="$1" want="$2" got="$3"
+  if [[ "$want" == "$got" ]]; then
+    ok "$name"
+  else
+    bad "$name"
+    printf '       wanted %q, got %q\n' "$want" "$got"
+  fi
+}
+
+run() {
+  OUT=$("$@" 2>&1)
+  STATUS=$?
+}
+
+WORK=$(mktemp -d)
+trap 'rm -rf "$WORK"' EXIT
+
+echo "smoke: $PROGRAM"
+
+run "$PY" -m "$MODULE" --version
+check_equal "the version exits zero" 0 "$STATUS"
+check_contains "the banner carries the version" "0.1.0" "$OUT"
+
+run "$PY" -m "$MODULE" --help
+check_equal "help exits zero" 0 "$STATUS"
+check_contains "help lists the subcommands" "selftest" "$OUT"
+
+# --- the array, the starts, and the count -----------------------------------------
+run "$PY" -m "$MODULE" zarray --word anana
+check_equal "a zarray exits zero" 0 "$STATUS"
+check_contains "the array seats the suffixes" "array      [5, 0, 3, 0, 1]" "$OUT"
+check_contains "the length is the word" "length     5" "$OUT"
+
+run "$PY" -m "$MODULE" occurrences --pattern ana "banana"
+check_equal "an occurrences run exits zero" 0 "$STATUS"
+check_contains "the overlap starts twice" "starts     [1, 3]" "$OUT"
+check_contains "the first is the leftmost" "first      1" "$OUT"
+
+run "$PY" -m "$MODULE" count --pattern ana "banana"
+check_equal "a count exits zero" 0 "$STATUS"
+check_contains "the count sees the overlap" "count      2" "$OUT"
+
+run "$PY" -m "$MODULE" occurrences --pattern zzz "banana"
+check_equal "an absent pattern exits one" 1 "$STATUS"
+check_contains "the absence is named" "first      None" "$OUT"
+
+run "$PY" -m "$MODULE" zarray --word anana --json
+WANT=$("$PY" - <<'PYEOF'
+from {{ package_name }}.naive import naive_z
+
+print("[" + ", ".join(str(step) for step in naive_z("anana")) + "]")
+PYEOF
+)
+ARRAY=$("$PY" -c 'import json,sys; print(json.dumps(json.loads(sys.argv[1])["array"]))' "$OUT")
+check_equal "the array is the stepper's answer" "$WANT" "$ARRAY"
+
+# --- the edges the gate refuses -----------------------------------------------------
+run "$PY" -m "$MODULE" count --pattern "" "abra"
+check_equal "the empty pattern exits zero" 0 "$STATUS"
+check_contains "the empty pattern sits everywhere" "count      5" "$OUT"
+
+run "$PY" -m "$MODULE" occurrences --pattern abracadabra "a"
+check_equal "a long pattern never sits" 1 "$STATUS"
+
+run "$PY" -m "$MODULE" occurrences --pattern Abra "abra"
+check_equal "an uppercase pattern is unusable" 2 "$STATUS"
+check_contains "the pattern is named" "not a word" "$OUT"
+
+run "$PY" -m "$MODULE" occurrences --pattern a "a b"
+check_equal "a spaced word is unusable" 2 "$STATUS"
+check_contains "the word is named" "not a word" "$OUT"
+
+# --- the fixture corpus, naive-equal ------------------------------------------------
+COUNT=$(grep -cvE '^[[:space:]]*(#|$)' fixtures/words.txt)
+if [[ "$COUNT" -ge 12 ]]; then
+  ok "the fixture holds a corpus ($COUNT words)"
+else
+  bad "the fixture is too small ($COUNT words)"
+fi
+
+BROKE=$("$PY" - <<'PYEOF'
+from {{ package_name }}.array import z_function
+from {{ package_name }}.naive import naive_z
+
+broken = []
+with open("fixtures/words.txt", encoding="utf-8") as handle:
+    for line in handle:
+        word = line.strip()
+        if not word or word.startswith("#"):
+            continue
+        if z_function(word) != naive_z(word):
+            broken.append(word)
+print(len(broken))
+PYEOF
+)
+check_equal "every fixture word answers like the stepper" 0 "$BROKE"
+
+# --- the stories and the invariants ---------------------------------------------------
+run "$PY" -m "$MODULE" demo
+check_equal "the demo exits zero" 0 "$STATUS"
+check_contains "every story holds" "6 of 6 hold" "$OUT"
+
+run "$PY" -m "$MODULE" selftest
+check_equal "the selftest exits zero" 0 "$STATUS"
+check_contains "the selftest reports no failures" "0 failed" "$OUT"
+
+printf 'smoke: %d passed, %d failed\n' "$PASSED" "$FAILED"
+[[ "$FAILED" -eq 0 ]]
