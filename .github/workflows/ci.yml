@@ -150,6 +150,8 @@ jobs:
           - python-bellman-ford
           - python-prim-mst
           - python-topological-sort
+          - python-floyd-warshall
+          - python-maximum-flow
           - python-treap
           - python-rope
           - python-graceful-shutdown

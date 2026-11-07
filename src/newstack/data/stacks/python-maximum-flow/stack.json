@@ -1,0 +1,82 @@
+{
+  "name": "python-maximum-flow",
+  "title": "Maximum Flow Walker",
+  "language": "python",
+  "blurb": "maximum flow over small nonneg-integer-capacity integer-keyed digraphs: the walker's value equals the brute-force min-cut oracle's least on every shipped and seeded corpus, the shipped map conserves at every interior node and never exceeds a capacity, and equal networks ship the same map run after run.",
+  "default_description": "A flow walker whose value is the cut enumeration's least on every small digraph, and whose shipped map conserves at every interior node.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} flow 0 3 \"0>1=3\" \"1>3=2\" \"0>2=2\" \"2>3=3\" \"0>3=1\" \"1>2=1\"",
+    "uv run {npm_name} map 0 3 \"0>1=3\" \"1>3=2\" \"0>2=2\" \"2>3=3\" \"0>3=1\" \"1>2=1\"",
+    "uv run {npm_name} report --corpus fixtures/networks.txt",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "flow walks the residual, never past a bottleneck"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_solve.py"
+  ]
+}

@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-maximum-flow` — maximum flow over small nonneg-integer-capacity integer-keyed digraphs: the walker's value equals the brute-force min-cut oracle's least on every shipped and seeded corpus, the shipped map conserves at every interior node and never exceeds a capacity, and equal networks ship the same map run after run.
+- `python-floyd-warshall` — all-pairs shortest paths over small nonneg-weight integer-keyed digraphs: the matrix's distance table equals the shipped walking oracle's table on every shipped and seeded corpus, the diagonal sits at zero, one more relaxation sweep changes nothing, and an unreached ordered pair stays omitted.
 - `python-topological-sort` — predecessors-first ordering of small integer-keyed digraphs: the order's listing validates against every shipped edge on every shipped and seeded corpus, every node sits exactly once, the sequence is a fixed point, and a cycle names its block honestly.
 - `python-prim-mst` — minimum spanning trees over small nonneg-weight undirected integer-keyed graphs: the grower's tree total equals the shipped enumeration oracle's minimum on every shipped and seeded corpus, every tree spans every node exactly once with |V|-1 edges, and equal weights pick the same edge set run after run.
 - `python-bellman-ford` — Single-source shortest paths over small integer-weighted digraphs: the walker's distance map equals the shipped walk-counting oracle's map on every shipped and seeded corpus, no edge still relaxes after |V|-1 rounds, and negative cycles are named honestly.
