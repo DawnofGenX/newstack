@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-tarjan-scc` — Tarjan's strongly-connected components over small digraphs: the walker's partition equals the shipped reachability oracle's partition on every shipped and seeded corpus, every node lands in exactly one component, and the condensed graph is acyclic under the shipped cycle checker.
+- `python-shunting-yard` — Infix to postfix and back: value_of answers exactly what the shipped recursive-descent oracle answers on shipped and seeded ledgers, and evaluate of the yielded queue equals the answer, division flooring as documented.
 - `python-run-length` — Run-length over lowercase text: decode hands back the letters encode was sent on shipped and seeded corpora, encode answers exactly what the shipped stepper walks, and a repeat never costs more pairs than letters.
 - `python-huffman-coding` — Canonical Huffman over lowercase text: decode(encode(text)) answers with the letters encode was sent on shipped and seeded corpora, no shipped code opens where another closes, and a skewed text pays strictly under eight bits a letter.
 - `python-lz77` — LZ77 over lowercase text: the read hands back the letters the write was sent on shipped and seeded corpora, every back-reference names letters the window already emitted, and a repeat never costs more tokens than letters.

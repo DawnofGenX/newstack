@@ -1,0 +1,82 @@
+{
+  "name": "python-shunting-yard",
+  "title": "Shunting Yard Evaluator",
+  "language": "python",
+  "blurb": "Infix to postfix and back: value_of answers exactly what the shipped recursive-descent oracle answers on shipped and seeded ledgers, and evaluate of the yielded queue equals the answer, division flooring as documented.",
+  "default_description": "A shunting yard whose queue reckons to the answer the recursive-descent oracle gives on every expression, integer divisions flooring as documented.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} eval \"3 + 4 * 2 / ( 1 - 5 ) * 2\"",
+    "uv run {npm_name} postfix \"2 + 3 * 4\"",
+    "uv run {npm_name} report --corpus fixtures/records.txt",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "the operator stack yields only to tighter binding"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_calc.py"
+  ]
+}

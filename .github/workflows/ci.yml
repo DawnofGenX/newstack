@@ -144,6 +144,8 @@ jobs:
           - python-lz77
           - python-huffman-coding
           - python-run-length
+          - python-shunting-yard
+          - python-tarjan-scc
           - python-treap
           - python-rope
           - python-graceful-shutdown
