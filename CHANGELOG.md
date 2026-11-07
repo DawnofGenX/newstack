@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-topological-sort` — predecessors-first ordering of small integer-keyed digraphs: the order's listing validates against every shipped edge on every shipped and seeded corpus, every node sits exactly once, the sequence is a fixed point, and a cycle names its block honestly.
+- `python-prim-mst` — minimum spanning trees over small nonneg-weight undirected integer-keyed graphs: the grower's tree total equals the shipped enumeration oracle's minimum on every shipped and seeded corpus, every tree spans every node exactly once with |V|-1 edges, and equal weights pick the same edge set run after run.
 - `python-bellman-ford` — Single-source shortest paths over small integer-weighted digraphs: the walker's distance map equals the shipped walk-counting oracle's map on every shipped and seeded corpus, no edge still relaxes after |V|-1 rounds, and negative cycles are named honestly.
 - `python-dijkstra` — single-source shortest paths over small nonneg-weight integer-keyed digraphs: the walker's distance map equals the shipped fixed-point oracle's map on every shipped and seeded corpus, every shipped path costs exactly the map's cost, and unreachable nodes stay out of the map.
 - `python-tarjan-scc` — Tarjan's strongly-connected components over small digraphs: the walker's partition equals the shipped reachability oracle's partition on every shipped and seeded corpus, every node lands in exactly one component, and the condensed graph is acyclic under the shipped cycle checker.

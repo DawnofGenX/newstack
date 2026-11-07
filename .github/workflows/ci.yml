@@ -148,6 +148,8 @@ jobs:
           - python-tarjan-scc
           - python-dijkstra
           - python-bellman-ford
+          - python-prim-mst
+          - python-topological-sort
           - python-treap
           - python-rope
           - python-graceful-shutdown
