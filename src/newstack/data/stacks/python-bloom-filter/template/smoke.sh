@@ -1,117 +1,136 @@
 #!/usr/bin/env bash
-# smoke.sh — drive the CLI end to end, the way a person would.
+# The smoke test runs the tool the way a user would and checks what it says.
+# PY points at the interpreter that has this package installed.
 set -uo pipefail
 
 PY="${PY:-python3}"
 MODULE="{{ package_name }}"
 PROGRAM="{{ npm_name }}"
-WORK="$(mktemp -d)"
-FILTER="$WORK/items.json"
+PASSED=0
+FAILED=0
+
+ok() { PASSED=$((PASSED + 1)); printf '  ok   %s\n' "$1"; }
+bad() { FAILED=$((FAILED + 1)); printf '  FAIL %s\n' "$1"; }
+
+check_contains() {
+  local name="$1" needle="$2" text="$3"
+  if [[ "$text" == *"$needle"* ]]; then
+    ok "$name"
+  else
+    bad "$name"
+    printf '       wanted %q in %q\n' "$needle" "${text:0:200}"
+  fi
+}
+
+check_equal() {
+  local name="$1" want="$2" got="$3"
+  if [[ "$want" == "$got" ]]; then
+    ok "$name"
+  else
+    bad "$name"
+    printf '       wanted %q, got %q\n' "$want" "$got"
+  fi
+}
+
+run() {
+  OUT=$("$@" 2>&1)
+  STATUS=$?
+}
+
+WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 
-passed=0
-failed=0
-ok() { printf 'ok    %s\n' "$1"; passed=$((passed + 1)); }
-bad() { printf 'FAIL  %s\n' "$1"; failed=$((failed + 1)); }
-check_equal() {
-  if [ "$2" = "$3" ]; then ok "$1"; else bad "$1 (got '$2', want '$3')"; fi
-}
-check_contains() {
-  case "$2" in *"$3"*) ok "$1" ;; *) bad "$1 (no '$3' in: $2)" ;; esac
-}
-
-run() { out=$("$@" 2>&1); status=$?; }
+echo "smoke: $PROGRAM"
 
 run "$PY" -m "$MODULE" --version
-check_contains "the version banner names the program" "$out" "$PROGRAM"
-check_contains "the version banner names a version" "$out" "0.1.0"
-
-run "$PY" -m "$MODULE" sized --expected 1000 --rate 0.01
-check_equal "sized exits zero" "$status" "0"
-check_contains "sized computes 9586 bits" "$out" "bits        9586"
-check_contains "sized computes 7 hashes" "$out" "hashes      7"
-
-run "$PY" -m "$MODULE" sized --expected 1000 --json
-check_contains "sized answers in json" "$out" '"m_bits": 9586'
-
-run "$PY" -m "$MODULE" create --filter "$FILTER" --expected 1000
-check_equal "create exits zero" "$status" "0"
-check_contains "create reports the bits" "$out" "bits        9586"
-test -s "$FILTER" && ok "create wrote a filter file" || bad "create wrote a filter file"
-
-run "$PY" -m "$MODULE" create --filter "$FILTER" --expected 10
-check_equal "a second create is refused" "$status" "2"
-check_contains "the refusal names --force" "$out" "--force"
-
-run "$PY" -m "$MODULE" create --filter "$FILTER" --expected 10 --force
-check_equal "create --force replaces the filter" "$status" "0"
-
-run "$PY" -m "$MODULE" add --filter "$FILTER" --item alpha --item beta
-check_equal "add exits zero" "$status" "0"
-check_contains "add reports fresh bits" "$out" "new bits 7 of 7"
-
-run "$PY" -m "$MODULE" add --filter "$FILTER" --item alpha
-check_contains "re-adding an item sets nothing" "$out" "new bits 0 of 7"
-
-run "$PY" -m "$MODULE" check --filter "$FILTER" --item alpha
-check_equal "an added item exits zero" "$status" "0"
-check_contains "a yes is a maybe" "$out" "maybe: false positives are possible"
-
-run "$PY" -m "$MODULE" check --filter "$FILTER" --item gamma
-check_equal "an unadded item exits one" "$status" "1"
-check_contains "a no is definite" "$out" "definite"
-
-run "$PY" -m "$MODULE" check --filter "$FILTER" --item gamma --json
-check_contains "the json answer is false" "$out" '"present": false'
-
-run "$PY" -m "$MODULE" info --filter "$FILTER"
-check_equal "info exits zero while healthy" "$status" "0"
-check_contains "info reports the verdict" "$out" "verdict           healthy"
-check_contains "info reports the estimate" "$out" "estimated items"
-
-run "$PY" -m "$MODULE" info --filter "$FILTER" --json
-check_contains "info answers in json" "$out" '"saturated": false'
-
-COUNTING="$WORK/counting.json"
-run "$PY" -m "$MODULE" create --filter "$COUNTING" --expected 100 --kind counting
-check_equal "a counting filter can be created" "$status" "0"
-check_contains "create names the kind" "$out" "counting-bloom"
-run "$PY" -m "$MODULE" add --filter "$COUNTING" --item alpha
-run "$PY" -m "$MODULE" check --filter "$COUNTING" --item alpha
-check_equal "the counting filter answers yes" "$status" "0"
-run "$PY" -m "$MODULE" info --filter "$COUNTING"
-check_contains "counters are reported" "$out" "saturated counters"
-
-SMALL="$WORK/small.json"
-run "$PY" -m "$MODULE" create --filter "$SMALL" --expected 1
-for number in $(seq 1 40); do
-  "$PY" -m "$MODULE" add --filter "$SMALL" --item "item-$number" >/dev/null 2>&1
-done
-run "$PY" -m "$MODULE" info --filter "$SMALL"
-check_equal "a saturated filter exits one from info" "$status" "1"
-check_contains "the verdict says saturated" "$out" "saturated"
-
-run "$PY" -m "$MODULE" check --filter "$WORK/nope.json" --item alpha
-check_equal "a missing filter is a usage error" "$status" "2"
-check_contains "the error names the fix" "$out" "create one with"
-
-run "$PY" -m "$MODULE" create --filter "$WORK/bad.json" --expected 10 --rate 0
-check_equal "a rate of zero is a usage error" "$status" "2"
-check_contains "the error explains the range" "$out" "between 0 and 1"
-
-run "$PY" -m "$MODULE" demo
-check_equal "demo exits zero" "$status" "0"
-check_contains "the demo proves the one guarantee" "$out" "no false negatives"
-check_contains "the demo measures the rate" "$out" "the false-positive rate is a number you can check"
-check_contains "the demo breaks removal" "$out" "removal is where the guarantee dies"
-check_contains "the demo shows saturation" "$out" "saturation is the failure mode"
-
-run "$PY" -m "$MODULE" selftest
-check_equal "selftest exits zero" "$status" "0"
-check_contains "selftest counts its checks" "$out" "checks passed"
+check_equal "the version exits zero" 0 "$STATUS"
+check_contains "the banner carries the version" "0.1.0" "$OUT"
 
 run "$PY" -m "$MODULE" --help
-check_contains "help lists create" "$out" "create"
+check_equal "help exits zero" 0 "$STATUS"
+check_contains "help lists the subcommands" "selftest" "$OUT"
 
-printf '\nsmoke: %d passed, %d failed\n' "$passed" "$failed"
-[ "$failed" -eq 0 ]
+# --- add seats, check asks, the promise holds ---------------------------------------
+run "$PY" -m "$MODULE" add --key 7 --key 42
+check_equal "an add exits zero" 0 "$STATUS"
+check_contains "the keys are echoed" "added      7 42" "$OUT"
+check_contains "the audit names no break" "audit      0 breaks" "$OUT"
+
+run "$PY" -m "$MODULE" check 165
+check_equal "a seeded key checks present" 0 "$STATUS"
+check_contains "the answer says present" "present" "$OUT"
+
+run "$PY" -m "$MODULE" check 1
+check_equal "an unseen key checks absent" 1 "$STATUS"
+check_contains "the answer says absent" "absent" "$OUT"
+
+run "$PY" -m "$MODULE" check 132 --seed 13
+check_equal "seed 13 checks 132 present" 0 "$STATUS"
+
+# --- the shipped audit, counted -------------------------------------------------------
+run "$PY" -m "$MODULE" report
+check_equal "the report exits zero" 0 "$STATUS"
+check_contains "the re-asks are booked" "7920 booked, 7920 run" "$OUT"
+check_contains "no key read absent" "false neg  0" "$OUT"
+check_contains "no absent key lied" "false pos  0" "$OUT"
+check_contains "the audit broke on nothing" "breaks     0" "$OUT"
+
+REPORT=$("$PY" -m "$MODULE" report --json)
+FNS=$("$PY" -c 'import json,sys; print(sum(len(v["false_negatives"]) for v in json.loads(sys.argv[1])["verdicts"]))' "$REPORT")
+FPS=$("$PY" -c 'import json,sys; print(sum(len(v["false_positives"]) for v in json.loads(sys.argv[1])["verdicts"]))' "$REPORT")
+check_equal "the json ledger holds no false negatives" 0 "$FNS"
+check_equal "the json ledger holds no false positives" 0 "$FPS"
+
+# --- the same seed, the same answers ---------------------------------------------------
+run "$PY" -m "$MODULE" seed 7
+check_equal "a seed replays" 0 "$STATUS"
+check_contains "the replay is identical" "replay     identical" "$OUT"
+check_contains "the first key is 165" "first keys 165" "$OUT"
+
+# --- the gates refuse what is not a key -------------------------------------------------
+run "$PY" -m "$MODULE" check x
+check_equal "a text key is unusable" 2 "$STATUS"
+check_contains "the text is named" "not a decimal integer" "$OUT"
+
+run "$PY" -m "$MODULE" check 256
+check_equal "256 leaves the universe" 2 "$STATUS"
+
+run "$PY" -m "$MODULE" check 7 --width 7
+check_equal "a narrow array is refused" 2 "$STATUS"
+
+# --- the frozen streams replay the arithmetic --------------------------------------------
+LINES=$(grep -cvE '^[[:space:]]*(#|$)' fixtures/streams.txt)
+if [[ "$LINES" -ge 5 ]]; then
+  ok "the fixture freezes five streams ($LINES lines)"
+else
+  bad "the fixture is too small ($LINES lines)"
+fi
+
+BROKE=$("$PY" - <<'PYEOF'
+from {{ package_name }}.stream import load_fixture, stream
+from {{ package_name }}.bloom import Bloom
+
+broken = 0
+for plan in load_fixture("fixtures/streams.txt"):
+    if plan.keys != stream(plan.seed):
+        broken += 1
+    filter_ = Bloom(1024, 4, plan.seed)
+    for key in plan.keys:
+        filter_.add(key)
+    broken += len(filter_.audit())
+print(broken)
+PYEOF
+)
+check_equal "every fixture stream replays and seats clean" 0 "$BROKE"
+
+# --- the stories and the invariants --------------------------------------------------------
+run "$PY" -m "$MODULE" demo
+check_equal "the demo exits zero" 0 "$STATUS"
+check_contains "every story holds" "6 of 6 hold" "$OUT"
+
+run "$PY" -m "$MODULE" selftest
+check_equal "the selftest exits zero" 0 "$STATUS"
+check_contains "the selftest reports no failures" "0 failed" "$OUT"
+
+printf 'smoke: %d passed, %d failed\n' "$PASSED" "$FAILED"
+[[ "$FAILED" -eq 0 ]]

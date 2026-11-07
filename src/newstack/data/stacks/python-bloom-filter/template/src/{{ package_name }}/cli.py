@@ -1,214 +1,218 @@
-"""Create a filter on disk, add items to it, and ask it questions."""
+"""The command line: one question per run, the array answers honestly.
+
+Exit codes keep the promise visible to a shell: ``0`` means present
+(or a clean audit), ``1`` means absent (or a broken audit), ``2``
+means the arguments or the file cannot be used as given.
+"""
 
 from __future__ import annotations
 
 import argparse
 import json
 import sys
-from pathlib import Path
 
-from .bloom import Bloom, BloomFilterError, CountingBloom, parse_filter, sized_for
-from .demo import render
+from .audit import (
+    CONFIGS,
+    RECHECKS,
+    estimate_items,
+    shipped_audit,
+)
+from .bloom import ROWS, SEED, WIDTH, Bloom, BloomError
+from .demo import stories
+from .stream import LENGTH, Plan, StreamError, stream
+from .universe import UniverseError, parse_key
 
 PROGRAM = "{{ npm_name }}"
 VERSION = "0.1.0"
 
-EXIT_PRESENT = 0
-EXIT_ABSENT = 1
+EXIT_OK = 0
+EXIT_MISS = 1
 EXIT_UNUSABLE = 2
 
 
-class UsageError(ValueError):
-    """The arguments cannot be used as given."""
+def _filter_from(seed: int, width: int, rows: int, seat: int) -> Bloom:
+    bloom = Bloom(width=width, rows=rows, seed=seat)
+    for key in stream(seed, LENGTH):
+        bloom.add(key)
+    return bloom
 
 
-def read_filter(path: Path) -> Bloom | CountingBloom:
-    if not path.exists():
-        raise UsageError(f"no filter at {path}; create one with `{PROGRAM} create`")
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as error:
-        raise UsageError(f"{path} is not JSON: {error}") from None
-    return parse_filter(payload)
-
-
-def write_filter(path: Path, bloom: Bloom | CountingBloom) -> None:
-    text = json.dumps(bloom.as_dict(), sort_keys=True, indent=2)
-    path.write_text(text + "\n", encoding="utf-8")
-
-
-def _rate(value: float) -> str:
-    """A rate of 1e-20 is not zero, and printing it as 0.000000 would say it was."""
-    return f"{value:.6f}" if value >= 1e-6 else f"{value:.2e}"
-
-
-def _new(kind: str, expected: int, rate: float) -> Bloom | CountingBloom:
-    sizing = sized_for(expected, rate)
-    factory = CountingBloom if kind == "counting" else Bloom
-    return factory(sizing.m_bits, sizing.k_hashes)
-
-
-def cmd_create(args: argparse.Namespace) -> int:
-    path = Path(args.filter)
-    if path.exists() and not args.force:
-        raise UsageError(f"{path} already exists; pass --force to replace it")
-    bloom = _new(args.kind, args.expected, args.rate)
-    write_filter(path, bloom)
-    print(f"created     {path}")
-    print(f"bits        {bloom.m_bits}")
-    print(f"hashes      {bloom.k_hashes}")
-    print(f"kind        {bloom.type_name}")
-    return EXIT_PRESENT
-
-
-def cmd_add(args: argparse.Namespace) -> int:
-    path = Path(args.filter)
-    bloom = read_filter(path)
-    for item in args.item:
-        fresh = bloom.add(item)
-        print(f"added       {item:<24} new bits {len(fresh)} of {bloom.k_hashes}")
-    write_filter(path, bloom)
-    print(f"fill        {bloom.fill():.4f} of {bloom.m_bits} bits")
-    return EXIT_PRESENT
-
-
-def cmd_check(args: argparse.Namespace) -> int:
-    bloom = read_filter(Path(args.filter))
-    present = bloom.might_contain(args.item)
+def _command_add(args: argparse.Namespace) -> int:
+    bloom = Bloom(args.width, args.rows, args.seat)
+    keys = [parse_key(text) for text in args.key]
+    if not keys:
+        raise UniverseError("add wants at least one --key")
+    fresh = sum(bloom.add(key) for key in keys)
     if args.json:
-        print(json.dumps({"item": args.item, "present": present}, sort_keys=True))
-    elif present:
-        print(f"present     {args.item} (maybe: false positives are possible)")
+        print(json.dumps({"added": keys, "bits_set": bloom.bits_set}, indent=2))
     else:
-        print(f"absent      {args.item} (definite: nothing that was added shares its bits)")
-    return EXIT_PRESENT if present else EXIT_ABSENT
+        listed = " ".join(str(key) for key in keys)
+        print(f"added      {listed}")
+        print(f"fresh bits {fresh} of {bloom.width} (width {bloom.width}, rows {bloom.rows})")
+        print(f"audit      {len(bloom.audit())} breaks")
+    return EXIT_OK
 
 
-def cmd_info(args: argparse.Namespace) -> int:
-    bloom = read_filter(Path(args.filter))
-    estimate = bloom.estimate_items()
-    verdict = "saturated" if bloom.is_saturated() else "healthy"
-    rows = [
-        ("kind", bloom.type_name),
-        ("bits", str(bloom.m_bits)),
-        ("hashes", str(bloom.k_hashes)),
-        ("bits set", f"{bloom.bits_set()} ({bloom.fill():.4f})"),
-        ("estimated items", "-" if estimate is None else f"{estimate:.1f}"),
-        ("predicted rate", _rate(bloom.predict_rate())),
-        ("verdict", verdict),
-    ]
-    if isinstance(bloom, CountingBloom):
-        rows.insert(5, ("saturated counters", str(bloom.saturated_positions())))
+def _command_check(args: argparse.Namespace) -> int:
+    key = parse_key(args.key)
+    bloom = _filter_from(args.seed, args.width, args.rows, args.seat)
+    present = bloom.might_contain(key)
+    clear_row = bloom.first_clear_row(key)
     if args.json:
         print(
             json.dumps(
                 {
-                    "kind": bloom.type_name,
-                    "bits": bloom.m_bits,
-                    "hashes": bloom.k_hashes,
-                    "fill": round(bloom.fill(), 6),
-                    "estimated_items": None if estimate is None else round(estimate, 3),
-                    "predicted_rate": round(bloom.predict_rate(), 8),
-                    "saturated": bloom.is_saturated(),
+                    "key": key,
+                    "present": present,
+                    "clear_row": clear_row,
+                    "added": len(bloom.added),
                 },
-                sort_keys=True,
+                indent=2,
             )
         )
     else:
-        for label, value in rows:
-            print(f"{label:<18}{value}")
-        if bloom.is_saturated():
-            print("note                at this fill nearly every lookup answers yes")
-    return EXIT_PRESENT if not bloom.is_saturated() else EXIT_ABSENT
+        print(f"key        {key}")
+        print(f"seed       {args.seed} (width {args.width}, rows {args.rows})")
+        if present:
+            print("answer     maybe: present (a collision can only lie this way)")
+        else:
+            print(f"answer     definite: absent (row {clear_row} was never raised)")
+    return EXIT_OK if present else EXIT_MISS
 
 
-def cmd_sized(args: argparse.Namespace) -> int:
-    sizing = sized_for(args.expected, args.rate)
+def _command_report(args: argparse.Namespace) -> int:
+    ledger = shipped_audit()
+    breaks = ledger.breaks
     if args.json:
-        print(
-            json.dumps(
+        payload = {
+            "checks": ledger.checks,
+            "verdicts": [
                 {
-                    "expected": sizing.expected,
-                    "fp_rate": sizing.fp_rate,
-                    "m_bits": sizing.m_bits,
-                    "k_hashes": sizing.k_hashes,
-                    "predicted_rate": round(sizing.predicted_rate, 8),
-                },
-                sort_keys=True,
-            )
-        )
+                    "config": verdict.config,
+                    "seed": verdict.seed,
+                    "false_negatives": list(verdict.false_negatives),
+                    "false_positives": list(verdict.false_positives),
+                }
+                for verdict in ledger.verdicts
+            ],
+        }
+        print(json.dumps(payload, indent=2))
     else:
-        for line in sizing.lines():
-            print(line)
-    return EXIT_PRESENT
+        widths = ", ".join(str(width) for _, width, _, _ in CONFIGS)
+        print(f"configs    {len(CONFIGS)} (widths {widths})")
+        print(f"streams    seeds 7 13 42 101 2026, {LENGTH} keys each")
+        print(f"re-asks    {RECHECKS} booked, {ledger.checks} run")
+        print(f"false neg  {sum(len(v.false_negatives) for v in ledger.verdicts)}")
+        print(f"false pos  {sum(len(v.false_positives) for v in ledger.verdicts)}")
+        crowded = _filter_from(7, 1024, 4, 11)
+        print(f"estimate   {estimate_items(crowded):.3f} keys behind " f"{crowded.bits_set} bits")
+        print(f"breaks     {len(breaks)}")
+        for line in breaks[:5]:
+            print(f"  - {line}")
+    return EXIT_OK if not breaks else EXIT_MISS
 
 
-def cmd_demo(args: argparse.Namespace) -> int:
-    for line in render():
-        print(line)
-    return EXIT_PRESENT
+def _command_seed(args: argparse.Namespace) -> int:
+    plan = Plan.draw(args.value)
+    first = Bloom(args.width, args.rows, args.seat)
+    second = Bloom(args.width, args.rows, args.seat)
+    for key in plan.keys:
+        first.add(key)
+    for key in stream(args.value, args.length):
+        second.add(key)
+    same = first.bits == second.bits and first.added == second.added
+    if args.json:
+        print(json.dumps({"seed": args.value, "keys": list(plan.keys)}, indent=2))
+    else:
+        head = " ".join(str(key) for key in plan.keys[:8])
+        print(f"seed       {args.value}")
+        print(f"first keys {head} ...")
+        print(f"replay     {'identical' if same else 'DIVERGED'}")
+    return EXIT_OK if same else EXIT_MISS
 
 
-def cmd_selftest(args: argparse.Namespace) -> int:
-    from . import selftest
+def _command_selftest(_args: argparse.Namespace) -> int:
+    from .selftest import run
 
-    return selftest.main()
+    report = run()
+    print(report.render())
+    return EXIT_OK if report.failed == 0 else EXIT_MISS
+
+
+def _command_demo(_args: argparse.Namespace) -> int:
+    told = stories()
+    standing = sum(story.held for story in told)
+    for story in told:
+        mark = "holds" if story.held else "FAILS"
+        print(f"  {mark:<6} {story.title}")
+        print(f"         {story.detail}")
+    print(f"stories    {standing} of {len(told)} hold")
+    return EXIT_OK if standing == len(told) else EXIT_MISS
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog=PROGRAM,
-        description="Probabilistic membership whose error rate you can measure.",
+        description=(
+            "A Bloom filter over [0, 256): add, check, report, seed, selftest, demo."
+        ),
     )
     parser.add_argument("--version", action="version", version=f"{PROGRAM} {VERSION}")
-    sub = parser.add_subparsers(dest="command", required=True)
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    create = sub.add_parser("create", help="write a new, empty filter")
-    create.add_argument("--filter", required=True, help="path of the filter file")
-    create.add_argument("--expected", type=int, required=True, help="items it must hold")
-    create.add_argument("--rate", type=float, default=0.01, help="target false-positive rate")
-    create.add_argument("--kind", choices=("bloom", "counting"), default="bloom")
-    create.add_argument("--force", action="store_true", help="replace an existing filter")
-    create.set_defaults(func=cmd_create)
+    add_parser = subparsers.add_parser("add", help="seat keys in a fresh array")
+    add_parser.add_argument("--key", action="append", default=[], required=False)
+    add_parser.add_argument("--width", type=int, default=WIDTH)
+    add_parser.add_argument("--rows", type=int, default=ROWS)
+    add_parser.add_argument("--seat", type=int, default=SEED)
+    add_parser.add_argument("--json", action="store_true")
+    add_parser.set_defaults(handler=_command_add)
 
-    add = sub.add_parser("add", help="add items to an existing filter")
-    add.add_argument("--filter", required=True)
-    add.add_argument("--item", action="append", required=True, help="repeatable")
-    add.set_defaults(func=cmd_add)
+    check_parser = subparsers.add_parser("check", help="ask one key of a seeded filter")
+    check_parser.add_argument("key")
+    check_parser.add_argument("--seed", type=int, default=7)
+    check_parser.add_argument("--width", type=int, default=WIDTH)
+    check_parser.add_argument("--rows", type=int, default=ROWS)
+    check_parser.add_argument("--seat", type=int, default=SEED)
+    check_parser.add_argument("--json", action="store_true")
+    check_parser.set_defaults(handler=_command_check)
 
-    check = sub.add_parser("check", help="ask whether an item might be present")
-    check.add_argument("--filter", required=True)
-    check.add_argument("--item", required=True)
-    check.add_argument("--json", action="store_true")
-    check.set_defaults(func=cmd_check)
+    report_parser = subparsers.add_parser("report", help="the shipped audit, counted")
+    report_parser.add_argument("--json", action="store_true")
+    report_parser.set_defaults(handler=_command_report)
 
-    info = sub.add_parser("info", help="report fill, estimate and health")
-    info.add_argument("--filter", required=True)
-    info.add_argument("--json", action="store_true")
-    info.set_defaults(func=cmd_info)
+    seed_parser = subparsers.add_parser("seed", help="the stream one seed draws")
+    seed_parser.add_argument("value", type=int)
+    seed_parser.add_argument("--length", type=int, default=LENGTH)
+    seed_parser.add_argument("--width", type=int, default=WIDTH)
+    seed_parser.add_argument("--rows", type=int, default=ROWS)
+    seed_parser.add_argument("--seat", type=int, default=SEED)
+    seed_parser.add_argument("--json", action="store_true")
+    seed_parser.set_defaults(handler=_command_seed)
 
-    sized = sub.add_parser("sized", help="print the bits and hashes a budget needs")
-    sized.add_argument("--expected", type=int, required=True)
-    sized.add_argument("--rate", type=float, default=0.01)
-    sized.add_argument("--json", action="store_true")
-    sized.set_defaults(func=cmd_sized)
+    selftest_parser = subparsers.add_parser("selftest", help="the invariants")
+    selftest_parser.set_defaults(handler=_command_selftest)
 
-    demo = sub.add_parser("demo", help="run the five measurements")
-    demo.set_defaults(func=cmd_demo)
-
-    selftest = sub.add_parser("selftest", help="check the filter against its own claims")
-    selftest.set_defaults(func=cmd_selftest)
+    demo_parser = subparsers.add_parser("demo", help="the claims, computed live")
+    demo_parser.set_defaults(handler=_command_demo)
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
-    args = parser.parse_args(argv)
     try:
-        return args.func(args)
-    except (BloomFilterError, UsageError) as error:
-        print(f"{PROGRAM}: error: {error}", file=sys.stderr)
+        args = parser.parse_args(argv)
+    except SystemExit as exit_request:  # --version and --help end the run here
+        return int(exit_request.code or 0)
+    try:
+        return int(args.handler(args))
+    except (
+        BloomError,
+        StreamError,
+        UniverseError,
+    ) as error:
+        print(f"{PROGRAM}: {error}", file=sys.stderr)
         return EXIT_UNUSABLE
     except OSError as error:
-        print(f"{PROGRAM}: error: {error}", file=sys.stderr)
+        print(f"{PROGRAM}: {error}", file=sys.stderr)
         return EXIT_UNUSABLE

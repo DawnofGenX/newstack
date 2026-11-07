@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-lz77` — LZ77 over lowercase text: the read hands back the letters the write was sent on shipped and seeded corpora, every back-reference names letters the window already emitted, and a repeat never costs more tokens than letters.
+- `python-bloom-filter` — A Bloom filter whose added keys are always answered present: the shipped audit re-asks every key after every update on seeded streams, the survey lists the liars at the shipped widths (none), and the rows are deterministic multiplicative hashes.
 - `python-z-function` — The Z-array over lowercase words: the array equals the naive per-position LCP scan on seeded corpora, the concatenated occurrences equal the naive scan's starts, and z[0], the single letter, and the empty word stay honest.
 - `python-rabin-karp` — Rabin-Karp over lowercase text: the scan's start list equals the naive scan's on seeded corpora, the roll equals a fresh weigh on shipped windows, and collisions stay honest under a letter-check.
 - `python-count-min` — A count-min sketch over [0, 256): the min of rows never dips under the ledger truth on seeded streams, the audit runs after every update, and the shipped grid answers its corpora exactly.

@@ -1,269 +1,257 @@
-"""Every claim the README makes, checked in one process."""
+"""Every claim this filter promises, run against the real modules.
+
+The promises are few and hard: a key added is always answered
+present — after *every* update on the seeded streams — and the
+survey at the shipped widths lists exactly the keys that lie. Same
+seed, same answers. Runnable in a fresh checkout:
+`python -m the-package selftest`.
+"""
 
 from __future__ import annotations
 
-import contextlib
-import io
-import json
-import math
-import tempfile
-from collections.abc import Callable
-from pathlib import Path
-from typing import Any
+from dataclasses import dataclass, field
 
-from . import bloom as core
-from .bloom import Bloom, BloomFilterError, CountingBloom, parse_filter, sized_for
+from . import demo
+from .audit import (
+    COLLISIONS_AT_DEFAULTS,
+    CONFIGS,
+    RECHECKS,
+    AuditError,
+    estimate_items,
+    run_stream,
+    shipped_audit,
+)
+from .bloom import (
+    ROWS,
+    SEED,
+    WIDTH,
+    Bloom,
+    BloomError,
+)
 from .cli import main as cli_main
-from .measure import false_negatives, false_positive_rate
+from .hashing import (
+    LARGE,
+    multiplier,
+    row_index,
+    rows_for,
+)
+from .stream import (
+    FIXTURE,
+    LENGTH,
+    Plan,
+    StreamError,
+    load_fixture,
+    stream,
+    write_fixture,
+)
+from .universe import (
+    UNIVERSE,
+    UniverseError,
+    describe,
+    ensure_key,
+    ensure_seed,
+    parse_key,
+)
 
-PASSED: list[str] = []
-
-
-def check(name: str, condition: bool, detail: str = "") -> None:
-    if not condition:
-        raise SystemExit(f"selftest: FAILED {name}" + (f" ({detail})" if detail else ""))
-    PASSED.append(name)
-
-
-def equal(name: str, actual: object, expected: object) -> None:
-    check(name, actual == expected, f"{actual!r} != {expected!r}")
-
-
-def refuses(name: str, call: Callable[[], Any], needle: str = "") -> None:
-    try:
-        call()
-    except BloomFilterError as error:
-        check(name, needle in str(error), f"{error} does not contain {needle!r}")
-        return
-    raise SystemExit(f"selftest: FAILED {name} (it did not raise)")
-
-
-def _quiet(call: Callable[[], Any]) -> tuple[Any, str]:
-    buffer = io.StringIO()
-    with contextlib.redirect_stdout(buffer), contextlib.redirect_stderr(buffer):
-        value = call()
-    return value, buffer.getvalue()
+KEYS = (0, 1, 7, 64, 127, 128, 200, 255)
 
 
-def _filled(count: int, rate: float = 0.01, prefix: str = "present") -> Bloom:
-    sizing = sized_for(count, rate)
-    bloom = Bloom(sizing.m_bits, sizing.k_hashes)
-    for number in range(count):
-        bloom.add(f"{prefix}-{number}")
-    return bloom
+@dataclass
+class Report:
+    checks: int = 0
+    failed: int = 0
+    lines: list[str] = field(default_factory=list)
 
+    def section(self, name: str) -> None:
+        self.lines.append(f"- {name}")
 
-def _sharing_pair(bloom: Bloom) -> tuple[str, str]:
-    seen: dict[int, str] = {}
-    for number in range(1_000):
-        item = f"candidate-{number}"
-        for position in bloom.positions(item):
-            other = seen.get(position)
-            if other is not None:
-                return other, item
-            seen[position] = item
-    raise SystemExit("selftest: FAILED could not find a sharing pair")
+    def ok(self, claim: str, held: bool) -> None:
+        self.checks += 1
+        if held:
+            self.lines.append(f"  ok   {claim}")
+        else:
+            self.failed += 1
+            self.lines.append(f"  FAIL {claim}")
 
-
-def _sizing_checks() -> None:
-    sizing = sized_for(1_000, 0.01)
-    equal("the textbook size is 9586 bits", sizing.m_bits, 9_586)
-    equal("the optimum hash count is 7", sizing.k_hashes, 7)
-    check("bits per item is near 9.59", abs(sizing.bits_per_item - 9.586) < 0.001)
-    check(
-        "the predicted rate is within 5% of the target",
-        abs(sizing.predicted_rate - 0.01) < 0.0005,
-        f"{sizing.predicted_rate:.6f}",
-    )
-    check("a tighter rate needs more bits", sized_for(1_000, 0.001).m_bits > sizing.m_bits)
-    check("more items need more bits", sized_for(5_000, 0.01).m_bits > sizing.m_bits)
-    optimum = sizing.m_bits / sizing.expected * math.log(2)
-    check("the hash count is the rounded optimum", abs(sizing.k_hashes - optimum) <= 0.5)
-    text = "\n".join(sizing.lines())
-    check("the report names the bits", "bits        9586" in text)
-    check("the report names the hashes", "hashes      7" in text)
-    refuses("a zero item count is refused", lambda: sized_for(0, 0.01), "at least 1")
-    refuses("a negative item count is refused", lambda: sized_for(-3, 0.01), "at least 1")
-    refuses("a boolean item count is refused", lambda: sized_for(True, 0.01), "not an integer")
-    refuses("a rate of zero is refused", lambda: sized_for(10, 0.0), "between 0 and 1")
-    refuses("a rate of one is refused", lambda: sized_for(10, 1.0), "between 0 and 1")
-    refuses("a negative rate is refused", lambda: sized_for(10, -0.5), "between 0 and 1")
-
-
-def _guarantee_checks() -> None:
-    bloom = _filled(2_000)
-    items = [f"present-{number}" for number in range(2_000)]
-    equal("nothing that was added is reported absent", false_negatives(bloom, items), [])
-    check(
-        "capacity leaves the filter about half full",
-        0.45 < bloom.fill() < 0.6,
-        f"{bloom.fill():.4f}",
-    )
-    estimate = bloom.estimate_items()
-    check(
-        "the estimate is near the real count",
-        estimate is not None and 1_600 < estimate < 2_500,
-        f"{estimate}",
-    )
-    measured = false_positive_rate(bloom, 20_000)
-    predicted = bloom.predict_rate()
-    check(
-        "the measured rate tracks the predicted one",
-        abs(measured - predicted) < 0.003,
-        f"measured {measured:.4f} predicted {predicted:.4f}",
-    )
-    check("the measured rate is near the 1% target", 0.002 < measured < 0.02, f"{measured:.4f}")
-    equal("a filter at its design capacity is not saturated", bloom.is_saturated(), False)
-
-
-def _structure_checks() -> None:
-    bloom = Bloom(1_024, 4)
-    equal("an empty filter has no bits set", bloom.bits_set(), 0)
-    equal("an empty filter answers no", bloom.might_contain("alpha"), False)
-    equal("the first add sets every hash position", len(bloom.add("alpha")), 4)
-    equal("re-adding sets nothing new", bloom.add("alpha"), ())
-    equal("the bit count matches the hash count", bloom.bits_set(), 4)
-    check(
-        "every position is inside the array",
-        all(0 <= position < 1_024 for position in bloom.positions("alpha")),
-    )
-    equal(
-        "the same items always produce the same bits",
-        _filled(100).as_dict(),
-        _filled(100).as_dict(),
-    )
-    padded = Bloom(3, 1, b"\xff")
-    equal("padding bits are not counted", padded.bits_set(), 3)
-    equal("a padded filter is full", padded.fill(), 1.0)
-    equal("a full filter has no estimate", padded.estimate_items(), None)
-    equal("a full filter is saturated", padded.is_saturated(), True)
-
-
-def _removal_checks() -> None:
-    naive = Bloom(4_096, 3)
-    counting = CountingBloom(4_096, 3)
-    keeper, dropped = _sharing_pair(naive)
-    for bloom in (naive, counting):
-        bloom.add(keeper)
-        bloom.add(dropped)
-    naive.clear(dropped)
-    counting.remove(dropped)
-    equal("clearing a bit makes another item vanish", naive.might_contain(keeper), False)
-    equal("a counter survives the same removal", counting.might_contain(keeper), True)
-    equal("the removed item is gone", counting.might_contain(dropped), False)
-    refuses(
-        "removing an item that was never added is refused",
-        lambda: counting.remove("ghost"),
-        "no record of the add",
-    )
-    saturating = CountingBloom(8, 1)
-    for _ in range(core.SATURATION + 5):
-        saturating.add("same")
-    equal("counters stop at 255", saturating.saturated_positions(), 1)
-    encoded = str(saturating.as_dict()["counters"])
-    check("saturation is visible in the encoding", encoded.startswith("ff"))
-
-
-def _state_checks() -> None:
-    original = _filled(300)
-    rebuilt = parse_filter(json.loads(json.dumps(original.as_dict())))
-    equal("a plain filter survives JSON", rebuilt.as_dict(), original.as_dict())
-    equal("the rebuilt filter answers the same", rebuilt.might_contain("present-42"), True)
-    counting = CountingBloom(512, 3)
-    counting.add("alpha")
-    round_trip = parse_filter(counting.as_dict())
-    equal("a counting filter survives JSON", round_trip.as_dict(), counting.as_dict())
-    check("the round trip keeps its type", isinstance(round_trip, CountingBloom))
-    refuses("a non-object payload is refused", lambda: parse_filter([]), "JSON object")
-    refuses(
-        "an unknown type is refused",
-        lambda: parse_filter({"type": "sieve"}),
-        "unknown filter type",
-    )
-    refuses(
-        "a missing bit count is refused",
-        lambda: parse_filter({"type": "bloom", "k_hashes": 3, "bits": ""}),
-        "has no m_bits",
-    )
-    refuses(
-        "a short bit array is refused",
-        lambda: parse_filter({"type": "bloom", "m_bits": 16, "k_hashes": 2, "bits": "00"}),
-        "holds 1 byte",
-    )
-    refuses(
-        "a non-hex bit array is refused",
-        lambda: parse_filter({"type": "bloom", "m_bits": 8, "k_hashes": 2, "bits": "zz"}),
-        "not hexadecimal",
-    )
-    refuses(
-        "a short counter array is refused",
-        lambda: parse_filter(
-            {"type": "counting-bloom", "m_bits": 8, "k_hashes": 1, "counters": "0000"}
-        ),
-        "holds 2 counter",
-    )
-    refuses("a zero bit count is refused", lambda: Bloom(0, 1), "at least 1")
-    refuses("a zero hash count is refused", lambda: Bloom(8, 0), "at least 1")
-
-
-def _cli_checks() -> None:
-    with tempfile.TemporaryDirectory() as directory:
-        path = Path(directory) / "items.json"
-        code, out = _quiet(
-            lambda: cli_main(["create", "--filter", str(path), "--expected", "100"])
+    def equal(self, claim: str, found: object, expected: object) -> None:
+        self.ok(
+            f"{claim} ({found!r})" if found == expected else f"{claim}: {found!r} != {expected!r}",
+            found == expected,
         )
-        equal("create exits zero", code, 0)
-        check("create names the file", "created" in out)
-        code, _ = _quiet(lambda: cli_main(["check", "--filter", str(path), "--item", "alpha"]))
-        equal("an empty filter says absent", code, 1)
-        code, _ = _quiet(
-            lambda: cli_main(["add", "--filter", str(path), "--item", "alpha"])
-        )
-        equal("add exits zero", code, 0)
-        code, out = _quiet(
-            lambda: cli_main(["check", "--filter", str(path), "--item", "alpha"])
-        )
-        equal("an added item is present", code, 0)
-        check("the answer says maybe", "maybe: false positives are possible" in out)
-        code, out = _quiet(
-            lambda: cli_main(["check", "--filter", str(path), "--item", "alpha", "--json"])
-        )
-        check("json carries the answer", '"present": true' in out)
-        code, out = _quiet(lambda: cli_main(["info", "--filter", str(path)]))
-        equal("info exits zero on a healthy filter", code, 0)
-        check("info reports healthy", "healthy" in out)
-        code, _ = _quiet(
-            lambda: cli_main(["create", "--filter", str(path), "--expected", "5"])
-        )
-        equal("a second create is refused", code, 2)
-        code, _ = _quiet(
-            lambda: cli_main(["check", "--filter", str(path) + ".gone", "--item", "x"])
-        )
-        equal("a missing filter is a usage error", code, 2)
-        code, _ = _quiet(
-            lambda: cli_main(["create", "--filter", str(path), "--expected", "0", "--force"])
-        )
-        equal("a zero expected count is a usage error", code, 2)
-        code, out = _quiet(lambda: cli_main(["sized", "--expected", "1000", "--rate", "0.01"]))
-        equal("sized exits zero", code, 0)
-        check("sized prints the bits", "bits        9586" in out)
-        code, out = _quiet(lambda: cli_main(["demo"]))
-        equal("demo exits zero", code, 0)
-        check("the demo shows removal failing", "removal is where the guarantee dies" in out)
-        check("the demo shows saturation", "saturation is the failure mode" in out)
+
+    def refuses(self, claim: str, call: object, error: type[Exception]) -> None:
+        try:
+            call()  # type: ignore[operator]
+        except error as seen:
+            self.ok(f"{claim} ({seen})", True)
+        except Exception as seen:
+            self.ok(f"{claim}: raised {type(seen).__name__}, not {error.__name__}", False)
+        else:
+            self.ok(f"{claim}: nothing raised", False)
+
+    def render(self) -> str:
+        tail = f"selftest: {self.checks - self.failed} checks passed, {self.failed} failed"
+        return "\n".join((*self.lines, "", tail))
 
 
-def main() -> int:
-    PASSED.clear()
-    _sizing_checks()
-    _guarantee_checks()
-    _structure_checks()
-    _removal_checks()
-    _state_checks()
-    _cli_checks()
-    print(f"selftest: {len(PASSED)} checks passed")
-    return 0
+def _gate(report: Report) -> None:
+    report.section("the gate keeps [0, 256) in and everything else out")
+    for key in KEYS:
+        report.equal(f"{key} is a key", ensure_key(key), key)
+    report.equal("text digits become a key", parse_key("42"), 42)
+    report.equal("a key prints padded", describe(7), "  7")
+    report.equal("a seed is its own", ensure_seed(0), 0)
+    report.refuses("256 leaves the universe", lambda: ensure_key(256), UniverseError)
+    report.refuses("a negative is no key", lambda: ensure_key(-1), UniverseError)
+    report.refuses("a float is no key", lambda: ensure_key(7.0), UniverseError)
+    report.refuses("True is no key", lambda: ensure_key(True), UniverseError)
+    report.refuses("'x' is no key text", lambda: parse_key("x"), UniverseError)
+    report.refuses("a negative seed is no seed", lambda: ensure_seed(-3), UniverseError)
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+def _rows(report: Report) -> None:
+    report.section("the rows are the family's arithmetic: multiply, fold, seat")
+    for row in range(ROWS):
+        mul = multiplier(row, SEED)
+        report.ok(f"row {row} multiplier is odd", bool(mul & 1))
+        report.ok(f"row {row} multiplier fits the fold", mul < LARGE)
+    report.ok(
+        "multipliers are distinct",
+        len({multiplier(row, SEED) for row in range(ROWS)}) == ROWS,
+    )
+    seats = rows_for(200, WIDTH, ROWS, SEED)
+    report.equal("a seating has one seat per row", len(seats), ROWS)
+    report.ok("every seat is inside the width", all(0 <= seat < WIDTH for seat in seats))
+    report.equal("the seating replays", rows_for(200, WIDTH, ROWS, SEED), seats)
+    report.equal("the fold is final at the ceiling", row_index(255, 8, 3, 0) < 8, True)
+
+
+def _array(report: Report) -> None:
+    report.section("add seats, might_contain asks, audit re-asks every key")
+    bloom = Bloom()
+    for key in KEYS:
+        fresh = bloom.add(key)
+        report.ok(f"{key} answers present once added", bloom.might_contain(key))
+        report.ok(f"{key} raised no more than its rows", 0 <= fresh <= ROWS)
+    report.equal("the audit names no break", bloom.audit(), [])
+    report.equal("the added list keeps every key", len(bloom.added), len(KEYS))
+    report.equal("re-adding stores no twin", len({key for key in bloom.added}), len(KEYS))
+    twin = Bloom(bloom.width, bloom.rows, bloom.seed, bloom.bits, tuple(bloom.added))
+    report.equal("a twin from the pattern agrees", twin.bits, bloom.bits)
+    report.refuses("a broken width is no array", lambda: Bloom(width=7), BloomError)
+    report.refuses("a runaway width is no array", lambda: Bloom(width=100_000), BloomError)
+    report.refuses("rows beyond the ceiling are refused", lambda: Bloom(rows=17), BloomError)
+    report.refuses(
+        "bits past the width are refused", lambda: Bloom(width=8, bits=256), BloomError
+    )
+
+
+def _streams(report: Report) -> None:
+    report.section("the stream is seeded arithmetic: same seed, same answers")
+    report.equal("the stream replays", stream(7), stream(7))
+    report.equal("the stream is the shipped length", len(stream(7)), LENGTH)
+    report.ok("the stream draws distinct keys", len(set(stream(7))) == LENGTH)
+    report.ok("every key is in the universe", all(0 <= k < UNIVERSE for k in stream(7)))
+    plan = Plan.draw(9)
+    report.equal("a plan carries its seed", plan.seed, 9)
+    report.equal("a plan carries its keys", plan.keys, stream(9))
+    report.refuses("zero keys is no stream", lambda: stream(7, 0), StreamError)
+    report.refuses("257 keys leave the universe", lambda: stream(7, 257), StreamError)
+
+
+def _audit(report: Report) -> None:
+    report.section("the shipped audit: zero false negatives, list in hand")
+    ledger = shipped_audit()
+    report.equal("every config and stream was run", len(ledger.verdicts), len(CONFIGS) * 5)
+    report.equal("the re-asks are all booked", ledger.checks, RECHECKS)
+    report.equal("the audit broke on nothing", ledger.breaks, [])
+    for verdict in ledger.verdicts:
+        if not verdict.clean:
+            report.ok(f"{verdict.config}/{verdict.seed} lies", False)
+            return
+    report.ok("every verdict is clean", True)
+    report.ok("the collision count is the counted edge", COLLISIONS_AT_DEFAULTS > 0)
+    quiet = run_stream("quiet", WIDTH, ROWS, SEED, Plan(seed=5, keys=(1, 2)))
+    report.equal("a two-key plan re-asks three times", quiet.rechecks, 3)
+    report.refuses(
+        "a one-key plan audits nothing",
+        lambda: run_stream("x", 8, 1, 1, Plan(seed=1, keys=(1,))),
+        AuditError,
+    )
+    crowded = Bloom(WIDTH, ROWS, SEED)
+    for key in stream(7):
+        crowded.add(key)
+    estimate = estimate_items(crowded)
+    report.ok(f"the estimator lands near 32 keys ({estimate:.2f})", abs(estimate - 32) < 2.0)
+
+
+def _fixture(report: Report) -> None:
+    report.section("the frozen streams replay the arithmetic")
+    plans = load_fixture(FIXTURE)
+    report.equal("the fixture froze five streams", len(plans), 5)
+    for plan in plans:
+        report.equal(f"stream {plan.seed} replays frozen", plan.keys, stream(plan.seed))
+    report.refuses(
+        "a missing fixture is named",
+        lambda: load_fixture(f"{FIXTURE}.missing"),
+        StreamError,
+    )
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as room:
+        path = f"{room}/streams.txt"
+        write_fixture(path, plans)
+        report.equal("a written fixture reads back", load_fixture(path), plans)
+
+
+def _edge(report: Report) -> None:
+    report.section("the honest edge: yes may lie, no never does")
+    bloom = Bloom(64, 4, 7)
+    for key in stream(7, 8):
+        bloom.add(key)
+    edge = bloom.survey()
+    report.ok("a crowded small array has liars", len(edge) > 0)
+    for key in edge:
+        report.ok(f"liar {key} is not added", key not in bloom.added)
+        report.ok(f"liar {key} answers present", bloom.might_contain(key))
+    absent_liar = edge[0]
+    clear = bloom.first_clear_row(absent_liar) if edge else None
+    report.equal("a liar has no clear row", clear if edge else None, None)
+    honest = Bloom(64, 4, 7)
+    report.equal("an empty array surveys no liars", honest.survey(), [])
+    honest.add(3)
+    report.equal("one key still answers honestly", honest.audit(), [])
+
+
+def _cli(report: Report) -> None:
+    report.section("the command line keeps the promise visible")
+    report.equal("add exits zero", cli_main(["add", "--key", "7", "--key", "42"]), 0)
+    report.equal("a seeded key checks present", cli_main(["check", "165"]), 0)
+    report.equal("an unseen key checks absent", cli_main(["check", "1"]), 1)
+    report.equal("the shipped audit reports clean", cli_main(["report"]), 0)
+    report.equal("a seed replays", cli_main(["seed", "7"]), 0)
+    report.equal("the demo stands", cli_main(["demo"]), 0)
+    report.equal("help exits zero", cli_main(["--help"]), 0)
+    report.equal("a text key exits as unusable", cli_main(["check", "x"]), 2)
+
+
+def _stories(report: Report) -> None:
+    report.section("the stories the tool tells")
+    told = demo.stories()
+    report.ok("every story is told", len(told) >= 5)
+    for story in told:
+        report.ok(f"{story.title}: all checks hold", story.held)
+
+
+def run() -> Report:
+    report = Report()
+    _gate(report)
+    _rows(report)
+    _array(report)
+    _streams(report)
+    _audit(report)
+    _fixture(report)
+    _edge(report)
+    _cli(report)
+    _stories(report)
+    return report

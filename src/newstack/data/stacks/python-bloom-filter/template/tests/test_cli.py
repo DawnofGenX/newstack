@@ -1,105 +1,95 @@
-from pathlib import Path
+"""The command line: one question per run, the exit code keeps the promise."""
+
+from __future__ import annotations
 
 import pytest
 
-from {{ package_name }}.cli import main
+from {{ package_name }}.cli import (
+    EXIT_MISS,
+    EXIT_OK,
+    EXIT_UNUSABLE,
+    VERSION,
+    main,
+)
 
 
-def make(tmp_path: Path, *extra: str) -> Path:
-    path = tmp_path / "items.json"
-    code = main(["create", "--filter", str(path), "--expected", "100", *extra])
-    assert code == 0
-    return path
+def test_the_version_exits_zero(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["--version"]) == EXIT_OK
+    assert VERSION in capsys.readouterr().out
 
 
-def test_an_item_that_was_added_is_present_and_one_that_was_not_is_absent(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+def test_help_lists_the_questions(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["--help"]) == EXIT_OK
+    listed = capsys.readouterr().out
+    for command in ("add", "check", "report", "seed", "selftest", "demo"):
+        assert command in listed
+
+
+def test_add_seats_and_the_audit_stays_silent(
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
-    path = make(tmp_path)
-    assert main(["check", "--filter", str(path), "--item", "alpha"]) == 1
-    assert main(["add", "--filter", str(path), "--item", "alpha"]) == 0
-    assert main(["check", "--filter", str(path), "--item", "alpha"]) == 0
-    assert "maybe: false positives are possible" in capsys.readouterr().out
+    assert main(["add", "--key", "7", "--key", "42"]) == EXIT_OK
+    said = capsys.readouterr().out
+    assert "added      7 42" in said
+    assert "audit      0 breaks" in said
 
 
-def test_check_says_absent_definitely(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    path = make(tmp_path)
-    assert main(["check", "--filter", str(path), "--item", "beta"]) == 1
-    assert "definite" in capsys.readouterr().out
+def test_a_seeded_key_checks_present(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["check", "165"]) == EXIT_OK
+    assert "present" in capsys.readouterr().out
 
 
-def test_check_can_answer_in_json(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+def test_an_unseen_key_checks_absent(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["check", "1"]) == EXIT_MISS
+    assert "absent" in capsys.readouterr().out
+
+
+def test_the_shipped_audit_reports_clean(
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
-    path = make(tmp_path)
-    main(["add", "--filter", str(path), "--item", "alpha"])
-    capsys.readouterr()
-    assert main(["check", "--filter", str(path), "--item", "alpha", "--json"]) == 0
-    assert capsys.readouterr().out.strip() == '{"item": "alpha", "present": true}'
+    assert main(["report"]) == EXIT_OK
+    said = capsys.readouterr().out
+    assert "false neg  0" in said
+    assert "false pos  0" in said
+    assert "breaks     0" in said
 
 
-def test_info_reports_a_healthy_filter(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    path = make(tmp_path)
-    main(["add", "--filter", str(path), "--item", "alpha"])
-    assert main(["info", "--filter", str(path)]) == 0
-    out = capsys.readouterr().out
-    assert "verdict           healthy" in out
-    assert "hashes            7" in out
+def test_a_seed_replays(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["seed", "7"]) == EXIT_OK
+    said = capsys.readouterr().out
+    assert "replay     identical" in said
+    assert "first keys 165" in said
 
 
-def test_info_exits_one_when_the_filter_is_saturated(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    path = tmp_path / "tiny.json"
-    assert main(["create", "--filter", str(path), "--expected", "1"]) == 0
-    for number in range(200):
-        main(["add", "--filter", str(path), "--item", f"item-{number}"])
-    capsys.readouterr()
-    assert main(["info", "--filter", str(path)]) == 1
-    assert "saturated" in capsys.readouterr().out
+def test_the_stories_stand(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["demo"]) == EXIT_OK
+    assert "6 of 6 hold" in capsys.readouterr().out
 
 
-def test_creating_twice_needs_force(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    path = make(tmp_path)
-    assert main(["create", "--filter", str(path), "--expected", "10"]) == 2
-    assert "--force" in capsys.readouterr().err
-    assert main(["create", "--filter", str(path), "--expected", "10", "--force"]) == 0
+def test_the_invariants_hold(capsys: pytest.CaptureFixture[str]) -> None:
+    assert main(["selftest"]) == EXIT_OK
+    assert "0 failed" in capsys.readouterr().out
 
 
-def test_a_missing_filter_names_the_fix(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    missing = tmp_path / "nope.json"
-    assert main(["check", "--filter", str(missing), "--item", "alpha"]) == 2
-    assert "create one with" in capsys.readouterr().err
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["check", "x"],
+        ["check", "256"],
+        ["check", "-1"],
+        ["check", "7", "--width", "7"],
+        ["add"],
+        ["seed", "-3"],
+    ],
+)
+def test_strangers_leave_the_arguments(argv: list[str]) -> None:
+    assert main(argv) == EXIT_UNUSABLE
 
 
-def test_a_bad_rate_is_a_usage_error(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    path = tmp_path / "bad.json"
-    assert main(["create", "--filter", str(path), "--expected", "10", "--rate", "0"]) == 2
-    assert "between 0 and 1" in capsys.readouterr().err
+def test_json_rides_on_the_report(capsys: pytest.CaptureFixture[str]) -> None:
+    import json
 
-
-def test_sized_prints_the_budget(capsys: pytest.CaptureFixture[str]) -> None:
-    assert main(["sized", "--expected", "1000", "--rate", "0.01"]) == 0
-    out = capsys.readouterr().out
-    assert "bits        9586 (9.59 per item)" in out
-    capsys.readouterr()
-    assert main(["sized", "--expected", "1000", "--json"]) == 0
-    assert '"m_bits": 9586' in capsys.readouterr().out
-
-
-def test_demo_runs_and_reports_the_guarantee(capsys: pytest.CaptureFixture[str]) -> None:
-    assert main(["demo"]) == 0
-    out = capsys.readouterr().out
-    assert "no false negatives" in out
-    assert "removal is where the guarantee dies" in out
-
-
-def test_selftest_passes(capsys: pytest.CaptureFixture[str]) -> None:
-    assert main(["selftest"]) == 0
-    assert "checks passed" in capsys.readouterr().out
+    assert main(["report", "--json"]) == EXIT_OK
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["checks"] == 7920
+    assert all(not v["false_negatives"] for v in payload["verdicts"])

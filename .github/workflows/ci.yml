@@ -140,6 +140,8 @@ jobs:
           - python-count-min
           - python-rabin-karp
           - python-z-function
+          - python-bloom-filter
+          - python-lz77
           - python-treap
           - python-rope
           - python-graceful-shutdown

@@ -1,112 +1,119 @@
-import json
+"""The array's promise: added keys answer present, always, one way only."""
+
+from __future__ import annotations
 
 import pytest
 
-from {{ package_name }} import bloom as subject
+from {{ package_name }}.bloom import (
+    MAX_ROWS,
+    MAX_WIDTH,
+    ROWS,
+    SEED,
+    WIDTH,
+    Bloom,
+    BloomError,
+)
+from {{ package_name }}.universe import UNIVERSE
+
+KEYS = (0, 1, 7, 64, 127, 128, 200, 255)
 
 
-def filled(count: int = 500) -> subject.Bloom:
-    sizing = subject.sized_for(count, 0.01)
-    bloom = subject.Bloom(sizing.m_bits, sizing.k_hashes)
-    for number in range(count):
-        bloom.add(f"present-{number}")
-    return bloom
+def test_an_added_key_is_never_answered_absent() -> None:
+    bloom = Bloom()
+    for key in KEYS:
+        bloom.add(key)
+        assert bloom.might_contain(key)
+    assert bloom.audit() == []
 
 
-def test_nothing_that_was_added_is_ever_reported_absent() -> None:
-    bloom = filled(2_000)
-    items = [f"present-{number}" for number in range(2_000)]
-    assert [item for item in items if not bloom.might_contain(item)] == []
+def test_add_reports_its_fresh_bits_within_the_rows() -> None:
+    bloom = Bloom()
+    for key in KEYS:
+        assert 0 <= bloom.add(key) <= ROWS
 
 
-def test_an_empty_filter_answers_no_to_everything() -> None:
-    bloom = subject.Bloom(64, 3)
-    assert not bloom.might_contain("anything")
-    assert bloom.fill() == 0.0
-    assert bloom.predict_rate() == 0.0
-    assert bloom.estimate_items() == 0.0
+def test_re_adding_changes_nothing_but_stores_no_twin() -> None:
+    bloom = Bloom()
+    for key in KEYS:
+        bloom.add(key)
+    bits = bloom.bits
+    for key in KEYS:
+        bloom.add(key)
+    assert bloom.bits == bits
+    assert len(bloom.added) == len(set(bloom.added)) == len(KEYS)
 
 
-def test_adding_the_same_item_twice_sets_nothing_the_second_time() -> None:
-    bloom = subject.Bloom(1_024, 4)
-    first = bloom.add("alpha")
-    assert len(first) == 4
-    assert bloom.add("alpha") == ()
-    assert bloom.bits_set() == 4
+def test_absence_points_at_a_row_never_raised() -> None:
+    bloom = Bloom(64, 4, 7)
+    for key in range(256):
+        if not bloom.might_contain(key):
+            row = bloom.first_clear_row(key)
+            assert row is not None
 
 
-def test_the_same_items_always_produce_the_same_bits() -> None:
-    assert filled(200).as_dict() == filled(200).as_dict()
+def test_the_lie_runs_one_way_only() -> None:
+    bloom = Bloom(64, 4, 7)
+    for key in (165, 242, 38, 101):
+        bloom.add(key)
+    for key in bloom.survey():
+        assert key not in bloom.added
+        assert bloom.might_contain(key)
+        assert bloom.first_clear_row(key) is None
 
 
-def test_padding_bits_beyond_the_last_position_are_not_counted() -> None:
-    bloom = subject.Bloom(3, 1, b"\xff")
-    assert bloom.bits_set() == 3
-    assert bloom.fill() == 1.0
+def test_the_pattern_round_trips_through_a_file() -> None:
+    bloom = Bloom()
+    for key in KEYS:
+        bloom.add(key)
+    twin = Bloom.from_dict(bloom.as_dict())
+    assert twin.bits == bloom.bits
+    assert twin.added == bloom.added
+    assert twin.audit() == []
 
 
-def test_the_estimate_inverts_the_formula() -> None:
-    bloom = filled(1_000)
-    estimate = bloom.estimate_items()
-    assert estimate is not None
-    assert estimate == pytest.approx(1_000, rel=0.25)
-
-
-def test_a_full_filter_has_no_invertible_estimate() -> None:
-    bloom = subject.Bloom(8, 1, b"\xff")
-    assert bloom.estimate_items() is None
-    assert bloom.is_saturated()
-    assert bloom.predict_rate() == 1.0
-
-
-def sharing_pair(bloom: subject.Bloom) -> tuple[str, str]:
-    """A pair that shares at least one position, so a clear can break the other."""
-    for number in range(500):
-        keeper, dropped = f"keep-{number}", f"drop-{number}"
-        if set(bloom.positions(keeper)) & set(bloom.positions(dropped)):
-            return keeper, dropped
-    raise AssertionError("no sharing pair in 500 candidates at this size")
-
-
-def test_clearing_the_bits_of_one_item_can_make_another_disappear() -> None:
-    bloom = subject.Bloom(256, 3)
-    keeper, dropped = sharing_pair(bloom)
-    bloom.add(keeper)
-    bloom.add(dropped)
-    bloom.clear(dropped)
-    assert not bloom.might_contain(keeper), "the guarantee is gone after a clear"
-
-
-def test_a_position_is_always_inside_the_array() -> None:
-    bloom = subject.Bloom(97, 5)
-    for position in bloom.positions("anything"):
-        assert 0 <= position < 97
-
-
-def test_a_filter_survives_a_json_round_trip() -> None:
-    original = filled(300)
-    rebuilt = subject.parse_filter(json.loads(json.dumps(original.as_dict())))
-    assert rebuilt.as_dict() == original.as_dict()
-    assert rebuilt.might_contain("present-42")
+def test_a_broken_file_is_named_not_guessed() -> None:
+    with pytest.raises(BloomError):
+        Bloom.from_dict({})
+    with pytest.raises(BloomError):
+        Bloom.from_dict("nope")
 
 
 @pytest.mark.parametrize(
-    ("payload", "message"),
+    "kwargs",
     [
-        ([], "a stored filter is a JSON object"),
-        ({"type": "sieve"}, "unknown filter type"),
-        ({"type": "bloom", "k_hashes": 3, "bits": ""}, "has no m_bits"),
-        ({"type": "bloom", "m_bits": 16, "k_hashes": 2}, "has no bit array"),
-        ({"type": "bloom", "m_bits": 16, "k_hashes": 2, "bits": "00"}, "holds 1 byte"),
-        ({"type": "bloom", "m_bits": 8, "k_hashes": 2, "bits": "zz"}, "not hexadecimal"),
+        {"width": 7},
+        {"width": MAX_WIDTH + 1},
+        {"rows": 0},
+        {"rows": MAX_ROWS + 1},
+        {"width": 8, "bits": 256},
+        {"width": 8, "bits": -1},
     ],
 )
-def test_a_stored_filter_that_cannot_be_used_is_refused(payload: object, message: str) -> None:
-    with pytest.raises(subject.BloomFilterError, match=message):
-        subject.parse_filter(payload)
+def test_the_shape_is_documented_and_policed(kwargs: dict[str, int]) -> None:
+    with pytest.raises(BloomError):
+        Bloom(**kwargs)
 
 
-@pytest.mark.parametrize(("m_bits", "k_hashes"), [(0, 1), (8, 0), (True, 1), (8, 1.5)])
-def test_impossible_parameters_are_refused(m_bits: object, k_hashes: object) -> None:
-    with pytest.raises(subject.BloomFilterError):
-        subject.Bloom(m_bits, k_hashes)  # type: ignore[arg-type]
+def test_a_negative_seat_seed_leaves_before_the_shape() -> None:
+    from {{ package_name }}.universe import UniverseError
+
+    with pytest.raises(UniverseError):
+        Bloom(seed=-1)
+
+
+def test_the_shipped_shape_is_the_documented_one() -> None:
+    bloom = Bloom()
+    assert (bloom.width, bloom.rows, bloom.seed) == (WIDTH, ROWS, SEED) == (1024, 4, 11)
+
+
+def test_the_empty_array_asks_nothing_and_hides_nothing() -> None:
+    bloom = Bloom()
+    assert bloom.survey() == []
+    assert bloom.bits_set == 0
+    assert not bloom.might_contain(0)
+
+
+def test_the_whole_universe_seats_inside_the_documented_width() -> None:
+    bloom = Bloom()
+    for key in range(UNIVERSE):
+        assert all(0 <= seat < bloom.width for seat in bloom.seats_of(key))
