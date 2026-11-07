@@ -125,6 +125,8 @@ jobs:
           - python-fenwick-tree
           - python-binomial-heap
           - python-prefix-trie
+          - python-kd-tree
+          - python-suffix-array
           - python-treap
           - python-rope
           - python-graceful-shutdown

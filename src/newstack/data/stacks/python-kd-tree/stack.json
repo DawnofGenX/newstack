@@ -1,0 +1,53 @@
+{
+  "name": "python-kd-tree",
+  "title": "KD-Tree",
+  "language": "python",
+  "blurb": "A 2-d kd-tree over integer point pairs: membership answers equal a set's, a rectangle answer equals the brute-force filter, the nearest answer equals the brute-force argmin with the tie on the lexicographically smallest point, and a rebuild from the in-order walk answers identically.",
+  "default_description": "A 2-d kd-tree over integer point pairs whose nearest answer equals the brute-force argmin on any seeded corpus.",
+  "requires": ["uv", "python3"],
+  "python": {"minimum": "3.12", "versions": ["3.12", "3.13"]},
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} count --points fixtures/points.txt",
+    "uv run {npm_name} has --points fixtures/points.txt 10,10",
+    "uv run {npm_name} nearest --points fixtures/points.txt 9,9",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [{ "file": "**/*.py", "contains": "a split divides, never the answer" }],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_tree.py"]
+}

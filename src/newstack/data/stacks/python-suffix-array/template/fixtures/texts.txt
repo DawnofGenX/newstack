@@ -1,0 +1,21 @@
+# one lowercase text per line; blank lines and # comments are skipped
+banana
+mississippi
+abracadabra
+ananas
+bananaanna
+mississinny
+cocomelon
+bananarama
+bananamana
+murmur
+attaboy
+doggydaddy
+pajama
+papaya
+cacaocacao
+cocococo
+tutututu
+boombox
+bananabandana
+bananabanana
