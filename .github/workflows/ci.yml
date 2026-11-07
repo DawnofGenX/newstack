@@ -129,6 +129,7 @@ jobs:
           - python-suffix-array
           - python-avl-tree
           - python-red-black-tree
+          - python-segment-tree
           - python-treap
           - python-rope
           - python-graceful-shutdown

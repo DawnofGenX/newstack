@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-segment-tree` — A segment tree over an integer array with the combine as the seam: every window answer equals the matching slice sum exactly, a rebuild from the leaf row equals the build it came from, and no query visits more than twice the bit-length of the array.
 - `python-red-black-tree` — A red-black tree over bounded integer keys: the in-order walk equals sorted of the live keys after every op, and a shipped checker walking the tree verifies root black, no red father, and equal black height on every path, with remove of an absent key refused by name.
 - `python-avl-tree` — A height-balanced BST over integer keys: the walk equals sorted(live) on mixed insert/delete storms, every balance factor stays inside -1, 0, 1 after every move, rotations preserve the walk, and the height stays under the AVL ceiling.
 - `python-suffix-array` — Sorted suffix starts of a lowercase text: the order equals the slice-sort exactly, every count equals the scan's start census with overlaps honest, and the longest repeat is the tallest neighbour share.

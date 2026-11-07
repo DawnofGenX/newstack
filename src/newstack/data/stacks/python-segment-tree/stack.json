@@ -1,0 +1,53 @@
+{
+  "name": "python-segment-tree",
+  "title": "Segment Tree",
+  "language": "python",
+  "blurb": "A segment tree over an integer array with the combine as the seam: every window answer equals the matching slice sum exactly, a rebuild from the leaf row equals the build it came from, and no query visits more than twice the bit-length of the array.",
+  "default_description": "A segment tree over an integer array whose every window answer equals the matching slice sum, under any fold you hand it.",
+  "requires": ["uv", "python3"],
+  "python": {"minimum": "3.12", "versions": ["3.12", "3.13"]},
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} query --values fixtures/values.txt 3 10",
+    "uv run {npm_name} set --values fixtures/values.txt 4 40",
+    "uv run {npm_name} demo",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [{ "file": "**/*.py", "contains": "a pull-up re-folds the path" }],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_tree.py"]
+}
