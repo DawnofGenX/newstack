@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-count-min` — A count-min sketch over [0, 256): the min of rows never dips under the ledger truth on seeded streams, the audit runs after every update, and the shipped grid answers its corpora exactly.
+- `python-binary-heap` — A min-heap over integer keys, sift-up and sift-down hand-rolled on a plain list: the drain equals sorted(pushed) on seeded push/pop storms, and the parent rule is walked by a shipped checker after every op.
 - `python-levenshtein` — Unit-cost edit distance over lowercase strings: the row walk equals a shipped exponential oracle on short pairs, reads the same from either side, never beats a detour, and nearest equals the scan's argmin with ties first by letters.
 - `python-kmp-automaton` — Knuth-Morris-Pratt over lowercase text: the scan's start list equals the naive scan's on seeded corpora, the failure table equals the naive border count, and overlaps and the empty pattern stay honest.
 - `python-van-emde-tree` — A van Emde Boas tree over the fixed universe [0, 256): successor, predecessor, and membership equal the brute-force scans on seeded insert/delete/seek storms, the walk equals sorted(live) after every move, and empty-set seeks answer None, checked by a shipped audit.

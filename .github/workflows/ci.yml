@@ -136,6 +136,8 @@ jobs:
           - python-van-emde-tree
           - python-kmp-automaton
           - python-levenshtein
+          - python-binary-heap
+          - python-count-min
           - python-treap
           - python-rope
           - python-graceful-shutdown
