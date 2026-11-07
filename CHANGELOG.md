@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-counting-sort` — stable counting sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, equal keys keep their input order, the tally is the histogram, and the rank is its prefix; negative or oversized values are named, never sorted.
 - `python-boruvka-mst` — minimum spanning trees over small nonneg-weight undirected integer-keyed graphs: the walker's tree total equals the shipped enumeration oracle's minimum on every shipped and seeded corpus, every tree spans every node exactly once with |V|-1 edges, every fragment reaches through its own cheapest edge each round, and equal weights pick the same edge set run after run.
 - `python-kruskal-mst` — minimum spanning trees over small nonneg-weight undirected integer-keyed graphs: the walker's tree total equals the shipped enumeration oracle's minimum on every shipped and seeded corpus, every tree spans every node exactly once with |V|-1 edges, the witness ledger tells the truth about every edge of the sorted list, and equal weights pick the same edge set run after run.
 - `python-maximum-flow` — maximum flow over small nonneg-integer-capacity integer-keyed digraphs: the walker's value equals the brute-force min-cut oracle's least on every shipped and seeded corpus, the shipped map conserves at every interior node and never exceeds a capacity, and equal networks ship the same map run after run.

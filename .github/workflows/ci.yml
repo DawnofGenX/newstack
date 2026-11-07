@@ -153,7 +153,7 @@ jobs:
           - python-floyd-warshall
           - python-kruskal-mst
           - python-boruvka-mst
-          - python-boruvka-mst
+          - python-counting-sort
           - python-maximum-flow
           - python-treap
           - python-rope
