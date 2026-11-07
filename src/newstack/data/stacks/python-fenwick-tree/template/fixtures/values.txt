@@ -1,0 +1,26 @@
+# one integer value per line; blank lines and # comments are skipped
+# the fixture is the corpus the smoke test builds on
+-5
+0
+3
+11
+7
+-2
+18
+26
+9
+40
+14
+63
+5
+31
+22
+57
+2
+16
+70
+8
+45
+13
+34
+6

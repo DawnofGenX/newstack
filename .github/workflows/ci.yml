@@ -121,6 +121,8 @@ jobs:
           - python-aho-corasick
           - python-radix-heap
           - python-scapegoat-tree
+          - python-union-find
+          - python-fenwick-tree
           - python-treap
           - python-rope
           - python-graceful-shutdown

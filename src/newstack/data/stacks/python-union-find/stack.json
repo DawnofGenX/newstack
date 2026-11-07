@@ -1,0 +1,58 @@
+{
+  "name": "python-union-find",
+  "title": "Union Find",
+  "language": "python",
+  "blurb": "A disjoint-set forest over integer elements: union by size keeps depth logarithmic, find compresses on the way back, and the partition equals a dict-of-parents reference after any seeded workload.",
+  "requires": ["uv", "python3"],
+  "default_description": "A disjoint-set forest with union by size and path compression, checked against a dict-of-parents reference on seeded workloads.",
+  "python": {
+    "minimum": "3.12",
+    "versions": ["3.12", "3.13"]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} build --pairs fixtures/pairs.txt",
+    "uv run {npm_name} connected --pairs fixtures/pairs.txt --first 1 --second 7",
+    "uv run {npm_name} count --pairs fixtures/pairs.txt",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    { "file": "**/*.py", "contains": "a merge rewrites nothing" }
+  ],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_forest.py"]
+}

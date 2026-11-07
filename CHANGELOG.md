@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-fenwick-tree` — A binary indexed tree over integer values: point adds climb the lowest bit, prefix and range sums walk it back, and every answer is checked against the running list-sum reference the walk visits at most bit-length(n) cells.
+- `python-union-find` — A disjoint-set forest over integer elements: union by size keeps depth logarithmic, find compresses on the way back, and the partition equals a dict-of-parents reference after any seeded workload.
 - `python-scapegoat-tree` — A binary search tree that rebuilds instead of rotating: the 0.7 alpha rule decides every repair, depth stays under log base 1/alpha of n, rebuilds are lossless against bisect, and the work counter settles at n log n.
 - `python-radix-heap` — An integer min-heap that never compares keys: buckets follow the keys' bits, pop-min drains sorted on monotone and mixed streams, and the bucket invariant is re-checked after every op against the sorted corpus.
 - `python-rope` — A binary rope of short leaf chunks with cached lengths: insert, delete, slice, and concat walk the spine instead of copying the text, and to_string is the join of the leaves in order.

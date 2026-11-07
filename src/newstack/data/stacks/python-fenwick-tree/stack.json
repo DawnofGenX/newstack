@@ -1,0 +1,58 @@
+{
+  "name": "python-fenwick-tree",
+  "title": "Fenwick Cells",
+  "language": "python",
+  "blurb": "A binary indexed tree over integer values: point adds climb the lowest bit, prefix and range sums walk it back, and every answer is checked against the running list-sum reference the walk visits at most bit-length(n) cells.",
+  "requires": ["uv", "python3"],
+  "default_description": "A binary indexed tree whose adds and prefixes walk the lowest set bit, answering every prefix exactly as the running list-sum reference does.",
+  "python": {
+    "minimum": "3.12",
+    "versions": ["3.12", "3.13"]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} demo",
+    "uv run {npm_name} sum --values fixtures/values.txt 5",
+    "uv run {npm_name} add 2 7",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    { "file": "**/*.py", "contains": "the lowest set bit" }
+  ],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_fenwick.py"]
+}
