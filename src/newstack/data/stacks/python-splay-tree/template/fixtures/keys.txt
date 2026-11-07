@@ -1,0 +1,17 @@
+# one signed integer per line; blank lines and # comments are skipped
+3
+-7
+12
+0
+99
+-120
+5
+42
+-8
+17
+256
+-3
+61
+88
+-999
+1024

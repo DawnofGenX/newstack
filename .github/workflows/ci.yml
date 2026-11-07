@@ -132,6 +132,8 @@ jobs:
           - python-segment-tree
           - python-fibonacci-heap
           - python-ring-buffer
+          - python-splay-tree
+          - python-van-emde-tree
           - python-treap
           - python-rope
           - python-graceful-shutdown

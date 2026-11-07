@@ -1,0 +1,53 @@
+{
+  "name": "python-van-emde-tree",
+  "title": "van Emde Boas Tree",
+  "language": "python",
+  "blurb": "A van Emde Boas tree over the fixed universe [0, 256): successor, predecessor, and membership equal the brute-force scans on seeded insert/delete/seek storms, the walk equals sorted(live) after every move, and empty-set seeks answer None, checked by a shipped audit.",
+  "default_description": "A van Emde Boas tree over [0, 256) whose seeks equal the brute-force scan on any seeded workload.",
+  "requires": ["uv", "python3"],
+  "python": {"minimum": "3.12", "versions": ["3.12", "3.13"]},
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} succ --keys fixtures/keys.txt 100",
+    "uv run {npm_name} has --keys fixtures/keys.txt 42",
+    "uv run {npm_name} min --keys fixtures/keys.txt",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [{ "file": "**/*.py", "contains": "cluster arithmetic pays the seek" }],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_tree.py"]
+}

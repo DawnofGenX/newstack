@@ -1,0 +1,17 @@
+# one seat per line, integers inside [0, 256); blanks and # comments skipped
+3
+17
+0
+99
+255
+61
+88
+120
+7
+150
+42
+200
+31
+176
+111
+233

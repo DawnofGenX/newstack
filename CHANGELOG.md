@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-van-emde-tree` — A van Emde Boas tree over the fixed universe [0, 256): successor, predecessor, and membership equal the brute-force scans on seeded insert/delete/seek storms, the walk equals sorted(live) after every move, and empty-set seeks answer None, checked by a shipped audit.
+- `python-splay-tree` — A self-adjusting BST over integer keys: the walk equals sorted(live) on mixed insert storms, the touched key sits at the root after every access, and zig, zig-zig, and zig-zag preserve the in-order walk.
 - `python-ring-buffer` — A fixed-capacity FIFO over integers: the drain equals the reference deque exactly under drop-oldest, the cursor never leaves [0, capacity), a full ring overwrites exactly the oldest, and the walk from (head, count) is the visible sequence after every op.
 - `python-fibonacci-heap` — A Fibonacci-ordered forest over integer-keyed items: the pop sequence equals sorted(corpus) on mixed push/pop/decrease storms, every degree stays under the log bound, and decrease-key never breaks heap order, checked by a shipped walk.
 - `python-segment-tree` — A segment tree over an integer array with the combine as the seam: every window answer equals the matching slice sum exactly, a rebuild from the leaf row equals the build it came from, and no query visits more than twice the bit-length of the array.
