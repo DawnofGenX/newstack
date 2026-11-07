@@ -1,0 +1,53 @@
+{
+  "name": "python-levenshtein",
+  "title": "Levenshtein Distance",
+  "language": "python",
+  "blurb": "Unit-cost edit distance over lowercase strings: the row walk equals a shipped exponential oracle on short pairs, reads the same from either side, never beats a detour, and nearest equals the scan's argmin with ties first by letters.",
+  "default_description": "Unit-cost edit distance over lowercase strings whose row walk equals a bare recursion on short pairs and whose nearest equals the scan's argmin.",
+  "requires": ["uv", "python3"],
+  "python": {"minimum": "3.12", "versions": ["3.12", "3.13"]},
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} distance cat cart",
+    "uv run {npm_name} distance knight light",
+    "uv run {npm_name} nearest --words fixtures/words.txt crt",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [{ "file": "**/*.py", "contains": "a change costs one letter" }],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_distance.py"]
+}

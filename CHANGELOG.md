@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-levenshtein` — Unit-cost edit distance over lowercase strings: the row walk equals a shipped exponential oracle on short pairs, reads the same from either side, never beats a detour, and nearest equals the scan's argmin with ties first by letters.
+- `python-kmp-automaton` — Knuth-Morris-Pratt over lowercase text: the scan's start list equals the naive scan's on seeded corpora, the failure table equals the naive border count, and overlaps and the empty pattern stay honest.
 - `python-van-emde-tree` — A van Emde Boas tree over the fixed universe [0, 256): successor, predecessor, and membership equal the brute-force scans on seeded insert/delete/seek storms, the walk equals sorted(live) after every move, and empty-set seeks answer None, checked by a shipped audit.
 - `python-splay-tree` — A self-adjusting BST over integer keys: the walk equals sorted(live) on mixed insert storms, the touched key sits at the root after every access, and zig, zig-zig, and zig-zag preserve the in-order walk.
 - `python-ring-buffer` — A fixed-capacity FIFO over integers: the drain equals the reference deque exactly under drop-oldest, the cursor never leaves [0, capacity), a full ring overwrites exactly the oldest, and the walk from (head, count) is the visible sequence after every op.

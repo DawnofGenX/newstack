@@ -134,6 +134,8 @@ jobs:
           - python-ring-buffer
           - python-splay-tree
           - python-van-emde-tree
+          - python-kmp-automaton
+          - python-levenshtein
           - python-treap
           - python-rope
           - python-graceful-shutdown
