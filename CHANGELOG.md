@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-bellman-ford` — Single-source shortest paths over small integer-weighted digraphs: the walker's distance map equals the shipped walk-counting oracle's map on every shipped and seeded corpus, no edge still relaxes after |V|-1 rounds, and negative cycles are named honestly.
+- `python-dijkstra` — single-source shortest paths over small nonneg-weight integer-keyed digraphs: the walker's distance map equals the shipped fixed-point oracle's map on every shipped and seeded corpus, every shipped path costs exactly the map's cost, and unreachable nodes stay out of the map.
 - `python-tarjan-scc` — Tarjan's strongly-connected components over small digraphs: the walker's partition equals the shipped reachability oracle's partition on every shipped and seeded corpus, every node lands in exactly one component, and the condensed graph is acyclic under the shipped cycle checker.
 - `python-shunting-yard` — Infix to postfix and back: value_of answers exactly what the shipped recursive-descent oracle answers on shipped and seeded ledgers, and evaluate of the yielded queue equals the answer, division flooring as documented.
 - `python-run-length` — Run-length over lowercase text: decode hands back the letters encode was sent on shipped and seeded corpora, encode answers exactly what the shipped stepper walks, and a repeat never costs more pairs than letters.

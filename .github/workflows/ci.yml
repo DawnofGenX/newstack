@@ -146,6 +146,8 @@ jobs:
           - python-run-length
           - python-shunting-yard
           - python-tarjan-scc
+          - python-dijkstra
+          - python-bellman-ford
           - python-treap
           - python-rope
           - python-graceful-shutdown

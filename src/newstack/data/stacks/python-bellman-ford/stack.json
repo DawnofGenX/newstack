@@ -1,0 +1,82 @@
+{
+  "name": "python-bellman-ford",
+  "title": "Bellman Weight Walker",
+  "language": "python",
+  "blurb": "Single-source shortest paths over small integer-weighted digraphs: the walker's distance map equals the shipped walk-counting oracle's map on every shipped and seeded corpus, no edge still relaxes after |V|-1 rounds, and negative cycles are named honestly.",
+  "default_description": "A weight walker whose distance map is the oracle's map on every small digraph, and whose settled check refuses a surviving relaxation.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} distances 0 1 2 3 \"0>1=4\" \"1>2=-2\" \"2>3=3\" --source 0",
+    "uv run {npm_name} cycles 0 1 2 \"0>1=-2\" \"1>2=1\" \"2>0=0\"",
+    "uv run {npm_name} report --corpus fixtures/graphs.txt",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "no cheaper walk survives a settled edge"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_walk.py"
+  ]
+}
