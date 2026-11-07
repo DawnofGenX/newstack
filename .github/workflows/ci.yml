@@ -130,6 +130,8 @@ jobs:
           - python-avl-tree
           - python-red-black-tree
           - python-segment-tree
+          - python-fibonacci-heap
+          - python-ring-buffer
           - python-treap
           - python-rope
           - python-graceful-shutdown

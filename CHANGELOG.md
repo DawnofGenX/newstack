@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-ring-buffer` — A fixed-capacity FIFO over integers: the drain equals the reference deque exactly under drop-oldest, the cursor never leaves [0, capacity), a full ring overwrites exactly the oldest, and the walk from (head, count) is the visible sequence after every op.
+- `python-fibonacci-heap` — A Fibonacci-ordered forest over integer-keyed items: the pop sequence equals sorted(corpus) on mixed push/pop/decrease storms, every degree stays under the log bound, and decrease-key never breaks heap order, checked by a shipped walk.
 - `python-segment-tree` — A segment tree over an integer array with the combine as the seam: every window answer equals the matching slice sum exactly, a rebuild from the leaf row equals the build it came from, and no query visits more than twice the bit-length of the array.
 - `python-red-black-tree` — A red-black tree over bounded integer keys: the in-order walk equals sorted of the live keys after every op, and a shipped checker walking the tree verifies root black, no red father, and equal black height on every path, with remove of an absent key refused by name.
 - `python-avl-tree` — A height-balanced BST over integer keys: the walk equals sorted(live) on mixed insert/delete storms, every balance factor stays inside -1, 0, 1 after every move, rotations preserve the walk, and the height stays under the AVL ceiling.

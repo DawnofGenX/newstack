@@ -1,0 +1,53 @@
+{
+  "name": "python-ring-buffer",
+  "title": "Ring Buffer",
+  "language": "python",
+  "blurb": "A fixed-capacity FIFO over integers: the drain equals the reference deque exactly under drop-oldest, the cursor never leaves [0, capacity), a full ring overwrites exactly the oldest, and the walk from (head, count) is the visible sequence after every op.",
+  "default_description": "A fixed-capacity FIFO over integers whose drain equals the deque exactly under the drop-oldest rule.",
+  "requires": ["uv", "python3"],
+  "python": {"minimum": "3.12", "versions": ["3.12", "3.13"]},
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} drain --values fixtures/values.txt --capacity 8",
+    "uv run {npm_name} peek --values fixtures/values.txt --capacity 8",
+    "uv run {npm_name} count --values fixtures/values.txt --capacity 8",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": ["uv"],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": ["uv"],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": ["bash"],
+      "timeout": 180
+    }
+  ],
+  "detect": [{ "file": "**/*.py", "contains": "the cursor never leaves the ring" }],
+  "detect_fallback": false,
+  "adopt": [".gitignore", ".github/workflows/ci.yml"],
+  "adopt_tests": ["tests/test_ring.py"]
+}
