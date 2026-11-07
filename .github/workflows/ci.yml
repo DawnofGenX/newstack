@@ -142,6 +142,8 @@ jobs:
           - python-z-function
           - python-bloom-filter
           - python-lz77
+          - python-huffman-coding
+          - python-run-length
           - python-treap
           - python-rope
           - python-graceful-shutdown

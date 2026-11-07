@@ -1,0 +1,82 @@
+{
+  "name": "python-huffman-coding",
+  "title": "Canonical Huffman Coding",
+  "language": "python",
+  "blurb": "Canonical Huffman over lowercase text: decode(encode(text)) answers with the letters encode was sent on shipped and seeded corpora, no shipped code opens where another closes, and a skewed text pays strictly under eight bits a letter.",
+  "default_description": "A deterministic ladder whose wordlist reads back the letters it was sent on any text, and whose codes never open where another code closes.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} encode \"mississippimississippi\"",
+    "uv run {npm_name} roundtrip \"abracadabraabracadabra\"",
+    "uv run {npm_name} report --corpus fixtures/corpora.txt",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "a decoder never asks for the tree"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_coder.py"
+  ]
+}

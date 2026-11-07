@@ -1,0 +1,13 @@
+# one lowercase-letter text per line; blanks and # comments skipped
+aaaaaaaaaaaaaaaaaaaaaaaa
+abracadabraabracadabra
+mississippimississippi
+bananabananabananabana
+thequickbrownfoxjumpsoverthelazydog
+aaabbbcccdddeeeffff
+zzzzzzzzzzzzzzzzyyyyxxxx
+huffmanhuffmanhuffman
+aaaaaaaaaabbbbcc
+abcabcabcabcabcabcabcabc
+eeeeeaaaabbbbccddd
+programmingwithouttreesisjusttyping

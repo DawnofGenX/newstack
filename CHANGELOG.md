@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-run-length` — Run-length over lowercase text: decode hands back the letters encode was sent on shipped and seeded corpora, encode answers exactly what the shipped stepper walks, and a repeat never costs more pairs than letters.
+- `python-huffman-coding` — Canonical Huffman over lowercase text: decode(encode(text)) answers with the letters encode was sent on shipped and seeded corpora, no shipped code opens where another closes, and a skewed text pays strictly under eight bits a letter.
 - `python-lz77` — LZ77 over lowercase text: the read hands back the letters the write was sent on shipped and seeded corpora, every back-reference names letters the window already emitted, and a repeat never costs more tokens than letters.
 - `python-bloom-filter` — A Bloom filter whose added keys are always answered present: the shipped audit re-asks every key after every update on seeded streams, the survey lists the liars at the shipped widths (none), and the rows are deterministic multiplicative hashes.
 - `python-z-function` — The Z-array over lowercase words: the array equals the naive per-position LCP scan on seeded corpora, the concatenated occurrences equal the naive scan's starts, and z[0], the single letter, and the empty word stay honest.
