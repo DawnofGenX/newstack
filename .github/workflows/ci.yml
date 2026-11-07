@@ -154,6 +154,7 @@ jobs:
           - python-kruskal-mst
           - python-boruvka-mst
           - python-counting-sort
+          - python-merge-sort
           - python-maximum-flow
           - python-treap
           - python-rope

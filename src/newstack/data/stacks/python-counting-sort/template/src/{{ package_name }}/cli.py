@@ -159,8 +159,8 @@ def main(argv: list | None = None) -> int:
     parser = build_parser()
     try:
         args = parser.parse_args(argv)
-    except SystemExit:
-        return EXIT_UNUSABLE
+    except SystemExit as exc:
+        return int(exc.code) if exc.code is not None else 0
     try:
         return args.handler(args)
     except SortError as exc:
