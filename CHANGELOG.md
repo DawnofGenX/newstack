@@ -7,6 +7,8 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-red-black-tree` — A red-black tree over bounded integer keys: the in-order walk equals sorted of the live keys after every op, and a shipped checker walking the tree verifies root black, no red father, and equal black height on every path, with remove of an absent key refused by name.
+- `python-avl-tree` — A height-balanced BST over integer keys: the walk equals sorted(live) on mixed insert/delete storms, every balance factor stays inside -1, 0, 1 after every move, rotations preserve the walk, and the height stays under the AVL ceiling.
 - `python-suffix-array` — Sorted suffix starts of a lowercase text: the order equals the slice-sort exactly, every count equals the scan's start census with overlaps honest, and the longest repeat is the tallest neighbour share.
 - `python-kd-tree` — A 2-d kd-tree over integer point pairs: membership answers equal a set's, a rectangle answer equals the brute-force filter, the nearest answer equals the brute-force argmin with the tie on the lexicographically smallest point, and a rebuild from the in-order walk answers identically.
 - `python-prefix-trie` — A string-keyed trie over lowercase words: membership answers equal a set's, every prefix listing equals the sorted scan of the corpus, delete drops only the exact word, and the empty prefix lists every word exactly once.

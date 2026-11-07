@@ -127,6 +127,8 @@ jobs:
           - python-prefix-trie
           - python-kd-tree
           - python-suffix-array
+          - python-avl-tree
+          - python-red-black-tree
           - python-treap
           - python-rope
           - python-graceful-shutdown
