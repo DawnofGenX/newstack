@@ -160,6 +160,7 @@ jobs:
           - python-insertion-sort
           - python-selection-sort
           - python-bucket-sort
+          - python-radix-sort
           - python-maximum-flow
           - python-treap
           - python-rope
