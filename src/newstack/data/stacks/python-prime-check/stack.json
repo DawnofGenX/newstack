@@ -1,0 +1,82 @@
+{
+    "name": "python-prime-check",
+    "title": "Prime check over small integers",
+    "language": "python",
+    "blurb": "prime check over small integers: is_prime agrees with the shipped oracle (trial division to sqrt) on every seeded n, prime_factors agrees, and a non-integer or oversized n is named, never checked.",
+    "default_description": "A spanning-tree walker whose total is the enumeration oracle's minimum on every small undirected graph, whose witness ledger tells the truth, and whose tree spans every node exactly once.",
+    "requires": [
+        "uv",
+        "python3"
+    ],
+    "python": {
+        "minimum": "3.12",
+        "versions": [
+            "3.12",
+            "3.13"
+        ]
+    },
+    "next_steps": [
+        "cd {path}",
+        "uv sync",
+        "uv run {npm_name} tree 1 2 3 \"1>2=4\" \"2>3=1\" \"1>3=1\"",
+        "uv run {npm_name} witness 1 2 3 \"1>2=4\" \"2>3=1\" \"1>3=1\"",
+        "uv run {npm_name} report --corpus fixtures/graphs.txt",
+        "PY=.venv/bin/python bash smoke.sh"
+    ],
+    "verify": [
+        {
+            "name": "install",
+            "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+            "tools": [
+                "uv"
+            ],
+            "timeout": 300
+        },
+        {
+            "name": "lint",
+            "cmd": ".venv/bin/ruff check .",
+            "tools": [
+                "uv"
+            ],
+            "timeout": 120
+        },
+        {
+            "name": "test",
+            "cmd": ".venv/bin/python -m pytest -q",
+            "tools": [
+                "uv"
+            ],
+            "timeout": 300
+        },
+        {
+            "name": "selftest",
+            "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+            "tools": [
+                "uv"
+            ],
+            "timeout": 120
+        },
+        {
+            "name": "smoke",
+            "cmd": "PY=.venv/bin/python bash smoke.sh",
+            "tools": [
+                "bash"
+            ],
+            "timeout": 180
+        }
+    ],
+    "detect": [
+        {
+            "file": "**/*.py",
+            "contains": "a prime is one of a, e, i, o, u, case-insensitive"
+        }
+    ],
+    "detect_fallback": false,
+    "adopt": [
+        ".gitignore",
+        ".github/workflows/ci.yml"
+    ],
+    "adopt_tests": [
+        "tests/test_solve.py"
+    ]
+}
