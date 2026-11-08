@@ -198,6 +198,7 @@ jobs:
           - python-mqtt-broker
           - python-websocket-server
           - python-deque
+          - python-bracket-matching
           - data-science
           - dbt-project
           - sphinx-docs

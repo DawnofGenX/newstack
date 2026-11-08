@@ -397,6 +397,7 @@ $ newstack stacks outdated
 | `python-combinations` | combinations of small lists: every subset of items is generated, the count equals two to the power of the length, and distinct subsets are deduplicated; oversized or malformed inputs are named, never combined. | uv, python3 |
 | `python-monotonic-stack` | monotonic stack: next greater, next smaller, and previous greater elements are found by popping while the new value breaks the order; oversized or malformed inputs are named, never stacked. | uv, python3 |
 | `python-deque` | double-ended queue of integers: append and pop at both ends, peek either side, and rotate without losing an item; oversized or malformed inputs are named, never queued. | uv, python3 |
+| `python-bracket-matching` | bracket matching over small strings: every opening bracket must close in the right order, matched pairs are listed, unmatched are counted, and oversized or malformed inputs are named, never matched. | uv, python3 |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle served by a zero-dependency static server with an SPA fallback, page/bundle/404 asserted by curl in `smoke.sh` | `node`, `npm`/`\`pnpm`\`/`\`yarn` |
