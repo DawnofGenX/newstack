@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-intro-sort`
 - `python-tim-sort`
 - `python-cocktail-sort`
 - `python-cycle-sort`

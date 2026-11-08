@@ -214,6 +214,7 @@ jobs:
           - python-cycle-sort
           - python-cocktail-sort
           - python-tim-sort
+          - python-intro-sort
           - data-science
           - dbt-project
           - sphinx-docs
