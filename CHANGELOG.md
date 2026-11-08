@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-roman-numerals` — convert between integers and roman numerals: int_to_roman turns a positive integer into its letter form, roman_to_int reads a roman string back into an integer, and the audit reports any pair that does not round-trip; out-of-range or malformed inputs are named, never converted.
 - `python-decimal-to-binary` — convert between decimal and binary strings: dec_to_binary turns a nonnegative integer into its base-two digits, binary_to_decimal reads a binary string back into an integer, and the audit reports any pair that does not round-trip; oversized or malformed inputs are named, never converted.
 - `python-power` — Fast exponentiation over small integers: power agrees with the shipped oracle (repeated multiplication) on every seeded base and exponent, modular exponentiation agrees, and an oversized input is named, never computed.
 - `python-lcs` — Longest common subsequence of two small strings: a dynamic-programming table of prefix lengths, backtracked to recover one optimal subsequence, audited against an independent length oracle.
