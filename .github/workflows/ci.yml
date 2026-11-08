@@ -181,6 +181,7 @@ jobs:
           - python-decimal-to-binary
           - python-roman-numerals
           - python-hamming-distance
+          - python-interpolation-search
           - python-gcd
           - python-maximum-flow
           - python-treap
