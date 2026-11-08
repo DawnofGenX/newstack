@@ -177,6 +177,7 @@ jobs:
           - python-prime-check
           - python-lcm
           - python-lcs
+          - python-power
           - python-gcd
           - python-maximum-flow
           - python-treap
