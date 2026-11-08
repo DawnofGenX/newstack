@@ -209,6 +209,7 @@ jobs:
           - python-bubble-sort
           - python-comb-sort
           - python-gnome-sort
+          - python-odd-even-sort
           - data-science
           - dbt-project
           - sphinx-docs
