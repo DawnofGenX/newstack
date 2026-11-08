@@ -173,6 +173,7 @@ jobs:
           - python-digit-sum
           - python-armstrong
           - python-word-count
+          - python-char-frequency
           - python-maximum-flow
           - python-treap
           - python-rope
