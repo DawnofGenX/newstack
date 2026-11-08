@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-sieve` — sieve of Eratosthenes up to small n: the prime list equals the shipped oracle (trial division) on every seeded n, each prime crosses off its multiples starting at its square, and is_prime agrees; non-positive or oversized n is named, never sieved.
 - `python-gcd` — gcd (Euclid) and lcm over small positive integers: the result equals the shipped oracle (trial division) on every seeded pair, the remainder is taken until it vanishes, and coprime reports shared divisors; non-positive or oversized inputs are named, never divided.
 - `python-linear-search` — linear search over small nonneg integer arrays: the first index equals the shipped oracle (first-match scan) on every seeded corpus, the first match wins and the walk stops there, and a missing target answers -1; out-of-range values are named, never searched.
 - `python-binary-search` — binary search over small sorted nonneg integer arrays: the index equals the shipped oracle (linear scan) on every seeded corpus, the middle is the pivot and the half that cannot hold the target is discarded, and a missing target answers -1; unsorted input is named, never searched.

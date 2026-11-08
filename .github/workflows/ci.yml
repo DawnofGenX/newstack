@@ -164,6 +164,7 @@ jobs:
           - python-binary-search
           - python-linear-search
           - python-gcd
+          - python-sieve
           - python-maximum-flow
           - python-treap
           - python-rope
