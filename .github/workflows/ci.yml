@@ -211,6 +211,7 @@ jobs:
           - python-gnome-sort
           - python-odd-even-sort
           - python-pancake-sort
+          - python-cycle-sort
           - data-science
           - dbt-project
           - sphinx-docs
