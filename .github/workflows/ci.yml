@@ -180,6 +180,7 @@ jobs:
           - python-power
           - python-decimal-to-binary
           - python-roman-numerals
+          - python-hamming-distance
           - python-gcd
           - python-maximum-flow
           - python-treap

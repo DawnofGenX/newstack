@@ -1,0 +1,82 @@
+{
+  "name": "python-hamming-distance",
+  "title": "Hamming Distance",
+  "language": "python",
+  "blurb": "count differing positions: hamming counts the differing bits between two nonnegative integers, hamming_text counts the differing characters between two equal-length strings, and the audit reports any triple whose expected distance does not match the computed one; out-of-range or malformed inputs are named, never measured.",
+  "default_description": "A distance walker whose bit count is the population of the xor on every small pair, whose char count is the mismatched positions on every equal-length pair, and whose audit names every triple that fails to match.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} bits 7 11",
+    "uv run {npm_name} chars abc axc",
+    "uv run {npm_name} audit \"7,11,2\" \"0,0,0\"",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "hamming counts the bits that disagree"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_solve.py"
+  ]
+}
