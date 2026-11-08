@@ -203,6 +203,7 @@ jobs:
           - python-knapsack
           - python-coin-change
           - python-lis
+          - python-subset-sum
           - data-science
           - dbt-project
           - sphinx-docs

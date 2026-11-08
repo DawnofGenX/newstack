@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-subset-sum`
 - `python-lis`
 - `python-coin-change`
 - `python-knapsack`
