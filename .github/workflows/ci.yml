@@ -197,6 +197,7 @@ jobs:
           - python-dns-server
           - python-mqtt-broker
           - python-websocket-server
+          - python-deque
           - data-science
           - dbt-project
           - sphinx-docs
