@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-coin-change`
 - `python-knapsack`
 - `python-caesar-cipher`
 - `python-bracket-matching` — bracket matching over small strings: every opening bracket must close in the right order, matched pairs are listed, unmatched are counted, and oversized or malformed inputs are named, never matched.

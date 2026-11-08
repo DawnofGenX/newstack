@@ -201,6 +201,7 @@ jobs:
           - python-bracket-matching
           - python-caesar-cipher
           - python-knapsack
+          - python-coin-change
           - data-science
           - dbt-project
           - sphinx-docs
