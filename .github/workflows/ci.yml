@@ -171,6 +171,7 @@ jobs:
           - python-anagram
           - python-vowel-count
           - python-digit-sum
+          - python-armstrong
           - python-maximum-flow
           - python-treap
           - python-rope
