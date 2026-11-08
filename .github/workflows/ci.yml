@@ -204,6 +204,7 @@ jobs:
           - python-coin-change
           - python-lis
           - python-subset-sum
+          - python-max-subarray
           - data-science
           - dbt-project
           - sphinx-docs
