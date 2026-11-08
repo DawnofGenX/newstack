@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-heap-sort` — heap sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the largest rides to the top and is peeled off last, and the rank is its prefix; negative or oversized values are named, never sorted.
 - `python-quick-sort` — stable quick sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, equal keys keep their input order through a stable partition, the pivot partitions the array and each side sorts itself, and the rank is its prefix; negative or oversized values are named, never sorted.
 - `python-merge-sort` — stable merge sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, equal keys keep their input order, the middle splits the work and the merge walks both halves, and the rank is its prefix; negative or oversized values are named, never sorted.
 - `python-counting-sort` — stable counting sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, equal keys keep their input order, the tally is the histogram, and the rank is its prefix; negative or oversized values are named, never sorted.
