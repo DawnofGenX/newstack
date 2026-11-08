@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-caesar-cipher`
 - `python-bracket-matching` — bracket matching over small strings: every opening bracket must close in the right order, matched pairs are listed, unmatched are counted, and oversized or malformed inputs are named, never matched.
 - `python-deque` — double-ended queue of integers: append and pop at both ends, peek either side, and rotate without losing an item; oversized or malformed inputs are named, never queued.
 - `python-monotonic-stack` — monotonic stack: next greater, next smaller, and previous greater elements are found by popping while the new value breaks the order; oversized or malformed inputs are named, never stacked.
