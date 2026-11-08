@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-lcm` — least common multiple over small integers: lcm agrees with the shipped oracle (a*b//gcd) on every seeded pair, gcd agrees, and a non-integer or oversized input is named, never divided.
 - `python-prime-check` — prime check over small integers: is_prime agrees with the shipped oracle (trial division to sqrt) on every seeded n, prime_factors agrees, and a non-integer or oversized n is named, never checked.
 - `python-char-frequency` — character frequency over small strings: count_chars agrees with the shipped oracle (len) on every seeded string, char_frequencies agrees, and a non-string or oversized input is named, never counted.
 - `python-word-count` — word count over small strings: count_words agrees with the shipped oracle (split) on every seeded string, word_frequencies agrees, and a non-string or oversized input is named, never counted.
