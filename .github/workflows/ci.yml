@@ -189,6 +189,7 @@ jobs:
           - python-rope
           - python-graceful-shutdown
           - python-combinations
+          - python-monotonic-stack
           - python-permutations
           - python-c-extension
           - python-smtp-sink
