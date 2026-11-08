@@ -158,6 +158,7 @@ jobs:
           - python-quick-sort
           - python-heap-sort
           - python-insertion-sort
+          - python-shell-sort
           - python-selection-sort
           - python-bucket-sort
           - python-radix-sort

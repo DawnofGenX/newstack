@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-shell-sort` — shell sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, gaps shrink by three and one until one, and each gap pass is an insertion sort; negative or oversized values are named, never sorted.
 - `python-interpolation-search` — interpolation search over small sorted nonneg integer arrays: the probe follows the value, not the middle, the index equals the shipped oracle (linear scan) on every seeded corpus, and a missing target answers -1; unsorted input is named, never searched.
 - `python-hamming-distance` — count differing positions: hamming counts the differing bits between two nonnegative integers, hamming_text counts the differing characters between two equal-length strings, and the audit reports any triple whose expected distance does not match the computed one; out-of-range or malformed inputs are named, never measured.
 - `python-roman-numerals` — convert between integers and roman numerals: int_to_roman turns a positive integer into its letter form, roman_to_int reads a roman string back into an integer, and the audit reports any pair that does not round-trip; out-of-range or malformed inputs are named, never converted.
