@@ -4,7 +4,13 @@ from __future__ import annotations
 
 import pytest
 
-from {{ package_name }}.solve import SieveError, audit, count_primes, is_prime, primes_up_to
+from {{ package_name }}.solve import (
+    SieveError,
+    audit,
+    count_primes,
+    is_prime,
+    primes_up_to,
+)
 
 
 def test_primes_basic():
