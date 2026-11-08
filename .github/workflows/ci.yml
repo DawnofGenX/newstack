@@ -205,6 +205,7 @@ jobs:
           - python-lis
           - python-subset-sum
           - python-max-subarray
+          - python-longest-common-substring
           - data-science
           - dbt-project
           - sphinx-docs
