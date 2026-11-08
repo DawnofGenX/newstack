@@ -399,6 +399,7 @@ $ newstack stacks outdated
 | `python-deque` | double-ended queue of integers: append and pop at both ends, peek either side, and rotate without losing an item; oversized or malformed inputs are named, never queued. | uv, python3 |
 | `python-bracket-matching` | bracket matching over small strings: every opening bracket must close in the right order, matched pairs are listed, unmatched are counted, and oversized or malformed inputs are named, never matched. | uv, python3 |
 | `python-caesar-cipher` | Caesar cipher over ASCII letters: encode and decode by a shift, brute-force all 26 shifts, and the audit reports any pair that does not round-trip; oversized or malformed inputs are named, never ciphered. | uv, python3 |
+| `python-knapsack` | 0/1 knapsack over small integer weights and values: the maximum value for a capacity equals the brute-force subset enumeration on every seeded instance, the chosen items are witnessed, and oversized or malformed inputs are named, never packed. | uv, python3 |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle served by a zero-dependency static server with an SPA fallback, page/bundle/404 asserted by curl in `smoke.sh` | `node`, `npm`/`\`pnpm`\`/`\`yarn` |

@@ -200,6 +200,7 @@ jobs:
           - python-deque
           - python-bracket-matching
           - python-caesar-cipher
+          - python-knapsack
           - data-science
           - dbt-project
           - sphinx-docs
