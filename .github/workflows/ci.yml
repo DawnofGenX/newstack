@@ -207,6 +207,7 @@ jobs:
           - python-max-subarray
           - python-longest-common-substring
           - python-bubble-sort
+          - python-comb-sort
           - data-science
           - dbt-project
           - sphinx-docs
