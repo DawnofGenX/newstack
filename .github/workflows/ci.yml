@@ -167,6 +167,7 @@ jobs:
           - python-sieve
           - python-factorial
           - python-fibonacci
+          - python-palindrome
           - python-maximum-flow
           - python-treap
           - python-rope
