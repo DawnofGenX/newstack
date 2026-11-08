@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-anagram` — anagram check over small strings: is_anagram agrees with the shipped oracle (sorted comparison) on every seeded pair, two strings are anagrams when their sorted letters agree, and signature agrees; non-string or oversized input is named, never compared.
 - `python-palindrome` — palindrome check over small strings: is_palindrome agrees with the shipped oracle (reversal) on every seeded string, a string reads the same forwards and backwards, and reverse agrees; non-string or oversized input is named, never reversed.
 - `python-fibonacci` — fibonacci over small n: the n-th term equals the shipped oracle (recurrence) on every seeded n, each term is the sum of the two before it, and the list agrees; negative or oversized n is named, never computed.
 - `python-factorial` — factorial and binomial over small n: n! equals the shipped oracle (sequential product) on every seeded n, the product grows by one factor at a time from 1 up to n, and binomial divides cleanly; negative or oversized n is named, never multiplied.
