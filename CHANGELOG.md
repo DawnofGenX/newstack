@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-binary-search` — binary search over small sorted nonneg integer arrays: the index equals the shipped oracle (linear scan) on every seeded corpus, the middle is the pivot and the half that cannot hold the target is discarded, and a missing target answers -1; unsorted input is named, never searched.
 - `python-radix-sort` — radix sort (LSD) over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the digit is (value divided by ten to the power) mod ten, and the rank is its prefix; negative or oversized values are named, never sorted.
 - `python-bucket-sort` — bucket sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the bucket index is value divided by the bucket width, and the rank is its prefix; negative or oversized values are named, never sorted.
 - `python-selection-sort` — selection sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the smallest of the unsorted tail is chosen and swapped into place, and the rank is its prefix; negative or oversized values are named, never sorted.

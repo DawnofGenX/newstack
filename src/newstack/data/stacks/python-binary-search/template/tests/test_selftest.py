@@ -1,0 +1,17 @@
+"""The selftest, checked for shape."""
+
+from __future__ import annotations
+
+from {{ package_name }}.selftest import run
+
+
+def test_selftest_passes():
+    report = run()
+    assert report.failed == 0
+    assert report.checks >= 10
+
+
+def test_fixture_marker_present():
+    from {{ package_name }}.selftest import FIXTURE
+
+    assert FIXTURE == "the middle is the pivot and the half that cannot hold the target"

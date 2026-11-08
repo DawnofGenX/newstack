@@ -161,6 +161,7 @@ jobs:
           - python-selection-sort
           - python-bucket-sort
           - python-radix-sort
+          - python-binary-search
           - python-maximum-flow
           - python-treap
           - python-rope
