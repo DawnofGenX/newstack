@@ -163,6 +163,7 @@ jobs:
           - python-radix-sort
           - python-binary-search
           - python-linear-search
+          - python-gcd
           - python-maximum-flow
           - python-treap
           - python-rope
