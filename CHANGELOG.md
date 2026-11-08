@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-bucket-sort` — bucket sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the bucket index is value divided by the bucket width, and the rank is its prefix; negative or oversized values are named, never sorted.
 - `python-selection-sort` — selection sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the smallest of the unsorted tail is chosen and swapped into place, and the rank is its prefix; negative or oversized values are named, never sorted.
 - `python-insertion-sort` — insertion sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the sorted prefix grows one value at a time walked leftwards, and the rank is its prefix; negative or oversized values are named, never sorted.
 - `python-heap-sort` — heap sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the largest rides to the top and is peeled off last, and the rank is its prefix; negative or oversized values are named, never sorted.

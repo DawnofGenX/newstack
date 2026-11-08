@@ -159,6 +159,7 @@ jobs:
           - python-heap-sort
           - python-insertion-sort
           - python-selection-sort
+          - python-bucket-sort
           - python-maximum-flow
           - python-treap
           - python-rope
