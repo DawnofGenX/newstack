@@ -169,6 +169,7 @@ jobs:
           - python-fibonacci
           - python-palindrome
           - python-anagram
+          - python-vowel-count
           - python-maximum-flow
           - python-treap
           - python-rope
