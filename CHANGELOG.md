@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-word-count` — word count over small strings: count_words agrees with the shipped oracle (split) on every seeded string, word_frequencies agrees, and a non-string or oversized input is named, never counted.
 - `python-armstrong` — armstrong number over small integers: is_armstrong agrees with the shipped oracle (digit^count sum) on every seeded n, armstrong_sum agrees, and a negative or oversized n is named, never checked.
 - `python-digit-sum` — digit sum over small integers: digit_sum agrees with the shipped oracle (sum of decimal digits) on every seeded n, the product and count agree, and a negative or oversized n is named, never summed.
 - `python-vowel-count` — vowel counting over small strings: count_vowels agrees with the shipped oracle (sum) on every seeded string, a vowel is one of a, e, i, o, u case-insensitively, and positions agree; non-string or oversized input is named, never counted.
