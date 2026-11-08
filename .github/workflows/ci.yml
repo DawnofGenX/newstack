@@ -170,6 +170,7 @@ jobs:
           - python-palindrome
           - python-anagram
           - python-vowel-count
+          - python-digit-sum
           - python-maximum-flow
           - python-treap
           - python-rope
