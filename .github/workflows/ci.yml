@@ -213,6 +213,7 @@ jobs:
           - python-pancake-sort
           - python-cycle-sort
           - python-cocktail-sort
+          - python-tim-sort
           - data-science
           - dbt-project
           - sphinx-docs
