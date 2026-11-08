@@ -208,6 +208,7 @@ jobs:
           - python-longest-common-substring
           - python-bubble-sort
           - python-comb-sort
+          - python-gnome-sort
           - data-science
           - dbt-project
           - sphinx-docs

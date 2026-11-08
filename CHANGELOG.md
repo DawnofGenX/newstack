@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-gnome-sort`
 - `python-comb-sort`
 - `python-bubble-sort`
 - `python-longest-common-substring`
