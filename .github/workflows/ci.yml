@@ -165,6 +165,7 @@ jobs:
           - python-linear-search
           - python-gcd
           - python-sieve
+          - python-factorial
           - python-maximum-flow
           - python-treap
           - python-rope
