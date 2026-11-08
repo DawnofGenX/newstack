@@ -188,6 +188,7 @@ jobs:
           - python-treap
           - python-rope
           - python-graceful-shutdown
+          - python-combinations
           - python-permutations
           - python-c-extension
           - python-smtp-sink
