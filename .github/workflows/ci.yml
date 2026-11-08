@@ -178,6 +178,7 @@ jobs:
           - python-lcm
           - python-lcs
           - python-power
+          - python-decimal-to-binary
           - python-gcd
           - python-maximum-flow
           - python-treap

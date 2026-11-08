@@ -1,0 +1,82 @@
+{
+  "name": "python-decimal-to-binary",
+  "title": "Decimal to Binary Conversion",
+  "language": "python",
+  "blurb": "convert between decimal and binary strings: dec_to_binary turns a nonnegative integer into its base-two digits, binary_to_decimal reads a binary string back into an integer, and the audit reports any pair that does not round-trip; oversized or malformed inputs are named, never converted.",
+  "default_description": "A conversion walker whose binary string is the standard base-two representation on every small integer, whose decimal reading is the value on every well-formed binary string, and whose audit names every pair that fails to round-trip.",
+  "requires": [
+    "uv",
+    "python3"
+  ],
+  "python": {
+    "minimum": "3.12",
+    "versions": [
+      "3.12",
+      "3.13"
+    ]
+  },
+  "next_steps": [
+    "cd {path}",
+    "uv sync",
+    "uv run {npm_name} convert 10",
+    "uv run {npm_name} read 1010",
+    "uv run {npm_name} audit \"10,1010\" \"7,111\"",
+    "PY=.venv/bin/python bash smoke.sh"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "uv venv --python 3.12 --allow-existing && uv pip install --python .venv/bin/python -e . pytest ruff",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "lint",
+      "cmd": ".venv/bin/ruff check .",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": ".venv/bin/python -m pytest -q",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "selftest",
+      "cmd": ".venv/bin/python -m {{ package_name }} selftest",
+      "tools": [
+        "uv"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "PY=.venv/bin/python bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "**/*.py",
+      "contains": "decimal to binary is division by two, binary to decimal is powers of two"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".gitignore",
+    ".github/workflows/ci.yml"
+  ],
+  "adopt_tests": [
+    "tests/test_solve.py"
+  ]
+}
