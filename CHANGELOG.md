@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-lcs` — Longest common subsequence of two small strings: a dynamic-programming table of prefix lengths, backtracked to recover one optimal subsequence, audited against an independent length oracle.
 - `python-gcd` — greatest common divisor over small integers: gcd agrees with the shipped oracle (Euclid) on every seeded pair, extended_gcd satisfies Bezout, and a non-integer or oversized input is named, never divided.
 - `python-lcm` — least common multiple over small integers: lcm agrees with the shipped oracle (a*b//gcd) on every seeded pair, gcd agrees, and a non-integer or oversized input is named, never divided.
 - `python-prime-check` — prime check over small integers: is_prime agrees with the shipped oracle (trial division to sqrt) on every seeded n, prime_factors agrees, and a non-integer or oversized n is named, never checked.
