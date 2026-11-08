@@ -12,4 +12,4 @@ def test_selftest_passes():
 
 
 def test_fixture_marker_present():
-    assert FIXTURE == "the remainder is taken until it vanishes, then the other side"
+    assert FIXTURE == "euclid's algorithm, a, b = b, a % b"

@@ -30,23 +30,23 @@ run "$PY" -m "$MODULE" --help
 check_equal "help exits zero" 0 "$STATUS"
 check_contains "help lists the subcommands" "selftest" "$OUT"
 
-run "$PY" -m "$MODULE" gcd 12 8
+run "$PY" -m "$MODULE" gcd 4 6
 check_equal "a gcd exits zero" 0 "$STATUS"
 check_contains "the gcd line shows" "gcd" "$OUT"
 
-run "$PY" -m "$MODULE" gcd --json 12 8
+run "$PY" -m "$MODULE" gcd --json 4 6
 check_equal "a json gcd exits zero" 0 "$STATUS"
 
-run "$PY" -m "$MODULE" lcm 4 6
-check_equal "a lcm exits zero" 0 "$STATUS"
-check_contains "the lcm line shows" "lcm" "$OUT"
+run "$PY" -m "$MODULE" ext 4 6
+check_equal "an ext exits zero" 0 "$STATUS"
+check_contains "the ext line shows" "extended_gcd" "$OUT"
 
-run "$PY" -m "$MODULE" coprime 7 5
-check_equal "a coprime exits zero" 0 "$STATUS"
-check_contains "the coprime line shows" "coprime" "$OUT"
+run "$PY" -m "$MODULE" inv 3 7
+check_equal "an inv exits zero" 0 "$STATUS"
+check_contains "the inv line shows" "mod_inverse" "$OUT"
 
-run "$PY" -m "$MODULE" gcd 0 5
-check_equal "a zero exits two" 2 "$STATUS"
+run "$PY" -m "$MODULE" gcd 10000 2
+check_equal "an oversized exits two" 2 "$STATUS"
 
 run "$PY" -m "$MODULE" demo
 check_equal "the demo exits zero" 0 "$STATUS"

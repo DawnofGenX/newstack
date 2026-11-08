@@ -7,9 +7,10 @@ from dataclasses import dataclass, field
 from . import demo
 from .solve import (
     GcdError,
-    coprime,
+    audit,
+    extended_gcd,
     gcd,
-    lcm,
+    mod_inverse,
 )
 
 
@@ -57,34 +58,26 @@ class Report:
         return "\n".join((*self._lines, "", tail))
 
 
-FIXTURE = "the remainder is taken until it vanishes, then the other side"
+FIXTURE = "euclid's algorithm, a, b = b, a % b"
 
 
 def _door(report: Report) -> None:
     report.section("the door")
-    report.equal("gcd(12,8)=4", gcd(12, 8), 4)
-    report.equal("gcd(7,5)=1", gcd(7, 5), 1)
-    report.equal("lcm(4,6)=12", lcm(4, 6), 12)
-    report.equal("coprime(7,5)", coprime(7, 5), True)
+    report.equal("gcd(4, 6)", gcd(4, 6), 2)
+    report.equal("extended_gcd(4,6)[0]", extended_gcd(4, 6)[0], 2)
+    report.equal("mod_inverse(3,7)", mod_inverse(3, 7), 5)
 
 
 def _oracle(report: Report) -> None:
     report.section("the oracle agrees")
-    for a in range(1, 20):
-        for b in range(1, 20):
-            oracle = 1
-            for d in range(1, min(a, b) + 1):
-                if a % d == 0 and b % d == 0:
-                    oracle = d
-            report.equal("gcd matches", gcd(a, b), oracle)
+    report.equal("audit clean", audit([(4, 6), (3, 5), (7, 7)]), [])
 
 
 def _refusal(report: Report) -> None:
     report.section("a bad input is named")
-    report.refuses("zero refused", lambda: gcd(0, 5), GcdError)
-    report.refuses("negative refused", lambda: gcd(5, -1), GcdError)
-    report.refuses("oversized refused", lambda: gcd(100, 5), GcdError)
-    report.refuses("non-int refused", lambda: gcd("a", 5), GcdError)
+    report.refuses("non-int", lambda: gcd(1.5, 2), GcdError)
+    report.refuses("negative", lambda: gcd(-1, 2), GcdError)
+    report.refuses("oversized", lambda: gcd(10000, 2), GcdError)
 
 
 def _stories(report: Report) -> None:

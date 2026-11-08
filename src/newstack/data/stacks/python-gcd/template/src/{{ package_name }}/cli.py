@@ -1,9 +1,4 @@
-"""The command line: one question per run, the oracle consulted first.
-
-gcd answers the greatest common divisor, lcm the least common
-multiple, coprime reports shared divisors, audit checks a corpus,
-demo tells the stories, selftest runs the promises.
-"""
+"""The command line: one question per run, the oracle consulted first."""
 
 from __future__ import annotations
 
@@ -11,7 +6,7 @@ import argparse
 import json
 import sys
 
-from .solve import GcdError, audit, coprime, gcd, lcm
+from .solve import GcdError, audit, extended_gcd, gcd, mod_inverse
 
 PROGRAM = "{{ npm_name }}"
 VERSION = "0.1.0"
@@ -23,69 +18,45 @@ EXIT_UNUSABLE = 2
 
 def _command_gcd(args: argparse.Namespace) -> int:
     try:
-        a = int(args.a)
-        b = int(args.b)
-    except ValueError as exc:
-        print(f"{PROGRAM}: {exc}", file=sys.stderr)
-        return EXIT_UNUSABLE
-    try:
-        g = gcd(a, b)
-    except GcdError as exc:
-        print(f"{PROGRAM}: {exc}", file=sys.stderr)
-        return EXIT_UNUSABLE
-    if args.json:
-        print(json.dumps(g))
-        return EXIT_OK
-    print(f"gcd        {g}")
-    return EXIT_OK
-
-
-def _command_lcm(args: argparse.Namespace) -> int:
-    try:
-        a = int(args.a)
-        b = int(args.b)
-    except ValueError as exc:
-        print(f"{PROGRAM}: {exc}", file=sys.stderr)
-        return EXIT_UNUSABLE
-    try:
-        result = lcm(a, b)
-    except GcdError as exc:
-        print(f"{PROGRAM}: {exc}", file=sys.stderr)
-        return EXIT_UNUSABLE
-    if args.json:
-        print(json.dumps(result))
-        return EXIT_OK
-    print(f"lcm        {result}")
-    return EXIT_OK
-
-
-def _command_coprime(args: argparse.Namespace) -> int:
-    try:
-        a = int(args.a)
-        b = int(args.b)
-    except ValueError as exc:
-        print(f"{PROGRAM}: {exc}", file=sys.stderr)
-        return EXIT_UNUSABLE
-    try:
-        c = coprime(a, b)
+        c = gcd(args.a, args.b)
     except GcdError as exc:
         print(f"{PROGRAM}: {exc}", file=sys.stderr)
         return EXIT_UNUSABLE
     if args.json:
         print(json.dumps(c))
         return EXIT_OK
-    print(f"coprime    {c}")
+    print(f"gcd           {c}")
+    return EXIT_OK
+
+
+def _command_ext(args: argparse.Namespace) -> int:
+    try:
+        g, x, y = extended_gcd(args.a, args.b)
+    except GcdError as exc:
+        print(f"{PROGRAM}: {exc}", file=sys.stderr)
+        return EXIT_UNUSABLE
+    if args.json:
+        print(json.dumps({"g": g, "x": x, "y": y}))
+        return EXIT_OK
+    print(f"extended_gcd  g={g} x={x} y={y}")
+    return EXIT_OK
+
+
+def _command_inv(args: argparse.Namespace) -> int:
+    try:
+        c = mod_inverse(args.a, args.m)
+    except GcdError as exc:
+        print(f"{PROGRAM}: {exc}", file=sys.stderr)
+        return EXIT_UNUSABLE
+    if args.json:
+        print(json.dumps(c))
+        return EXIT_OK
+    print(f"mod_inverse   {c}")
     return EXIT_OK
 
 
 def _command_audit(args: argparse.Namespace) -> int:
-    try:
-        xs = args.values[::2]
-        ys = args.values[1::2]
-        pairs = [(int(x), int(y)) for x, y in zip(xs, ys, strict=False)]
-    except ValueError as exc:
-        print(f"{PROGRAM}: {exc}", file=sys.stderr)
-        return EXIT_UNUSABLE
+    pairs = [(int(x), int(y)) for x, y in (v.split(",") for v in args.values)]
     breaks = audit(pairs)
     if breaks:
         for b in breaks:
@@ -122,37 +93,37 @@ def demo_stories():
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog=PROGRAM, description="small positive integers, honestly divided.")
+        prog=PROGRAM, description="small integers, honestly divided.")
     parser.add_argument("--version", action="version", version=f"{PROGRAM} {VERSION}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    gcd_p = subparsers.add_parser("gcd", help="a and b, gcd out")
-    gcd_p.add_argument("a")
-    gcd_p.add_argument("b")
-    gcd_p.add_argument("--json", action="store_true")
-    gcd_p.set_defaults(handler=_command_gcd)
+    g = subparsers.add_parser("gcd", help="a b, gcd out")
+    g.add_argument("a", type=int)
+    g.add_argument("b", type=int)
+    g.add_argument("--json", action="store_true")
+    g.set_defaults(handler=_command_gcd)
 
-    lcm_p = subparsers.add_parser("lcm", help="a and b, lcm out")
-    lcm_p.add_argument("a")
-    lcm_p.add_argument("b")
-    lcm_p.add_argument("--json", action="store_true")
-    lcm_p.set_defaults(handler=_command_lcm)
+    e = subparsers.add_parser("ext", help="a b, extended gcd out")
+    e.add_argument("a", type=int)
+    e.add_argument("b", type=int)
+    e.add_argument("--json", action="store_true")
+    e.set_defaults(handler=_command_ext)
 
-    cp_p = subparsers.add_parser("coprime", help="a and b, coprime out")
-    cp_p.add_argument("a")
-    cp_p.add_argument("b")
-    cp_p.add_argument("--json", action="store_true")
-    cp_p.set_defaults(handler=_command_coprime)
+    inv = subparsers.add_parser("inv", help="a m, inverse out")
+    inv.add_argument("a", type=int)
+    inv.add_argument("m", type=int)
+    inv.add_argument("--json", action="store_true")
+    inv.set_defaults(handler=_command_inv)
 
-    audit_p = subparsers.add_parser("audit", help="pairs, audited")
-    audit_p.add_argument("values", nargs="+")
-    audit_p.set_defaults(handler=_command_audit)
+    a = subparsers.add_parser("audit", help="pairs, audited")
+    a.add_argument("values", nargs="+")
+    a.set_defaults(handler=_command_audit)
 
-    selftest_p = subparsers.add_parser("selftest", help="the promises")
-    selftest_p.set_defaults(handler=_command_selftest)
+    st = subparsers.add_parser("selftest", help="the promises")
+    st.set_defaults(handler=_command_selftest)
 
-    demo_p = subparsers.add_parser("demo", help="six stories, computed live")
-    demo_p.set_defaults(handler=_command_demo)
+    d = subparsers.add_parser("demo", help="six stories, computed live")
+    d.set_defaults(handler=_command_demo)
     return parser
 
 

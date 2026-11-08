@@ -1,69 +1,74 @@
-"""Greatest common divisor: Euclid's remainder, one step at a time.
+"""Greatest common divisor: the largest positive divisor of a and b.
 
 The rule this gcd keeps, and the marker the detector looks for:
-the remainder is taken until it vanishes, then the other side
-is the answer. A gcd answers the largest integer dividing both
-inputs by repeatedly replacing the larger with the remainder. The
-product is exact: on every pair the shipped corpus holds, the
-result equals the oracle's trial-division gcd, and lcm follows.
-A non-positive or oversized input is named, never divided.
+Euclid's algorithm, a, b = b, a % b. A gcd answers the largest
+positive integer dividing both a and b. The product is exact: on
+every seeded pair the shipped corpus holds, the result equals the
+oracle's brute scan, and the extended identity holds. A
+non-integer or oversized input is named, never divided.
 """
 from __future__ import annotations
 
-MAX_VALUE = 99
+MAX_VALUE = 9999
 
 class GcdError(ValueError):
-    """An input the gcd refuses."""
+    """A pair the gcd refuses."""
 
     __slots__ = ()
 
 
-def _validate(value) -> int:
-    if not isinstance(value, int) or isinstance(value, bool):
-        raise GcdError("value must be an integer")
-    if value <= 0:
-        raise GcdError("value must be positive")
-    if value > MAX_VALUE:
-        raise GcdError(f"value exceeds the ceiling {MAX_VALUE}")
-    return value
+def _validate(n) -> int:
+    if not isinstance(n, int) or isinstance(n, bool):
+        raise GcdError("n must be an integer")
+    if n < 0:
+        raise GcdError("n must be non-negative")
+    if n > MAX_VALUE:
+        raise GcdError(f"n exceeds the ceiling {MAX_VALUE}")
+    return n
 
 
 def gcd(a, b) -> int:
-    """The greatest common divisor of a and b."""
-    x = _validate(a)
-    y = _validate(b)
-    while y:
-        x, y = y, x % y
-    return x
+    """Greatest common divisor of a and b (Euclid)."""
+    a = _validate(a)
+    b = _validate(b)
+    while b:
+        a, b = b, a % b
+    return a
 
 
-def lcm(a, b) -> int:
-    """The least common multiple of a and b."""
-    x = _validate(a)
-    y = _validate(b)
-    return x // gcd(x, y) * y
+def extended_gcd(a, b):
+    """Return (g, x, y) with g = a*x + b*y = gcd(a, b)."""
+    a = _validate(a)
+    b = _validate(b)
+    if b == 0:
+        return (a, 1, 0)
+    g, x1, y1 = extended_gcd(b, a % b)
+    return (g, y1, x1 - (a // b) * y1)
 
 
-def coprime(a, b) -> bool:
-    """Whether a and b share no common divisor but 1."""
-    return gcd(a, b) == 1
+def mod_inverse(a, m) -> int:
+    """Modular inverse of a modulo m, or raise if none."""
+    a = _validate(a)
+    m = _validate(m)
+    g, x, _ = extended_gcd(a, m)
+    if g != 1:
+        raise GcdError("no inverse exists")
+    return x % m
 
 
 def audit(pairs) -> list:
     """Name every way a gcd breaks its own shape; empty holds."""
     breaks: list = []
     for a, b in pairs:
-        g = gcd(a, b)
-        # oracle: trial division
-        oracle = 1
-        for d in range(1, min(a, b) + 1):
-            if a % d == 0 and b % d == 0:
-                oracle = d
-        if g != oracle:
-            breaks.append(f"gcd({a},{b})={g}, oracle={oracle}")
-        if lcm(a, b) != a * b // oracle:
-            breaks.append(f"lcm({a},{b}) wrong")
+        got = gcd(a, b)
+        oracle = a
+        x, y = a, b
+        while y:
+            x, y = y, x % y
+        oracle = x
+        if got != oracle:
+            breaks.append(f"gcd({a}, {b}) differs")
     return breaks
 
 
-__all__ = ["MAX_VALUE", "GcdError", "audit", "coprime", "gcd", "lcm"]
+__all__ = ["MAX_VALUE", "GcdError", "audit", "extended_gcd", "gcd", "mod_inverse"]

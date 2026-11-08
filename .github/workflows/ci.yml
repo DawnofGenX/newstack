@@ -176,6 +176,7 @@ jobs:
           - python-char-frequency
           - python-prime-check
           - python-lcm
+          - python-gcd
           - python-maximum-flow
           - python-treap
           - python-rope

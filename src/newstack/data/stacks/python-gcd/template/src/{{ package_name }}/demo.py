@@ -13,46 +13,46 @@ class Story:
 
 
 def stories() -> list:
-    from .solve import audit, coprime, gcd, lcm
+    from .solve import audit, extended_gcd, gcd, mod_inverse
 
     first = Story(
-        "gcd(12,8)=4",
-        f"gcd(12,8)={gcd(12, 8)}",
-        gcd(12, 8) == 4,
+        "gcd(4, 6)",
+        f"gcd(4, 6)={gcd(4, 6)}",
+        gcd(4, 6) == 2,
     )
     second = Story(
-        "gcd(7,5)=1",
-        f"gcd(7,5)={gcd(7, 5)}",
-        gcd(7, 5) == 1,
+        "extended_gcd(4, 6)",
+        f"extended_gcd(4, 6)={extended_gcd(4, 6)}",
+        extended_gcd(4, 6)[0] == 2,
     )
     third = Story(
-        "lcm(4,6)=12",
-        f"lcm(4,6)={lcm(4, 6)}",
-        lcm(4, 6) == 12,
+        "mod_inverse(3, 7)",
+        f"mod_inverse(3, 7)={mod_inverse(3, 7)}",
+        mod_inverse(3, 7) == 5,
     )
     fourth = Story(
-        "coprime(7,5)",
-        f"coprime(7,5)={coprime(7, 5)}",
-        coprime(7, 5) is True,
+        "the audit stays silent",
+        f"breaks={audit([(4, 6), (3, 5), (7, 7)])}",
+        audit([(4, 6), (3, 5), (7, 7)]) == [],
     )
     fifth = Story(
-        "the audit stays silent",
-        f"breaks={audit([(2, 4), (3, 5), (10, 15)])}",
-        audit([(2, 4), (3, 5), (10, 15)]) == [],
+        "gcd(0, 5)",
+        f"gcd(0, 5)={gcd(0, 5)}",
+        gcd(0, 5) == 5,
     )
     sixth = Story(
-        "a zero input is refused",
-        "gcd refuses zero",
-        _refuses_zero(),
+        "an oversized n is refused",
+        "gcd refuses 10000",
+        _refuses_oversized(),
     )
     return [first, second, third, fourth, fifth, sixth]
 
 
-def _refuses_zero() -> bool:
+def _refuses_oversized() -> bool:
     from .solve import GcdError, gcd
 
     try:
-        gcd(0, 5)
+        gcd(10000, 2)
     except GcdError:
         return True
     return False
