@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-lis`
 - `python-coin-change`
 - `python-knapsack`
 - `python-caesar-cipher`
