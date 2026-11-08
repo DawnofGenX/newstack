@@ -166,6 +166,7 @@ jobs:
           - python-gcd
           - python-sieve
           - python-factorial
+          - python-fibonacci
           - python-maximum-flow
           - python-treap
           - python-rope

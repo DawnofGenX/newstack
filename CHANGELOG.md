@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format follows
 ## [Unreleased]
 
 ### Added
+- `python-fibonacci` — fibonacci over small n: the n-th term equals the shipped oracle (recurrence) on every seeded n, each term is the sum of the two before it, and the list agrees; negative or oversized n is named, never computed.
 - `python-factorial` — factorial and binomial over small n: n! equals the shipped oracle (sequential product) on every seeded n, the product grows by one factor at a time from 1 up to n, and binomial divides cleanly; negative or oversized n is named, never multiplied.
 - `python-sieve` — sieve of Eratosthenes up to small n: the prime list equals the shipped oracle (trial division) on every seeded n, each prime crosses off its multiples starting at its square, and is_prime agrees; non-positive or oversized n is named, never sieved.
 - `python-gcd` — gcd (Euclid) and lcm over small positive integers: the result equals the shipped oracle (trial division) on every seeded pair, the remainder is taken until it vanishes, and coprime reports shared divisors; non-positive or oversized inputs are named, never divided.
