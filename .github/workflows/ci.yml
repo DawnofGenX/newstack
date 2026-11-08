@@ -206,6 +206,7 @@ jobs:
           - python-subset-sum
           - python-max-subarray
           - python-longest-common-substring
+          - python-bubble-sort
           - data-science
           - dbt-project
           - sphinx-docs
