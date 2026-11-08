@@ -212,6 +212,7 @@ jobs:
           - python-odd-even-sort
           - python-pancake-sort
           - python-cycle-sort
+          - python-cocktail-sort
           - data-science
           - dbt-project
           - sphinx-docs
