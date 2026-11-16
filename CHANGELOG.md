@@ -4,1104 +4,148 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.5.0] - 2026-11-16
+
+280 new starter stacks since 0.4.0, across 58 languages. Every stack is
+generated and verified on a clean runner; the stack matrix is now sharded so that growth
+past GitHub's 256-job matrix cap cannot silently stop that verification (docs/CI.md).
 
 ### Added
-- `python-intro-sort`
-- `python-tim-sort`
-- `python-cocktail-sort`
-- `python-cycle-sort`
-- `python-pancake-sort`
-- `python-odd-even-sort`
-- `python-gnome-sort`
-- `python-comb-sort`
-- `python-bubble-sort`
-- `python-longest-common-substring`
-- `python-max-subarray`
-- `python-subset-sum`
-- `python-lis`
-- `python-coin-change`
-- `python-knapsack`
-- `python-caesar-cipher`
-- `python-bracket-matching` — bracket matching over small strings: every opening bracket must close in the right order, matched pairs are listed, unmatched are counted, and oversized or malformed inputs are named, never matched.
-- `python-deque` — double-ended queue of integers: append and pop at both ends, peek either side, and rotate without losing an item; oversized or malformed inputs are named, never queued.
-- `python-monotonic-stack` — monotonic stack: next greater, next smaller, and previous greater elements are found by popping while the new value breaks the order; oversized or malformed inputs are named, never stacked.
-- `python-combinations` — combinations of small lists: every subset of items is generated, the count equals two to the power of the length, and distinct subsets are deduplicated; oversized or malformed inputs are named, never combined.
-- `python-permutations` — permutations of small lists: every ordering of items is generated, the count equals the factorial, and distinct permutations are deduplicated; oversized or malformed inputs are named, never permuted.
-- `python-shell-sort` — shell sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, gaps shrink by three and one until one, and each gap pass is an insertion sort; negative or oversized values are named, never sorted.
-- `python-interpolation-search` — interpolation search over small sorted nonneg integer arrays: the probe follows the value, not the middle, the index equals the shipped oracle (linear scan) on every seeded corpus, and a missing target answers -1; unsorted input is named, never searched.
-- `python-hamming-distance` — count differing positions: hamming counts the differing bits between two nonnegative integers, hamming_text counts the differing characters between two equal-length strings, and the audit reports any triple whose expected distance does not match the computed one; out-of-range or malformed inputs are named, never measured.
-- `python-roman-numerals` — convert between integers and roman numerals: int_to_roman turns a positive integer into its letter form, roman_to_int reads a roman string back into an integer, and the audit reports any pair that does not round-trip; out-of-range or malformed inputs are named, never converted.
-- `python-decimal-to-binary` — convert between decimal and binary strings: dec_to_binary turns a nonnegative integer into its base-two digits, binary_to_decimal reads a binary string back into an integer, and the audit reports any pair that does not round-trip; oversized or malformed inputs are named, never converted.
-- `python-power` — Fast exponentiation over small integers: power agrees with the shipped oracle (repeated multiplication) on every seeded base and exponent, modular exponentiation agrees, and an oversized input is named, never computed.
-- `python-lcs` — Longest common subsequence of two small strings: a dynamic-programming table of prefix lengths, backtracked to recover one optimal subsequence, audited against an independent length oracle.
-- `python-gcd` — greatest common divisor over small integers: gcd agrees with the shipped oracle (Euclid) on every seeded pair, extended_gcd satisfies Bezout, and a non-integer or oversized input is named, never divided.
-- `python-lcm` — least common multiple over small integers: lcm agrees with the shipped oracle (a*b//gcd) on every seeded pair, gcd agrees, and a non-integer or oversized input is named, never divided.
-- `python-prime-check` — prime check over small integers: is_prime agrees with the shipped oracle (trial division to sqrt) on every seeded n, prime_factors agrees, and a non-integer or oversized n is named, never checked.
-- `python-char-frequency` — character frequency over small strings: count_chars agrees with the shipped oracle (len) on every seeded string, char_frequencies agrees, and a non-string or oversized input is named, never counted.
-- `python-word-count` — word count over small strings: count_words agrees with the shipped oracle (split) on every seeded string, word_frequencies agrees, and a non-string or oversized input is named, never counted.
-- `python-armstrong` — armstrong number over small integers: is_armstrong agrees with the shipped oracle (digit^count sum) on every seeded n, armstrong_sum agrees, and a negative or oversized n is named, never checked.
-- `python-digit-sum` — digit sum over small integers: digit_sum agrees with the shipped oracle (sum of decimal digits) on every seeded n, the product and count agree, and a negative or oversized n is named, never summed.
-- `python-vowel-count` — vowel counting over small strings: count_vowels agrees with the shipped oracle (sum) on every seeded string, a vowel is one of a, e, i, o, u case-insensitively, and positions agree; non-string or oversized input is named, never counted.
-- `python-anagram` — anagram check over small strings: is_anagram agrees with the shipped oracle (sorted comparison) on every seeded pair, two strings are anagrams when their sorted letters agree, and signature agrees; non-string or oversized input is named, never compared.
-- `python-palindrome` — palindrome check over small strings: is_palindrome agrees with the shipped oracle (reversal) on every seeded string, a string reads the same forwards and backwards, and reverse agrees; non-string or oversized input is named, never reversed.
-- `python-fibonacci` — fibonacci over small n: the n-th term equals the shipped oracle (recurrence) on every seeded n, each term is the sum of the two before it, and the list agrees; negative or oversized n is named, never computed.
-- `python-factorial` — factorial and binomial over small n: n! equals the shipped oracle (sequential product) on every seeded n, the product grows by one factor at a time from 1 up to n, and binomial divides cleanly; negative or oversized n is named, never multiplied.
-- `python-sieve` — sieve of Eratosthenes up to small n: the prime list equals the shipped oracle (trial division) on every seeded n, each prime crosses off its multiples starting at its square, and is_prime agrees; non-positive or oversized n is named, never sieved.
-- `python-gcd` — gcd (Euclid) and lcm over small positive integers: the result equals the shipped oracle (trial division) on every seeded pair, the remainder is taken until it vanishes, and coprime reports shared divisors; non-positive or oversized inputs are named, never divided.
-- `python-linear-search` — linear search over small nonneg integer arrays: the first index equals the shipped oracle (first-match scan) on every seeded corpus, the first match wins and the walk stops there, and a missing target answers -1; out-of-range values are named, never searched.
-- `python-binary-search` — binary search over small sorted nonneg integer arrays: the index equals the shipped oracle (linear scan) on every seeded corpus, the middle is the pivot and the half that cannot hold the target is discarded, and a missing target answers -1; unsorted input is named, never searched.
-- `python-radix-sort` — radix sort (LSD) over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the digit is (value divided by ten to the power) mod ten, and the rank is its prefix; negative or oversized values are named, never sorted.
-- `python-bucket-sort` — bucket sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the bucket index is value divided by the bucket width, and the rank is its prefix; negative or oversized values are named, never sorted.
-- `python-selection-sort` — selection sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the smallest of the unsorted tail is chosen and swapped into place, and the rank is its prefix; negative or oversized values are named, never sorted.
-- `python-insertion-sort` — insertion sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the sorted prefix grows one value at a time walked leftwards, and the rank is its prefix; negative or oversized values are named, never sorted.
-- `python-heap-sort` — heap sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, the largest rides to the top and is peeled off last, and the rank is its prefix; negative or oversized values are named, never sorted.
-- `python-quick-sort` — stable quick sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, equal keys keep their input order through a stable partition, the pivot partitions the array and each side sorts itself, and the rank is its prefix; negative or oversized values are named, never sorted.
-- `python-merge-sort` — stable merge sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, equal keys keep their input order, the middle splits the work and the merge walks both halves, and the rank is its prefix; negative or oversized values are named, never sorted.
-- `python-counting-sort` — stable counting sort over small nonneg integer arrays: the sorted list equals the shipped oracle (sorted()) on every seeded corpus, equal keys keep their input order, the tally is the histogram, and the rank is its prefix; negative or oversized values are named, never sorted.
-- `python-boruvka-mst` — minimum spanning trees over small nonneg-weight undirected integer-keyed graphs: the walker's tree total equals the shipped enumeration oracle's minimum on every shipped and seeded corpus, every tree spans every node exactly once with |V|-1 edges, every fragment reaches through its own cheapest edge each round, and equal weights pick the same edge set run after run.
-- `python-kruskal-mst` — minimum spanning trees over small nonneg-weight undirected integer-keyed graphs: the walker's tree total equals the shipped enumeration oracle's minimum on every shipped and seeded corpus, every tree spans every node exactly once with |V|-1 edges, the witness ledger tells the truth about every edge of the sorted list, and equal weights pick the same edge set run after run.
-- `python-maximum-flow` — maximum flow over small nonneg-integer-capacity integer-keyed digraphs: the walker's value equals the brute-force min-cut oracle's least on every shipped and seeded corpus, the shipped map conserves at every interior node and never exceeds a capacity, and equal networks ship the same map run after run.
-- `python-floyd-warshall` — all-pairs shortest paths over small nonneg-weight integer-keyed digraphs: the matrix's distance table equals the shipped walking oracle's table on every shipped and seeded corpus, the diagonal sits at zero, one more relaxation sweep changes nothing, and an unreached ordered pair stays omitted.
-- `python-topological-sort` — predecessors-first ordering of small integer-keyed digraphs: the order's listing validates against every shipped edge on every shipped and seeded corpus, every node sits exactly once, the sequence is a fixed point, and a cycle names its block honestly.
-- `python-prim-mst` — minimum spanning trees over small nonneg-weight undirected integer-keyed graphs: the grower's tree total equals the shipped enumeration oracle's minimum on every shipped and seeded corpus, every tree spans every node exactly once with |V|-1 edges, and equal weights pick the same edge set run after run.
-- `python-bellman-ford` — Single-source shortest paths over small integer-weighted digraphs: the walker's distance map equals the shipped walk-counting oracle's map on every shipped and seeded corpus, no edge still relaxes after |V|-1 rounds, and negative cycles are named honestly.
-- `python-dijkstra` — single-source shortest paths over small nonneg-weight integer-keyed digraphs: the walker's distance map equals the shipped fixed-point oracle's map on every shipped and seeded corpus, every shipped path costs exactly the map's cost, and unreachable nodes stay out of the map.
-- `python-tarjan-scc` — Tarjan's strongly-connected components over small digraphs: the walker's partition equals the shipped reachability oracle's partition on every shipped and seeded corpus, every node lands in exactly one component, and the condensed graph is acyclic under the shipped cycle checker.
-- `python-shunting-yard` — Infix to postfix and back: value_of answers exactly what the shipped recursive-descent oracle answers on shipped and seeded ledgers, and evaluate of the yielded queue equals the answer, division flooring as documented.
-- `python-run-length` — Run-length over lowercase text: decode hands back the letters encode was sent on shipped and seeded corpora, encode answers exactly what the shipped stepper walks, and a repeat never costs more pairs than letters.
-- `python-huffman-coding` — Canonical Huffman over lowercase text: decode(encode(text)) answers with the letters encode was sent on shipped and seeded corpora, no shipped code opens where another closes, and a skewed text pays strictly under eight bits a letter.
-- `python-lz77` — LZ77 over lowercase text: the read hands back the letters the write was sent on shipped and seeded corpora, every back-reference names letters the window already emitted, and a repeat never costs more tokens than letters.
-- `python-bloom-filter` — A Bloom filter whose added keys are always answered present: the shipped audit re-asks every key after every update on seeded streams, the survey lists the liars at the shipped widths (none), and the rows are deterministic multiplicative hashes.
-- `python-z-function` — The Z-array over lowercase words: the array equals the naive per-position LCP scan on seeded corpora, the concatenated occurrences equal the naive scan's starts, and z[0], the single letter, and the empty word stay honest.
-- `python-rabin-karp` — Rabin-Karp over lowercase text: the scan's start list equals the naive scan's on seeded corpora, the roll equals a fresh weigh on shipped windows, and collisions stay honest under a letter-check.
-- `python-count-min` — A count-min sketch over [0, 256): the min of rows never dips under the ledger truth on seeded streams, the audit runs after every update, and the shipped grid answers its corpora exactly.
-- `python-binary-heap` — A min-heap over integer keys, sift-up and sift-down hand-rolled on a plain list: the drain equals sorted(pushed) on seeded push/pop storms, and the parent rule is walked by a shipped checker after every op.
-- `python-levenshtein` — Unit-cost edit distance over lowercase strings: the row walk equals a shipped exponential oracle on short pairs, reads the same from either side, never beats a detour, and nearest equals the scan's argmin with ties first by letters.
-- `python-kmp-automaton` — Knuth-Morris-Pratt over lowercase text: the scan's start list equals the naive scan's on seeded corpora, the failure table equals the naive border count, and overlaps and the empty pattern stay honest.
-- `python-van-emde-tree` — A van Emde Boas tree over the fixed universe [0, 256): successor, predecessor, and membership equal the brute-force scans on seeded insert/delete/seek storms, the walk equals sorted(live) after every move, and empty-set seeks answer None, checked by a shipped audit.
-- `python-splay-tree` — A self-adjusting BST over integer keys: the walk equals sorted(live) on mixed insert storms, the touched key sits at the root after every access, and zig, zig-zig, and zig-zag preserve the in-order walk.
-- `python-ring-buffer` — A fixed-capacity FIFO over integers: the drain equals the reference deque exactly under drop-oldest, the cursor never leaves [0, capacity), a full ring overwrites exactly the oldest, and the walk from (head, count) is the visible sequence after every op.
-- `python-fibonacci-heap` — A Fibonacci-ordered forest over integer-keyed items: the pop sequence equals sorted(corpus) on mixed push/pop/decrease storms, every degree stays under the log bound, and decrease-key never breaks heap order, checked by a shipped walk.
-- `python-segment-tree` — A segment tree over an integer array with the combine as the seam: every window answer equals the matching slice sum exactly, a rebuild from the leaf row equals the build it came from, and no query visits more than twice the bit-length of the array.
-- `python-red-black-tree` — A red-black tree over bounded integer keys: the in-order walk equals sorted of the live keys after every op, and a shipped checker walking the tree verifies root black, no red father, and equal black height on every path, with remove of an absent key refused by name.
-- `python-avl-tree` — A height-balanced BST over integer keys: the walk equals sorted(live) on mixed insert/delete storms, every balance factor stays inside -1, 0, 1 after every move, rotations preserve the walk, and the height stays under the AVL ceiling.
-- `python-suffix-array` — Sorted suffix starts of a lowercase text: the order equals the slice-sort exactly, every count equals the scan's start census with overlaps honest, and the longest repeat is the tallest neighbour share.
-- `python-kd-tree` — A 2-d kd-tree over integer point pairs: membership answers equal a set's, a rectangle answer equals the brute-force filter, the nearest answer equals the brute-force argmin with the tie on the lexicographically smallest point, and a rebuild from the in-order walk answers identically.
-- `python-prefix-trie` — A string-keyed trie over lowercase words: membership answers equal a set's, every prefix listing equals the sorted scan of the corpus, delete drops only the exact word, and the empty prefix lists every word exactly once.
-- `python-binomial-heap` — A mergeable integer min-heap of binomial trees: a tree of rank k holds exactly 2^k keys, the forest keeps one tree per rank, size follows the bit pattern of the count, and meld unions two heaps -- what plain heaps refuse.
-- `python-fenwick-tree` — A binary indexed tree over integer values: point adds climb the lowest bit, prefix and range sums walk it back, and every answer is checked against the running list-sum reference the walk visits at most bit-length(n) cells.
-- `python-union-find` — A disjoint-set forest over integer elements: union by size keeps depth logarithmic, find compresses on the way back, and the partition equals a dict-of-parents reference after any seeded workload.
-- `python-scapegoat-tree` — A binary search tree that rebuilds instead of rotating: the 0.7 alpha rule decides every repair, depth stays under log base 1/alpha of n, rebuilds are lossless against bisect, and the work counter settles at n log n.
-- `python-radix-heap` — An integer min-heap that never compares keys: buckets follow the keys' bits, pop-min drains sorted on monotone and mixed streams, and the bucket invariant is re-checked after every op against the sorted corpus.
-- `python-rope` — A binary rope of short leaf chunks with cached lengths: insert, delete, slice, and concat walk the spine instead of copying the text, and to_string is the join of the leaves in order.
-- `python-treap` — A binary search tree that is also a heap on seeded draws: insert, delete, rank, and select run through split and merge, heap and search order are re-checked after every mixed workload, and answers equal bisect's.
-- `python-aho-corasick` — Multi-pattern matching in one pass: a trie with BFS failure links, suffix outputs that never miss an overlap, and a hit set proven equal to a naive scan on seeded alphabets.
-- `python-interval-tree` — A centered interval tree over half-open integer spans: stabbing and overlap answers equal the brute-force scan on any seeded corpus, the max-end augmentation is repaired on every delete, and a point at a span's right end stands outside it.
-- `python-lsm-tree` — A log-structured merge table of integer keys and string values: a sorted memtable flushes to numbered on-disk level tables, reads fall through newest level first, and compaction merges sorted tables while dropping tombstones.
-- `python-b-tree` — A keyed B-tree of configurable order: insert with splits, delete with borrow and merge, exact lookup and range scan, and a page file that reads back identical after any history.
-- `python-skip-list` — A sorted map that balances on seeded coin flips instead of rotations: insert, delete, rank, and select cost one walk, link widths are repaired on every edit, and rank answers exactly what bisect answers.
-- `python-bk-tree` — Edit distance plus a Burkhard-Keller tree: a word is found by distance without comparing it to every word, and the pruning is proved against a full scan on the same corpus.
-- `python-regex-engine` — A pattern compiled to a Thompson NFA and simulated as a set of states, so matching costs one pass and never backtracks; the same pattern is determinised and both machines are proved equal by enumeration.
-- `python-route-trie` — a trie router where the walk order is the documented rule: literal over parameter over catch-all, backtracking on a dead branch, `not-allowed` with an allow list instead of a 404, and a miss that names the segment that ended the search.
-- `python-expression-parser`: precedence climbing with a printer that keeps a parenthesis exactly when removing it would change the tree, right-associative `^` that binds tighter than unary minus, exact arithmetic that refuses `1 / 3` by name instead of rounding unless `--inexact` is asked for, and errors that name the column they are about with a caret under it.
-- `python-linearizability-checker`: linearizability decided by exhaustive search over programme order and real time, with a replayed witness when the history holds and a minimal core when it does not, a permutation yardstick `compare` holds the search to, and an honest refusal for histories too long to enumerate.
-- `python-three-way-merge`: a three-way merge that conflicts only the disputed region. The same edit on both sides is agreement, two insertions at one point conflict because the base orders nothing, an insertion beside a replacement does not conflict, a span without a final newline still gets markers on their own lines, and `explain` prints every chunk before the text.
-- `python-rrule-recurrence`: RRULE expansion where COUNT counts firings rather than intervals, UNTIL is an inclusive instant, INTERVAL is anchored to the start's own period, ordinal weekdays are counted from the month's edges, DST gaps are skipped and reported, and impossible rules are refused at parse time.
-- `python-gitignore-matcher`: contains-a-slash anchoring, directory-only rules, last-match-wins, `**` versus `*`, escapes and character classes, and the ancestor rule that stops a negation from rescuing a file inside an excluded directory.
-- `python-semver-ranges`: a range parsed into intervals you can read, caret's three rules, comparators on partial versions, a prerelease gate that only opens where a core is named, and intersections that prove emptiness instead of guessing.
-- `python-snowflake-ids`: a 64-bit layout written down (41/10/12 bits), a generator that refuses a backwards clock or holds its last millisecond, sequence overflow that waits instead of wrapping, an audit that reads order and duplicates back out of a stream, and the capacity budget printed as dates.
-- `python-hdr-histogram`: bucketed latency percentiles with a printed, measured relative error, exact counts and merges, and a demo that shows why percentiles do not average.
-- `python-version-vectors`: one counter per writer, four verdicts (`equal`, `before`, `after`,
-  `concurrent`), a merge that is a join, a delivery gate that holds a message until its
-  dependencies arrive, and compaction measured for where it is exact and where it
-  silently changes the answer.
-- `python-lru-cache`: four replacement policies (FIFO, LRU, CLOCK, segmented LRU) over seeded traces, with scan resistance and the frequency ceiling printed beside every hit ratio.
-- `python-minhash-lsh`: MinHash signatures and LSH banding with the predicted banding curve printed beside the measured recall, verified candidate pairs, and a planted-duplicate corpus the demo scores against the exact answer.
-- `python-ab-test`: fixed-horizon two-proportion tests with Wilson intervals, a relative lift interval, a sample-ratio-mismatch gate and a peeking simulation that measures how far a 5% test drifts (18.90% under a flat line, 6.70% under an O'Brien-Fleming boundary) on the same simulated worlds.
-- Add `python-merkle-proofs`: Merkle inclusion proofs with domain-separated hashing, where a node's digest can never pass as a leaf, the tree shape is a named rule instead of a builder's choice, the sibling count comes from the index, and every refusal names the rule a proof broke.
-- Add `python-url-signing`: signed requests over a canonical form, where a reordered query is the same request, an escaped slash stays data, the body is covered by its hash, an expiry and a nonce refuse a replay, and each refusal names the rule that failed.
-- Add `python-json-patch`: JSON Pointer and JSON Patch where a patch applies whole or not at all, a failing test rolls back its neighbours, and a computed diff is applied and compared before it is printed.
-- Add `python-hybrid-clock`: a hybrid logical clock that proves a wall clock stepping backwards cannot move a stamp, that a receipt never sorts before its send, and that skew past a bound is refused rather than reported.
-- Add `python-backoff-jitter`: a retry simulator that measures the pile-up each backoff policy creates, instead of assuming jitter helps.
-- **python-hyperloglog** — estimate distinct counts from a fixed bag of registers, with the promised error printed beside the estimate, measured at four scales and five precisions, and a demonstration of the hash bias that collapses the sketch into one register.
-- `node-http-cache`: conditional requests, measured. The RFC 9110 comparison rules are proved by a live server: a weak tag answers `304` for `If-None-Match` and `412` for `If-Match`, a matching tag outranks an old `If-Modified-Since`, a 304 returns zero bytes, `Vary: accept` shows a URL keyed cache serving the wrong representation, a cache that copies the 304 body empties its own entry (shown, then read back), and a 20-round run counts 323 of 340 bytes saved.
-- `python-count-min-sketch`: a count-min sketch that prints its error bound beside every number. A deterministic 125,652-update Zipf stream with a known truth shows zero underestimates, a largest overestimate of 211 against the printed promise of 1,334, and a width sweep where four times the counters cut the mean overestimate from 101.52 to 1.76. Merging two halves is proved exact by comparing rows with a single pass, the conservative update is measured against the plain one on the same stream (mean 11.39 vs 34.87), the five heaviest items come back in true order, and depth above 8 is refused because one blake2b digest cannot supply more rows.
-- `python-leases-fences`: a lease with a strictly increasing fencing token, and a fenced resource that refuses the ghost of an expired holder. Renewal extends from the store's clock reading at renewal time, not from the previous deadline, which is the difference between 1900 and 2000 in the printed story; the same 1500 ms pause is then run against a `FencedValue` (which keeps `b-1`) and an `UnfencedValue` (which keeps the paused holder's `a-late`) so the lost update is printed rather than described. `model` gates the contract, exits 1 if a stale token is ever accepted, and refuses a pause inside the lease because a scenario that never expires demonstrates nothing.
-- `python-consistent-hashing`: a blake2b hash ring with weighted virtual nodes where movement and balance are printed, not claimed. Five thousand keys through `hash % N` move 83.6% when a sixth node joins; the ring moves 18.1%, exactly the arriving node's share, and every moved key lands on a node that was not there before. Removal is checked to take only the departing node's keys, insertion order is checked not to matter, and a probe key past the last point is found and shown wrapping to the first node. The vnode sweep prints two imbalances side by side: the arc imbalance from point spacing, which falls from 271x to 1.08x, and the imbalance measured over a fixed 5,000-key sample, which stops improving at ~160 points because the sample, not the ring, is then the limit. `move` exits 1 on a stranger or on more than 1.5x the fair share, `balance` gates the split, and an empty ring refuses lookups instead of returning a default.
-- `node-worker-pool`: a fixed-size worker-thread pool with a bounded queue, where the numbers come from live runs — reuse versus a worker per task, the main-thread timer that keeps ticking, a 1 MiB buffer detached by its transfer list, a refusal that names the queue depth, and a crashed worker that rejects with its exit code and is replaced.
-- `node-stream-backpressure`: the same chunk series through the same slow sink four ways, with `writableLength` sampled after every write — ignoring a refusal, awaiting a kept promise, waiting for `drain`, and `pipeline()` — so the 4 MiB vs 16 KiB peak is a measurement, plus the forgotten-callback stall and the doubled-callback error that make a Node process hang.
-- `python-bloom-filter`: bit-array membership sized from the math, with the measured false-positive rate, a broken removal next to a counting filter that survives it, and a saturation verdict instead of a silent yes.
-- `python-crdt`: counters, a last-write-wins register and an observed-remove set whose merge laws are checked on real states, with a gossip simulation that shuffles and duplicates every delivery.
-- `python-dependency-resolver`: a semver resolver with prerelease opt-in, backtracking that explains its own dead ends, a conflict message that names both ranges, and a lock audited by re-resolving rather than by comparing versions.
-- `python-time-series-window` — windowing where the timing is the contract. Windows are half-open and aligned to the epoch, because aligning to the first event makes the same input produce different windows; the watermark is `max(event time seen) - allowed lateness`, derived from the data so a replay of the file gives byte-identical output. An event that arrives after its window's end but before its watermark changes the aggregate (the aggregate does not exist yet), while one that arrives after it is `too_late`: it is printed with the instant, the window and the watermark that closed it, and the emitted number stands. Empty windows are listed as `missing` instead of counted as zero, `mean` of all-null events is undefined rather than 0.0, and a flushed window at end of input is marked `final: false` because no watermark reached it. Late data exits 1 as a data-quality gate.
-- `node-event-sourcing` — an event log whose guarantees are checked rather than described. An append is atomic because a batch is one JSON line and one `fsyncSync`, and a torn final line is dropped and counted while a torn line anywhere else raises — a crash artefact is recoverable, a truncated log is evidence. Optimistic concurrency compares `expectedVersion` with the stream's version and the error names both numbers plus the fix (re-read, then retry), because a store that silently orders two writers' intents is answering a business question. Versions are per stream and positions are global, a version hole refuses to load, and projections are pure folds from a `{position, state}` checkpoint written by rename so a resume cannot pair one run's position with another's state. The CLI prints `replay matches a full rebuild` or exits non-zero, and the demo keeps a refused stale append in the story instead of hiding it.
-- `python-saga-compensation` — forward steps, reverse compensations, and a journal that answers what happened. A broken compensation does not stop the others, an irreversible step makes the rollback `incomplete` and is named, a re-run is answered from the journal instead of re-executed, and an interrupted step is retried under the same idempotency key. A torn final line is dropped as a crash artefact; a torn line in the middle refuses to load, because records were lost and guessing which ones invents history.
-- `python-permission-model` — roles, scopes and conditions with an explainable deny. A matching deny outranks any number of allows and the lowest deny id wins, so the sentence is stable; a role granted on `project:acme` stops at the project boundary; `project:*` matches one segment and not `project:acme/doc:42`; and a condition whose attribute is missing reports the missing operand instead of matching. Inheritance cycles, unknown roles and duplicate rule ids fail at load time, with the policy path in the message.
-- `python-retry-budget` — the error budget behind an SLO, and pages that do not flap. The burn rate is a ratio of ratios (bad fraction over allowed fraction), so 1.0 means exactly on pace and the same threshold holds for 30 rps and 30 000 rps. A window with no requests has no burn rate and is reported as undefined, because 0.00x is the most misleading number a dashboard can show; a gap in the buckets, or a window that starts before the first reading, is printed as `missing` instead of being counted as success. Paging is the two-window rule: a 6h window over 6x plus a 30m window over 6x, so one bad minute in six quiet hours is 33x over five minutes and 2.8x over six hours and does not page. Targets are parts per million parsed with `Decimal` (99.9 is 999 000, budget 1 000), the budget is a rolling window so it refills as bad events age out, and past zero the report says `already exhausted` rather than a negative time to exhaustion.
-- `python-cron-schedule` — cron expressions where the answer is a list of UTC instants, not a pattern. The parsing is the easy half: day-of-month and day-of-week are joined with **OR** when both are restricted (so `0 0 1 * 1` is "the 1st or a Monday", which is the Vixie rule and a classic way to mail a report four extra times a month), Sunday is both 0 and 7, and a step is a stride over a range. The hard half is DST: runs are found by walking UTC minutes and converting each candidate into the zone, so a local time that does not exist has no run (2026-03-08 02:30 in New York — the gap between runs is 47 hours, and shifting the job to 03:30 would describe a job that never ran) and a local time that happens twice runs twice (2026-11-01 01:30 in EST and again in EDT, an hour apart in UTC and identical on the wall clock; the two printed offsets are the evidence). A naive `--after` is refused rather than guessed at UTC, and `0 0 30 2 *` parses fine but exits 1 because it describes nothing.
-- `python-html-sanitizer` — a sanitizer that filters is a denylist with a polite name, so this one rebuilds: the input is parsed into events and the output is written from the events the policy allows, which means a construct the parser did not understand cannot survive as text a browser will. The three traps it exists for: `<script>` has to go with its body (dropping the tag publishes the payload), a URL scheme is what the browser sees rather than what was typed (ASCII whitespace and control characters inside `java\tscript:` are discarded, so the value is entity-decoded by the parser, stripped the same way, and only then compared against `http`/`https`/`mailto`/`tel` — and an unknown scheme is refused rather than assumed relative), and unknown entities are escaped instead of guessed. Attributes are per tag (`href` on a `p` is not a thing), attributes with no value are dropped, broken nesting is repaired because the output is written from a stack, and every vector is checked to be a fixed point — `sanitize(sanitize(x)) == sanitize(x)` — because an output a second pass changes is two documents to two browsers. `check` audits the OUTPUT and exits 1, which is the only side of a sanitizer worth auditing.
-- `python-text-diff` — a patch tool's job is to refuse, and everything here exists because the alternative is silent corruption. A hunk header is a hint from the file the patch was made against, so every hunk is located against the text it actually lands on: a hunk whose lines moved still applies and the report says which line the context was found on, while a hunk that matches in two places raises `ApplyError` naming both — picking the first is how a deploy edits the wrong function. Fuzz is a report, not a repair: `with fuzz: hunk 1 dropped 1` is printed, and the tolerated line is kept from the FILE rather than from the patch, because the patch's copy is the line that no longer exists. `a\n` and `a` are different files, so the `\ No newline at end of file` marker is written, parsed and applied; and because text-mode I/O translates CRLF to LF — exactly the difference a diff is meant to preserve — the CLI reads and writes bytes. `check` is the point of the whole thing: it computes `apply(old, diff(old, new)) == new` and exits 1 when a claim breaks, so a deploy pipeline can assert the patch instead of hoping. The demo applies the same patch twice on purpose — the second run must refuse, which is the check that catches a retried deployment step.
-- `python-single-flight` — a cache that stampedes is a multiplier for the outage it was meant to absorb, so this stack runs the loader once per key. The registry lock is held long enough to look a key up and then released — holding it across the load serialises every other key behind the slowest one, which is a cache with a queue in front of it — while each `Entry` carries its own `threading.Event`, so waiters wake only for the key they asked about. A failed load is delivered to every waiter and remembered by nobody: negative caching turns a two-second blip into a TTL-long outage, and an event left unset on the exception path is how callers hang while the leader has already returned. The TTL starts when the value became readable, because an entry that a slow loader would have expired before anyone read it is a rotation, not a cache; an expired entry is replaced inside the same critical section so no waiter blocks on a finished load. Every caller sees one exception type (the loader's own error rides along as `.error`), and `run` exits 1 when the loader ran more than once — the command is the assertion.
-- `python-counter-rollup` — a counter reading is a level, not a rate, and every dashboard bug this stack prevents comes from pretending otherwise. Windows are floor-aligned (rounding moves a boundary and two scrapers then disagree about one event); an increase is attributed to the window holding the LATER reading, and `covered_us` is printed so the denominator of the rate is checkable from the artifact — an interval that straddles a boundary is one measurement, and splitting it would invent two numbers nobody measured; a counter that goes backwards is a RESTART, so the new value is the increase and `resets` says why that window looks odd; a missing scrape is absent, never zero, and `rollup` exits 1 naming the hole because a rate with an unmeasured middle is not the rate. Rollups travel over at-least-once transport, so `merge` drops an exact repeat and raises `Conflict` on a disagreeing one — adding both would multiply the traffic by the retry count — while `combine` adds shards and unions their coverage. Time is integer microseconds throughout, so no float drift and no DST surprise, and the width you type in seconds is converted once at the edge.
-- `python-idempotency-keys` — a retried `POST /charge` is how a customer gets billed twice, so this stack puts the key table where the retry meets the effect and measures *effects*, not answers. `claim` commits its row in its own short transaction before the handler runs (holding the SQLite write lock across a payment call would serialise every other writer behind the network), the fingerprint is taken over the canonical body so a retry that reorders JSON members is still the same request while a changed amount is a conflict, and the stored success body is returned as *text* so a replay is byte-identical instead of re-serialised. The lease makes the second worker say `retry in 30.0s` rather than charging twice, and the attempt number is the fence: completing after your own lease expired is fine while nobody else claimed the key, and raises `OwnerLost` the moment someone did. Two traps the code states rather than hides — `busy_timeout` does not cover the `PRAGMA journal_mode = WAL` switch, so concurrent openers retry that statement themselves, and the crash scenario in `demo` shows the window no key table can close: the effect lands, the row never learns about it, the lease expires, and the handler runs again. That is why `demo` exits non-zero only when a scenario stops being as advertised.
-- `python-schema-evolution` — a schema diff that refuses to cry wolf: it answers one narrow question (can a document that validated against the old schema fail against the new one, or can a member a reader relied on disappear?) and then proves every "yes" with a real document. `diff` classifies each change as breaking, risky or safe and names the JSON path, and `demo` runs the witnesses through the old schema (must pass) and the new one (must fail), quoting the first failure — a witness that passes the new schema is reported `unproven` and the demo exits 1. The distinction the tool keeps is between claims a document can settle and claims only the contract can: `property-removed` is labelled `reader`, because the old documents still validate and no witness can exist, while a changed `pattern` is `risky` — undecidable in general, so it fails `--strict` and not the default run. Also encoded: adding a required member is reported at the parent path (the failure happens on the object), widening a type is safe for writers and work for readers while a straight replacement is one `type-changed` finding rather than two, a new `default` changes behaviour without changing validity, closing `additionalProperties` breaks documents that carried extras, and documentation keys produce no findings at all — a diff that screams about prose gets ignored.
-- `python-outbox-pattern` — the event is a row: `INSERT INTO orders` and `INSERT INTO outbox` commit in one `BEGIN IMMEDIATE`, so the process cannot die between the write and the message. The relay publishes then marks (never the other way round), which makes delivery at-least-once by construction, and `--crash-after` reproduces the exact window in which the sink accepted an event that was never acknowledged — the demo shows the sink seeing it twice and the consumer applying it once, because the ledger row and the effect commit together. Ordering is per aggregate and is enforced by *blocking*, not retrying: an event whose predecessor the broker refused is reported as `blocked` and waits, so no consumer sees `seq 2` before `seq 1`. The sequence number is computed inside the transaction for the same reason the transaction exists, and the first scenario is the negative control — the same write without an outbox, observed to lose the event with nothing in the database to say it happened.
-- `python-keyset-pagination` — cursor pagination whose pages survive deletes and inserts, with a demo that shows what `LIMIT`/`OFFSET` costs.
-- `python-feature-flags` — flags that can explain themselves: `bucket_of` is SHA-256 over `salt:user` because `hash()` is re-seeded per process (the test suite re-runs one script under three seeds and a negative control proves `hash()` moves), a strict `<` against an integer cutoff in basis units makes 0% admit nobody, a per-flag salt keeps two rollouts independent, the precedence table is kill switch > targeting > rollout and the decision reports which rule won, and `distribution` measures each rollout against a population with the worst deviation printed
-- `python-audit-log` — an append-only log whose tampering is detectable, and whose detection is what the tests pin: each event hashes a canonical body (`sort_keys`, tight separators, UTF-8 kept, floats *refused* because `1.0` prints differently in Python and JavaScript) plus the previous event's hash, so four failure modes get names — `body-changed`, `gap`, `chain-broken`, `truncated` — instead of a bare mismatch. Two lessons the code states rather than hides: an edit is caught at its own row and *only* there (the next event links to the stored hash, which never changed), and a hash chain is a checksum, not a signature — an attacker with write access recomputes every hash, so the checkpoint written elsewhere is what turns that rewrite into `rewritten`. `demo` runs all five scenarios and exits `1` while the checkpointless rewrite is still missed, so the gate cannot rot; appends take `BEGIN IMMEDIATE` before the read that picks the sequence number, or two writers fork the chain.
-- `python-rate-limiter` — rate limiting where the arithmetic is the feature: a token bucket stores `tokens: float` and refills by `elapsed * rate`, so it loses a little at every step and the bucket after a million requests is not the bucket you specified. This one stores one integer per key — the theoretical arrival time, in microseconds scaled by the limit so the division comes last — and GCRA derives everything else from it: `allow iff max(tat, now) + (cost-1)*interval - tolerance <= now`. Consequences worth naming: `Retry-After` is the exact instant the request could be admitted (`--limit 7 --per 60` → `8 571 429 µs`, not 0.8571428571428571 s), a second denial says `0.250s` rather than repeating `0.500s`, `reset_at` is when the bucket is *full* instead of when the next request fits, a `cost` above the burst raises (`a request that can never be admitted is a configuration error, not a denial`), keys whose bucket refilled are pruned on write so the table is bounded, and the clock is injected so the boundary cases are exact. `selftest` pins the invariant a reviewer actually cares about — no one-second window admits more than `burst + limit` — and puts eight threads against one bucket to prove it cannot be spent twice.
-- `python-money-allocation` — money as an integer count of minor units, because a float is how half a cent appears and then does not disappear: `Currency` carries the exponent (JPY 0, KWD 3), `parse('12.345 USD')` refuses a third decimal place until `--round half-even|half-up|down|up` names the loss, a decimal comma is refused instead of being read as a thousands separator, and `Money` has no `__lt__` so `100 JPY` cannot be ordered against `100 USD`. The allocator is largest-remainder on integers — floor every share, hand the leftover units to the largest fractional remainders, ties to the earliest share — and it sums the parts and raises `allocation did not balance; this is a bug, not a rounding error` rather than return a total that disagrees with the input.
-- `python-websocket-server` — an RFC 6455 WebSocket service with no dependencies, where the asymmetry is the lesson: client frames must be masked and server frames must not, so the codec takes an explicit `mask=` per direction and a client that forgets it is answered `1002` instead of being read anyway. The handshake answers `404`/`400`/`426` (advertising `Sec-WebSocket-Version: 13`)/`405` before any frame is parsed; fragments are reassembled before the app sees them, control frames may interleave and cannot be fragmented or exceed 125 bytes; text must be valid UTF-8 (`1007`), binary is refused (`1003`), a message over 64 KiB closes `1009`; a close echoes the peer's code and defaults to `1000` while a one-byte or out-of-range payload is `1002`. The smoke test drives real sockets with a masking client and every `curl` carries `--max-time`, because the one assertion that must observe a rejection is exactly the one a broken handshake turns into a hang.
-- `python-circuit-breaker` — a breaker whose state machine is the product. Failures are counted consecutively (one success resets them), the cooldown is measured on an injected clock so the whole `closed → open → half-open` cycle is testable in microseconds, and the half-open state admits exactly one probe while every other caller is refused without a network call. A failed probe restarts the cooldown (otherwise the dependency is retried on every request), an ignored error such as a 422 never trips it but does release the probe it occupied, and a straggler that finishes after the trip is tallied as `late` instead of extending the outage.
-- `python-task-queue` — a SQLite job queue whose delivery guarantee is the product. `claim()` is one `UPDATE … WHERE id = (SELECT … LIMIT 1) RETURNING …` statement, so two workers cannot win the same row; the lease makes at-least-once explicit (a slow job is re-delivered unless a heartbeat renews it), retries wait `min(cap, base * 2 ** (attempts - 1))`, and a job that runs out of attempts lands in `dead` with its last error rather than disappearing. The heartbeat thread opens its own `Store` inside itself, because a SQLite connection belongs to the thread that created it — the bug that passes every local test and raises `ProgrammingError` the first time a handler is slow.
-- `go-consistent-hash`: three in-process cache nodes on a consistent-hash ring (150 vnodes, fmix64-mixed FNV-1a points, replication to the first N owners, ring-order failover, rebalance that moves only the victim's keys) with a `-race` gate and a live HTTP smoke test.
-- `go-wal-kv`: an HTTP key/value service with a real write-ahead log (CRC32C frames, fsync before the in-memory map changes, torn-tail truncation on the last segment, tombstones, and compaction via a temporary segment and a rename).
-- `python-config-precedence` — layered configuration whose every value carries its provenance. The merge is a fold over `LAYER_ORDER = ("file", "env", "flag")`, so precedence is data instead of a chain of `if`s. Layers are read first and parsed afterwards, which is what lets one run report a bad file value, a typo'd key and a bad `--set` together instead of one per attempt. An unset variable is not an empty one: unset means "no opinion", empty is a value and fails to parse. Environment text is parsed per declared kind, so `bool("false")` never happens, a boolean accepts only real boolean words, and integers go through a regex so `1_000` is refused with a hint rather than silently becoming 1000. Nesting uses `__` because `_` is legal inside a setting name, and a single-underscore variable is reported as the typo it usually is. A configuration printer is a leak, so secrets are masked in `show`, in the JSON payload and in `get` (which refuses without `--reveal`); `check --strict` exits 1 while a secret still holds the default that shipped with the code.
-- `python-pytest-plugin` — a pytest plugin whose product is the report. The marker is registered in `pytest_configure`, because `--strict-markers` treats an unregistered decorator as an error and the decorator itself registers nothing. `pytest_runtest_makereport` runs once per phase, so the report keeps `setup`/`call`/`teardown` separately and a failing fixture is recorded as an `error` rather than a failed assertion. Durations are measured around the hook's `yield` and stored in milliseconds. Strict mode raises `pytest.UsageError` at collection and therefore exits 4 before a single test runs. The `summary` command reads the file back with a validated format version, prints the slowest tests, and exits 1 when `--fail-over-ms` is breached.
-- **python-mqtt-broker**: an MQTT 3.1.1 broker with no dependencies. The remaining-length field is seven bits per byte with a continuation bit, so a 20 KB payload needs three length bytes; SUBACK is written *before* the retained replay, otherwise a client that reads one reply per call sees a PUBLISH where it expects its grant; `a/#` also matches the parent `a`; a retained publish is only observable from a test at QoS 1 because QoS 0 is never acknowledged and the assertion races the server thread; a connection dropped with unread bytes reaches the peer as `ECONNRESET`, not a clean EOF; and an empty retained publish both deletes the record and delivers an empty message. `mosquitto_pub`/`mosquitto_sub` drive the smoke test.
-- `node-cli`: a streaming counter whose contract is the shell — byte-accurate UTF-8, a carried word across chunk boundaries, logical lines, `EPIPE` as exit 0, unknown flags as exit 2, and tests that pipe a real child process into `head`.
-- `python-graceful-shutdown`: a SIGTERM path as a tested contract — non-daemon request threads, a drain watcher off the serving thread, the listener closed mid-drain, `503 draining` for keep-alive, a deadline that exits 1 immediately, and a second signal that exits 130.
-- `python-rag-eval` — a retrieval evaluation harness whose numbers can be defended. The chunk
-  windows are word-aligned with stable `doc#offset` ids and a coverage check, because a step
-  larger than `size - overlap` silently leaves a hole and every later metric is then measured
-  against an incomplete corpus. BM25 uses the smoothed idf `log(1 + (N - df + 0.5)/(df + 0.5))`
-  so a term in every chunk scores zero instead of negative. Before any metric runs, the chunk
-  ranking collapses to a document ranking at each document's best chunk — counting chunk hits
-  inflates recall for long documents, which are simply chunked more often. Precision divides by
-  `k`, not by the number of results returned; a query with no judgements is reported as
-  `skipped` instead of being scored 0.0 (which blames the retriever for a gap in the labels);
-  macro and micro recall are printed together because either one alone can hide a regression;
-  and `compare --baseline before.json --candidate after.json` exits 1 when macro recall, micro
-  recall, ndcg or mrr drops, so a retrieval change either earns its place in CI or fails it.
-- `python-openapi-client` — the OpenAPI document as an executable contract, not a comment. A
-  stdlib-only client reads `fixtures/openapi.json` at run time, validates the request body before
-  a byte leaves the process, and validates each response against the schema attached to that
-  exact status: an undocumented status is drift, a documented `4xx` is a normal answer whose body
-  is checked like any other, and every disagreement is reported at once (`$.tags: expected
-  array, got integer`, `$: unexpected member 'server_side'`). `bool` is named before `int`
-  because `isinstance(True, int)` is true, so `true` never satisfies an integer schema; path
-  values are percent-encoded so `id=a/b` cannot invent a segment; and `validate --operation getNote
-  --response saved.json` re-checks a captured body offline with no server anywhere.
-- `python-dns-server` — an authoritative DNS server for one zone over UDP **and** TCP on the
-  same port: the wire format is hand-written, so the traps are the protocol's. Binding UDP and
-  TCP separately with port 0 picks two different ephemeral ports and every TCP client gets
-  `ECONNREFUSED`; EDNS0's advertised payload size arrives in the OPT record's CLASS field and
-  must raise the datagram ceiling rather than be minimised away; a CNAME belongs in the answer
-  before the chain is followed; pointers that do not point backwards are a format error, not a
-  loop; TXT rdata is chunked at 255 bytes; and `dig` silently retries over TCP after a
-  truncated answer, so a truncation check needs `+ignore` or it asserts the full answer.
-- `python-resp-server` — a RESP2 key-value server whose parser is the point: TCP splits a
-  command wherever it likes (the reader buffers and only consumes a whole frame, and the selftest
-  feeds one command one byte at a time), two commands in one write owe two replies in order,
-  inline and multibulk are separate grammars, `*0\r\n` is ignored rather than answered, a
-  malformed frame answers one `-ERR Protocol error` and then closes the connection, and `INCR` on
-  a non-numeric value must neither answer nor overwrite it. `redis-cli` drives the smoke test, so
-  a real client is the judge.
-- `python-smtp-sink` — a development SMTP capture server: `Controller(port=0)` does not work
-  (aiosmtpd probes the server by connecting to port 0 and raises ConnectionRefusedError), the
-  size limit can surface as `SMTPSenderRefused` rather than `SMTPDataError` because EHLO
-  advertises SIZE, and dot-stuffing is a wire encoding that must be undone before the message is
-  stored — so the test parses the stored mail instead of scanning it for `..`. Messages are
-  written to a `.part` file and renamed before the index line is `fsync`ed, and `rebuild`
-  recreates the index from the `.eml` files alone because the files are the truth.
-- `go-tcp-framing` — a service that is not HTTP: 4-byte big-endian length prefixes in
-  front of JSON payloads over raw TCP. The cap is enforced before the length prefix can
-  allocate, a zero-length frame is refused instead of read as an empty message, protocol
-  errors are answered without dropping the connection, and `Shutdown` closes parked
-  clients so Ctrl-C is immediate. The smoke test speaks the byte format from Python
-  rather than reusing the server's own encoder, so a framing bug shared by both ends
-  cannot pass.
-- `python-c-extension` — a CPython extension module built by `setuptools`, with the
-  reference implementation kept as the test oracle: `y*` (not `y#`, which refuses a
-  `bytearray`) fills a `Py_buffer` so embedded NUL bytes are counted rather than
-  truncating the input, `view.len` is copied before `PyBuffer_Release` may clear it, and
-  one test asserts that `import` really loaded a compiled `.so` so a future "pure Python
-  fallback" cannot pass quietly. Compile flags live in `setup.py` because the
-  `pyproject.toml` extension table does not carry them portably.
-- `node-http2-api` — an h2c service written straight on `http2`, with no HTTP/1 fallback left
-  on by accident: the server listens on the raw `stream` event (the argument to `createServer`
-  is the HTTP/1-compatible pair, which is why `stream.respond` is missing there), the body cap
-  is enforced while the stream is still arriving, and the contract refuses to pass unless
-  `curl --http2-prior-knowledge -w '%{http_version}'` reports `2` rather than a 200 on a
-  downgraded connection.
-- `node-load-test` — an HTTP load generator plus the thresholds that make it a gate.
-  Latency is measured from the instant a request was *due*, not from the instant a socket
-  freed up: the second reading is coordinated omission, and it makes a stalled server look
-  fast. Percentiles are nearest-rank, so every number is a latency that happened (p95 of
-  1..100 is 95, not 95.05) and the method is printed in the report. Warm-up samples are
-  excluded *and counted*, durations come from `process.hrtime.bigint()` rather than a wall
-  clock that can jump, and every response body is drained - an undrained body never returns
-  its socket, so a keep-alive run silently measures connection setup. Throughput is printed
-  but never thresholded, because it depends on the machine next to yours. With no
-  `--threshold` the run still gates `errorRate <= 0`, and `replay` re-derives the summary
-  from an archived sample file with no network, which is what makes the arithmetic testable.
-- `latex-paper` — a two-page article built with `latexmk` and `bibtex`, and gated on the PDF
-  instead of the sources: `pdftotext` must show the title, every heading, the `[1]` citation and
-  the bibliography entry, `pdfinfo` must report two pages, and `build/paper.log` must contain no
-  overfull line and no unresolved citation. The starter documents why `\n` inside `\texttt{}` is
-  a fatal undefined control sequence, why section numbers vanish from plain `pdftotext` output,
-  and why `latexmk -v` hangs a CI step instead of printing a version.
-- `kotlin-ktor-api` — Ktor 3 + kotlinx.serialization on JDK 21, one shaded jar. Ktor routes answer
-  unknown paths with their own plain-text body, so the service intercepts `Setup` on the raw
-  `Application` instead: that keeps `{"error":"not_found","detail":"no route for GET /nope"}`
-  byte-exact and makes `/health/` a 404 rather than a rewrite. kotlinx silently accepts
-  `"text":42`, so the discriminator between `missing_text` and `invalid_json` comes from a
-  hand-rolled scanner, and the shade plugin keeps `ServicesResourceTransformer` (Ktor discovers
-  engines through `META-INF/services`) while `dependency-reduced-pom.xml` stays out of the repo.
-- `go-trace-api` — a text-stats service that emits W3C trace context without OpenTelemetry or
-  any other SDK. The `traceparent` parser is strict (four fields, version `00`, lowercase hex,
-  no all-zero ids) and answers `400` instead of silently minting a new root; every response names
-  the span that served it; a child span is recorded whose parent is the request span; a trace
-  whose sampled flag is `00` still propagates ids but stores nothing; and `/spans` keeps a ring
-  of the last 256 spans, reporting how many it evicted. The export is plain JSON, so the whole
-  starter is `go vet ./...` plus `go test ./...`.
-- `python-property-tests` — half-open interval arithmetic with Hypothesis. The properties are
-  the point (`normalize` is idempotent, `coverage` agrees with the point set,
-  `coverage(left ∩ right) + coverage(left − right) == coverage(left)`), and `CoverageMachine`
-  applies random add/remove sequences to both the interval code and a `set[int]` oracle, which
-  is where boundary bugs actually live. Three settings keep CI honest: `derandomize=True`,
-  `database=None` (`.hypothesis/` otherwise makes local and runner results disagree) and
-  `deadline=None` (the 200 ms default measures the machine, not the code). `demo` proves
-  shrinking by searching exhaustively for the smallest input where a naive `sum(length)`
-  disagrees - two identical unit intervals, reported as `naive sum 2   real coverage 1`.
-- `python-pdf-report` — NDJSON records to a PDF report with reportlab. `rl_config.invariant = 1`
-  must be set before the first canvas: it pins the creation date and the object ids, so two
-  builds of the same input are byte-identical and a golden-file test is possible. Bytes are
-  counted over UTF-8 (a 5-character `héllo` is 6 bytes), text cp1252 cannot encode is replaced
-  with `?` and counted, and the finished PDF is read back with pypdf to prove the rows and the
-  totals are on the page rather than merely in the summary. Input errors name the line, and an
-  exit 2 leaves no half-written file behind.
-- `python-migrations` — numbered SQL files applied once, in order, each inside one explicit
-  transaction. The ledger keeps the sha256 of every file it applied, so editing a migration
-  that already ran fails with `drift` instead of leaving the database and the repository
-  quietly different, and a file numbered below an applied one is refused rather than squeezed
-  in. Two sqlite3 traps drove the design and are asserted in the tests: `with
-  sqlite3.connect(...)` does not roll back DDL, and `executescript` commits any open
-  transaction before it runs, so statements are split with `sqlite3.complete_statement` and
-  executed one at a time.
-- `node-metrics-exporter` — a text-stats service that publishes its own Prometheus metrics without `prom-client`. Counter names must end in `_total`, histogram buckets are cumulative and `+Inf` must equal `_count`, label values are escaped (`\\`, `\"`, `\n`), and the scrape is counted before it renders so it never looks a request behind. `src/exposition.js` is a strict reader for the format — `tools/check_scrape.mjs` runs it over the live payload, so the smoke test fails on a malformed scrape instead of importing garbage.
-- `bun-sqlite-api` — a notes API on Bun with no dependencies. `bun:sqlite` has no `db.pragma()`
-  helper and `exec("PRAGMA …")` throws the result away, so every connection reads the mode
-  back through `query("PRAGMA journal_mode = WAL").get()` and the selftest asserts the value;
-  migrations run inside `db.transaction()`, which is synchronous — an `await` inside it commits
-  early and leaves half a schema — and `Bun.scanDir` does not exist in 1.4.x, so discovery uses
-  `node:fs`. The smoke step stops the process and boots a second server on the same database
-  file to prove the rows are persisted and that no phantom row appeared.
-- `python-duckdb-report` — a reporting CLI that treats the report as the product, so the numbers
-  are exact and the output is diffable. Two rules do the heavy lifting: money is summed as
-  `DECIMAL(18, 4)` and never as a binary float (`0.10 + 0.20` is `0.30`, not `0.30000000000000004`),
-  and rows whose metric is null are *counted* and printed as `null revenue skipped 1` instead of
-  being dropped, because a silent drop turns "sum of revenue" into "sum of the revenue we could
-  parse". Groups are ordered by total then by name so two runs over the same file are byte
-  identical, and `expected/report.md` is compared with `diff -u` rather than grepped — a table that
-  reflows or loses a column fails the build. DuckDB cannot bind an identifier as a parameter, so a
-  column or group name has to be interpolated into SQL; `Dataset.column()` is the single gate that
-  checks the name against the file's own `DESCRIBE` and returns it quoted (embedded double quotes
-  escaped), and `--metric revenu` therefore exits 2 naming the columns that do exist instead of
-  raising a binder error. CSV, Parquet and JSON all go through one `READERS` table, and a test
-  copies the shipped CSV to Parquet with `COPY … (FORMAT parquet)` to prove both readers agree.
-  `smoke.sh` defaults to `.venv/bin/python` when that interpreter exists, so it runs with or
-  without `PY` set.
-- `python-webhook-receiver` — a webhook endpoint that trusts only signed bytes. The HMAC is
-  computed over the body that actually arrived, before any parser touches it: a receiver that
-  hashes `json.dumps(json.loads(body))` rejects every honest sender, because spacing, key order
-  and unicode escapes all move. Checks run in a fixed order (secret, signature, replay window,
-  event id, JSON) so an unauthorised malformed body is a 401 rather than a 422; comparisons go
-  through `hmac.compare_digest`; the window rejects future timestamps as well as old ones; and
-  the event id is a primary key, so a sender's retry after a crash gets a 200 and no second row.
-- `python-batch-inference` — a resumable batch inference runner. The results file *is* the
-  checkpoint: it is append-only and flushed per line, a torn final line is discarded on the next
-  run, and ids already present are skipped instead of sent twice — so a `kill -9` costs one
-  request, not the run. Failures are written as records (`ok: false` plus the reason) rather than
-  raised, because a run of 10 000 prompts must not lose its first 9 000 to one 400. Retries are
-  limited to 408/429/5xx and network errors with exponential back-off; every other 4xx fails on the
-  first attempt, since retrying a malformed request only spends quota. `attempts` sits in each
-  record, so a retry is visible in the data instead of buried in a log. Exit codes are the contract:
-  0 answered, 1 permanent failure, 2 unusable batch (missing, not JSONL, duplicate ids). It has no
-  runtime dependencies, and `tests/stub.py` is a real HTTP server that misbehaves on demand
-  (`FAIL429` answers 429 twice, `FAIL400` answers 400 forever), so the retry and failure paths are
-  proven against a socket.
-- `python-eval-harness` — an offline evaluation harness, and the first stack in the registry that is
-  about measuring rather than serving. Three rules are enforced by the code, because each is a way
-  published numbers go wrong: a **missing prediction scores zero** (dropping it shrinks the
-  denominator and makes a model that answered 3 of 100 look perfect on the ones it answered), the
-  metric is written into both the output and the record (`token_f1` and `exact_match` disagree on
-  almost everything), and every record carries provenance — the git commit with `+dirty` when the
-  tree was not clean. `compare` exits 1 on any per-example regression, so it drops into CI as a
-  gate; `--tolerance` is the only way to let a drop through. Predictions can be piped in with
-  `--predictions -`, and unknown metrics are rejected by our own code rather than argparse's
-  `choices`, because a `SystemExit` from argparse cannot be turned into the documented exit 2.
-- `rust-sqlx-api` — axum + sqlx on SQLite, with the schema *in* the binary: `sqlx::migrate!`
-  embeds `migrations/`, so a shipped release can never drift from the tables it was built
-  against. The macro is gated behind the `macros` feature — `["runtime-tokio","sqlite","migrate"]`
-  alone fails `error[E0433]: cannot find migrate in sqlx`, which is the first wall this stack
-  hits. Deletes are decided by `rows_affected() == 0` (SQL does not error on a missing row) and
-  a non-numeric `/notes/{id}` is answered by the handler as `404 no route for GET /notes/abc`
-  rather than by an extractor as a 400. Responses are structs because serde emits declaration
-  order while `json!` sorts keys, and `text.len()` — not `text.as_bytes().len()` — is what
-  clippy's `needless_as_bytes` insists a byte count is. Its four integration tests open a real
-  database file, so the migrator, the pool and the queries are exercised together against a
-  temp dir rather than a mock.
-- `ruby-cli` — the missing scripting-language CLI, in the shape a gem takes. `bin/{{ npm_name }}`
-  is three lines because the whole program is `CLI#run(argv)`: stdin, stdout, stderr and the
-  file reader all arrive as keyword arguments, so the suite drives the real CLI through
-  `StringIO` and never spawns a process. `Data.define` carries `Counts` and `Options` as
-  immutable values, which makes an assertion one comparison instead of three, and the JSON
-  body is assembled by hand so the key order is the contract. The counting rules are wc's,
-  including the one that trips people up: lines are newline *bytes*, so `"hi"` with no
-  trailing newline is one word and **zero** lines. A missing file exits 1 and the remaining
-  arguments still get counted; an unknown option raises `UsageError` and exits 2 with only
-  the usage line, which is what keeps the two failures distinguishable in a script.
-- `actix-web` — the service owns its routing: `web::route()` (actix 4 has no `web::any()`)
-  with a manual method check, plus `default_service`, because actix's own `405`/`404` bodies
-  are plain text and this stack answers JSON. `serde_json::json!` sorts keys, so a
-  byte-compared response has to come from a struct; `query_string()` arrives raw, so `+` and
-  `%C3` are the app's job — and the decoder returns `bytes`, because `%C3%A9` is one
-  character but two bytes and the counter must see two. Its `detect` rule carries
-  `actix-web` as content, which is what keeps a real actix project from coming out
-  ambiguous against the bare-`Cargo.toml` Rust stacks.
-- `prisma-api` — Prisma 6 + SQLite + Express 5. The CLI resolves `file:./dev.db` relative to
-  `schema.prisma`, so the runtime default has to resolve the *same* absolute file or
-  `migrate deploy` looks like a no-op against a database the app never opens. `app.all()`
-  instead of `app.get()` is what makes an unsupported method a `405` rather than Express's
-  own `404`; `express.json()`'s `SyntaxError` is mapped to `422 invalid_json`; and `PATCH`
-  only writes the members that were sent, so an untouched `body` survives. The smoke test
-  kills the server and asks again, because "the row is in memory" and "the row is in SQLite"
-  answer identically until a restart.
-- `playwright-e2e` — a browser suite where Playwright owns the server (`webServer`), so
-  one command is self-contained; `reuseExistingServer: false` stops a stale process from
-  making the suite pass against old code. A project-level `testMatch` alone does not keep
-  the desktop project from collecting a mobile-only spec — it reports as "1 skipped" and
-  hides a green suite behind a skip, so the desktop project needs `testIgnore`. CI must
-  run `npx playwright install --with-deps chromium` (the browser alone lacks libnss3).
-- `nuxt-app` — Nuxt 4 SSR app. Without a `pages/` directory Nuxt renders `app.vue` for
-  *every* path, so no request is ever a 404; adding `pages/index.vue` is what makes the
-  router answer one. `server/api/stats.get.ts` only claims `GET`, and an unmatched method
-  falls through to the page renderer as `200` HTML, so the route is one file for every
-  method that returns `405` (with `allow: GET`) itself. `tsconfig.json` extends
-  `./.nuxt/tsconfig.json`, which does not exist until `nuxt prepare` runs — vitest therefore
-  dies with `TSCONFIG_ERROR` on a fresh clone unless `postinstall` prepares the types.
-  Vue's `{{ … }}` interpolation cannot be written in the template verbatim (newstack renders
-  those), so the page binds with `v-text`.
-- `angular-app` — Angular 22 standalone component driven by `signal`/`computed` counters.
-  `ng test` runs Vitest in jsdom, so the suite needs no browser and no Karma launcher; the
-  built bundle is served by a small static server that has to answer the SPA fallback for a
-  deep link and a real `404` for a missing asset, which is what `smoke.sh` checks. `ng build`
-  emits a *relative* script `src`, so a bundle check has to add the leading slash. `npm` 11
-  warns that `esbuild`'s postinstall did not run, and the build still works — the platform
-  binary arrives as an optional dependency.
-- `python-litestar-api` — Litestar 2 service. A declared `text: str` handler parameter makes
-  Litestar answer `400` with its own envelope before the handler runs, so the handler takes
-  `Request` and the contract decides `422`; `request.scope["raw_path"]` already ends with
-  `?query`, and appending `query_string` as well counts `"a b?text=a b"`. Litestar answers
-  `HEAD` for `GET` routes itself — the catch-all claims it and returns `405`.
-- `fastify-api` — Fastify 5 service. Fastify's built-in `application/json` parser takes
-  precedence over an added `*` parser, so `{}` arrived as an object and every request
-  without a `text` member answered `invalid_json` instead of `missing_text`;
-  `removeAllContentTypeParsers()` is what makes the raw body readable. Replies are sent as
-  `JSON.stringify(...)` so the key order stays fixed, and parse failures are mapped to 422
-  (Fastify would answer 400 on its own).
-- `python-scheduler-api` — delayed and repeating jobs with the database as the only
-  state. A tick claims due rows inside `BEGIN IMMEDIATE`: a SELECT-then-UPDATE is not
-  a claim, because with autocommit on, two tickers read the same rows and both run
-  them. An interval job reschedules from *now*, not from its missed slot, so a job
-  that has been overdue for ten intervals owes one run rather than ten; failures
-  double their delay up to `max_attempts` and then stop, and every attempt lands in a
-  run ledger with its counts. The ticker's loop keeps the error of a broken job
-  instead of dying with it.
-- `node-upload-api` — resumable uploads with no dependencies. The client declares a
-  size, then sends byte ranges; an offset that is not what the service already holds
-  is a `409` carrying the expected value (accepting it would drop or duplicate bytes
-  while the length still looked right), the running SHA-256 is rebuilt from the file
-  *before* the next chunk lands so a resumed upload can never hash bytes twice, and
-  the index is written through a temp file and a rename so a crash cannot leave a
-  truncated ledger next to real bytes. `DELETE` sends no body at all, and `stop()`
-  closes idle sockets so keep-alive clients cannot hold the process open.
-- `go-jwt-api` — the registry's first stack with accounts. Passwords are
-  PBKDF2-HMAC-SHA256 with the iteration count and salt stored inside the digest,
-  tokens are HMAC-SHA256 with an absolute `exp` (a duration would be read against
-  the wrong clock after a restart), and every rejected token is the same 401
-  `invalid_token`: telling "expired" from "forged" hands an attacker an oracle.
-  `login` hashes against a dummy digest when the email is unknown so the response
-  time does not enumerate accounts, and `/me` looks the account up rather than
-  trusting the claims, so deleting a user invalidates a live token. The store
-  writes with a temp file, `Sync` and `Rename`; a truncate-then-write leaves JSON
-  the next boot refuses to open.
-- `python-sse-api` — the registry's first streaming response. `GET /stream` holds
-  the connection open and writes one event per tick, `Last-Event-ID` resumes
-  instead of replaying, and `src/<pkg>/wire.py` is the only place that knows the
-  field format (a newline inside `data:` splits the event, so a multi-line value
-  repeats the field name). The `http` step times the first event with a raw
-  `http.client` read: curl piped into grep reports the end of the pipe, not the
-  arrival of the line, and a server that builds the whole body as one string
-  passes every other test.
-- `go-worker` — the registry's first batch worker and the first stack with no
-  port at all. `job.go` splits failures into permanent (`invalid_json`,
-  `missing_id`, `unknown_op`) and `transient`, so only a retryable failure spends
-  the retry budget; `state.go` keeps the idempotency ledger and writes it with a
-  temp file, `Sync` and `Rename`, because `os.WriteFile` truncates first and a
-  kill in between replays the whole input; `worker.go`'s `Consume` runs the scan
-  in its own goroutine so a SIGTERM returns without waiting for a producer that
-  is blocked in `read(2)`. `run.sh` proves all three: the fixture twice
-  (skipped), then an interrupt in the middle of a stream.
-- `node-ws-api` — the registry's first non-HTTP service. `ws` runs with
-  `noServer: true` and its own `upgrade` handler, because the default
-  `new WebSocketServer({ server })` hijacks every upgrade and would accept
-  `/anything`; `src/room.js` owns presence and broadcasts join/leave frames to
-  open clients only; `tools/contract.mjs` is a live two-client checker, since a
-  socket server cannot be exercised in-process the way an HTTP app can.
-- `python-fastapi-sqlite` — the registry's first stateful service: FastAPI over
-  SQLite with numbered SQL migrations that run in `lifespan` and are recorded in
-  a `schema_migrations` table (so a second boot applies nothing), WAL plus a busy
-  timeout set per connection, typed request models that reject a blank title, and
-  rows that survive a restart. `migrate()` wraps each script in an explicit
-  transaction because `executescript` commits before it runs, and the suite
-  proves idempotence by applying the migrations twice and diffing `sqlite_master`.
-- `kotlin-http-api` — a Kotlin JSON service on the JDK's own `HttpServer`, so the
-  only dependency is the standard library. `Counts.kt`, `Json.kt` and
-  `Contract.kt` are pure Kotlin (byte-exact counting, a hand-written JSON reader
-  that decodes `\u` escapes and surrogate pairs, and the router that owns every
-  status code), `Server.kt` is the thin adapter to `com.sun.net.httpserver`, and
-  `SelfTest.kt` is the whole suite (50 checks) behind `--selftest` — no JUnit, no
-  test runner. Maven shades one runnable jar and the root context means the
-  router, not the JDK, answers `404` and `405`.
-- `octave-http-api` — an Octave JSON service with no packages to install. Octave
-  has no sockets, so `lib/serve.m` drives `java.net.ServerSocket` through the
-  bundled JVM bridge, reads the head byte by byte with
-  `InputStream.read()` (which returns `-1` at end of stream) and answers with a
-  pure-Octave router; `lib/jsonread.m` keeps the last `text` member and decodes
-  `\u` escapes and surrogate pairs; `lib/selftest.m` is the entire suite (27
-  checks). Octave passes structs BY VALUE, so the JSON reader threads its cursor
-  through every helper's return values instead of mutating it in place.
-- `fortran-http-api` — a Fortran JSON service with no bindings and no dependencies:
-  `server_m.f90` declares `socket`, `bind`, `listen`, `accept`, `recv`, `send` and
-  `close` as `bind(c)` interfaces and speaks HTTP/1.1 over an `int8` buffer,
-  `counts_m.f90` counts lines/words/bytes over raw bytes, `json_m.f90` decodes
-  `\u` escapes and surrogate pairs into UTF-8 (and keeps the last `text` member),
-  and `main.f90` adds a `--selftest` mode (38 checks) so `make test` needs no
-  framework. The `sockaddr_in` is filled in byte by byte, so there is no struct
-  layout to guess, and `SO_REUSEADDR` is set before `bind` so a restart never
-  trips over a port still in `TIME_WAIT`.
-- `fsharp-http-api` — an F# JSON service on .NET 8 with no web framework. `Server.fs`
-  accepts a `TcpListener` connection and reads the head byte by byte until CRLFCRLF
-  (`ReadByte()` returning `-1` is the only end-of-stream signal), reads exactly
-  `Content-Length` bytes and writes its own status line; `Counts.fs` counts over
-  `byte[]` so UTF-8 never round-trips through a decoder; `Json.fs` is a
-  recursive-descent reader that re-encodes `\u00e9` and surrogate pairs to UTF-8 and
-  keeps the last `text` member; `Program.fs` adds a `--selftest` mode (34 checks, no
-  test framework) so the suite runs on plain `dotnet`.
-- `sml-http-api` — a Standard ML JSON service on `INetSock.TCP`, compiled by MLton
-  into one native binary with `-warnings-as-errors`-grade hygiene and no packages to
-  install. MLton's basis has no `Posix.Socket`: the socket is
-  `INetSock.TCP.socket ()`, `Socket.recvVec`/`sendVec` take and return `Word8VectorSlice`
-  values, and `Socket.Ctl.setREUSEADDR` must be set or the port sits in TIME_WAIT.
-  The JSON reader is hand-written (surrogate pairs re-encoded as UTF-8, `\u00e9`
-  becomes two bytes), the router is pure, and the harness runs 51 checks without a
-  framework.
-- `raku-http-api` — a Raku JSON service on Rakudo's own `IO::Socket::INET`, with no
-  `zef` and no CPAN: Rakudo ships no JSON parser, so the reader is a small
-  recursive-descent parser that keeps a string apart from a number (`{"text": 42}`
-  is `422 missing_text`). Three Raku traps are documented in the README: a literal
-  space inside a character class is ignored (`/^<[ \t]>$/` never matches a space,
-  write `\x20`), `\x0bb` parses as hex `0xBB` (use `\x[0b]`), and a `Nil` from
-  `index` cannot be unboxed into an `int`.
-- `swift-http-api` — a Swift 6 JSON service on POSIX sockets, built by `swiftc`
-  straight from `src/` and `tests/` into one binary: no `Package.swift`, no
-  dependency graph, and `-warnings-as-errors` as the gate. The harness is compiled
-  into the binary and runs from `--selftest`, so `make test` needs no test framework.
-  Two Swift traps are documented in the README because both cost a live run: a
-  `String.UTF8View` index is not an `Int`, and `send` through `&out[sent]` ships the
-  array's buffer metadata instead of the bytes.
-- `java-httpserver-api` — a Java 21 JSON service on the JDK's own
-  `com.sun.net.httpserver`, so the whole dependency list is the JDK and a `Makefile`
-  over `javac -Xlint:all -Werror`. The JSON reader is hand-written, because the JDK
-  ships no JSON API and a number must not pass for a string (`{"text": 42}` is
-  `422 missing_text`). `-Werror` also turns a private `RuntimeException` without a
-  `serialVersionUID` into a build failure, which is exactly the kind of thing a
-  service skeleton should teach.
-- `ada-http-api` — an Ada JSON service on `GNAT.Sockets`, with no web framework and no
-  JSON library: the counting rules, a validating reader that keeps a number apart from
-  a string, and the whole HTTP contract are separate packages, so the 34 checks run
-  without opening a socket. Child units live in `textstat-server.ads`, because GNAT
-  looks for the dash form and needs the parent `textstat.ads` to exist first.
-- `pascal-http-api` — a Free Pascal JSON service on the fcl-web listener, the third
-  language in the registry whose service builds on a hand-written JSON reader rather
-  than its library's `fpjson`: that reader hands strings back in the system codepage,
-  so `\u00e9` would count as one byte instead of two and a surrogate pair would become
-  two question marks. Every route is one pure `Route(method, path, query, body)` call,
-  so the 58 checks run without a socket, and `make test` is the gate.
 
-- **`haxe-http-api`**: the Haxe service for the eval target (`haxe --interp`,
-  no build step, no haxelib). Haxe cannot ask `sys.net.Socket` for
-  `SO_REUSEADDR`, so the server drains the connection until the client hangs up
-  before closing its own side — otherwise the listening port sits in `TIME_WAIT`
-  for a minute and the next run dies with
-  `Unix.Unix_error(Unix.EADDRINUSE, "bind", "")` while `ss -ltn` shows it free.
-  The JSON reader is hand-written because a number must not pass for a string
-  (`{"text": 42}` is `422 missing_text`).
-- `cpp-http-api` — C++17 with a plain Makefile instead of CMake: POSIX sockets,
-  a validating JSON reader that keeps a JSON number apart from a JSON string, and
-  `make test` running a hand-rolled harness.
-- `groovy-http-api` — a Groovy JSON service with no build tool: `com.sun.net.httpserver`
-  serves a pure route table, `JsonSlurper` already distinguishes a number from a
-  string, and the tests are a plain script rather than JUnit.
-- `ocaml-http-api` — an OCaml JSON service on the `Unix` module with no opam package
-  beyond dune: the JSON reader is hand-written so a number and a string stay
-  distinguishable, and `\uXXXX` escapes (surrogate pairs included) decode to UTF-8.
-- `d-http-api` — a D JSON service on `std.socket` with a pure route table and
-  `std.json` deciding whether `text` is a string; the tests are ordinary `unittest`
-  blocks run through `-unittest -main`, so no test framework is installed.
-- `c-http-api` — a C11 JSON service on POSIX sockets with no dependencies: the route
-  table is a pure function, the JSON reader distinguishes a string from a number, and
-  the socket loop sets a read timeout so one stalled client cannot wedge the process.
-- `lisp-http-api` — a JSON service on SBCL with no Quicklisp: the route table is a pure
-  function, the JSON reader keeps strings and numbers apart (so `{"text":42}` is a
-  422 while `{"text":"42"}` counts), and the HTTP loop is `sb-bsd-sockets` with one
-  thread per connection.
-- `tcl-http-api` — the Tcl service: no tcllib on a stock box, so the JSON
-  reader is hand-written (numbers are kept apart from strings, so
-  `{"text": 42}` is a 422 while `{"text": "42"}` is counted), the route
-  table is one pure function over four strings, and only `src/server.tcl`
-  touches a socket. Tcl counts braces textually inside a braced body, which
-  is why a `}` inside a quoted string had to be written `\}`.
-- `lua-http-api` — the Lua service: LuaSocket plus `cjson` from the
-  distribution, 26 checks with no framework, and response documents written
-  by hand because a Lua table has no key order to promise. `cjson` is only
-  used to read a posted body, so `{"text": 42}` stays a 422 while
-  `{"text": "42"}` is counted.
-- `guile-http-api` — the Guile service: `(web server)` and `(json)` from
-  guile-json, counting over the UTF-8 bytes, the route table as one pure
-  procedure tested without a socket, and `set -e` plus an `EXIT` trap so a
-  failed assertion stops the server instead of being masked by `wait`.
-- `prolog-http-api`, `racket-api`, `powershell-api` — services for the three
-  scripting runtimes whose only template so far was a CLI. Each keeps the
-  route table in a pure function (a Prolog predicate, a Racket function, a
-  PowerShell function) so the tests need no socket, and each flips its CLI
-  stack to `detect_fallback` because the CLI marker matches any file of the
-  language.
-- `haskell-warp-api`, `perl-mojolicious-api` — the last two runtimes that had a CLI stack
-  and no service. Both keep the whole route table in a pure function (`Contract.route` /
-  `Textstat::Contract->route`) so every status code is pinned by the unit suite and only the
-  verify step binds a port. Haskell ships a hand-written JSON reader instead of `aeson` to
-  keep the dependency set at warp/wai, and learns that warp hands over the query string with
-  its leading `?` still attached. Perl re-encodes a decoded `JSON::PP` value to tell `"42"`
-  from `42`, because both stringify the same way and a numeric `text` would otherwise pass.
-- `erlang-cowboy-api` — an Erlang JSON service on Cowboy, built with rebar3 and shipped as
-  an escript so the run step starts and stops exactly one process. `contract:route/4` is a
-  pure function over `(Method, Path, Query, Body)`, so the eunit suites pin every status
-  code without a socket and only the verify step binds a port. `rebar.lock` is committed and
-  `warnings_as_errors` turns the build into the lint gate.
-- `r-plumber-api`: a plumber service in R. The route table is one pure function
-  (`textstat_route()`), so the base-R suite pins every status code without binding a
-  socket; `bin/serve.R` adds the two things plumber does not default to — an unboxed
-  JSON serializer (`{"lines":[2]}` would otherwise be the wire format) and no JSON
-  body parser, because plumber answers 500 to a malformed body while the contract
-  wants 422 `invalid_json`.
+#### Stacks
 
-- `mkdocs-site` — an MkDocs Material site over the same counting module family. Two different gates: `mkdocs build --strict` fails on broken internal links and missing nav targets, while `tools/check_fences.py` executes every `python` fence in `docs/` and diffs the printed output against the `# ->` lines beside it, so an example that stops matching the module fails CI. The checker has its own suite that proves it catches a wrong expectation and a traceback.
-- `julia-api` — a Julia JSON service on HTTP.jl. `count_text` and `route(method, path, query, body)` are pure functions, so the `Test` suite covers 200/404/405/422 without a socket and only one test opens a port. `ncodeunits`, not `length`, is the byte count; the word scan is a hand-written `isspace` loop because `length` is not defined for the iterator `eachmatch` returns.
-- `zig-http-api` — a Zig 0.17 JSON service on `std.http`. `contract.route` is a pure function over method/path/query/body, so the whole status-code surface (200/404/405/422) is tested with no socket, and `counting.zig` is shared with `zig-cli`. Two Zig 0.17 details worth knowing: `std.http.Server.init` takes `Io.Reader`/`Io.Writer` interfaces (the template owns the buffers), and a listener needs `reuse_address = true` or a restart inside a minute fails with `AddressInUse` because the previous socket is still in TIME-WAIT. `build.zig.zon` keeps the fixed `.textstat` identity every scaffolded Zig project ships.
-- `gleam-mist-api` — a Gleam JSON service on Mist: `contract.route` is a pure function so the whole HTTP surface is tested without a socket, a gleeunit suite covers it, and the verify step serves the app on a real port. Mist 6 needs `gleam_stdlib` 1.x, which is why the template pins both.
-- `scala-cask-api` — a Scala 3 JSON service on Cask: `Contract.route` is a pure function so the whole HTTP surface is covered without a socket, a utest suite covers the counting rules, and the verify step serves a single assembly jar (`scala-cli --power package --assembly`) over a real socket.
-- **`crystal-kemal-api`**: Crystal 1.11 + Kemal 1.5 service. As in the Nim stack, the
-  counting rules and the route table are pure functions, so `crystal spec` covers every
-  status code with no socket and `crystal tool format --check` is a real gate. Three Crystal
-  traps are pre-solved: `env.request.body` is an `IO` (`try(&.gets_to_end)`), a `%(...)`
-  literal processes escapes so a JSON body must be `%q(...)`, and `JSON::Any#as_s?` is a
-  nil-returning cast that must be compared with `nil` — `if node.nil? || node.as_s?` looks
-  right but silently accepts an integer. Kemal 1.6 needs a newer Crystal (`Process.on_terminate`),
-  so the shard pins `~> 1.5.0`.
-- **`nim-http-api`**: Nim service that needs no package manager at all — the counting core
-  and the router are plain modules, so `nimble test` exercises every status code through a
-  pure `route(method, path, query, body)` function while `std/asynchttpserver` adapts real
-  requests to it. Two Nim facts are baked in: `method` is a reserved word (the parameter is
-  `httpMethod`), and `std/uri` has no `parseQuery` on 1.6, so the query string is split and
-  `decodeUrl`-ed by hand. `requires "nim >= 1.6.0"` must be call syntax in a `.nimble` file;
-  the `= @[...]` form fails `nimble build` with "'requires' cannot be assigned to".
-- **`clojure-ring-api`**: Ring on `deps.edn`, and the lesson is that a Ring handler is
-  already a testable function — `ring.mock.request` builds the request map, so the suite
-  covers every route with no port and `ring/ring-mock` sits in the `:test` alias rather
-  than the production classpath. `clojure.test` needs a runner to be a CI gate, so
-  `run_tests.clj` requires the namespaces and exits non-zero; `ring.util.codec/form-decode-map`
-  (not the `parse-query-string` you might expect) parses the query string.
-- **`bun-api`**: Bun service whose application is one `(Request) => Promise<Response>`
-  function handed to `Bun.serve`, so `bun test` drives the routes in-process while the
-  verify step still curls a real socket. Types come from `bun-types` plus `tsc --noEmit`
-  (`bun run typecheck`), and `bun install` is a verify step because the toolchain, unlike
-  Deno's, resolves its compiler from `node_modules`.
-- **`deno-api`**: Deno 2 service with no framework — `handler` is a plain
-  `(Request) => Response` function, so `Deno.test` builds requests and awaits
-  responses with no port to bind, while `Deno.serve` in `src/server.ts` and a curl
-  step in the verify manifest still exercise a real socket. Permissions are least
-  privilege: `--allow-env --allow-net` only, so a dependency cannot touch the disk.
-  `deno fmt --check` is a gate, which means the template ships already-formatted
-  files (`deno fmt` rewraps object literals and generic parameters).
-- **`dart-shelf-api`**: the registry's first Dart service, and the shape is worth
-  copying: `buildHandler()` returns a `Handler`, so tests call the exact function the
-  socket drives — no port, no readiness loop, no flaky `SocketException` on a busy
-  runner — while the verify step still boots `dart run bin/<name>.dart` and curls it,
-  because a handler that only works in-process fails in production. `dart analyze
-  --fatal-infos` (not plain `analyze`) is the gate, and the hyphenated entry file needs
-  `// ignore_for_file: file_names`, since a directory name is not a Dart identifier.
-  `dart pub get` resolves `shelf` 1.x and `shelf_router` 1.x; the lock file is left for
-  you to commit.
-- **`grpc-go`**: protobuf-first Go service where the `.proto` is the source of truth. `buf lint` enforces the contract style rules (including the `Service` suffix), `buf generate` builds the stubs locally via `protoc-gen-go`, and the generated code is
-  gitignored so a contract and its stubs cannot drift. Tests run over `bufconn` — the real
-  gRPC stack without a socket — with one case that dials TCP so listener setup is not
-  untested, and the smoke test builds a `probe` client and talks to a live server. Two
-  details the suite documents: invalid UTF-8 is rejected by protobuf marshalling before the
-  handler sees it, and newer gRPC releases raise the `go` directive, so the module pins
-  gRPC rather than floating.
-- **`dbt-project`**: analytics engineering where the dataset is the thing under test. A seed
-  CSV, a staging view that restores real newlines, and a mart that computes `lines`/`words`/
-  `bytes` in SQL — `strlen()` for UTF-8 bytes, `length()` for characters, because DuckDB's
-  `length()` counts characters and getting that backwards is the classic analytics bug. A
-  singular test encodes the documented numbers and fails the build when a model drifts, and
-  `scripts/check_counts.py` re-reads the DuckDB file with no dbt code in the path, so the
-  pipeline is checked by something that does not share its code. `+schema` gives each layer
-  its own schema (`main_staging`, `main_marts`), which is what makes the mart addressable.
-- **`graphql-api`**: schema-first GraphQL on GraphQL Yoga. `src/schema.ts` is SDL, `src/resolvers.ts` resolves it, and `createSchema()` fails at boot if the two drift. Two
-  things are worth copying: the depth-limit plugin (`src/limits.ts`) walks the document with
-  `visit` and reports `QUERY_TOO_DEEP` *before* execution, so a cyclic client cannot pin a
-  worker; and the tests drive `yoga.fetch()` — the exact handler the HTTP server mounts — so
-  they test the real pipeline without opening a port. The suite also documents the status-code
-  split clients trip over: a malformed request (missing variable) is `400`, a malformed query
-  (bad literal, missing argument) is `200` with an `errors` array and no `data`.
-- **`openapi-spec`**: contract-first in the literal sense — `openapi.yaml` (3.1, so JSON
-  Schema 2020-12) is written before the handler, `spectral` lints it with warnings promoted
-  to failures, `redocly` bundles it and renders an HTML reference, and the tests validate
-  the server's live responses against the **bundle** with `ajv` in 2020-12 mode. Validating
-  the bundle rather than the source is deliberate: a `$ref` that resolves against the source
-  can still be broken for the consumer who only has `dist/openapi.yaml`. The server is
-  `node:http` with no runtime dependencies, and `additionalProperties: false` everywhere
-  means a response that grows a field fails the suite instead of silently widening the
-  contract.
-- **`sphinx-docs`**: a documentation site whose docs are tested like code. `autodoc` reads
-  the docstrings from `src/`, the prose in `docs/guides/counting.rst` is executed as
-  doctests, and the build runs with `-W --keep-going` against `nitpicky = True`, so a
-  renamed page, an unimportable module or a dangling `:func:` reference fails CI instead of
-  publishing a broken site. `tests/test_docs.py` rebuilds the site into a temporary
-  directory with `warningiserror=True`, which is the only way to notice that the docs still
-  build after a refactor — `sphinx-build` alone would happily reuse a stale `_build/`.
-- **`hono-api`**: a Hono JSON API on Node with no bundler — `tsc` emits plain ESM and
-  `node dist/server.js` serves it. The stack's argument is the test shape: `createApp()`
-  returns the app as a value, so `app.request("/stats?text=…")` hands back a real `Response`
-  in-process and the suite needs no port, no server start and no teardown. A missing field,
-  a non-string and a non-JSON body are all `422`, an unknown route is a JSON `404`, and the
-  verify step still boots the built server and curls it, because a route that only works
-  through `app.request()` would pass the unit tests and fail the deploy.
-- **`ts-lib`**: a publishable TypeScript package, and the first stack whose subject is the
-  *published shape* rather than the code. `countText`/`formatCounts` are ordinary, but
-  `package.json` splits `exports` per condition (`import` → `.d.ts`, `require` → `.d.cts`)
-  because a single `types` entry lies to CommonJS consumers, and CI proves every declared
-  entry point resolves by importing the built ESM file and `require`ing the built CJS one.
-  `publint --strict` and `npm pack --dry-run` are verify steps, so a missing `.d.ts` or a
-  file outside `files` fails here. TypeScript is pinned to 6.x: the 7.x compiler ships no
-  compiler API, which tsup's `.d.ts` bundler needs.
-- **`c-cli`**: a C11 command line tool built by plain GNU make, no dependencies. Counting
-  lives in a `textstat` library so it is testable on its own, argv parsing is hand-rolled
-  (including `--`, a lone `-` for stdin and "later flag wins" like `wc`), and the suite is a
-  small `CHECK`/`CHECK_SIZE`/`CHECK_TEXT` header rather than a framework. The build uses
-  `-Wall -Wextra -Wpedantic -Werror`, so warnings are failures from the first commit, and
-  `make test` plus three shell assertions (exact counts, exit `2` on bad usage, exit `1` on
-  an unreadable file) are verify steps.
-- **`github-action`**: a JavaScript GitHub Action on `node24` with no dependencies.
-  Counting is a pure `countText`, the Markdown table and `GITHUB_OUTPUT` writes live in
-  `report.js`, and the `node:test` suite spawns the real entry point with temporary
-  `GITHUB_OUTPUT` / `GITHUB_STEP_SUMMARY` files, so what the runner sees is what the
-  tests assert — including the exit code for an empty `paths` input.
-- **`phoenix-app`**: a Phoenix 1.8 JSON API on Elixir 1.18. A pure `TextStat` module does
-  the counting, and endpoint → router → controller → controller test go through
-  `Phoenix.ConnTest` with `@endpoint`, covering 200s, 422s and a rendered JSON 404.
-  `mix format --check-formatted` is a verify step, so the starter cannot drift from the
-  formatter; `elixir-mix-cli` became a detection fallback so a Phoenix project no longer
-  matches two stacks.
-- **`aspnet-api`**: a minimal ASP.NET Core 8 API. Counting lives in a pure
-  `TextStat.Of(string)` returning a `Counts` record, and `WebApplicationFactory` boots
-  the real pipeline in memory so routing, model binding, 422s and 404s are tested
-  without a port; a live verify step then curls the running binary. `dotnet-cli` became
-  a detection fallback so a Web SDK project no longer matches two stacks.
-- **`laravel-app`**: a Laravel 13 JSON service on PHP 8.3. Counting lives in a pure
-  `App\Support\TextStat` class, `StatController` is a thin route handler, and a PHPUnit 12
-  suite proves routing, JSON encoding, the 422 and 404 paths — plus a test that Laravel's
-  global `TrimStrings` / `ConvertEmptyStringsToNull` middleware, removed in
-  `bootstrap/app.php`, no longer eats the trailing newline that makes a line count wrong.
-- **`jsonnet-config`**: a service manifest in Jsonnet where the rules are data too.
-  `check` prints `ok` or one line per problem, `render` sorts services and sums
-  replicas, and an 18-check suite builds deliberately broken manifests so a validator
-  that accepts everything fails the suite instead of passing it.
-- **`d-cli`**: D compiled with LDC into one native binary. Counting runs over
-  `ubyte[]` so it is byte-accurate, report building sits behind an `Io` struct of
-  function pointers so 37 assertions never touch the disk, and a parity suite diffs
-  every row against `wc`, padding included.
-- **`sml-cli`**: Standard ML compiled with MLton into one native binary. Counting
-  runs over `Word8Vector` so it is byte-accurate, argv parsing and report building
-  sit behind an `io` record so 37 assertions never touch the disk, and a parity
-  suite diffs every row against `wc`, padding included.
-- **`haxe-cli`**: a Haxe program compiled to Neko that counts lines, words and
-  bytes the way `wc` does. Counting, option parsing and report building live in
-  separate modules behind an `Io` interface, so 43 assertions run without touching
-  the disk; a parity suite then diffs the output against the real `wc` across six
-  inputs and eight flag sets, padding included.
-- **`docker-compose-svc`**: a small HTTP service shipped as a container — a
-  non-root image with a real `HEALTHCHECK`, a compose file driven by `PORT`, the
-  service's answers kept as pure functions so the unit tests need no Docker, and a
-  smoke test that builds the image, waits for healthy, checks every answer (health,
-  metrics counter, 404, 405, uid) and leaves nothing running.
-- **`mdbook-docs`**: an mdBook site whose links and table of contents are
-  checked in CI. `tools/check-links.sh` reads every page under `src/`, reports a
-  relative link or image whose target is missing, and reports any page that
-  `src/SUMMARY.md` does not list — because a page nobody can navigate to is a
-  page nobody reads. External, `mailto:` and same-page anchor links are left
-  alone; the exit contract is 0 intact / 1 problems / 2 usage error. Twenty-five
-  assertions cover the checker, the shipped book, and the two failure modes.
-- **`jq-report`**: reports over a JSON access log, written as plain jq programs
-  and wrapped in a small shell command. `filters/*.jq` is one report each —
-  counts per status, busiest paths, slowest requests, bytes per day, error rate —
-  so `jq -c -f filters/top-paths.jq data/sample.json` and
-  `run top-paths data/sample.json` cannot disagree. 59 assertions pin every
-  answer, the exit-code contract (0 / 1 data / 2 usage), the empty-log case that
-  would otherwise divide by zero, and `lint`, which reports a filter that fails
-  to compile before any data is involved.
-- **`powershell-cli`**: a `wc`-style CLI in PowerShell 7. Counting is a byte loop
-  in `lib/TextStat.ps1`, options are parsed by hand in `lib/Options.ps1`, and the
-  report lives in `lib/Runner.ps1` — which takes its I/O as a hashtable of
-  scriptblocks, so the 57 checks assert the exact bytes on stdout and stderr
-  without spawning a process. `main.ps1` is the only file that opens files,
-  reads stdin and exits; it decides whether stdin is a stream with
-  `stat -L -c %F`, because that is what changes `wc`'s column width.
-- **`sqlite-sql`**: not a CLI for once — a SQL reporting project. `schema.sql`
-  carries the keys and the `CHECK` constraints, `views.sql` holds the arithmetic
-  exactly once, `queries/` is one `SELECT` per report and `bin/NAME` builds a
-  throwaway database and prints one of them. 24 assertions cover exact cents,
-  every refused row and the `ON DELETE CASCADE` counts; the wrapper never writes
-  inside the project.
-- **`forth-cli`**: a word-count CLI in plain Forth on `gforth`, no library and
-  no build step. Everything is a byte loop over a block the runner reads whole,
-  so the counts are exact whatever the file contains; argv is parsed into
-  parallel vectors and the rows are padded the way `wc` pads them. 64 unit
-  checks in Forth plus 27 shell checks that diff the real binary against the
-  host `wc`, including the seven-column pad a pipe gets.
-- **`awk-cli`**: a word-count CLI in `gawk` and nothing else. `RS="\0"` makes
-  each file a single record, so `length()` is the byte count and two `gsub`
-  passes give the line and word counts. The runner fills a report and `main.awk`
-  prints it, which lets 69 assertions cover the whole CLI in one process; the
-  `stdin` step proves the one path a suite cannot fake, and every row — label,
-  padding and `total` — matches `wc` byte for byte, including the seven-column
-  pad a pipe gets.
-- **`groovy-cli`**: a word-count CLI in Groovy, no build step and no dependency.
-  The counting core walks a `byte[]`, the argv parser is a plain list walk, and
-  the runner takes its four side effects as closures so the suite drives the real
-  logic in-process. 83 assertions plus a five-fixture diff against `wc`.
-- **`raku-cli`**: a word-count CLI in Raku. Reading is `Buf`-based, so the
-  counting core works on bytes rather than characters; the runner takes the four
-  side effects as closures, so a formatting slip fails without spawning a
-  process. 82 assertions and a five-fixture diff against `wc`.
-- **`guile-cli`**: a word-count CLI in Scheme. Guile's `read-bytevector` is not
-  there and `get-bytevector-all` hands back a bytevector, so the counting core
-  works on bytes with `bytevector-u8-ref`; the runner takes a record of four
-  procedures, so a formatting slip fails without spawning a process. 83
-  assertions, `-l/-w/-c` with clusters and `--`, and byte-for-byte agreement
-  with `wc`, including the implicit-standard-input row that carries no label.
-- **`cobol-cli`**: a word-count CLI in COBOL. GNUCOBOL has no `ARGUMENT-NUMBER` in
-  every build, so `main.cob` reads `/proc/self/cmdline` with the same one-byte
-  `ORGANIZATION IS SEQUENTIAL` reader it uses for files and splits it on `LOW-VALUE`;
-  `TEXTSTAT-COUNTS` counts bytes handed to it a block at a time, `TEXTSTAT-OPTIONS`
-  decides what argv means without any I/O, and `TEXTSTAT-RUNNER` is the only program
-  that opens anything. One-byte records are what make stdin byte-exact — a pipe and a
-  redirect behave alike. The runner reproduces `wc`'s padding and labelling rules and
-  keeps the `total` row when an operand could not be read; a directory operand is
-  refused instead of being reported as zeroes. A COBOL unit driver (38 assertions over
-  the counting and parsing subprograms) plus a shell suite that diffs the built tool
-  against the real `wc` add up to `checks: 71, passed: 71, failed: 0`.
-- **`bash-cli`**: a word-count CLI written in bash itself — no `wc`, no `awk`, no `od`.
-  `lib/counts.sh` counts newlines by substitution, words by a `read -a` split on the
-  shell's own whitespace set, and bytes by `${#data}`; `lib/io.sh` is the only file that
-  touches the process, and it keeps trailing newlines intact with a sentinel. The runner
-  reproduces `wc`'s padding rule (one figure from one operand is never padded, a pipe
-  widens every column to seven, otherwise the width is the digits of the bytes read) and
-  its labelling rule: a row read from standard input with no operand carries no name,
-  while an explicit `-` does. 94 assertions through a hand-rolled harness, `shellcheck -x`
-  clean, and the same five-fixture `wc` parity step every CLI stack ships.
-- **`hugo-site`**: a Hugo content site rather than a CLI — hand-written `layouts/` and
-  partials, no theme and no JavaScript, TOML front matter, a `{{< note >}}` shortcode, and a
-  stylesheet that is minified and fingerprinted (with subresource integrity) by Hugo's asset
-  pipeline. `make test` renders the whole site into a temporary directory and asserts on the
-  HTML — partials ran, the shortcode expanded, headings got ids, the sitemap and RSS feed
-  exist, `robots.txt` points at the sitemap, no dev-only script leaked into a built page — and
-  it writes deliberately malformed front matter to require the build to *fail*. Six verify
-  steps, including a negative one and a real `hugo server` fetch.
-- **`pascal-cli`**: a `wc`-style counter in Free Pascal on `fpc` and `make`, RTL only —
-  bytes are read raw and folded once, arguments are parsed by hand, and the terminal lives
-  behind a record of three function pointers, so the suite drives exit codes and rows
-  without spawning a process. 47 assertions, and the shipped workflow checks the suite,
-  the exit codes, stdin and byte-for-byte parity with `wc`.
-- **`lisp-cli`**: a `wc`-style counter in Common Lisp on SBCL, standard library only —
-  bytes are read as `(unsigned-byte 8)` and folded once, arguments are parsed by hand, and
-  the program takes a structure of four functions so the suite drives it without a process.
-  69 assertions, and the shipped workflow checks the suite, the exit codes, stdin and
-  byte-for-byte parity with `wc`.
-- **`prolog-cli`**: a `wc`-style counter in SWI-Prolog with no dependencies outside the
-  standard library — counting works on a stream, arguments are parsed by hand, output goes
-  through two writer closures so the whole contract is testable, and a four-predicate
-  harness runs 58 assertions. The shipped workflow checks the suite, the exit codes, stdin
-  and byte-for-byte parity with `wc` on five fixtures.
-- **`nest-api`**: a NestJS 12 service — a feature module with a controller, a service and a
-  pipe that rejects a missing `text` with 400, six unit tests plus four end-to-end tests
-  over supertest, and `GET /stats?text=...` returning `{lines, words, bytes}`. NestJS 12
-  ships no CommonJS build, so the project is ESM (`"type": "module"`, `.js` import
-  suffixes) and `jest.config.js` strips that suffix for ts-jest. The five verify steps
-  install, typecheck, test, build and then serve the app and query it live.
-- **`octave-cli`**: a wc-style CLI in plain Octave — the counting core, the argument
-  parser and the runner live in a `+textstat` package directory, the runner takes its
-  environment as a struct of function handles, and a 58-check suite needs no
-  framework. The seven verify steps cover the suite, the help text, both exit-code
-  paths, standard input, the `-` operand and `wc` parity. Single-quoted Octave strings
-  do not interpret escapes, so the fixtures are built with `sprintf`.
-- **`ada-cli`**: Ada on GNAT — a counting core that works on bytes, an argv parser with
-  `--` and short clusters, and a dependency-free harness of 71 checks; the runner takes
-  its two output subprograms as parameters, so only `main.adb` touches the real stdin.
-  Eight checks, including a `stdin` step, a `dash-operand` step and byte-exact `wc` parity.
-- **`fortran-cli` stack.** Fortran 2018 on `gfortran` and `make`, with no test framework: the counting core takes bytes through a `counter_t`, the runner takes its output units as arguments so the 51-check suite reads what the tool would have printed, and stdin is read a byte at a time through a stream connection to `/dev/stdin` — the only byte-exact option in Fortran.
-- **`vhdl-sim` stack** — a synthesizable VHDL counter plus a self-checking testbench on GHDL: every
-  check is an `assert ... severity error` and `run.sh` passes `--assert-level=error`, so a wrong design
-  is a non-zero exit code rather than a waveform for a human to read. The `inject_fault` generic is the
-  teeth test — the shipped workflow runs the testbench a second time with the fault enabled and
-  requires that run to fail. `*.vhd` is the detection marker.
-- **`deno-cli` stack** — a TypeScript project on Deno, with no `package.json` and no build step: the
-  runtime is also the typechecker and the test runner. Counting works on `Uint8Array` so `wc` parity
-  holds for UTF-8 and control characters, the argv parser is a pure function, and the runner takes an
-  object of four functions so 24 `Deno.test` cases run without touching a file — while the shipped
-  `stdin` check still pipes real text through the real command. The wrapper grants only `--allow-read`.
-  `deno.json` is the detection marker.
-- **`racket-cli` stack** — a Racket project on the core distribution, no packages and no build step.
-  Counting works on `bytes` so `wc` parity holds for UTF-8 and control characters, the argv parser is
-  a struct with no side effects, and the runner takes a `struct io` of four funs so 54 `rackunit`
-  checks run without touching a file — while the shipped `stdin` check still pipes real text through
-  the real command. `*.rkt` is the detection marker.
-- **`erlang-cli` stack** — an Erlang project on plain OTP and `make`, no rebar and no hex packages.
-  Counting works on binaries so `wc` parity holds for UTF-8 and control characters, the argv parser
-  is hand-written, and the runner takes a map of four funs (`read_file`, `read_stdin`, `out`, `err`)
-  so 42 eunit tests run without touching a file — while the shipped `stdin` check still pipes real
-  text through the real binary, because a fake boundary cannot see a broken stdin path. The wrapper
-  builds on first use. `Makefile` containing `erlc` is the detection marker.
-- **`tcl-cli` stack** — a Tcl project on plain `tclsh`, no package manager and no build step. The
-  counting core works on byte strings (`binary scan cu*`) so `wc` parity holds for UTF-8 and control
-  characters, the argv parser is hand-written, and the runner takes a dictionary of `readFile`,
-  `readStdin`, `out` and `err` so 40 checks run without a process — while the shipped `stdin` check
-  still pipes real text through the real binary, because a fake boundary cannot see a broken stdin
-  path. `*.tcl` is the detection marker.
-- **`rails-app` stack** — Rails 8.1 on Ruby 3.2+: the counting lives in
-  `app/services/text_stat.rb` (a plain class, no Rails code), `StatsController` turns it into
-  `GET /stats?text=...`, and an `ActionDispatch::IntegrationTest` goes through the router so a
-  broken route fails the suite. `bin/setup` writes gems into `vendor/bundle` via the committed
-  `.bundle/config` instead of the system gem directory, and the five checks cover install,
-  `bin/rails test`, `wc` parity through `bin/rails runner`, and a live request against a
-  server started on its own port. No encrypted credentials are shipped.
-- **`ansible-role` stack** — a Galaxy-shaped role (defaults, vars, tasks, handlers, templates,
-  files, meta, `tests/playbook.yml` + `tests/verify.yml`) that installs a small POSIX counter
-  and refuses an unsupported `textstat_columns` value through an `assert`. Fourteen checks
-  include idempotence (`changed=0` on the second run), a `--check` dry run that writes
-  nothing, and two override runs proving the defaults actually drive the output.
-- **`class_name` context key** — a PascalCase identifier (`my-tool` → `MyTool`) for languages
-  that name a module after the project; the Rails template uses it for `module MyTool`.
-- **`--package-manager NAME`** — the JavaScript stacks declare the managers they are proven
-  with (`"package_manager": ["npm", "pnpm", "yarn"]`, npm first) and one value writes every
-  command in the project: the install, test, run and build lines in the generated workflow
-  and the README, the lockfile name the README asks you to commit, the `cache:` hint for the
-  CI setup step, a `Prepare <manager>` step that installs the manager itself, and the
-  manager's debug log in `.gitignore`. A manager the stack was not proven with is refused
-  before anything is written, and `newstack update --package-manager` moves a project to a
-  different one with all of those following.
-- **`--node MAJOR`** — the JavaScript stacks declare the majors they are proven on
-  (`"node": {"minimum": "22", "versions": ["22", "24"]}`) and one value writes every place a
-  version appears: `engines` in `package.json`, the `node-version` matrix in the generated
-  workflow, and the README. The floor can only go up and only to a major the stack supports —
-  `astro` declares 24 as its own minimum, so `--node 22` is refused instead of scaffolding a
-  project Astro refuses to start. `newstack update --node` moves a project's floor later and
-  every affected file follows.
-- **`newstack stacks outdated`** — which installed stacks have moved upstream, answered with
-  one `git ls-remote` per repository rather than a clone, so checking is cheap and writes
-  nothing. Exits 1 when a stack is behind or an origin could not be reached; an unreachable
-  origin is reported as "could not check" instead of hiding the stacks whose state is known.
-  `stacks update` clears it.
-- **`newstack stacks update [name]`** — re-pull installed stacks from the repositories they
-  came from, so a fix upstream reaches the machine without a manual reinstall. The clone,
-  the per-stack validation and the name checks all run before anything is replaced: a
-  repository that no longer validates — or one that dropped a stack — leaves the installed
-  copy untouched and names what it could not find. A stack whose files did not change is
-  reported as already current rather than rewritten. Refreshing a stack updates the
-  template; `newstack update <path>` is still what re-applies it to a project, and it keeps
-  local edits.
-- **`newstack --python 3.12`** — pick the interpreter floor for the Python stacks, and let
-  one value write every line that names a version: `requires-python`, the ruff target, the
-  trove classifiers, the `python-version` matrix in the generated workflow, the
-  `FROM python:` Docker tag and the README's requires line. Each Python stack declares the
-  versions it has been proven on (`python` in `stack.json`); the floor can only move up,
-  and only to one of them, so `--python 3.9` on `python-cli` or `--python 3.10` on `django`
-  is refused before anything is written. Non-Python stacks say the choice does not apply.
-  The floor is recorded in `.newstack.json`, so `update` keeps it and `update --python 3.13`
-  moves it, rewriting every affected file.
-- **`newstack stacks add <git-url>`** — install a stack from any git repository, so a team
-  can keep its own starters without forking newstack. `add` clones shallowly, validates
-  every stack in the repository (one at the root, one per directory, or under `stacks/`;
-  `--dir` picks a subdirectory) before writing anything, refuses a name that already ships
-  with newstack, and records where each stack came from in `sources.json`. `stacks remove`
-  deletes one, `stacks list` shows origin and revision, and installed stacks are marked
-  `[installed]` in `newstack list`, because they are not covered by this repository's CI —
-  `newstack check <name>` is the local equivalent. Stacks live in `$NEWSTACK_HOME/stacks`
-  (default `~/.local/share/newstack/stacks`). `--force` replaces an installed stack.
-- **`--license mit|apache-2.0|bsd-3|none`** on `new` (and `update`, to switch later) —
-  the generated `LICENSE` now comes from a licence registry in `data/licenses/` instead of
-  a per-template copy, filled in with `--author` and the current year. `none` ships no
-  file at all, and the choice is stored in `.newstack.json` so `update` keeps honouring
-  it. `adopt` never writes a licence, and `astro` — the one stack whose template had no
-  `LICENSE` — now gets one like every other stack. Closes the last roadmap item.
-- **`newstack update`** — re-apply a stack's current template to a project `newstack new`
-  generated, without losing local edits. `new` now writes a `.newstack.json` record (the
-  render context plus a sha256 per file); `update` re-renders the current template with
-  the recorded context and merges per file: untouched files are refreshed, edited files
-  are reported as conflicts and left alone (exit 1) until you pass `--force`, new
-  template files are added, and files the template dropped are reported and only deleted
-  with `--prune` — and only while they still match what newstack wrote. `--dry-run` and
-  `--json` included. Closes the first roadmap item.
-- **`newstack outdated`** — the read-only half of the same comparison: reports which
-  recorded files the template has moved past, which files it now adds, and which local
-  edits will conflict. Never writes; exits 1 when there is something to pull, so a CI job
-  or pre-commit hook can ask "is this project still current?".
-- **Two stacks: `bun-cli` and `r-cli`** — `bun-cli` is a zero-dependency Bun +
-  TypeScript CLI whose whole test suite is the built-in `bun:test` runner, so a fresh
-  clone runs `bun test` offline with no `node_modules` at all; `r-cli` is the same
-  wc-style tool in **base R only** (no testthat, no CRAN, no renv) with a hand-rolled
-  assertion harness and `Rscript` as the entry point. Both follow the counting-library +
-  thin-CLI split and the 0/2/1 exit contract, and both are verified line-for-line against
-  real `wc -l -w -c`.
-- **`symfony-app` stack** — a Symfony 7 web application on PHP 8.3 + Composer, not a
-  console toy: a real kernel with `config/` bundles and routes, a `GET /` route returning
-  JSON from an injected pure `TextStats` service, a kernel-booting PHPUnit 11 functional
-  test next to the unit test, a working `bin/console`, and a shipped CI workflow with
-  PHPUnit plus a console smoke step. Autowiring means the service needs no container
-  configuration.
-- **`ocaml-cli` stack** — OCaml 4.14 on dune 3.14 with no opam packages at all: pure
-  `Counts`/`Options`/`Runner` modules (`(wrapped false)`, no `open` boilerplate in the
-  tests), a stdlib-only harness that prints a pass/fail tally and exits non-zero, and a
-  shell wrapper around the dune executable so the dashed project name survives dune's
-  "executable name must be a module identifier" rule. Verified against `wc -l -w -c` on
-  plain, no-trailing-newline, multibyte-UTF-8, empty and control-character files.
-- **`helm-chart` stack** — a Kubernetes Helm chart for one stateless HTTP service,
-  the first stack that is not a program: named templates in `_helpers.tpl`, a Deployment
-  with a hardened `securityContext` and probes, a Service, an optional ServiceAccount,
-  and a `values.schema.json` that helm enforces on every `lint`, `template` and `install`
-  (so `--set replicaCount=0` fails the chart rather than the cluster). It also ships the
-  chart's own `helm test` hook — a pod that curls the Service — and seven checks: lint,
-  render, values plumbing, schema rejection, hook rendering, release-name plumbing and
-  the hardened defaults, all of which run without a cluster or any plugin.
-- **`gleam-cli` stack** — a Gleam 1.19 CLI on Erlang/OTP 27 with no hex packages beyond
-  `gleam_stdlib`: pure `Counts`/`Options`/`Runner` modules, a hand-rolled test harness
-  (`gleam test` runs the tally and exits non-zero on failure), and one small Erlang module
-  for the three things Gleam's standard library has no answer for — argv, stdin and the
-  process exit code. `Runner.run` *returns* the 0/1/2 code and only the entry point calls
-  `erlang:halt`, so the exit contract is asserted without spawning a process. `gleam
-  format --check` is part of the shipped workflow. Verified against `wc -l -w -c`.
-- **`scala-cli` stack** — a Scala 3 CLI where the build definition *is* the source:
-  `project.scala` holds three `//> using` directives (Scala 3.3.6, main class, munit) and
-  there is no `build.sbt`, no `pom.xml` and no build server (`--server=false`, so no Bloop
-  daemon is left running). Counting is pure, `Runner.run` takes an `Io` instead of touching
-  the world, so the 0/1/2 exit contract and the `wc` column layout are asserted in munit
-  without spawning a process. The generated project ships a workflow that installs the
-  single scala-cli binary at a pinned version.
-- **`haskell-cli` stack** — a GHC 9.4 / cabal CLI whose only dependencies are `base` and
-  `bytestring`, both of which ship with GHC, so a generated project builds offline once
-  cabal has an index. Counting is a strict `foldl'` over the bytes; `Runner.run` takes an
-  `Io` record, so the 0/1/2 exit contract, the `-` stdin label and the `total` row are
-  asserted in a 47-check hand-written harness instead of a test framework. `wc` parity is
-  a verify step and part of the shipped workflow.
-- **Detect rules accept a glob** — a stack marker may be a pattern, so `haskell-cli` can
-  be detected by `*.cabal` even though the file is named after the project. Literal
-  markers behave exactly as before.
-- **`dotnet-cli` stack** — a .NET 8 C# CLI laid out the way a .NET solution actually is:
-  a `<name>.sln` with the app project and a separate xUnit project under `tests/`,
-  a pure `TextStat` counter that never touches I/O, a hand-written `Options.Parse` that
-  returns `{figures, files, status}` instead of throwing, and a `Cli.Run(args, out, err)`
-  that *returns* the 0/1/2 exit code so tests assert the contract without spawning a
-  process. `-l -w -c` combine like real `wc`, `--` ends flag parsing, and several files
-  get a `total` row. Verified against `wc -l -w -c`.
-- **`spring-boot` stack** — a Java 21 Spring Boot 3 web service rather than a console
-  tool: `StatsService` is pure counting, `StatsController` exposes `GET /stats?text=…`
-  (400 when the parameter is missing) and `GET /`, and the JUnit 5 suite covers the
-  service directly plus the controller through `MockMvc` — 5 tests, no running server
-  needed. A Maven wrapper is included, the jar is `target/<name>.jar`, and the shipped
-  workflow runs `mvn -B -ntp verify` plus a live endpoint smoke test on a port the app is
-  told to use, so a scaffolded service proves its own HTTP surface in CI.
-- **`clojure-cli` stack** — a Clojure CLI tool on `deps.edn` and `clojure -M:test`, with
-  no Leiningen and no third-party libraries: `textstat.counts` folds over raw bytes,
-  `textstat.options` parses argv by hand, `textstat.cli/run` returns the exit code as a
-  value so the `clojure.test` suite (28 tests, 54 assertions) never spawns a process, and
-  only `textstat.main` touches the filesystem, `System/in` and `System/exit`. The seven
-  shipped checks include stdin, so a broken real-input path cannot hide behind the fake
-  I/O record the unit tests inject.
-- **`swift-cli` stack** — a Swift 6 CLI on SwiftPM with XCTest and no packages beyond
-  the toolchain: `TextStat` is a pure library (`ofBytes` over raw bytes, `add`, the
-  right-aligned row layout), `Options.parse` handles `-l/-w/-c`, the long flags, `--`, `-`
-  and help/version by hand, and `CLI.run(_:io:)` returns the exit code against a struct of
-  closures so 29 XCTest cases never spawn a process. Only `main.swift` touches the real
-  files, stdin and `exit`; the wrapper builds in release mode and execs the product. The
-  shipped checks include stdin and a `wc -l -w -c` parity loop, and `total` rows follow
-  `wc` even when an operand is unreadable.
+- **Python (163)**: `dbt-project`, `mkdocs-site`, `python-ab-test`, `python-aho-corasick`,
+  `python-anagram`, `python-armstrong`, `python-audit-log`, `python-avl-tree`, `python-b-tree`,
+  `python-backoff-jitter`, `python-batch-inference`, `python-bellman-ford`,
+  `python-binary-heap`, `python-binary-search`, `python-binomial-heap`, `python-bk-tree`,
+  `python-bloom-filter`, `python-boruvka-mst`, `python-bracket-matching`, `python-bubble-sort`,
+  `python-bucket-sort`, `python-c-extension`, `python-caesar-cipher`, `python-char-frequency`,
+  `python-circuit-breaker`, `python-cocktail-sort`, `python-coin-change`, `python-comb-sort`,
+  `python-combinations`, `python-config-precedence`, `python-consistent-hashing`,
+  `python-count-min`, `python-count-min-sketch`, `python-counter-rollup`,
+  `python-counting-sort`, `python-crdt`, `python-cron-schedule`, `python-cycle-sort`,
+  `python-decimal-to-binary`, `python-dependency-resolver`, `python-deque`, `python-digit-sum`,
+  `python-dijkstra`, `python-dns-server`, `python-duckdb-report`, `python-eval-harness`,
+  `python-expression-parser`, `python-factorial`, `python-fastapi-sqlite`,
+  `python-feature-flags`, `python-fenwick-tree`, `python-fibonacci`, `python-fibonacci-heap`,
+  `python-floyd-warshall`, `python-gcd`, `python-gitignore-matcher`, `python-gnome-sort`,
+  `python-graceful-shutdown`, `python-hamming-distance`, `python-hdr-histogram`,
+  `python-heap-sort`, `python-html-sanitizer`, `python-huffman-coding`, `python-hybrid-clock`,
+  `python-hyperloglog`, `python-idempotency-keys`, `python-insertion-sort`,
+  `python-interpolation-search`, `python-interval-tree`, `python-intro-sort`,
+  `python-json-patch`, `python-kd-tree`, `python-keyset-pagination`, `python-kmp-automaton`,
+  `python-knapsack`, `python-kruskal-mst`, `python-lcm`, `python-lcs`, `python-leases-fences`,
+  `python-levenshtein`, `python-linear-search`, `python-linearizability-checker`, `python-lis`,
+  `python-litestar-api`, `python-longest-common-substring`, `python-lru-cache`,
+  `python-lsm-tree`, `python-lz77`, `python-max-subarray`, `python-maximum-flow`,
+  `python-merge-sort`, `python-merkle-proofs`, `python-migrations`, `python-minhash-lsh`,
+  `python-money-allocation`, `python-monotonic-stack`, `python-mqtt-broker`,
+  `python-odd-even-sort`, `python-openapi-client`, `python-outbox-pattern`, `python-palindrome`,
+  `python-pancake-sort`, `python-pdf-report`, `python-permission-model`, `python-permutations`,
+  `python-power`, `python-prefix-trie`, `python-prim-mst`, `python-prime-check`,
+  `python-property-tests`, `python-pytest-plugin`, `python-quick-sort`, `python-rabin-karp`,
+  `python-radix-heap`, `python-radix-sort`, `python-rag-eval`, `python-rate-limiter`,
+  `python-red-black-tree`, `python-regex-engine`, `python-resp-server`, `python-retry-budget`,
+  `python-ring-buffer`, `python-roman-numerals`, `python-rope`, `python-route-trie`,
+  `python-rrule-recurrence`, `python-run-length`, `python-saga-compensation`,
+  `python-scapegoat-tree`, `python-scheduler-api`, `python-schema-evolution`,
+  `python-segment-tree`, `python-selection-sort`, `python-semver-ranges`, `python-shell-sort`,
+  `python-shunting-yard`, `python-sieve`, `python-single-flight`, `python-skip-list`,
+  `python-smtp-sink`, `python-snowflake-ids`, `python-splay-tree`, `python-sse-api`,
+  `python-subset-sum`, `python-suffix-array`, `python-tarjan-scc`, `python-task-queue`,
+  `python-text-diff`, `python-three-way-merge`, `python-tim-sort`, `python-time-series-window`,
+  `python-topological-sort`, `python-treap`, `python-union-find`, `python-url-signing`,
+  `python-van-emde-tree`, `python-version-vectors`, `python-vowel-count`,
+  `python-webhook-receiver`, `python-websocket-server`, `python-word-count`,
+  `python-z-function`, `sphinx-docs`
+- **Node (21)**: `angular-app`, `fastify-api`, `github-action`, `graphql-api`, `hono-api`,
+  `nest-api`, `node-cli`, `node-event-sourcing`, `node-http-cache`, `node-http2-api`,
+  `node-load-test`, `node-metrics-exporter`, `node-stream-backpressure`, `node-upload-api`,
+  `node-worker-pool`, `node-ws-api`, `nuxt-app`, `openapi-spec`, `playwright-e2e`, `prisma-api`,
+  `ts-lib`
+- **Go (7)**: `go-consistent-hash`, `go-jwt-api`, `go-tcp-framing`, `go-trace-api`, `go-wal-kv`,
+  `go-worker`, `grpc-go`
+- **Bun (3)**: `bun-api`, `bun-cli`, `bun-sqlite-api`
+- **R (2)**: `r-cli`, `r-plumber-api`
+- **Ada (2)**: `ada-cli`, `ada-http-api`
+- **C (2)**: `c-cli`, `c-http-api`
+- **Clojure (2)**: `clojure-cli`, `clojure-ring-api`
+- **Csharp (2)**: `aspnet-api`, `dotnet-cli`
+- **D (2)**: `d-cli`, `d-http-api`
+- **Erlang (2)**: `erlang-cli`, `erlang-cowboy-api`
+- **Fortran (2)**: `fortran-cli`, `fortran-http-api`
+- **Gleam (2)**: `gleam-cli`, `gleam-mist-api`
+- **Groovy (2)**: `groovy-cli`, `groovy-http-api`
+- **Haskell (2)**: `haskell-cli`, `haskell-warp-api`
+- **Haxe (2)**: `haxe-cli`, `haxe-http-api`
+- **Java (2)**: `java-httpserver-api`, `spring-boot`
+- **Kotlin (2)**: `kotlin-http-api`, `kotlin-ktor-api`
+- **Lisp (2)**: `lisp-cli`, `lisp-http-api`
+- **Ocaml (2)**: `ocaml-cli`, `ocaml-http-api`
+- **Octave (2)**: `octave-cli`, `octave-http-api`
+- **Pascal (2)**: `pascal-cli`, `pascal-http-api`
+- **Php (2)**: `laravel-app`, `symfony-app`
+- **Powershell (2)**: `powershell-api`, `powershell-cli`
+- **Prolog (2)**: `prolog-cli`, `prolog-http-api`
+- **Racket (2)**: `racket-api`, `racket-cli`
+- **Raku (2)**: `raku-cli`, `raku-http-api`
+- **Ruby (2)**: `rails-app`, `ruby-cli`
+- **Rust (2)**: `actix-web`, `rust-sqlx-api`
+- **Scala (2)**: `scala-cask-api`, `scala-cli`
+- **Scheme (2)**: `guile-cli`, `guile-http-api`
+- **Sml (2)**: `sml-cli`, `sml-http-api`
+- **Swift (2)**: `swift-cli`, `swift-http-api`
+- **Tcl (2)**: `tcl-cli`, `tcl-http-api`
+- **Typescript (2)**: `deno-api`, `deno-cli`
+- **Yaml (2)**: `ansible-role`, `helm-chart`
+- **Awk (1)**: `awk-cli`
+- **Cobol (1)**: `cobol-cli`
+- **Cpp (1)**: `cpp-http-api`
+- **Crystal (1)**: `crystal-kemal-api`
+- **Dart (1)**: `dart-shelf-api`
+- **Docker (1)**: `docker-compose-svc`
+- **Elixir (1)**: `phoenix-app`
+- **Forth (1)**: `forth-cli`
+- **Fsharp (1)**: `fsharp-http-api`
+- **Html (1)**: `hugo-site`
+- **Jq (1)**: `jq-report`
+- **Jsonnet (1)**: `jsonnet-config`
+- **Julia (1)**: `julia-api`
+- **Latex (1)**: `latex-paper`
+- **Lua (1)**: `lua-http-api`
+- **Markdown (1)**: `mdbook-docs`
+- **Nim (1)**: `nim-http-api`
+- **Perl (1)**: `perl-mojolicious-api`
+- **Shell (1)**: `bash-cli`
+- **Sql (1)**: `sqlite-sql`
+- **Vhdl (1)**: `vhdl-sim`
+- **Zig (1)**: `zig-http-api`
+
+#### CLI and options
+
+- **`class_name` context key** — a PascalCase identifier (`my-tool` → `MyTool`) for languages that name a module after the project; the Rails template uses it for `module MyTool`.
+- **`--package-manager NAME`** — the JavaScript stacks declare the managers they are proven with (`"package_manager": ["npm", "pnpm", "yarn"]`, npm first) and one value writes every command in the project: the install, test, run and build lines in the generated workflow and the README, the lockfile name the README asks you to commit, the `cache:` hint for the CI setup step, a `Prepare <manager>` step that installs the manager itself, and the manager's debug log in `.gitignore`. A manager the stack was not proven with is refused before anything is written, and `newstack update --package-manager` moves a project to a different one with all of those following.
+- **`--node MAJOR`** — the JavaScript stacks declare the majors they are proven on (`"node": {"minimum": "22", "versions": ["22", "24"]}`) and one value writes every place a version appears: `engines` in `package.json`, the `node-version` matrix in the generated workflow, and the README. The floor can only go up and only to a major the stack supports — `astro` declares 24 as its own minimum, so `--node 22` is refused instead of scaffolding a project Astro refuses to start. `newstack update --node` moves a project's floor later and every affected file follows.
+- **`newstack stacks outdated`** — which installed stacks have moved upstream, answered with one `git ls-remote` per repository rather than a clone, so checking is cheap and writes nothing. Exits 1 when a stack is behind or an origin could not be reached; an unreachable origin is reported as "could not check" instead of hiding the stacks whose state is known. `stacks update` clears it.
+- **`newstack stacks update [name]`** — re-pull installed stacks from the repositories they came from, so a fix upstream reaches the machine without a manual reinstall. The clone, the per-stack validation and the name checks all run before anything is replaced: a repository that no longer validates — or one that dropped a stack — leaves the installed copy untouched and names what it could not find. A stack whose files did not change is reported as already current rather than rewritten. Refreshing a stack updates the template; `newstack update <path>` is still what re-applies it to a project, and it keeps local edits.
+- **`newstack --python 3.12`** — pick the interpreter floor for the Python stacks, and let one value write every line that names a version: `requires-python`, the ruff target, the trove classifiers, the `python-version` matrix in the generated workflow, the `FROM python:` Docker tag and the README's requires line. Each Python stack declares the versions it has been proven on (`python` in `stack.json`); the floor can only move up, and only to one of them, so `--python 3.9` on `python-cli` or `--python 3.10` on `django` is refused before anything is written. Non-Python stacks say the choice does not apply. The floor is recorded in `.newstack.json`, so `update` keeps it and `update --python 3.13` moves it, rewriting every affected file.
+- **`newstack stacks add <git-url>`** — install a stack from any git repository, so a team can keep its own starters without forking newstack. `add` clones shallowly, validates every stack in the repository (one at the root, one per directory, or under `stacks/`; `--dir` picks a subdirectory) before writing anything, refuses a name that already ships with newstack, and records where each stack came from in `sources.json`. `stacks remove` deletes one, `stacks list` shows origin and revision, and installed stacks are marked `[installed]` in `newstack list`, because they are not covered by this repository's CI — `newstack check <name>` is the local equivalent. Stacks live in `$NEWSTACK_HOME/stacks` (default `~/.local/share/newstack/stacks`). `--force` replaces an installed stack.
+- **`--license mit|apache-2.0|bsd-3|none`** on `new` (and `update`, to switch later) — the generated `LICENSE` now comes from a licence registry in `data/licenses/` instead of a per-template copy, filled in with `--author` and the current year. `none` ships no file at all, and the choice is stored in `.newstack.json` so `update` keeps honouring it. `adopt` never writes a licence, and `astro` — the one stack whose template had no `LICENSE` — now gets one like every other stack. Closes the last roadmap item.
+- **`newstack update`** — re-apply a stack's current template to a project `newstack new` generated, without losing local edits. `new` now writes a `.newstack.json` record (the render context plus a sha256 per file); `update` re-renders the current template with the recorded context and merges per file: untouched files are refreshed, edited files are reported as conflicts and left alone (exit 1) until you pass `--force`, new template files are added, and files the template dropped are reported and only deleted with `--prune` — and only while they still match what newstack wrote. `--dry-run` and `--json` included. Closes the first roadmap item.
+- **`newstack outdated`** — the read-only half of the same comparison: reports which recorded files the template has moved past, which files it now adds, and which local edits will conflict. Never writes; exits 1 when there is something to pull, so a CI job or pre-commit hook can ask "is this project still current?".
+- **Detect rules accept a glob** — a stack marker may be a pattern, so `haskell-cli` can be detected by `*.cabal` even though the file is named after the project. Literal markers behave exactly as before.
 
 ### Fixed
 
-- **`newstack update` no longer rewrites `.newstack.json` when there is nothing to
-  do.** The record carries `updated_at`, so a run over an up-to-date project bumped
-  the timestamp and turned "up to date" into a one-line diff every time. The record
-  is now written only when something actually changed.
-- **`fortran-cli` no longer fails its own test suite on a strict filesystem.** The harness
-  used `status='scratch'` units and closed them with `status='delete'`; gfortran on a
-  runner refuses with `Fortran runtime error: File cannot be deleted`, so the `test` step
-  failed even though the counter was correct. The harness now writes and truncates two
-  ordinary files under `build/`, which needs no unlink.
-- **The JavaScript stacks pass their tests under yarn, and install under pnpm.** npm and
-  pnpm install the peer dependencies a package asks for, yarn 1 does not, so `yarn test`
-  failed with `Cannot find module '@testing-library/dom'` (`react-vite-ts`) and with
-  `Cannot find package 'vite'` (`next-app-ts`, `node-express-ts`) — projects that were green
-  on two managers and broken on the third the new flag offers. Those dependencies are now
-  pinned in `devDependencies`, `node-express-ts` allows pnpm to build esbuild
-  (`pnpm.onlyBuiltDependencies`), and the pnpm the projects are proven with is pinned to 10 —
-  the version CI installs — because pnpm 12 reads build approval from `pnpm-workspace.yaml`
-  instead and fails such an install with `ERR_PNPM_IGNORED_BUILDS`.
-- **`scala-cli` no longer fails on a cold-cache Maven Central hiccup.** scala-cli resolves the
-  pinned Scala version against Maven Central metadata while its cache is empty, and a transient
-  failure there is reported as `Cannot find matching Scala version for '3.3.6'` — a version
-  that plainly exists. Compilation now retries once (in the manifest's verify step and in the
-  shipped workflow), which keeps a genuine compile error failing while a network blip does not.
-- **`adopt` recognises a Next.js app as `next-app-ts`.** Every Next project depends on React,
-  so the `"react"` marker matched both stacks and `adopt` would only ever have asked for
-  `--stack`. `next-app-ts` keeps the specific marker and `react-vite-ts` became a
-  `detect_fallback:`, so a Next app resolves to one stack and a plain React project still
-  resolves to the Vite SPA; both directions are tested.
-- **`adopt` no longer dead-ends on every Composer and Symfony project.** `symfony-app`
-  detects `bin/console`, which a plain Composer package does not have, so the generic
-  `php-composer-cli` rule became a `detect_fallback:` — a specific marker now wins and a
-  bare `composer.json` still resolves to the CLI stack, with both directions tested.
-- **Shipped workflows no longer fail their own exit-code steps.** A `run:` step executes
-  as `bash -e`, so `./bin/app --bogus …; test $? -eq 2` killed the step on the first
-  command and reported the very behaviour the CLI gets right as a failure. The argument
-  and missing-file steps in `bun-cli`, `lua-cli` and `r-cli` now capture `$?` under
-  `set +e` before asserting it, and a structural test rejects the broken shape across
-  every stack.
-- **A Haskell project whose name ends in a number now builds.** Cabal reads
-  `tool-2024.cabal` as package `tool` at version `2024` and refuses the file, so a project
-  generated as `tool-2024` failed before its first build. Templates can now use a
-  `cabal_name` context key — the same slug with every all-numeric word given a letter
-  (`tool-v2024`) — and `haskell-cli` names its package with it while the executable keeps
-  the name the user typed.
-- **`astro` no longer fails its own check on a moving Node floor.** `astro check` refuses
-  to run below the Node version Astro declares (`>=22.23.4` as of Astro 7.4), and the
-  runner image plus the shared CI step still installed 22.23.3, so the astro job failed
-  while every other stack was green. The repo's Node step now installs 24, the astro
-  scaffold declares `engines.node` and states it in its README, and its shipped workflow
-  tests that LTS instead of a floating 22.x.
+- **`newstack update` no longer rewrites `.newstack.json` when there is nothing to do.** The record carries `updated_at`, so a run over an up-to-date project bumped the timestamp and turned "up to date" into a one-line diff every time. The record is now written only when something actually changed.
+- **`fortran-cli` no longer fails its own test suite on a strict filesystem.** The harness used `status='scratch'` units and closed them with `status='delete'`; gfortran on a runner refuses with `Fortran runtime error: File cannot be deleted`, so the `test` step failed even though the counter was correct. The harness now writes and truncates two ordinary files under `build/`, which needs no unlink.
+- **The JavaScript stacks pass their tests under yarn, and install under pnpm.** npm and pnpm install the peer dependencies a package asks for, yarn 1 does not, so `yarn test` failed with `Cannot find module '@testing-library/dom'` (`react-vite-ts`) and with `Cannot find package 'vite'` (`next-app-ts`, `node-express-ts`) — projects that were green on two managers and broken on the third the new flag offers. Those dependencies are now pinned in `devDependencies`, `node-express-ts` allows pnpm to build esbuild (`pnpm.onlyBuiltDependencies`), and the pnpm the projects are proven with is pinned to 10 — the version CI installs — because pnpm 12 reads build approval from `pnpm-workspace.yaml` instead and fails such an install with `ERR_PNPM_IGNORED_BUILDS`.
+- **`scala-cli` no longer fails on a cold-cache Maven Central hiccup.** scala-cli resolves the pinned Scala version against Maven Central metadata while its cache is empty, and a transient failure there is reported as `Cannot find matching Scala version for '3.3.6'` — a version that plainly exists. Compilation now retries once (in the manifest's verify step and in the shipped workflow), which keeps a genuine compile error failing while a network blip does not.
+- **`adopt` recognises a Next.js app as `next-app-ts`.** Every Next project depends on React, so the `"react"` marker matched both stacks and `adopt` would only ever have asked for `--stack`. `next-app-ts` keeps the specific marker and `react-vite-ts` became a `detect_fallback:`, so a Next app resolves to one stack and a plain React project still resolves to the Vite SPA; both directions are tested.
+- **`adopt` no longer dead-ends on every Composer and Symfony project.** `symfony-app` detects `bin/console`, which a plain Composer package does not have, so the generic `php-composer-cli` rule became a `detect_fallback:` — a specific marker now wins and a bare `composer.json` still resolves to the CLI stack, with both directions tested.
+- **Shipped workflows no longer fail their own exit-code steps.** A `run:` step executes as `bash -e`, so `./bin/app --bogus …; test $? -eq 2` killed the step on the first command and reported the very behaviour the CLI gets right as a failure. The argument and missing-file steps in `bun-cli`, `lua-cli` and `r-cli` now capture `$?` under `set +e` before asserting it, and a structural test rejects the broken shape across every stack.
+- **A Haskell project whose name ends in a number now builds.** Cabal reads `tool-2024.cabal` as package `tool` at version `2024` and refuses the file, so a project generated as `tool-2024` failed before its first build. Templates can now use a `cabal_name` context key — the same slug with every all-numeric word given a letter (`tool-v2024`) — and `haskell-cli` names its package with it while the executable keeps the name the user typed.
+- **`astro` no longer fails its own check on a moving Node floor.** `astro check` refuses to run below the Node version Astro declares (`>=22.23.4` as of Astro 7.4), and the runner image plus the shared CI step still installed 22.23.3, so the astro job failed while every other stack was green. The repo's Node step now installs 24, the astro scaffold declares `engines.node` and states it in its README, and its shipped workflow tests that LTS instead of a floating 22.x.
 
 ## [0.4.0] - 2026-11-03
 
