@@ -32,6 +32,46 @@ def test_every_stack_is_in_the_ci_matrix() -> None:
     assert not missing, f"ci.yml stack matrix is missing: {', '.join(missing)}"
 
 
+def _readme_rows() -> list[str]:
+    """Stack names in the README table, one per row, in file order."""
+    text = README.read_text(encoding="utf-8")
+    return re.findall(r"^\|\s*`([a-z0-9][a-z0-9-]*)`\s*\|", text, re.M)
+
+
+def _ci_matrix_entries() -> list[str]:
+    """Names under the `stack:` matrix key, in file order."""
+    lines = CI.read_text(encoding="utf-8").splitlines()
+    start = next(i for i, line in enumerate(lines) if line.strip() == "stack:")
+    entries: list[str] = []
+    for line in lines[start + 1 :]:
+        if not line.strip():
+            continue
+        if not line.startswith("          - "):
+            break
+        entries.append(line.strip()[2:].strip())
+    return entries
+
+
+def test_readme_lists_each_stack_exactly_once() -> None:
+    """A duplicated row is drift too: it makes the table count lie about the registry."""
+    rows = _readme_rows()
+    duplicated = sorted({name for name in rows if rows.count(name) > 1})
+    assert not duplicated, f"README stack table lists twice: {', '.join(duplicated)}"
+    assert sorted(rows) == sorted(load_stacks()), (
+        f"README has {len(rows)} rows for {len(load_stacks())} stacks"
+    )
+
+
+def test_ci_matrix_lists_each_stack_exactly_once() -> None:
+    """A duplicate matrix entry runs the same stack twice and hides a missing one."""
+    entries = _ci_matrix_entries()
+    duplicated = sorted({name for name in entries if entries.count(name) > 1})
+    assert not duplicated, f"ci.yml stack matrix lists twice: {', '.join(duplicated)}"
+    assert sorted(entries) == sorted(load_stacks()), (
+        f"ci.yml matrix has {len(entries)} entries for {len(load_stacks())} stacks"
+    )
+
+
 def test_readme_states_no_stack_count_that_can_go_stale() -> None:
     """A hardcoded count is drift bait once a stack is added; the table is the source."""
     text = README.read_text(encoding="utf-8")
