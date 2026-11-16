@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -29,7 +31,7 @@ from .upgrade import (
     sha256_bytes,
     write_record,
 )
-from .verify import check_stack, missing_tools
+from .verify import CheckResult, check_stack, missing_tools
 
 TOOLCHAIN_CHECKS = {
     "python3": "Python",
@@ -721,6 +723,9 @@ def cmd_stacks_list(args: argparse.Namespace) -> int:
 
 
 def cmd_check(args: argparse.Namespace) -> int:
+    # check_stack is subprocess-bound (it shells out to each stack's verify
+    # commands), so a ThreadPoolExecutor of threads is sufficient — no process
+    # pool is needed.
     names = list(args.stacks or [])
     broken: dict[str, str] = {}
     if args.all:
@@ -733,20 +738,55 @@ def cmd_check(args: argparse.Namespace) -> int:
     if not names:
         raise RegistryError("name at least one stack, or pass --all")
 
+    # Resolve --jobs: 0 means "auto". Serial behaviour stays the default for
+    # named stacks (no surprise parallelism).
+    jobs = args.jobs
+    if jobs is None:
+        jobs = min(8, os.cpu_count() or 1) if args.all else 1
+    elif jobs == 0:
+        jobs = min(8, os.cpu_count() or 1)
+    if jobs < 1:
+        jobs = 1
+
+    # Build contexts and detect missing toolchains up front (once, before any
+    # worker thread starts) so detection is not repeated per thread.
+    contexts = {name: build_context_for_check(available[name], args.name) for name in names}
+    absent_by_name = {name: missing_tools(available[name]) for name in names}
+
+    run_names = [
+        name for name in names if not (absent_by_name[name] and not args.force)
+    ]
+
+    computed: dict[str, CheckResult] = {}
+    if run_names:
+        items = [(available[name], contexts[name]) for name in run_names]
+        workers = min(jobs, len(run_names))
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            results_list = list(
+                executor.map(
+                    lambda item: check_stack(
+                        item[0], item[1], keep=args.keep, verbose=args.verbose
+                    ),
+                    items,
+                )
+            )
+        for name, result in zip(run_names, results_list, strict=True):
+            computed[name] = result
+
     results = []
     for name in names:
         stack = available[name]
-        context = build_context_for_check(stack, args.name)
-        absent = missing_tools(stack)
+        absent = absent_by_name[name]
         if absent and not args.force:
             print(f"  {stack.name:<16} SKIP  missing toolchain: {', '.join(absent)}")
             continue
-        print(f"  {stack.name:<16} running…", end="", flush=True)
-        result = check_stack(stack, context, keep=args.keep, verbose=args.verbose)
+        result = computed[name]
         results.append(result)
         status = "PASS" if result.ok else "FAIL"
-        print(f"\r  {stack.name:<16} {status}  {result.seconds:5.1f}s  "
-              f"{len(result.outcomes)} step(s)          ")
+        print(
+            f"  {stack.name:<16} {status}  {result.seconds:5.1f}s  "
+            f"{len(result.outcomes)} step(s)          "
+        )
         for outcome in result.outcomes:
             if outcome.skipped:
                 print(f"      - {outcome.name}: skipped ({outcome.skipped})")
@@ -808,6 +848,16 @@ def cmd_version(args: argparse.Namespace) -> int:
 
 
 # --------------------------------------------------------------------------- parser
+
+
+def _jobs_count(value: str) -> int:
+    try:
+        number = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("--jobs must be an integer") from exc
+    if number < 0:
+        raise argparse.ArgumentTypeError("--jobs must be a non-negative integer")
+    return number
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -970,6 +1020,8 @@ def build_parser() -> argparse.ArgumentParser:
     check = sub.add_parser("check", help="generate a stack in a temp dir and run its checks")
     check.add_argument("stacks", nargs="*", help="stack names")
     check.add_argument("--all", action="store_true", help="check every stack")
+    check.add_argument("--jobs", type=_jobs_count, default=None, metavar="N",
+                      help="run stacks concurrently (0 = auto; default serial)")
     check.add_argument("--keep", action="store_true", help="keep the generated project")
     check.add_argument("--verbose", action="store_true", help="show passing step output")
     check.add_argument("--force", action="store_true", help="run even if tools look missing")

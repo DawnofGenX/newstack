@@ -221,6 +221,88 @@ def test_package_name_is_never_a_reserved_word() -> None:
         assert slug.isidentifier() or "_" in slug
 
 
+def test_check_jobs_output_matches_serial(monkeypatch, capsys) -> None:
+    import re
+
+    class _Result:
+        ok = True
+        seconds = 1.25
+        outcomes = []
+        directory = "/tmp/x"
+
+        def as_dict(self):
+            return {"stack": "x", "ok": True}
+
+    monkeypatch.setattr("newstack.cli.check_stack", lambda *a, **k: _Result())
+    monkeypatch.setattr("newstack.cli.missing_tools", lambda stack: [])
+
+    stacks = ["python-lib", "python-cli", "fastapi"]
+    assert main(["check", *stacks, "--jobs", "1"]) == 0
+    out1 = capsys.readouterr().out
+    assert main(["check", *stacks, "--jobs", "2"]) == 0
+    out2 = capsys.readouterr().out
+
+    def norm(s):
+        return re.sub(r"\d+\.\d+s", "Xs", s)
+    assert norm(out1) == norm(out2)
+
+
+def test_check_jobs_failing_stack_prints_tail(monkeypatch, capsys) -> None:
+    from newstack.verify import StepOutcome
+
+    class _Result:
+        ok = False
+        seconds = 0.5
+        outcomes = [StepOutcome(name="test", ok=False, seconds=0.1, output="BOOM-TAIL-LINE")]
+        directory = "/tmp/x"
+
+        def as_dict(self):
+            return {"stack": "x", "ok": False}
+
+    monkeypatch.setattr("newstack.cli.check_stack", lambda *a, **k: _Result())
+    monkeypatch.setattr("newstack.cli.missing_tools", lambda stack: [])
+
+    assert main(["check", "python-lib", "--jobs", "2"]) == 1
+    assert "BOOM-TAIL-LINE" in capsys.readouterr().out
+
+
+def test_check_jobs_rejects_negative(capsys) -> None:
+    import pytest
+
+    with pytest.raises(SystemExit) as exc:
+        main(["check", "python-lib", "--jobs", "-1"])
+    assert exc.value.code == 2
+    err = capsys.readouterr().err
+    assert "--jobs" in err
+
+
+def test_check_auto_mode_does_not_spawn_more_than_stacks(monkeypatch, capsys) -> None:
+    import time
+
+    active = {"n": 0, "max": 0}
+
+    def fake_check_stack(*a, **k):
+        nonlocal active
+        active["n"] += 1
+        active["max"] = max(active["max"], active["n"])
+        time.sleep(0.05)
+        active["n"] -= 1
+        result = type("R", (), {})()
+        result.ok = True
+        result.seconds = 0.05
+        result.outcomes = []
+        result.directory = "/tmp/x"
+        result.as_dict = lambda: {}
+        return result
+
+    monkeypatch.setattr("newstack.cli.check_stack", fake_check_stack)
+    monkeypatch.setattr("newstack.cli.missing_tools", lambda stack: [])
+
+    stacks = ["python-lib", "python-cli", "fastapi"]
+    assert main(["check", *stacks, "--jobs", "0"]) == 0
+    assert active["max"] <= len(stacks)
+
+
 def test_java_stack_builds_a_legal_package_from_a_reserved_name(tmp_path) -> None:
     """Prove it end to end: the generated sources must not declare `package static;`."""
     from newstack.cli import build_context_for_check
