@@ -13,6 +13,486 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+
+# GitHub expands at most 256 jobs from one matrix: a 257-entry list does not
+# expand AT ALL (the job vanishes and the run reports a bare failure), which is
+# how 257+ stacks silently stopped being verified. So the stack job is sharded
+# into four matrices, each comfortably under the cap, all driven by ONE step
+# list anchored below so the toolchain gates cannot drift between shards.
+x-shared-steps: &shared_setup
+  - uses: actions/checkout@v7
+  # GitHub's release CDN answered 504 twice mid-transfer, which fails an
+  # install step that trusts a single curl. Every tarball download in this
+  # job goes through `fetch`, which retries and never leaves a partial file
+  # behind for the next step to execute.
+  - name: Add a retrying download helper
+    run: |
+      sudo tee /usr/local/bin/fetch >/dev/null <<'SH'
+      #!/usr/bin/env bash
+      # fetch OUT URL - download with retries and no partial files.
+      set -euo pipefail
+      out=$1
+      url=$2
+      for attempt in 1 2 3 4; do
+        if curl -sSLf --retry 2 --retry-delay 3 --max-time 300 -o "$out" "$url"; then
+          exit 0
+        fi
+        echo "download of $url failed (attempt $attempt)" >&2
+        rm -f "$out"
+        sleep $((attempt * 5))
+      done
+      echo "could not download $url after 4 attempts" >&2
+      exit 1
+      SH
+      sudo chmod +x /usr/local/bin/fetch
+  - name: Set up uv
+    uses: astral-sh/setup-uv@v10.3.3
+    with:
+      enable-cache: true
+  - name: Set up Node
+    uses: actions/setup-node@v7
+    with:
+      node-version: "24"
+  - name: Set up Go
+    if: contains(fromJSON('["go-cli","go-http","grpc-go","go-worker","go-jwt-api","go-trace-api","go-tcp-framing","go-wal-kv","go-consistent-hash"]'), matrix.stack)
+    uses: actions/setup-go@v7
+    with:
+      go-version: "1.24"
+      cache: false
+  - name: Set up Rust
+    if: contains(fromJSON('["rust-cli","rust-axum","actix-web","rust-sqlx-api"]'), matrix.stack)
+    uses: dtolnay/rust-toolchain@v1
+    with:
+      toolchain: stable
+      components: rustfmt, clippy
+  - name: Set up Terraform
+    if: matrix.stack == 'terraform-module'
+    uses: hashicorp/setup-terraform@v3
+    with:
+      terraform_version: "1.17.1"
+  # The role pins nothing but ansible-core; `uv tool install` is the fastest
+  # way to get a modern ansible-playbook onto the runner's PATH.
+  - name: Install ansible-core
+    if: matrix.stack == 'ansible-role'
+    run: |
+      uv tool install --quiet ansible-core
+      ansible-playbook --version
+  - name: Set up Ruby
+    if: contains(fromJSON('["ruby-sinatra","rails-app"]'), matrix.stack)
+    uses: ruby/setup-ruby@v1
+    with:
+      ruby-version: "3.2"
+      bundler-cache: true
+  # ruby-cli needs no gems (minitest and rake ship with Ruby), so it takes
+  # setup-ruby without the bundler cache its sibling stacks require.
+  - name: Set up Ruby (no bundle)
+    if: matrix.stack == 'ruby-cli'
+    uses: ruby/setup-ruby@v1
+    with:
+      ruby-version: "3.3"
+      bundler-cache: false
+  - name: Set up Java
+    if: contains(fromJSON('["java-maven-cli","kotlin-cli","kotlin-http-api","kotlin-ktor-api","spring-boot"]'), matrix.stack)
+    uses: actions/setup-java@v5
+    with:
+      distribution: temurin
+      java-version: "21"
+      cache: maven
+  # Mojolicious is not in core Perl, so the service stack installs the
+  # distro package; `perl -MMojolicious -e1` in its own verify step is the
+  # same presence check CI does here.
+  - name: Install Mojolicious
+    if: matrix.stack == 'perl-mojolicious-api'
+    run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmojolicious-perl
+  # GHC and cabal come from haskell-actions/setup, which also puts both on
+  # PATH; cabal still needs an index before it can resolve a build plan.
+  - name: Set up GHC and cabal
+    if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
+    uses: haskell-actions/setup@v2
+    with:
+      ghc-version: "9.4.7"
+      cabal-version: "3.10.3.0"
+  - name: Update the cabal package index
+    if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
+    run: cabal update
+  # The JDK HTTP server needs nothing but a JDK, and there is no pom to
+  # prime a Maven cache with.
+  - name: Set up Java (java-httpserver-api)
+    if: matrix.stack == 'java-httpserver-api'
+    uses: actions/setup-java@v5
+    with:
+      distribution: temurin
+      java-version: "21"
+  # scala-cli is one binary, so installing it is the whole toolchain; no
+  # Maven cache here because there is no pom (scala-cli fetches its own deps).
+  - name: Set up Java (scala-cli)
+    if: contains(fromJSON('["scala-cli","scala-cask-api"]'), matrix.stack)
+    uses: actions/setup-java@v5
+    with:
+      distribution: temurin
+      java-version: "21"
+  - name: Install scala-cli
+    if: contains(fromJSON('["scala-cli","scala-cask-api"]'), matrix.stack)
+    run: |
+      fetch scala-cli.gz https://github.com/VirtusLab/scala-cli/releases/download/v1.18.0/scala-cli-x86_64-pc-linux.gz
+      gzip -d scala-cli.gz
+      chmod +x scala-cli
+      sudo mv scala-cli /usr/local/bin/scala-cli
+      scala-cli version
+  # The Clojure CLI is a launcher script plus a lib dir; the release tag is
+  # the version, so this installs 1.12.6 exactly. (The DeLaGuardo action
+  # only publishes bare numeric tags, which the repo's pinning rule rejects.)
+  - name: Set up Java (clojure-cli)
+    if: contains(fromJSON('["clojure-cli","clojure-ring-api"]'), matrix.stack)
+    uses: actions/setup-java@v5
+    with:
+      distribution: temurin
+      java-version: "21"
+  - name: Install the Clojure CLI
+    if: contains(fromJSON('["clojure-cli","clojure-ring-api"]'), matrix.stack)
+    run: |
+      fetch linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
+      chmod +x linux-install.sh
+      sudo ./linux-install.sh
+      clojure -Sdescribe
+  # Swift ships as a toolchain tarball in swift.org; the action installs the
+  # pinned release and puts `swift` on PATH. No package dependencies, so
+  # nothing to resolve over the network.
+  - name: Set up Swift
+    if: contains(fromJSON('["swift-cli","swift-http-api"]'), matrix.stack)
+    uses: swift-actions/setup-swift@v2
+    with:
+      swift-version: "6.2"
+  - name: Install GHDL
+    if: matrix.stack == 'vhdl-sim'
+    run: |
+      sudo apt-get update -qq
+      sudo apt-get install -y --no-install-recommends ghdl
+      ghdl --version | head -1
+
+  - name: Set up Deno
+    if: contains(fromJSON('["deno-cli","deno-api"]'), matrix.stack)
+    uses: denoland/setup-deno@v2
+    with:
+      deno-version: v2.x
+
+  - name: Install Racket
+    if: contains(fromJSON('["racket-cli","racket-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update -qq
+      sudo apt-get install -y --no-install-recommends racket
+      racket --version
+
+  - name: Install Erlang
+    if: matrix.stack == 'erlang-cli'
+    run: |
+      sudo apt-get update -qq
+      sudo apt-get install -y --no-install-recommends erlang-nox erlang-dev make curl
+      erl -noshell -eval 'io:format("~s~n", [erlang:system_info(otp_release)]), halt().'
+
+  # The release escript for rebar3 dies on the distro's Erlang with
+  # "escript: exception error: undefined function rebar3:main/1", so the
+  # service job takes its Erlang and rebar3 from the toolbox that already
+  # works for the Gleam stacks.
+  - name: Set up Erlang and rebar3
+    if: matrix.stack == 'erlang-cowboy-api'
+    uses: erlef/setup-beam@v1
+    with:
+      otp-version: "27"
+      rebar3-version: "3.28.0"
+
+  - name: Install gfortran
+    if: contains(fromJSON('["fortran-cli","fortran-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends gfortran make curl
+      gfortran --version | head -1
+
+  - name: Install GNAT
+    if: contains(fromJSON('["ada-cli","ada-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends gnat make curl
+      gnatmake --version | head -1
+
+  - name: Install Free Pascal
+    if: contains(fromJSON('["pascal-cli","pascal-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      packages="fp-compiler make"
+      if [ "${{ matrix.stack }}" = "pascal-http-api" ]; then
+        packages="$packages fp-units-fcl fp-units-net"
+      fi
+      sudo apt-get install -y --no-install-recommends $packages
+      fpc -iV
+
+  - name: Install shellcheck
+    if: matrix.stack == 'bash-cli'
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends shellcheck
+      shellcheck --version | head -2
+
+  - name: Install Guile
+    if: contains(fromJSON('["guile-cli","guile-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends guile-3.0 guile-json
+      guile --version | head -1
+
+  - name: Install Rakudo
+    if: contains(fromJSON('["raku-cli","raku-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends rakudo curl
+      raku --version
+
+  - name: Install gawk
+    if: matrix.stack == 'awk-cli'
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends gawk
+      gawk --version | head -1
+
+  - name: Install gforth
+    if: matrix.stack == 'forth-cli'
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends gforth
+      gforth --version
+
+  - name: Install sqlite3
+    if: matrix.stack == 'sqlite-sql'
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends sqlite3 make
+      sqlite3 --version
+
+  - name: Set up PowerShell
+    if: contains(fromJSON('["powershell-cli","powershell-api"]'), matrix.stack)
+    run: |
+      if ! command -v pwsh >/dev/null 2>&1; then
+        fetch /tmp/pwsh.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz
+        sudo mkdir -p /opt/microsoft/powershell/7
+        sudo tar -xzf /tmp/pwsh.tar.gz -C /opt/microsoft/powershell/7
+        sudo chmod +x /opt/microsoft/powershell/7/pwsh
+        sudo ln -sf /opt/microsoft/powershell/7/pwsh /usr/local/bin/pwsh
+      fi
+      pwsh --version
+
+  - name: Install jq
+    if: matrix.stack == 'jq-report'
+    run: |
+      if ! command -v jq >/dev/null 2>&1; then
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends jq
+      fi
+      jq --version
+
+  - name: Install TeX Live and poppler
+    if: matrix.stack == 'latex-paper'
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends \
+        texlive-latex-base texlive-latex-recommended latexmk poppler-utils
+
+  - name: Install mdbook
+    if: matrix.stack == 'mdbook-docs'
+    run: |
+      if ! command -v mdbook >/dev/null 2>&1; then
+        fetch /tmp/mdbook.tar.gz https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-gnu.tar.gz
+        tar -xzf /tmp/mdbook.tar.gz -C /tmp
+        sudo install -m755 /tmp/mdbook /usr/local/bin/mdbook
+      fi
+      mdbook --version
+
+  - name: Install Haxe
+    if: contains(fromJSON('["haxe-cli","haxe-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends haxe neko
+      haxe --version
+      neko -version
+
+  - name: Install Jsonnet
+    if: matrix.stack == 'jsonnet-config'
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends jsonnet
+      jsonnet --version
+
+  - name: Install LDC
+    if: contains(fromJSON('["d-cli","d-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends ldc
+      ldc2 --version | head -1
+
+  - name: Install MLton
+    if: contains(fromJSON('["sml-cli","sml-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends mlton curl
+      mlton
+
+  - name: Install Groovy
+    if: contains(fromJSON('["groovy-cli","groovy-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends groovy
+      groovy --version
+
+  - name: Install GNUCOBOL
+    if: matrix.stack == 'cobol-cli'
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends gnucobol make
+      cobc --version | head -1
+
+  - name: Install SBCL
+    if: contains(fromJSON('["lisp-cli","lisp-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends sbcl
+      sbcl --version
+
+  - name: Install SWI-Prolog
+    if: contains(fromJSON('["prolog-cli","prolog-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends swi-prolog-nox
+      swipl --version
+
+  - name: Install Octave
+    if: contains(fromJSON('["octave-cli","octave-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends octave curl
+      octave --version | head -1
+
+  - name: Install Tcl
+    if: contains(fromJSON('["tcl-cli","tcl-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update -qq
+      sudo apt-get install -y --no-install-recommends tcl
+      echo 'puts [info patchlevel]' | tclsh
+
+  - name: Install Hugo
+    if: matrix.stack == 'hugo-site'
+    run: |
+      sudo apt-get update -qq
+      sudo apt-get install -y --no-install-recommends hugo
+      hugo version
+
+  - name: Set up PHP
+    if: contains(fromJSON('["php-composer-cli","symfony-app","laravel-app"]'), matrix.stack)
+    uses: shivammathur/setup-php@v2
+    with:
+      php-version: "8.3"
+      extensions: ctype, fileinfo, mbstring, tokenizer, xml
+      coverage: none
+  - name: Set up .NET
+    if: contains(fromJSON('["csharp-cli","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
+    uses: actions/setup-dotnet@v4
+    with:
+      dotnet-version: "8.0.x"
+  - name: Set up Elixir
+    if: contains(fromJSON('["elixir-mix-cli","phoenix-app"]'), matrix.stack)
+    uses: erlef/setup-beam@v1
+    with:
+      elixir-version: "1.18"
+      otp-version: "27"
+  - name: Set up Dart
+    if: contains(fromJSON('["dart-cli","dart-shelf-api"]'), matrix.stack)
+    uses: dart-lang/setup-dart@v1
+    with:
+      sdk: "3.13.7"
+  - name: Set up Zig
+    if: contains(fromJSON('["zig-cli","zig-http-api"]'), matrix.stack)
+    uses: mlugg/setup-zig@v2
+    with:
+      version: "0.17.0"
+  - name: Set up OCaml
+    if: contains(fromJSON('["ocaml-cli","ocaml-http-api"]'), matrix.stack)
+    uses: ocaml/setup-ocaml@v3
+    with:
+      ocaml-compiler: "4.14.1"
+      dune-cache: true
+  # setup-ocaml leaves dune off PATH for later steps, and `newstack check`
+  # needs `dune` resolvable to build the generated project.
+  - name: Put dune on PATH
+    if: contains(fromJSON('["ocaml-cli","ocaml-http-api"]'), matrix.stack)
+    run: |
+      opam install --yes dune
+      echo "$(opam var bin)" >> "$GITHUB_PATH"
+  - name: Set up Helm
+    if: matrix.stack == 'helm-chart'
+    uses: azure/setup-helm@v4
+    with:
+      version: v4.3.1
+  # setup-beam is reliable for OTP and rebar3, but its own Gleam download
+  # answered 504 twice in a row; the pinned release asset behind `fetch`
+  # keeps a CDN hiccup from failing the job.
+  - name: Set up Erlang for Gleam
+    if: contains(fromJSON('["gleam-cli","gleam-mist-api"]'), matrix.stack)
+    uses: erlef/setup-beam@v1
+    with:
+      otp-version: "27.3"
+      rebar3-version: "3.28.0"
+  - name: Install Gleam
+    if: contains(fromJSON('["gleam-cli","gleam-mist-api"]'), matrix.stack)
+    run: |
+      tools=$(mktemp -d)
+      fetch "$tools/gleam.tar.gz" https://github.com/gleam-lang/gleam/releases/download/v1.19.2/gleam-v1.19.2-x86_64-unknown-linux-musl.tar.gz
+      tar -xzf "$tools/gleam.tar.gz" -C "$tools"
+      sudo install -m755 "$tools/gleam" /usr/local/bin/gleam
+      gleam --version
+  - name: Set up Julia
+    if: contains(fromJSON('["julia-cli","julia-api"]'), matrix.stack)
+    uses: julia-actions/setup-julia@v2
+    with:
+      version: "1.13"
+  - name: Set up Nim
+    if: contains(fromJSON('["nim-cli","nim-http-api"]'), matrix.stack)
+    uses: jiro4989/setup-nim-action@v2
+    with:
+      nim-version: "2.2.4"
+  - name: Install Lua
+    if: contains(fromJSON('["lua-cli","lua-http-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update -qq
+      sudo apt-get install -y -qq lua5.4
+      # The service stack needs the two distribution libraries; the CLI
+      # stack does not, and installing them costs a second.
+      if [ "${{ matrix.stack }}" = "lua-http-api" ]; then
+        sudo apt-get install -y -qq lua-socket lua-cjson
+        lua5.4 -e 'print(require("socket")._VERSION, require("cjson")._VERSION)'
+      fi
+      lua5.4 -v
+  - name: Install Crystal
+    if: contains(fromJSON('["crystal-cli","crystal-kemal-api"]'), matrix.stack)
+    uses: crystal-lang/install-crystal@v1.9.5
+    with:
+      crystal: "1.11"
+  - name: Set up Bun
+    if: contains(fromJSON('["bun-cli","bun-api","bun-sqlite-api"]'), matrix.stack)
+    uses: oven-sh/setup-bun@v2
+    with:
+      bun-version: 1.4.2
+  - name: Install R
+    if: contains(fromJSON('["r-cli","r-plumber-api"]'), matrix.stack)
+    run: |
+      sudo apt-get update -qq
+      sudo apt-get install -y -qq --no-install-recommends r-base-core
+      Rscript --version
+  - name: Install plumber
+    if: matrix.stack == 'r-plumber-api'
+    run: sudo apt-get install -y -qq --no-install-recommends r-cran-plumber
+  - name: Install newstack
+    run: uv sync --group dev
+  - name: Generate and verify the stack
+    run: uv run newstack check ${{ matrix.stack }} --verbose
+
 jobs:
   test:
     name: unit tests (py ${{ matrix.python-version }})
@@ -41,8 +521,8 @@ jobs:
       - name: Test
         run: uv run pytest
 
-  stacks:
-    name: stack ${{ matrix.stack }} is green
+  stacks-a:
+    name: stack ${{ matrix.stack }} is green (a)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -127,6 +607,15 @@ jobs:
           - python-prefix-trie
           - python-kd-tree
           - python-suffix-array
+    steps: *shared_setup
+
+  stacks-b:
+    name: stack ${{ matrix.stack }} is green (b)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stack:
           - python-avl-tree
           - python-red-black-tree
           - python-segment-tree
@@ -206,6 +695,15 @@ jobs:
           - python-longest-common-substring
           - python-bubble-sort
           - python-comb-sort
+    steps: *shared_setup
+
+  stacks-c:
+    name: stack ${{ matrix.stack }} is green (c)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stack:
           - python-gnome-sort
           - python-odd-even-sort
           - python-pancake-sort
@@ -284,6 +782,15 @@ jobs:
           - kotlin-ktor-api
           - zig-cli
           - zig-http-api
+    steps: *shared_setup
+
+  stacks-d:
+    name: stack ${{ matrix.stack }} is green (d)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        stack:
           - julia-cli
           - julia-api
           - nim-cli
@@ -362,479 +869,7 @@ jobs:
           - jsonnet-config
           - github-action
           - latex-paper
-    steps:
-      - uses: actions/checkout@v7
-      # GitHub's release CDN answered 504 twice mid-transfer, which fails an
-      # install step that trusts a single curl. Every tarball download in this
-      # job goes through `fetch`, which retries and never leaves a partial file
-      # behind for the next step to execute.
-      - name: Add a retrying download helper
-        run: |
-          sudo tee /usr/local/bin/fetch >/dev/null <<'SH'
-          #!/usr/bin/env bash
-          # fetch OUT URL - download with retries and no partial files.
-          set -euo pipefail
-          out=$1
-          url=$2
-          for attempt in 1 2 3 4; do
-            if curl -sSLf --retry 2 --retry-delay 3 --max-time 300 -o "$out" "$url"; then
-              exit 0
-            fi
-            echo "download of $url failed (attempt $attempt)" >&2
-            rm -f "$out"
-            sleep $((attempt * 5))
-          done
-          echo "could not download $url after 4 attempts" >&2
-          exit 1
-          SH
-          sudo chmod +x /usr/local/bin/fetch
-      - name: Set up uv
-        uses: astral-sh/setup-uv@v10.3.3
-        with:
-          enable-cache: true
-      - name: Set up Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: "24"
-      - name: Set up Go
-        if: contains(fromJSON('["go-cli","go-http","grpc-go","go-worker","go-jwt-api","go-trace-api","go-tcp-framing","go-wal-kv","go-consistent-hash"]'), matrix.stack)
-        uses: actions/setup-go@v7
-        with:
-          go-version: "1.24"
-          cache: false
-      - name: Set up Rust
-        if: contains(fromJSON('["rust-cli","rust-axum","actix-web","rust-sqlx-api"]'), matrix.stack)
-        uses: dtolnay/rust-toolchain@v1
-        with:
-          toolchain: stable
-          components: rustfmt, clippy
-      - name: Set up Terraform
-        if: matrix.stack == 'terraform-module'
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.17.1"
-      # The role pins nothing but ansible-core; `uv tool install` is the fastest
-      # way to get a modern ansible-playbook onto the runner's PATH.
-      - name: Install ansible-core
-        if: matrix.stack == 'ansible-role'
-        run: |
-          uv tool install --quiet ansible-core
-          ansible-playbook --version
-      - name: Set up Ruby
-        if: contains(fromJSON('["ruby-sinatra","rails-app"]'), matrix.stack)
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.2"
-          bundler-cache: true
-      # ruby-cli needs no gems (minitest and rake ship with Ruby), so it takes
-      # setup-ruby without the bundler cache its sibling stacks require.
-      - name: Set up Ruby (no bundle)
-        if: matrix.stack == 'ruby-cli'
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.3"
-          bundler-cache: false
-      - name: Set up Java
-        if: contains(fromJSON('["java-maven-cli","kotlin-cli","kotlin-http-api","kotlin-ktor-api","spring-boot"]'), matrix.stack)
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "21"
-          cache: maven
-      # Mojolicious is not in core Perl, so the service stack installs the
-      # distro package; `perl -MMojolicious -e1` in its own verify step is the
-      # same presence check CI does here.
-      - name: Install Mojolicious
-        if: matrix.stack == 'perl-mojolicious-api'
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libmojolicious-perl
-      # GHC and cabal come from haskell-actions/setup, which also puts both on
-      # PATH; cabal still needs an index before it can resolve a build plan.
-      - name: Set up GHC and cabal
-        if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
-        uses: haskell-actions/setup@v2
-        with:
-          ghc-version: "9.4.7"
-          cabal-version: "3.10.3.0"
-      - name: Update the cabal package index
-        if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
-        run: cabal update
-      # The JDK HTTP server needs nothing but a JDK, and there is no pom to
-      # prime a Maven cache with.
-      - name: Set up Java (java-httpserver-api)
-        if: matrix.stack == 'java-httpserver-api'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "21"
-      # scala-cli is one binary, so installing it is the whole toolchain; no
-      # Maven cache here because there is no pom (scala-cli fetches its own deps).
-      - name: Set up Java (scala-cli)
-        if: contains(fromJSON('["scala-cli","scala-cask-api"]'), matrix.stack)
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "21"
-      - name: Install scala-cli
-        if: contains(fromJSON('["scala-cli","scala-cask-api"]'), matrix.stack)
-        run: |
-          fetch scala-cli.gz https://github.com/VirtusLab/scala-cli/releases/download/v1.18.0/scala-cli-x86_64-pc-linux.gz
-          gzip -d scala-cli.gz
-          chmod +x scala-cli
-          sudo mv scala-cli /usr/local/bin/scala-cli
-          scala-cli version
-      # The Clojure CLI is a launcher script plus a lib dir; the release tag is
-      # the version, so this installs 1.12.6 exactly. (The DeLaGuardo action
-      # only publishes bare numeric tags, which the repo's pinning rule rejects.)
-      - name: Set up Java (clojure-cli)
-        if: contains(fromJSON('["clojure-cli","clojure-ring-api"]'), matrix.stack)
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "21"
-      - name: Install the Clojure CLI
-        if: contains(fromJSON('["clojure-cli","clojure-ring-api"]'), matrix.stack)
-        run: |
-          fetch linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
-          chmod +x linux-install.sh
-          sudo ./linux-install.sh
-          clojure -Sdescribe
-      # Swift ships as a toolchain tarball in swift.org; the action installs the
-      # pinned release and puts `swift` on PATH. No package dependencies, so
-      # nothing to resolve over the network.
-      - name: Set up Swift
-        if: contains(fromJSON('["swift-cli","swift-http-api"]'), matrix.stack)
-        uses: swift-actions/setup-swift@v2
-        with:
-          swift-version: "6.2"
-      - name: Install GHDL
-        if: matrix.stack == 'vhdl-sim'
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends ghdl
-          ghdl --version | head -1
-
-      - name: Set up Deno
-        if: contains(fromJSON('["deno-cli","deno-api"]'), matrix.stack)
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      - name: Install Racket
-        if: contains(fromJSON('["racket-cli","racket-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends racket
-          racket --version
-
-      - name: Install Erlang
-        if: matrix.stack == 'erlang-cli'
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends erlang-nox erlang-dev make curl
-          erl -noshell -eval 'io:format("~s~n", [erlang:system_info(otp_release)]), halt().'
-
-      # The release escript for rebar3 dies on the distro's Erlang with
-      # "escript: exception error: undefined function rebar3:main/1", so the
-      # service job takes its Erlang and rebar3 from the toolbox that already
-      # works for the Gleam stacks.
-      - name: Set up Erlang and rebar3
-        if: matrix.stack == 'erlang-cowboy-api'
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: "27"
-          rebar3-version: "3.28.0"
-
-      - name: Install gfortran
-        if: contains(fromJSON('["fortran-cli","fortran-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends gfortran make curl
-          gfortran --version | head -1
-
-      - name: Install GNAT
-        if: contains(fromJSON('["ada-cli","ada-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends gnat make curl
-          gnatmake --version | head -1
-
-      - name: Install Free Pascal
-        if: contains(fromJSON('["pascal-cli","pascal-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          packages="fp-compiler make"
-          if [ "${{ matrix.stack }}" = "pascal-http-api" ]; then
-            packages="$packages fp-units-fcl fp-units-net"
-          fi
-          sudo apt-get install -y --no-install-recommends $packages
-          fpc -iV
-
-      - name: Install shellcheck
-        if: matrix.stack == 'bash-cli'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends shellcheck
-          shellcheck --version | head -2
-
-      - name: Install Guile
-        if: contains(fromJSON('["guile-cli","guile-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends guile-3.0 guile-json
-          guile --version | head -1
-
-      - name: Install Rakudo
-        if: contains(fromJSON('["raku-cli","raku-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends rakudo curl
-          raku --version
-
-      - name: Install gawk
-        if: matrix.stack == 'awk-cli'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends gawk
-          gawk --version | head -1
-
-      - name: Install gforth
-        if: matrix.stack == 'forth-cli'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends gforth
-          gforth --version
-
-      - name: Install sqlite3
-        if: matrix.stack == 'sqlite-sql'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends sqlite3 make
-          sqlite3 --version
-
-      - name: Set up PowerShell
-        if: contains(fromJSON('["powershell-cli","powershell-api"]'), matrix.stack)
-        run: |
-          if ! command -v pwsh >/dev/null 2>&1; then
-            fetch /tmp/pwsh.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz
-            sudo mkdir -p /opt/microsoft/powershell/7
-            sudo tar -xzf /tmp/pwsh.tar.gz -C /opt/microsoft/powershell/7
-            sudo chmod +x /opt/microsoft/powershell/7/pwsh
-            sudo ln -sf /opt/microsoft/powershell/7/pwsh /usr/local/bin/pwsh
-          fi
-          pwsh --version
-
-      - name: Install jq
-        if: matrix.stack == 'jq-report'
-        run: |
-          if ! command -v jq >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install -y --no-install-recommends jq
-          fi
-          jq --version
-
-      - name: Install TeX Live and poppler
-        if: matrix.stack == 'latex-paper'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            texlive-latex-base texlive-latex-recommended latexmk poppler-utils
-
-      - name: Install mdbook
-        if: matrix.stack == 'mdbook-docs'
-        run: |
-          if ! command -v mdbook >/dev/null 2>&1; then
-            fetch /tmp/mdbook.tar.gz https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-gnu.tar.gz
-            tar -xzf /tmp/mdbook.tar.gz -C /tmp
-            sudo install -m755 /tmp/mdbook /usr/local/bin/mdbook
-          fi
-          mdbook --version
-
-      - name: Install Haxe
-        if: contains(fromJSON('["haxe-cli","haxe-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends haxe neko
-          haxe --version
-          neko -version
-
-      - name: Install Jsonnet
-        if: matrix.stack == 'jsonnet-config'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends jsonnet
-          jsonnet --version
-
-      - name: Install LDC
-        if: contains(fromJSON('["d-cli","d-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ldc
-          ldc2 --version | head -1
-
-      - name: Install MLton
-        if: contains(fromJSON('["sml-cli","sml-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends mlton curl
-          mlton
-
-      - name: Install Groovy
-        if: contains(fromJSON('["groovy-cli","groovy-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends groovy
-          groovy --version
-
-      - name: Install GNUCOBOL
-        if: matrix.stack == 'cobol-cli'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends gnucobol make
-          cobc --version | head -1
-
-      - name: Install SBCL
-        if: contains(fromJSON('["lisp-cli","lisp-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends sbcl
-          sbcl --version
-
-      - name: Install SWI-Prolog
-        if: contains(fromJSON('["prolog-cli","prolog-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends swi-prolog-nox
-          swipl --version
-
-      - name: Install Octave
-        if: contains(fromJSON('["octave-cli","octave-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends octave curl
-          octave --version | head -1
-
-      - name: Install Tcl
-        if: contains(fromJSON('["tcl-cli","tcl-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends tcl
-          echo 'puts [info patchlevel]' | tclsh
-
-      - name: Install Hugo
-        if: matrix.stack == 'hugo-site'
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends hugo
-          hugo version
-
-      - name: Set up PHP
-        if: contains(fromJSON('["php-composer-cli","symfony-app","laravel-app"]'), matrix.stack)
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.3"
-          extensions: ctype, fileinfo, mbstring, tokenizer, xml
-          coverage: none
-      - name: Set up .NET
-        if: contains(fromJSON('["csharp-cli","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.0.x"
-      - name: Set up Elixir
-        if: contains(fromJSON('["elixir-mix-cli","phoenix-app"]'), matrix.stack)
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: "1.18"
-          otp-version: "27"
-      - name: Set up Dart
-        if: contains(fromJSON('["dart-cli","dart-shelf-api"]'), matrix.stack)
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: "3.13.7"
-      - name: Set up Zig
-        if: contains(fromJSON('["zig-cli","zig-http-api"]'), matrix.stack)
-        uses: mlugg/setup-zig@v2
-        with:
-          version: "0.17.0"
-      - name: Set up OCaml
-        if: contains(fromJSON('["ocaml-cli","ocaml-http-api"]'), matrix.stack)
-        uses: ocaml/setup-ocaml@v3
-        with:
-          ocaml-compiler: "4.14.1"
-          dune-cache: true
-      # setup-ocaml leaves dune off PATH for later steps, and `newstack check`
-      # needs `dune` resolvable to build the generated project.
-      - name: Put dune on PATH
-        if: contains(fromJSON('["ocaml-cli","ocaml-http-api"]'), matrix.stack)
-        run: |
-          opam install --yes dune
-          echo "$(opam var bin)" >> "$GITHUB_PATH"
-      - name: Set up Helm
-        if: matrix.stack == 'helm-chart'
-        uses: azure/setup-helm@v4
-        with:
-          version: v4.3.1
-      # setup-beam is reliable for OTP and rebar3, but its own Gleam download
-      # answered 504 twice in a row; the pinned release asset behind `fetch`
-      # keeps a CDN hiccup from failing the job.
-      - name: Set up Erlang for Gleam
-        if: contains(fromJSON('["gleam-cli","gleam-mist-api"]'), matrix.stack)
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: "27.3"
-          rebar3-version: "3.28.0"
-      - name: Install Gleam
-        if: contains(fromJSON('["gleam-cli","gleam-mist-api"]'), matrix.stack)
-        run: |
-          tools=$(mktemp -d)
-          fetch "$tools/gleam.tar.gz" https://github.com/gleam-lang/gleam/releases/download/v1.19.2/gleam-v1.19.2-x86_64-unknown-linux-musl.tar.gz
-          tar -xzf "$tools/gleam.tar.gz" -C "$tools"
-          sudo install -m755 "$tools/gleam" /usr/local/bin/gleam
-          gleam --version
-      - name: Set up Julia
-        if: contains(fromJSON('["julia-cli","julia-api"]'), matrix.stack)
-        uses: julia-actions/setup-julia@v2
-        with:
-          version: "1.13"
-      - name: Set up Nim
-        if: contains(fromJSON('["nim-cli","nim-http-api"]'), matrix.stack)
-        uses: jiro4989/setup-nim-action@v2
-        with:
-          nim-version: "2.2.4"
-      - name: Install Lua
-        if: contains(fromJSON('["lua-cli","lua-http-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq lua5.4
-          # The service stack needs the two distribution libraries; the CLI
-          # stack does not, and installing them costs a second.
-          if [ "${{ matrix.stack }}" = "lua-http-api" ]; then
-            sudo apt-get install -y -qq lua-socket lua-cjson
-            lua5.4 -e 'print(require("socket")._VERSION, require("cjson")._VERSION)'
-          fi
-          lua5.4 -v
-      - name: Install Crystal
-        if: contains(fromJSON('["crystal-cli","crystal-kemal-api"]'), matrix.stack)
-        uses: crystal-lang/install-crystal@v1.9.5
-        with:
-          crystal: "1.11"
-      - name: Set up Bun
-        if: contains(fromJSON('["bun-cli","bun-api","bun-sqlite-api"]'), matrix.stack)
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.4.2
-      - name: Install R
-        if: contains(fromJSON('["r-cli","r-plumber-api"]'), matrix.stack)
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq --no-install-recommends r-base-core
-          Rscript --version
-      - name: Install plumber
-        if: matrix.stack == 'r-plumber-api'
-        run: sudo apt-get install -y -qq --no-install-recommends r-cran-plumber
-      - name: Install newstack
-        run: uv sync --group dev
-      - name: Generate and verify the stack
-        run: uv run newstack check ${{ matrix.stack }} --verbose
+    steps: *shared_setup
 
   package:
     name: wheel ships the stacks

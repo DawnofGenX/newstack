@@ -38,20 +38,6 @@ def _readme_rows() -> list[str]:
     return re.findall(r"^\|\s*`([a-z0-9][a-z0-9-]*)`\s*\|", text, re.M)
 
 
-def _ci_matrix_entries() -> list[str]:
-    """Names under the `stack:` matrix key, in file order."""
-    lines = CI.read_text(encoding="utf-8").splitlines()
-    start = next(i for i, line in enumerate(lines) if line.strip() == "stack:")
-    entries: list[str] = []
-    for line in lines[start + 1 :]:
-        if not line.strip():
-            continue
-        if not line.startswith("          - "):
-            break
-        entries.append(line.strip()[2:].strip())
-    return entries
-
-
 def test_readme_lists_each_stack_exactly_once() -> None:
     """A duplicated row is drift too: it makes the table count lie about the registry."""
     rows = _readme_rows()
@@ -62,13 +48,87 @@ def test_readme_lists_each_stack_exactly_once() -> None:
     )
 
 
+def _ci_matrix_blocks() -> dict[str, list[str]]:
+    """Map each stack-sharding job in ci.yml to the names in its matrix, in file order.
+
+    The stack job is split across several matrices (see docs/CI.md): a single
+    matrix stops expanding once it reaches 256 entries, and a matrix that does
+    not expand makes the run fail with no per-stack jobs at all.
+    """
+    lines = CI.read_text(encoding="utf-8").splitlines()
+    try:
+        start = next(i for i, line in enumerate(lines) if line == "jobs:")
+    except StopIteration:  # pragma: no cover - a workflow without jobs is not a workflow
+        raise AssertionError("ci.yml has no top-level `jobs:` section") from None
+    blocks: dict[str, list[str]] = {}
+    job: str | None = None
+    in_matrix = False
+    for line in lines[start + 1 :]:
+        header = re.match(r"^ {2}([A-Za-z0-9_-]+):\s*$", line)
+        if header:
+            job, in_matrix = header.group(1), False
+            continue
+        if line.strip() == "stack:" and job is not None:
+            in_matrix = True
+            blocks.setdefault(job, [])
+            continue
+        if in_matrix and job is not None:
+            if line.startswith("          - "):
+                blocks[job].append(line.strip()[2:].strip())
+            elif line.strip():
+                in_matrix = False
+    return blocks
+
+
+def _ci_matrix_entries() -> list[str]:
+    """Every stack named by any shard matrix, in file order."""
+    return [name for entries in _ci_matrix_blocks().values() for name in entries]
+
+
 def test_ci_matrix_lists_each_stack_exactly_once() -> None:
     """A duplicate matrix entry runs the same stack twice and hides a missing one."""
     entries = _ci_matrix_entries()
     duplicated = sorted({name for name in entries if entries.count(name) > 1})
-    assert not duplicated, f"ci.yml stack matrix lists twice: {', '.join(duplicated)}"
+    assert not duplicated, f"ci.yml stack matrices list twice: {', '.join(duplicated)}"
     assert sorted(entries) == sorted(load_stacks()), (
-        f"ci.yml matrix has {len(entries)} entries for {len(load_stacks())} stacks"
+        f"ci.yml matrices name {len(entries)} stacks for {len(load_stacks())} in the registry"
+    )
+
+
+def test_every_shard_matrix_stays_under_the_github_limit() -> None:
+    """Past 256 entries GitHub silently drops the matrix, so the run proves nothing.
+
+    That is not a slowdown: the job does not expand at all, no `stack X` job is
+    created, and the run just reports a failure. Keep every shard well under.
+    """
+    blocks = _ci_matrix_blocks()
+    assert blocks, "ci.yml has no `stack:` matrix to check"
+    too_big = {job: len(entries) for job, entries in blocks.items() if len(entries) > 256}
+    assert not too_big, f"matrix over the 256-job expansion cap (it will not expand): {too_big}"
+
+
+def test_shard_matrices_are_balanced() -> None:
+    """One empty or one giant shard means the split stopped doing its job."""
+    sizes = [len(entries) for entries in _ci_matrix_blocks().values() if entries]
+    assert sizes, "ci.yml has no non-empty stack matrix"
+    assert min(sizes) > 0
+    assert max(sizes) <= 2 * min(sizes), f"shard sizes are lopsided: {sorted(sizes)}"
+
+
+def test_stack_shards_share_one_step_list() -> None:
+    """Four copies of the 60-odd toolchain gates drift apart on the first edit."""
+    text = CI.read_text(encoding="utf-8")
+    blocks = _ci_matrix_blocks()
+    assert len(blocks) > 1, "expected the stack job to be sharded"
+    assert text.count("x-shared-steps: &shared_setup") == 1, (
+        "ci.yml must define the shared step list exactly once, as `x-shared-steps: &shared_setup`"
+    )
+    used = text.count("    steps: *shared_setup")
+    assert used == len(blocks), f"{len(blocks)} stack jobs share the steps, {used} do"
+    anchor = text.split("x-shared-steps: &shared_setup", 1)[1].split("\njobs:", 1)[0]
+    assert "fromJSON(" in anchor, "the toolchain gates must live in the shared step list"
+    assert anchor.count("      - name:") + anchor.count("  - name:") >= 20, (
+        "the shared step list looks truncated"
     )
 
 
