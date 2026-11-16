@@ -31,21 +31,28 @@ A healthy run counts one job per stacks entry **plus** the 5 non-matrix jobs
 ## Layout
 
 ```yaml
-x-shared-steps: &shared_setup     # the ~68 steps, once
-  - uses: actions/checkout@v7
-  ...
-
 jobs:
   stacks-a:
     name: stack ${{ matrix.stack }} is green (a)
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         stack: [ ... 79 entries ... ]
-    steps: *shared_setup
+    steps: &shared_setup           # the ~71 steps, defined once, anchored here
+      - uses: actions/checkout@v7
+      ...
   stacks-b: ...   # 79
+    steps: *shared_setup
   stacks-c: ...   # 78
   stacks-d: ...   # 78
 ```
+
+The anchor must sit on the **first job's `steps:` key**. A top-level
+`x-shared-steps: &shared_setup` looks tidier and silently breaks the whole
+workflow: GitHub's schema drops unknown top-level keys, the aliases then resolve
+to nothing, and the run reports zero jobs with "This run likely failed because
+of a workflow file issue" (run 43883103545 is the example). Validate any anchor
+edit by checking that the run's `total_count` is non-zero before believing it.
 
 One anchored step list feeds all four jobs. Do not inline copies: the 60-odd
 toolchain gates (`if: contains(fromJSON([...]), matrix.stack)`) are the part
@@ -57,6 +64,25 @@ pole; `tests/test_docs.py` enforces the cap, the balance, the uniqueness of the
 union, and the single shared step list. Add a shard when a shard passes ~200
 entries: 5 shards × 200 = 1,000 stacks still fits, and the 1,029-dummy-job probe
 (plan task T3.4) is what proves the runner capacity before the tree gets there.
+
+## Runner image: the shards stay on 24.04
+
+The stack shards pin `runs-on: ubuntu-24.04` while `test` and `package` float on
+`ubuntu-latest`. `ubuntu-latest` moved to 26.04 and two toolchains in the shared
+step list cannot run there:
+
+- `swift-actions/setup-swift@v2` aborts with `Version "26.04" of Ubuntu is not
+  supported` — swift-http-api and swift-cli never reach their verify step.
+- `ocaml/setup-ocaml@v3` bootstraps through apt and 404s on
+  `libc6-dev-i386_2.43-2ubuntu2.4`, so ocaml-http-api and ocaml-cli die in setup.
+
+Pin the image rather than rewriting those installs; move the shards back to
+`ubuntu-latest` when both actions publish 26.04 support (the failure is loud and
+obvious if you try it early). Distro packages the smokes need but the image
+does not carry are installed by stack-scoped gates in the shared step list:
+`redis-tools` for python-resp-server, `mosquitto-clients` for python-mqtt-broker,
+and `binutils`/`gcc`/`libgmp-dev` for the ghcup-based Haskell stacks (`cabal`
+otherwise dies with `collect2: fatal error: cannot find 'ld'`).
 
 ## Adding a stack
 
