@@ -120,12 +120,16 @@ def test_stack_shards_share_one_step_list() -> None:
     text = CI.read_text(encoding="utf-8")
     blocks = _ci_matrix_blocks()
     assert len(blocks) > 1, "expected the stack job to be sharded"
-    assert text.count("x-shared-steps: &shared_setup") == 1, (
-        "ci.yml must define the shared step list exactly once, as `x-shared-steps: &shared_setup`"
+    assert text.count("    steps: &shared_setup") == 1, (
+        "ci.yml must define the shared step list exactly once, as `    steps: &shared_setup`"
     )
     used = text.count("    steps: *shared_setup")
-    assert used == len(blocks), f"{len(blocks)} stack jobs share the steps, {used} do"
-    anchor = text.split("x-shared-steps: &shared_setup", 1)[1].split("\njobs:", 1)[0]
+    assert used == len(blocks) - 1, (
+        f"{len(blocks)} stack jobs but {used + 1} use the shared step list"
+    )
+    # A top-level anchor key is dropped by the workflow schema, which breaks the
+    # aliases; anchoring on the first shard is the form GitHub actually expands.
+    anchor = text.split("    steps: &shared_setup", 1)[1].split("\n  stacks-", 1)[0]
     assert "fromJSON(" in anchor, "the toolchain gates must live in the shared step list"
     assert anchor.count("      - name:") + anchor.count("  - name:") >= 20, (
         "the shared step list looks truncated"
