@@ -35,7 +35,13 @@ fi
     --size-limit 2048 --reject bounce@example.test >"$work/server.log" 2>&1 &
 server=$!
 
+ready=0
 for _ in $(seq 1 160); do
+    if ! kill -0 "$server" 2>/dev/null; then
+        echo "FAIL smtp sink exited before becoming ready; see $work/server.log:" >&2
+        cat "$work/server.log" >&2 || true
+        exit 1
+    fi
     if "$PY" - "$PORT" 2>/dev/null <<'PY'
 import socket
 import sys
@@ -44,11 +50,16 @@ sock = socket.create_connection(("127.0.0.1", int(sys.argv[1])), timeout=1)
 sock.close()
 PY
     then
+        ready=1
         break
     fi
     sleep 0.25
 done
-kill -0 "$server"
+if [ "$ready" -ne 1 ]; then
+    echo "FAIL smtp sink did not become ready on port $PORT; see $work/server.log:" >&2
+    cat "$work/server.log" >&2 || true
+    exit 1
+fi
 
 # The client below is a plain smtplib client: nothing from the project is
 # imported, so a bug in the sink's own idea of SMTP cannot hide here.

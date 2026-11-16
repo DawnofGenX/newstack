@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import asyncio
 import socket
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -96,9 +96,17 @@ class Sink:
             self._started = False
 
     def wait(self) -> None:
-        """Block until the event loop is interrupted, then stop cleanly."""
+        """Block until interrupted, then stop cleanly.
+
+        aiosmtpd runs its event loop in the controller's own thread, so the
+        main thread only needs to stay alive. ``asyncio.get_event_loop()``
+        does not create a loop on Python 3.10+ when none is current (and was
+        removed entirely on 3.12+), so poll with a sleep instead of relying
+        on it.
+        """
         try:
-            asyncio.get_event_loop().run_forever()
+            while True:
+                time.sleep(1)
         except (KeyboardInterrupt, SystemExit):
             pass
         finally:

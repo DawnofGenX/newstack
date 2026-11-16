@@ -98,8 +98,9 @@ if [ "$ready" = "yes" ]; then
   check_equal "an unconditional write answers 428" "$code" "428"
   plain="$(curl -sS -H 'Accept: text/plain' "http://127.0.0.1:$PORT/report")"
   check_contains "the plain representation differs" "$plain" "v1"
-  jsonfirst="$(curl -sS -H 'Accept: application/json' "http://127.0.0.1:$PORT/report" | cut -c1)"
-  check_equal "the json representation is an object" "$jsonfirst" "{"
+  jsonbody="$(curl -sS -H 'Accept: application/json' "http://127.0.0.1:$PORT/report")"
+  jsonkind="$(printf '%s' "$jsonbody" | "$NODE" -e "process.stdin.resume(); let d=''; process.stdin.on('data', c => d += c); process.stdin.on('end', () => { const v = JSON.parse(d); process.stdout.write(typeof v === 'object' && v !== null && !Array.isArray(v) ? 'object' : 'non-object'); });")"
+  check_equal "the json representation is an object" "$jsonkind" "object"
 else
   bad "the server answers on port $PORT" "$(tail -3 "$work/serve.log")"
 fi

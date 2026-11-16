@@ -71,8 +71,10 @@ class ChatClient:
                 output, tokens_in, tokens_out = self._once(prompt)
                 return output, tokens_in, tokens_out, attempt
             except urllib.error.HTTPError as exc:
-                last = f"http {exc.code}"
-                if exc.code not in RETRY_STATUS:
+                code = exc.code
+                exc.close()
+                last = f"http {code}"
+                if code not in RETRY_STATUS:
                     raise RequestFailed(last) from exc
             except (urllib.error.URLError, TimeoutError, OSError) as exc:
                 last = f"network {exc}"
