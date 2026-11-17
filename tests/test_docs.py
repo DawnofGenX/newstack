@@ -208,7 +208,9 @@ def _java_gated_stacks() -> set[str]:
                 break
             if candidate.startswith("if:"):
                 gated.update(re.findall(r"[\"']([a-z0-9][a-z0-9-]*)[\"']", candidate))
-                gated.update(re.findall(r"matrix\.stack\s*==\s*[\"']([a-z0-9][a-z0-9-]*)", candidate))
+                gated.update(
+                    re.findall(r"matrix\.stack\s*==\s*[\"']([a-z0-9][a-z0-9-]*)", candidate)
+                )
                 break
     return gated
 

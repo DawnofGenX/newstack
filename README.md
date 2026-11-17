@@ -247,16 +247,28 @@ $ newstack stacks outdated
 
 | Stack | What you get | Toolchain |
 | --- | --- | --- |
+| `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
 | `go-cobra-cli` | cobra subcommands with go test and a smoke run of the binary | go |
 | `go-echo-api` | labstack/echo JSON service with httptest tests and curl smoke | go |
+| `go-slog-middleware` | net/http + log/slog middleware: request id, structured logging, panic recovery, auth redaction. | go |
+| `go-sqlite-migrate` | Embedded SQL migrations with an applied-version table, checksums, and status. | go |
 | `java-picocli-cli` | picocli CLI on Maven with JUnit 5 tests and a shaded jar smoke | java |
 | `node-commander-cli` | commander subcommands with assertion-based tests | node |
+| `node-csv-stream-cli` | RFC 4180 streaming CSV parser/serializer on Node streams with csv2json/json2csv CLI. | node |
+| `node-openapi-mock-server` | Zero-dependency OpenAPI 3 mock server: example-first responses, schema-shaped defaults, 404/405, required param validation. | node |
 | `node-sse-api` | Server-sent events service on bare Node: a replayable event log, Last-Event-ID resumption, heartbeat comments, node --test plus a live streaming contract | node |
 | `node-trpc-api` | tRPC v11 router with a direct server-side caller test and HTTP smoke over plain fetch | node |
 | `python-aiohttp-api` | aiohttp JSON service with health and stats endpoints, curl smoke | python |
 | `python-alembic-migrations` | Alembic with SQLite and two revisions; smoke upgrades and asserts schema | python |
 | `python-apscheduler-worker` | APScheduler interval job writing rows to SQLite; CLI runs N ticks | python |
 | `python-click-cli` | Click command group with subcommands, CliRunner tests, and an entry point | python |
+| `python-content-addressed-store` | Dependency-free content-addressed blob store with atomic writes, dedupe, verify and gc | python |
+| `python-csv-importer` | CSV to SQLite importer: header mapping, type coercion, per-row errors with line numbers, single-transaction batch, dry-run, idempotent upsert | python |
+| `python-fastapi-jwt-auth` | FastAPI service issuing HS256 JWTs: /token login, /me protected route, 401 with WWW-Authenticate | python |
+| `python-graphql-api` | graphql-core schema on stdlib http.server: arguments, resolver errors with paths, aliases, variables, POST /graphql and GET /health | python |
+| `python-image-thumbnailer` | Pillow thumbnails: EXIF orientation, aspect-preserving max box, JPEG quality, RGBA/palette, batch with per-file errors | python |
+| `python-json-logging` | Dependency-free structured logging: JSON lines, context binding, secret redaction, exceptions, levels, child loggers | python |
+| `python-jsonschema-validator` | jsonschema validation collecting all errors with JSON Pointer paths, report, --json, exit codes | python |
 | `python-lib` | src layout, hatchling build, pytest, ruff, 4-version CI matrix | `uv` |
 | `python-cli` | console entry point on argparse, zero runtime deps, tested CLI | `uv` |
 | `fastapi` | typed JSON API, pydantic models, TestClient tests, Dockerfile | `uv` |
@@ -267,6 +279,8 @@ $ newstack stacks outdated
 | `python-prometheus-exporter` | prometheus_client metrics endpoint with /metrics exposition | python |
 | `python-pydantic-settings-app` | pydantic-settings precedence: defaults < .env < env < CLI override | python |
 | `python-sqlalchemy-async-api` | SQLAlchemy 2 async with aiosqlite: seeded table, async queries, CLI subcommands | python |
+| `python-sqlite-backup` | stdlib sqlite3 backup API: timestamped copies, integrity check, row-count verify, rotation | python |
+| `python-sqlite-fts` | SQLite FTS5 external-content index: porter tokenizer, bm25 ranking, snippets, query escaping | python |
 | `python-sse-api` | Server-sent events: an endless `text/event-stream` response, `Last-Event-ID` resume, proxy-proof headers, and a socket test that fails if the body is buffered | `uv` |
 | `python-scheduler-api` | A durable scheduler: due jobs claimed under `BEGIN IMMEDIATE`, interval jobs rescheduled from *now* so an overdue job does not stampede, exponential back-off capped by `max_attempts`, and a run ledger with the counts of every attempt | `uv` |
 | `python-webhook-receiver` | Signed webhooks: HMAC-SHA256 over the *raw* body (a parsed and re-serialised body never matches), a both-directions replay window, `hmac.compare_digest`, idempotency enforced by an event-id primary key, and a 401 before any parser sees the payload | `uv` |
@@ -351,6 +365,7 @@ $ newstack stacks outdated
 | `python-binary-heap` | A min-heap over integer keys, sift-up and sift-down hand-rolled on a plain list: the drain equals sorted(pushed) on seeded push/pop storms, and the parent rule is walked by a shipped checker after every op. | uv, python3 |
 | `python-count-min` | A count-min sketch over [0, 256): the min of rows never dips under the ledger truth on seeded streams, the audit runs after every update, and the shipped grid answers its corpora exactly. | uv, python3 |
 | `python-rabin-karp` | Rabin-Karp over lowercase text: the scan's start list equals the naive scan's on seeded corpora, the roll equals a fresh weigh on shipped windows, and collisions stay honest under a letter-check. | uv, python3 |
+| `python-xlsx-report` | openpyxl reports from CSV: styled header, freeze panes, widths, number formats, autofilter, formula | python |
 | `python-z-function` | The Z-array over lowercase words: the array equals the naive per-position LCP scan on seeded corpora, the concatenated occurrences equal the naive scan's starts, and z[0], the single letter, and the empty word stay honest. | uv, python3 |
 | `python-bloom-filter` | A Bloom filter whose added keys are always answered present: the shipped audit re-asks every key after every update on seeded streams, the survey lists the liars at the shipped widths (none), and the rows are deterministic multiplicative hashes. | uv, python3 |
 | `python-lz77` | LZ77 over lowercase text: the read hands back the letters the write was sent on shipped and seeded corpora, every back-reference names letters the window already emitted, and a repeat never costs more tokens than letters. | uv, python3 |
@@ -427,6 +442,7 @@ $ newstack stacks outdated
 | `python-tim-sort` | tim sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `python-intro-sort` | intro sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `rust-config-loader` | Layered configuration (defaults < file < env < CLI) with typed errors and a .env parser. | rust |
 | `rust-jsonrpc-stdio` | JSON-RPC 2.0 server over stdin/stdout: request types, notifications, batches, spec error codes, and the exact framing an LSP-style client expects | rust |
 | `rust-tracing-service` | tracing + tracing-subscriber JSON output with a small HTTP service | rust |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |

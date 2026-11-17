@@ -1,0 +1,26 @@
+{
+  "name": "node-csv-stream-cli",
+  "title": "Node CSV Stream CLI",
+  "language": "node",
+  "blurb": "RFC 4180 streaming CSV parser/serializer on Node streams with csv2json/json2csv CLI.",
+  "requires": ["node", "npm"],
+  "node": { "minimum": "22", "versions": ["22", "24"] },
+  "package_manager": ["npm", "pnpm", "yarn"],
+  "default_description": "A streaming CSV tool.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "node src/cli.js csv2json data.csv out.json"
+  ],
+  "verify": [
+    { "name": "install", "cmd": "npm install --no-audit --no-fund", "tools": ["npm"], "timeout": 900 },
+    { "name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 600 }
+  ],
+  "detect": [
+    { "file": "src/csv.js", "contains": "CsvParser" }
+  ],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["tests/parse.test.js"]
+}

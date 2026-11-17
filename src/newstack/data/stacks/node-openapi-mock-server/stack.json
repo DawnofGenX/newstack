@@ -1,0 +1,44 @@
+{
+  "name": "node-openapi-mock-server",
+  "title": "Node OpenAPI Mock Server",
+  "language": "node",
+  "blurb": "Zero-dependency OpenAPI 3 mock server: example-first responses, schema-shaped defaults, 404/405, required param validation.",
+  "requires": ["node", "npm", "curl"],
+  "node": { "minimum": "22", "versions": ["22", "24"] },
+  "package_manager": ["npm", "pnpm", "yarn"],
+  "default_description": "An OpenAPI-driven mock server.",
+  "port": 5531,
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "PORT=8080 {package_manager_run} start",
+    "curl http://127.0.0.1:8080/health"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": ["npm"],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": ["npm"],
+      "timeout": 600
+    },
+    {
+      "name": "contract",
+      "cmd": "if curl -s --max-time 2 http://127.0.0.1:5531/health >/dev/null 2>&1; then echo 'port 5531 is already answering - stop that process before running this step'; exit 1; fi; PORT=5531 node src/main.js >.openapi-mock.log 2>&1 & srv=$!; ok=1; for _ in $(seq 1 120); do if curl -s --max-time 2 http://127.0.0.1:5531/health >/dev/null 2>&1; then ok=0; break; fi; sleep 0.5; done; kill -0 $srv 2>/dev/null || { echo 'the server exited before it answered'; cat .openapi-mock.log; exit 1; }; if [ $ok -ne 0 ]; then cat .openapi-mock.log; kill $srv 2>/dev/null; exit 1; fi; node tools/contract.mjs --base http://127.0.0.1:5531; rc=$?; kill $srv 2>/dev/null; wait $srv 2>/dev/null; test $rc -eq 0",
+      "tools": ["node", "curl"],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    { "file": "openapi.json", "contains": "openapi" }
+  ],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["tests/mock.test.js"]
+}

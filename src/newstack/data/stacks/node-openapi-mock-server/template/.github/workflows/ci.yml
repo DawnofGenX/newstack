@@ -1,0 +1,32 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [{{ node_versions }}]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install --no-audit --no-fund
+      - run: npm test
+      - name: Live contract
+        run: |
+          if curl -s --max-time 2 http://127.0.0.1:5531/health >/dev/null 2>&1; then echo 'port in use'; exit 1; fi
+          PORT=5531 node src/main.js >.mock.log 2>&1 &
+          server=$!
+          trap 'kill $server 2>/dev/null || true; wait $server 2>/dev/null || true' EXIT
+          for _ in $(seq 1 120); do
+            if curl -s --max-time 2 http://127.0.0.1:5531/health >/dev/null 2>&1; then break; fi
+            sleep 0.25
+          done
+          kill -0 $server
+          node tools/contract.mjs --base http://127.0.0.1:5531

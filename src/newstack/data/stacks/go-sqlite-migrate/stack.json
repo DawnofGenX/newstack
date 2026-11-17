@@ -1,0 +1,25 @@
+{
+  "name": "go-sqlite-migrate",
+  "title": "Go SQLite Migrate",
+  "language": "go",
+  "blurb": "Embedded SQL migrations with an applied-version table, checksums, and status.",
+  "requires": ["go", "git"],
+  "default_description": "A Go CLI for SQLite migrations.",
+  "next_steps": [
+    "cd {path}",
+    "go run . up app.db",
+    "go run . status app.db"
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 1200 },
+    { "name": "build", "cmd": "go build -o bin/migrate .", "tools": ["go"], "timeout": 1200 },
+    { "name": "cli", "cmd": "bash smoke.sh", "tools": ["bash"], "timeout": 300 }
+  ],
+  "detect": [
+    { "file": "internal/migrate/migrate.go", "contains": "schema_migrations" }
+  ],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["main_test.go"]
+}

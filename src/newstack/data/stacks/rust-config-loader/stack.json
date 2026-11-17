@@ -1,0 +1,26 @@
+{
+  "name": "rust-config-loader",
+  "title": "Rust Config Loader",
+  "language": "rust",
+  "blurb": "Layered configuration (defaults < file < env < CLI) with typed errors and a .env parser.",
+  "requires": ["cargo", "rustc"],
+  "default_description": "A Rust CLI for layered configuration.",
+  "next_steps": [
+    "cd {path}",
+    "cargo run -- print",
+    "cargo run -- explain"
+  ],
+  "verify": [
+    { "name": "fmt", "cmd": "cargo fmt --check", "tools": ["cargo"], "timeout": 600 },
+    { "name": "clippy", "cmd": "cargo clippy --all-targets -- -D warnings", "tools": ["cargo"], "timeout": 600 },
+    { "name": "test", "cmd": "cargo test", "tools": ["cargo"], "timeout": 1200 },
+    { "name": "build", "cmd": "cargo build --release", "tools": ["cargo"], "timeout": 1200 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "cargo"], "timeout": 1200 }
+  ],
+  "detect": [
+    { "file": "src/lib.rs", "contains": "parse_dotenv" }
+  ],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": []
+}

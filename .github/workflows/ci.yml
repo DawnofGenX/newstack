@@ -184,6 +184,10 @@ jobs:
           - python-alembic-migrations
           - node-commander-cli
           - rust-tracing-service
+          - python-sqlite-fts
+          - python-jsonschema-validator
+          - node-openapi-mock-server
+          - rust-config-loader
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -769,6 +773,10 @@ jobs:
           - python-apscheduler-worker
           - go-cobra-cli
           - java-picocli-cli
+          - python-json-logging
+          - python-content-addressed-store
+          - node-csv-stream-cli
+          - elixir-gen-server
     steps: *shared_setup
 
   stacks-c:
@@ -862,6 +870,10 @@ jobs:
           - python-aiohttp-api
           - go-echo-api
           - node-sse-api
+          - python-fastapi-jwt-auth
+          - python-image-thumbnailer
+          - python-graphql-api
+          - go-slog-middleware
     steps: *shared_setup
 
   stacks-d:
@@ -955,6 +967,10 @@ jobs:
           - python-prometheus-exporter
           - node-trpc-api
           - rust-jsonrpc-stdio
+          - python-sqlite-backup
+          - python-xlsx-report
+          - python-csv-importer
+          - go-sqlite-migrate
     steps: *shared_setup
 
   package:
