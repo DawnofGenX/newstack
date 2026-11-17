@@ -192,3 +192,46 @@ def test_the_stack_shards_are_gated_on_a_stack_diff_for_pull_requests() -> None:
         assert "if: needs.changed.outputs.stacks == 'true'" in block, (
             f"{job} is not skipped for a pull request that touches no stack"
         )
+
+
+def _java_gated_stacks() -> set[str]:
+    """Stack names any `actions/setup-java` step in ci.yml applies to."""
+    lines = CI.read_text(encoding="utf-8").splitlines()
+    gated: set[str] = set()
+    for index, line in enumerate(lines):
+        if "uses: actions/setup-java@" not in line:
+            continue
+        # The `if:` for a step sits directly above its `uses:` line.
+        for back in range(index - 1, max(index - 6, -1), -1):
+            candidate = lines[back].strip()
+            if candidate.startswith("- name:") or candidate.startswith("- uses:"):
+                break
+            if candidate.startswith("if:"):
+                gated.update(re.findall(r"[\"']([a-z0-9][a-z0-9-]*)[\"']", candidate))
+                gated.update(re.findall(r"matrix\.stack\s*==\s*[\"']([a-z0-9][a-z0-9-]*)", candidate))
+                break
+    return gated
+
+
+def test_every_java_build_stack_gets_a_runner_jdk() -> None:
+    """The runner default JDK is older than the release these stacks target.
+
+    java-picocli-cli passed locally on a JDK 21 and failed on the runner with
+    "error: release version 21 not supported" because no setup-java step named
+    it. A stack that compiles with Maven or Gradle has to appear in a gate; an
+    interpreter-only stack (groovy/clojure/scala-cli scripts) just needs a JRE
+    and the runner image already ships one.
+    """
+    gated = _java_gated_stacks()
+    assert gated, "ci.yml has no actions/setup-java gate at all"
+    builders = {"mvn", "mvnw", "gradle", "gradlew"}
+    missing = sorted(
+        name
+        for name, stack in load_stacks().items()
+        if "java" in stack.requires
+        and builders & set(stack.requires)
+        and name not in gated
+    )
+    assert not missing, (
+        f"these stacks need a JDK but no setup-java step names them: {', '.join(missing)}"
+    )

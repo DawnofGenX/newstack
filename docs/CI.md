@@ -131,6 +131,27 @@ does not carry are installed by stack-scoped gates in the shared step list:
 and `binutils`/`gcc`/`libgmp-dev` for the ghcup-based Haskell stacks (`cabal`
 otherwise dies with `collect2: fatal error: cannot find 'ld'`).
 
+## Toolchain gates, and the one that bit
+
+Most toolchains come from a stack-scoped step in the shared list: `if: contains(fromJSON([...]), matrix.stack)`
+or `if: matrix.stack == '<name>'`. A stack that needs a tool the runner image does not carry must be named
+in the matching gate — and nothing fails loudly when it is not, because the stack's verify step simply runs
+against the runner's default tool.
+
+That is exactly how `java-picocli-cli` shipped red: it compiles with Maven at `release 21`, passed locally
+on JDK 21, and died on the runner with
+
+```
+[ERROR] Failed to execute goal ...maven-compiler-plugin:3.16.0:compile ...:
+        Fatal error compiling: error: release version 21 not supported
+```
+
+because the setup-java gate listed the other Maven stacks and not this one. Adding a Maven/Gradle stack
+means adding its name to that gate; `tests/test_docs.py::test_every_java_build_stack_gets_a_runner_jdk`
+now fails if a stack that requires `java` plus `mvn`/`mvnw`/`gradle`/`gradlew` is missing from every
+`actions/setup-java` step. Interpreter-only JVM stacks (groovy, clojure, scala-cli) are exempt on purpose:
+they need a JRE the image ships, not a compiler at a specific release.
+
 ## Adding a stack
 
 ```console

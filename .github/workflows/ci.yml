@@ -257,7 +257,7 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-maven-cli","kotlin-cli","kotlin-http-api","kotlin-ktor-api","spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-maven-cli","java-picocli-cli","kotlin-cli","kotlin-http-api","kotlin-ktor-api","spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
