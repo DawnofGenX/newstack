@@ -1,0 +1,7 @@
+{
+  "django": "web app: selftest is an HTTP request script exercised via pytest TestClient",
+  "fastapi": "web app: selftest is an HTTP request script exercised via pytest TestClient",
+  "flask": "web app: selftest is an HTTP request script exercised via pytest TestClient",
+  "mkdocs-site": "documentation site: selftest is a rendered-page check run by pytest",
+  "sphinx-docs": "documentation site: selftest is a doctest/rendered-page check run by pytest"
+}
