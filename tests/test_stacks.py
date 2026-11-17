@@ -475,6 +475,25 @@ def test_every_verify_command_uses_double_braces(name):
     )
 
 
+@pytest.mark.parametrize("name", STACK_NAMES)
+def test_every_stack_can_render_its_next_steps(name):
+    """`newstack new` renders next_steps with `str.format_map`, so a literal `{` kills it.
+
+    A JSON example in a next step is the easy way to hit this: `{"jsonrpc":"2.0"}` is read
+    as the field `jsonrpc`, and the CLI dies with `ValueError: Invalid format specifier`
+    after the project has already been written. Escape them as `{{` and `}}`.
+    """
+    from newstack.cli import _format_step, build_context_for_check
+
+    stack = get_stack(name)
+    context = build_context_for_check(stack, "demo")
+    for step in stack.next_steps:
+        try:
+            _format_step(step, context, Path("demo"))
+        except (KeyError, IndexError, ValueError) as exc:
+            pytest.fail(f"{name}: next step would crash `newstack new`: {step!r} ({exc})")
+
+
 # scripts/proof_stack.sh scaffolds into `newstack-smoke-<stack>-<epoch>`, so the
 # rendered package name grows with the stack's own name and a line that fits at
 # `demo` can break in the one place a stack's CI actually runs. The epoch is fixed

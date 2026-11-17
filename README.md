@@ -247,12 +247,26 @@ $ newstack stacks outdated
 
 | Stack | What you get | Toolchain |
 | --- | --- | --- |
+| `go-cobra-cli` | cobra subcommands with go test and a smoke run of the binary | go |
+| `go-echo-api` | labstack/echo JSON service with httptest tests and curl smoke | go |
+| `java-picocli-cli` | picocli CLI on Maven with JUnit 5 tests and a shaded jar smoke | java |
+| `node-commander-cli` | commander subcommands with assertion-based tests | node |
+| `node-sse-api` | Server-sent events service on bare Node: a replayable event log, Last-Event-ID resumption, heartbeat comments, node --test plus a live streaming contract | node |
+| `node-trpc-api` | tRPC v11 router with a direct server-side caller test and HTTP smoke over plain fetch | node |
+| `python-aiohttp-api` | aiohttp JSON service with health and stats endpoints, curl smoke | python |
+| `python-alembic-migrations` | Alembic with SQLite and two revisions; smoke upgrades and asserts schema | python |
+| `python-apscheduler-worker` | APScheduler interval job writing rows to SQLite; CLI runs N ticks | python |
+| `python-click-cli` | Click command group with subcommands, CliRunner tests, and an entry point | python |
 | `python-lib` | src layout, hatchling build, pytest, ruff, 4-version CI matrix | `uv` |
 | `python-cli` | console entry point on argparse, zero runtime deps, tested CLI | `uv` |
 | `fastapi` | typed JSON API, pydantic models, TestClient tests, Dockerfile | `uv` |
 | `django` | Django 6.1 app: config/core split, SQLite, pytest-django, migration drift check | `uv` |
 | `flask` | Flask app factory: JSON routes, pytest fixtures, ruff, CI | `uv` |
 | `python-fastapi-sqlite` | FastAPI over SQLite: numbered SQL migrations applied in `lifespan`, WAL + busy timeout on every connection, typed request models, restart-safe rows | `uv` |
+| `python-polars-etl` | Polars dataframe pipeline reading and writing Parquet in a temp directory | python |
+| `python-prometheus-exporter` | prometheus_client metrics endpoint with /metrics exposition | python |
+| `python-pydantic-settings-app` | pydantic-settings precedence: defaults < .env < env < CLI override | python |
+| `python-sqlalchemy-async-api` | SQLAlchemy 2 async with aiosqlite: seeded table, async queries, CLI subcommands | python |
 | `python-sse-api` | Server-sent events: an endless `text/event-stream` response, `Last-Event-ID` resume, proxy-proof headers, and a socket test that fails if the body is buffered | `uv` |
 | `python-scheduler-api` | A durable scheduler: due jobs claimed under `BEGIN IMMEDIATE`, interval jobs rescheduled from *now* so an overdue job does not stampede, exponential back-off capped by `max_attempts`, and a run ledger with the counts of every attempt | `uv` |
 | `python-webhook-receiver` | Signed webhooks: HMAC-SHA256 over the *raw* body (a parsed and re-serialised body never matches), a both-directions replay window, `hmac.compare_digest`, idempotency enforced by an event-id primary key, and a 401 before any parser sees the payload | `uv` |
@@ -413,6 +427,8 @@ $ newstack stacks outdated
 | `python-tim-sort` | tim sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `python-intro-sort` | intro sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `rust-jsonrpc-stdio` | JSON-RPC 2.0 server over stdin/stdout: request types, notifications, batches, spec error codes, and the exact framing an LSP-style client expects | rust |
+| `rust-tracing-service` | tracing + tracing-subscriber JSON output with a small HTTP service | rust |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle served by a zero-dependency static server with an SPA fallback, page/bundle/404 asserted by curl in `smoke.sh` | `node`, `npm`/`\`pnpm`\`/`\`yarn` |
 | `nuxt-app` | Nuxt 4 SSR app over a shared counter: `pages/` for a real 404, one `server/api/stats.ts` for every method so `405` is the app's answer, Nitro `node-server` build, Vitest with no browser | `node`, `npm`/`\`pnpm`\`/\`yarn` |

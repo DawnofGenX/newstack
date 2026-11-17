@@ -1,0 +1,56 @@
+{
+  "name": "go-cobra-cli",
+  "title": "Go Cobra CLI",
+  "language": "go",
+  "blurb": "cobra subcommands with go test and a smoke run of the binary",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "A Go command line tool built with cobra.",
+  "next_steps": [
+    "cd {path}",
+    "go run . greet --name you",
+    "go test ./..."
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/app .",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "go.mod",
+      "contains": "cobra"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "internal/app/app_test.go"
+  ]
+}

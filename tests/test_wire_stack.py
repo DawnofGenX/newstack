@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -180,3 +181,45 @@ def test_balance_rule_enforced(tmp_path):
     assert res.returncode != 0, res.stdout
     assert (root / "README.md").read_bytes() == readme_bytes
     assert ci_path.read_bytes() == ci_bytes
+
+
+def test_remove_unwires_a_stack(tmp_path):
+    """A stack that turns out to duplicate an existing one has to be unwirable."""
+    root = _copy_repo(tmp_path)
+    _make_stack(root, "zz-test-stack")
+    readme_rows_before = _count_readme_rows(root / "README.md")
+    ci_before = _ci_blocks(root / ".github" / "workflows" / "ci.yml")
+    total_before = sum(len(v) for v in ci_before.values())
+
+    assert _run(root, "zz-test-stack").returncode == 0
+
+    res = _run(root, "zz-test-stack", "--remove")
+    assert res.returncode == 0, res.stderr
+    assert "Unwired zz-test-stack" in res.stdout
+
+    assert _count_readme_rows(root / "README.md") == readme_rows_before
+    ci_after = _ci_blocks(root / ".github" / "workflows" / "ci.yml")
+    assert sum(len(v) for v in ci_after.values()) == total_before
+    assert ci_after == ci_before
+    text = (root / "README.md").read_text(encoding="utf-8")
+    assert "zz-test-stack" not in text
+
+
+def test_remove_works_after_the_directory_is_gone(tmp_path):
+    """The duplicate case: the directory is deleted first, then unwired."""
+    root = _copy_repo(tmp_path)
+    _make_stack(root, "zz-test-stack")
+    assert _run(root, "zz-test-stack").returncode == 0
+    shutil.rmtree(root / "src" / "newstack" / "data" / "stacks" / "zz-test-stack")
+
+    res = _run(root, "zz-test-stack", "--remove")
+    assert res.returncode == 0, res.stderr
+    ci_after = _ci_blocks(root / ".github" / "workflows" / "ci.yml")
+    assert all("zz-test-stack" not in entries for entries in ci_after.values())
+
+
+def test_remove_is_idempotent(tmp_path):
+    root = _copy_repo(tmp_path)
+    first = _run(root, "zz-never-wired", "--remove")
+    assert first.returncode == 0
+    assert "not wired; no changes" in first.stdout

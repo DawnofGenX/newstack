@@ -1,0 +1,4 @@
+{{ npm_name }}
+*.exe
+*.test
+coverage.out

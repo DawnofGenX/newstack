@@ -180,6 +180,10 @@ jobs:
           - python-prefix-trie
           - python-kd-tree
           - python-suffix-array
+          - python-pydantic-settings-app
+          - python-alembic-migrations
+          - node-commander-cli
+          - rust-tracing-service
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -761,6 +765,10 @@ jobs:
           - python-longest-common-substring
           - python-bubble-sort
           - python-comb-sort
+          - python-sqlalchemy-async-api
+          - python-apscheduler-worker
+          - go-cobra-cli
+          - java-picocli-cli
     steps: *shared_setup
 
   stacks-c:
@@ -850,6 +858,10 @@ jobs:
           - kotlin-ktor-api
           - zig-cli
           - zig-http-api
+          - python-click-cli
+          - python-aiohttp-api
+          - go-echo-api
+          - node-sse-api
     steps: *shared_setup
 
   stacks-d:
@@ -939,6 +951,10 @@ jobs:
           - jsonnet-config
           - github-action
           - latex-paper
+          - python-polars-etl
+          - python-prometheus-exporter
+          - node-trpc-api
+          - rust-jsonrpc-stdio
     steps: *shared_setup
 
   package:

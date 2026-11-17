@@ -1,0 +1,66 @@
+{
+  "name": "go-echo-api",
+  "title": "Go Echo API",
+  "language": "go",
+  "blurb": "labstack/echo JSON service with httptest tests and curl smoke",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "A Go HTTP service built with Echo.",
+  "port": 5512,
+  "next_steps": [
+    "cd {path}",
+    "go run .",
+    "curl -sS http://127.0.0.1:8080/health"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/server .",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "go.mod",
+      "contains": "echo"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "internal/api/api_test.go"
+  ]
+}

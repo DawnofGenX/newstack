@@ -196,10 +196,61 @@ def plan_changes(name: str, data: dict, readme_text: str, ci_text: str):
     return new_readme_text, new_ci_text, chosen
 
 
+def plan_removal(name: str, readme_text: str, ci_text: str):
+    """Drop every README row and matrix entry for `name`.
+
+    A stack that turns out to duplicate an existing one has to be unwired
+    before it is deleted, otherwise README and the shard matrices keep
+    pointing at a directory that no longer exists.
+    """
+    row_re = re.compile(rf"^\|\s*`{re.escape(name)}`\s*\|")
+    readme_lines = readme_text.splitlines(keepends=True)
+    kept_readme = [line for line in readme_lines if not row_re.match(line)]
+    readme_removed = len(readme_lines) - len(kept_readme)
+
+    ci_lines = ci_text.splitlines(keepends=True)
+    entry_line = f"          - {name}"
+    kept_ci = [line for line in ci_lines if line.rstrip("\r\n") != entry_line]
+    ci_removed = len(ci_lines) - len(kept_ci)
+
+    return "".join(kept_readme), "".join(kept_ci), readme_removed, ci_removed
+
+
+def print_diff(
+    readme_text: str,
+    new_readme_text: str,
+    readme_path: Path,
+    ci_text: str,
+    new_ci_text: str,
+    ci_path: Path,
+) -> None:
+    parts = []
+    for old, new, path in (
+        (readme_text, new_readme_text, readme_path),
+        (ci_text, new_ci_text, ci_path),
+    ):
+        diff = "".join(
+            unified_diff(
+                old.splitlines(keepends=True),
+                new.splitlines(keepends=True),
+                fromfile=str(path),
+                tofile=str(path),
+            )
+        )
+        if diff:
+            parts.append(diff)
+    sys.stdout.write("".join(parts))
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Wire a stack into README.md and ci.yml")
     parser.add_argument("name", help="stack name to wire")
     parser.add_argument("--dry-run", action="store_true", help="print changes without writing")
+    parser.add_argument(
+        "--remove",
+        action="store_true",
+        help="unwire a stack: drop its README row and every CI shard entry",
+    )
     parser.add_argument("--root", "--repo-root", "--repo", dest="root", default=None)
     parser.add_argument("--readme", "--readme-path", dest="readme", default=None)
     parser.add_argument(
@@ -214,9 +265,29 @@ def main(argv=None) -> int:
 
     try:
         _root, readme_path, ci_path, stacks_root = resolve_paths(args)
-        data, _manifest = load_stack_manifest(stacks_root, args.name)
         readme_text = readme_path.read_text(encoding="utf-8")
         ci_text = ci_path.read_text(encoding="utf-8")
+
+        if args.remove:
+            new_readme_text, new_ci_text, row_count, entry_count = plan_removal(
+                args.name, readme_text, ci_text
+            )
+            if not row_count and not entry_count:
+                print(f"{args.name} is not wired; no changes.")
+                return 0
+            validate_ci(new_ci_text)
+            if args.dry_run:
+                print_diff(readme_text, new_readme_text, readme_path, ci_text, new_ci_text, ci_path)
+                return 0
+            readme_path.write_text(new_readme_text, encoding="utf-8")
+            ci_path.write_text(new_ci_text, encoding="utf-8")
+            print(
+                f"Unwired {args.name}: -{row_count} README row, "
+                f"-{entry_count} CI entry."
+            )
+            return 0
+
+        data, _manifest = load_stack_manifest(stacks_root, args.name)
 
         if is_wired(args.name, readme_text, ci_text):
             print(f"{args.name} is already wired; no changes.")
@@ -229,28 +300,7 @@ def main(argv=None) -> int:
         validate_ci(new_ci_text)
 
         if args.dry_run:
-            diff_parts = []
-            readme_diff = "".join(
-                unified_diff(
-                    readme_text.splitlines(keepends=True),
-                    new_readme_text.splitlines(keepends=True),
-                    fromfile=str(readme_path),
-                    tofile=str(readme_path),
-                )
-            )
-            ci_diff = "".join(
-                unified_diff(
-                    ci_text.splitlines(keepends=True),
-                    new_ci_text.splitlines(keepends=True),
-                    fromfile=str(ci_path),
-                    tofile=str(ci_path),
-                )
-            )
-            if readme_diff:
-                diff_parts.append(readme_diff)
-            if ci_diff:
-                diff_parts.append(ci_diff)
-            sys.stdout.write("".join(diff_parts))
+            print_diff(readme_text, new_readme_text, readme_path, ci_text, new_ci_text, ci_path)
             return 0
 
         readme_path.write_text(new_readme_text, encoding="utf-8")

@@ -1,0 +1,19 @@
+{
+  "name": "{{ npm_name }}",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "{{ description }}",
+  "bin": {
+    "{{ npm_name }}": "src/cli.js"
+  },
+  "engines": {
+    "node": ">={{ node_version }}"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  }
+}

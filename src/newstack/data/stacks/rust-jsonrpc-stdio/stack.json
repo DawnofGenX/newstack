@@ -1,0 +1,74 @@
+{
+  "name": "rust-jsonrpc-stdio",
+  "title": "Rust JSON-RPC over stdio",
+  "language": "rust",
+  "blurb": "JSON-RPC 2.0 server over stdin/stdout: request types, notifications, batches, spec error codes, and the exact framing an LSP-style client expects",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A newline-delimited JSON-RPC 2.0 server over stdio.",
+  "next_steps": [
+    "cd {path}",
+    "cargo run",
+    "",
+    "type a request and press enter:",
+    "  {{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"add\",\"params\":{{\"a\":2,\"b\":3}}}}"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "stdio contract",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml",
+      "contains": "jsonrpc"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/dispatch.rs"
+  ]
+}
