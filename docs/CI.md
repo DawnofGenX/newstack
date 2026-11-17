@@ -32,13 +32,12 @@ A healthy run counts one job per stacks entry **plus** the 5 non-matrix jobs
 
 ```yaml
 jobs:
-  changed:                         # pull requests only: did any stack change?
-    if: github.event_name == 'pull_request'
+  changed:                         # did any stack change? (runs on every event)
     outputs: { stacks: ${{ steps.diff.outputs.stacks }} }
   stacks-a:
     name: stack ${{ matrix.stack }} is green (a)
     needs: changed
-    if: github.event_name != 'pull_request' || needs.changed.outputs.stacks == 'true'
+    if: needs.changed.outputs.stacks == 'true'
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -93,9 +92,19 @@ The workflow runs on three triggers, and each answers a different question:
   never verified by a subset.
 
 `tests/test_docs.py` pins all of it: the `schedule` trigger exists, every shard
-`needs: changed`, and every shard carries the skip condition. The gate is a
-`needs` + `if` pair rather than a `paths:` trigger on the workflow because
-`paths:` would skip the unit tests and the wheel for a docs-only change too.
+`needs: changed`, and every shard carries `if: needs.changed.outputs.stacks == 'true'`.
+The gate is a `needs` + `if` pair rather than a `paths:` trigger on the workflow
+because `paths:` would skip the unit tests and the wheel for a docs-only change too.
+
+**Do not put the pull-request condition on the `changed` job itself.** A job whose
+`needs` was skipped is skipped as well, even when its own `if` looks true, so
+`if: github.event_name == 'pull_request'` on the gate turned a push run into a
+green run with 10 jobs and no stack verified — the matrices never expanded and the
+job names still contained the literal `${{ matrix.stack }}`. The condition lives on
+the gate's *steps* (checkout and diff only run for a pull request); the job runs
+on every event and answers `stacks=true` for push and schedule. Check the symptom
+directly: a push run must have `total_count` = stacks + 6 — one job per stack, plus
+the four unit-test legs, the gate job and the wheel job, so 320 at 314 stacks.
 
 The dynamic alternative — one job computing the changed stacks and feeding
 per-shard `fromJSON` matrices so a PR runs only what it touched — arrives with

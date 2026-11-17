@@ -176,11 +176,19 @@ def test_the_stack_shards_are_gated_on_a_stack_diff_for_pull_requests() -> None:
     blocks = _ci_job_blocks()
     assert "changed" in blocks, "ci.yml has no `changed` job to gate the shards"
     changed = "\n".join(blocks["changed"])
-    assert "github.event_name == 'pull_request'" in changed
     assert "src/newstack/data/stacks" in changed, "the gating job does not look at the stacks tree"
+    # The gating job must run on every event: a job whose `needs` was skipped is
+    # skipped too, which would report a green run with no stack verified at all.
+    assert "if: github.event_name == 'pull_request'" not in changed.split("steps:")[0], (
+        "the `changed` job is itself skipped on push, which skips every shard"
+    )
+    event_condition = changed.index("if: github.event_name == 'pull_request'")
+    assert event_condition > changed.index("steps:"), (
+        "the event condition belongs on steps, not on the job"
+    )
     for job in _ci_matrix_blocks():
         block = "\n".join(blocks[job])
         assert "needs: changed" in block, f"{job} does not wait for the `changed` job"
-        assert "github.event_name != 'pull_request'" in block, (
+        assert "if: needs.changed.outputs.stacks == 'true'" in block, (
             f"{job} is not skipped for a pull request that touches no stack"
         )

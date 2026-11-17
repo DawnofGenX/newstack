@@ -56,25 +56,31 @@ jobs:
   changed:
     name: which stacks changed
     # A pull request that touches no stack does not need 314 runner jobs, so the
-    # shards below are gated on this job. Push and schedule runs skip it and run
-    # the whole matrix.
-    if: github.event_name == 'pull_request'
+    # shards below are gated on this job's output. It runs on every event and is
+    # never skipped: a job whose `needs` was skipped is skipped too, and the run
+    # would then report green with no stack verified at all.
     runs-on: ubuntu-24.04
     outputs:
       stacks: ${{ steps.diff.outputs.stacks }}
     steps:
       - uses: actions/checkout@v7
+        if: github.event_name == 'pull_request'
         with:
           fetch-depth: 0
-      - name: Diff against the base branch
+      - name: Decide whether the stack matrix has to run
         id: diff
         run: |
           set -eu
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "stacks=true" >> "$GITHUB_OUTPUT"
+            echo "not a pull request: every stack runs"
+            exit 0
+          fi
           base="origin/${{ github.base_ref }}"
           git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
           if git diff --quiet "$base...HEAD" -- src/newstack/data/stacks; then
             echo "stacks=false" >> "$GITHUB_OUTPUT"
-            echo "no stack changed"
+            echo "no stack changed: the stack matrix is skipped"
           else
             echo "stacks=true" >> "$GITHUB_OUTPUT"
             git diff --name-only "$base...HEAD" -- src/newstack/data/stacks \
@@ -84,7 +90,7 @@ jobs:
   stacks-a:
     name: stack ${{ matrix.stack }} is green (a)
     needs: changed
-    if: github.event_name != 'pull_request' || needs.changed.outputs.stacks == 'true'
+    if: needs.changed.outputs.stacks == 'true'
     # The stack shards stay on the 24.04 LTS image on purpose. ubuntu-latest
     # moved to 26.04, where swift-actions/setup-swift@v2 refuses to run
     # ("Version 26.04 of Ubuntu is not supported") and ocaml/setup-ocaml@v3's
@@ -670,7 +676,7 @@ jobs:
   stacks-b:
     name: stack ${{ matrix.stack }} is green (b)
     needs: changed
-    if: github.event_name != 'pull_request' || needs.changed.outputs.stacks == 'true'
+    if: needs.changed.outputs.stacks == 'true'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -760,7 +766,7 @@ jobs:
   stacks-c:
     name: stack ${{ matrix.stack }} is green (c)
     needs: changed
-    if: github.event_name != 'pull_request' || needs.changed.outputs.stacks == 'true'
+    if: needs.changed.outputs.stacks == 'true'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -849,7 +855,7 @@ jobs:
   stacks-d:
     name: stack ${{ matrix.stack }} is green (d)
     needs: changed
-    if: github.event_name != 'pull_request' || needs.changed.outputs.stacks == 'true'
+    if: needs.changed.outputs.stacks == 'true'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
