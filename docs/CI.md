@@ -32,8 +32,13 @@ A healthy run counts one job per stacks entry **plus** the 5 non-matrix jobs
 
 ```yaml
 jobs:
+  changed:                         # pull requests only: did any stack change?
+    if: github.event_name == 'pull_request'
+    outputs: { stacks: ${{ steps.diff.outputs.stacks }} }
   stacks-a:
     name: stack ${{ matrix.stack }} is green (a)
+    needs: changed
+    if: github.event_name != 'pull_request' || needs.changed.outputs.stacks == 'true'
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -62,8 +67,41 @@ that shard.
 Shards stay balanced (largest ≤ 2× smallest) so no single job becomes the long
 pole; `tests/test_docs.py` enforces the cap, the balance, the uniqueness of the
 union, and the single shared step list. Add a shard when a shard passes ~200
-entries: 5 shards × 200 = 1,000 stacks still fits, and the 1,029-dummy-job probe
-(plan task T3.4) is what proves the runner capacity before the tree gets there.
+entries: five shards × 200 = 1,000 stacks still fits under the cap. Measured on
+the 314-entry layout: a per-stack job has a median of 23 s and a p90 of 29 s on a
+warm runner, so the wall-clock cost of the matrix is the queue, not the work —
+which is the other reason the nightly run and the PR gate above exist. The
+1,029-dummy-job capacity probe (plan task T3.4) was dropped: the four real
+shards already prove expansion (`total_count` = stacks + 5) and dummy jobs buy
+no information the real ones do not.
+
+## Triggers: push, a nightly run, and the pull-request gate
+
+The workflow runs on three triggers, and each answers a different question:
+
+- **`push` to `main`** — is the tree I just merged green? The whole matrix runs.
+- **`schedule` (03:00 UTC daily)** — has a toolchain moved under us? A Go, Node,
+  GHC or JDK release can break a stack with no commit of ours behind it, and a
+  stack nobody scaffolds for a month is a stack we ship broken. The nightly run
+  is the same four shards on the same anchored steps, so a nightly failure is a
+  stack failure, not a different code path.
+- **`pull_request`** — the `changed` job diffs the branch against its base and
+  sets `stacks=true` when anything under `src/newstack/data/stacks/` moved. A
+  docs-only or CLI-only PR then skips all four shards (the `test` and `package`
+  jobs still run), while a PR that touches a stack still runs the full matrix:
+  conservative on purpose, because the whole point is that a stack change is
+  never verified by a subset.
+
+`tests/test_docs.py` pins all of it: the `schedule` trigger exists, every shard
+`needs: changed`, and every shard carries the skip condition. The gate is a
+`needs` + `if` pair rather than a `paths:` trigger on the workflow because
+`paths:` would skip the unit tests and the wheel for a docs-only change too.
+
+The dynamic alternative — one job computing the changed stacks and feeding
+per-shard `fromJSON` matrices so a PR runs only what it touched — arrives with
+the tree at ~500 stacks, when a full PR run costs more than the rewrite. It is
+also what invalidates the static-matrix guards in `tests/test_docs.py` and the
+shard-append logic in `scripts/wire_stack.py`, so it is one change, not two.
 
 ## Runner image: the shards stay on 24.04
 
@@ -86,8 +124,15 @@ otherwise dies with `collect2: fatal error: cannot find 'ld'`).
 
 ## Adding a stack
 
-Until `scripts/wire_stack.py` lands (see the growth plan), add the entry to the
-shortest shard by hand *and* the README table, then run
-`uv run pytest tests/test_docs.py -q`: those guards are what catch a stack that is
-in the registry but in no shard — invisible to CI, which is the failure mode this
-file exists to prevent.
+```console
+$ uv run python scripts/wire_stack.py <stack-name> --dry-run   # show the diff
+$ uv run python scripts/wire_stack.py <stack-name>             # README row + shortest shard
+$ uv run python scripts/gen_catalog.py                         # docs/STACKS.md
+$ uv run pytest tests/test_docs.py tests/test_catalog.py -q
+```
+
+`wire_stack.py` is idempotent, refuses to push a shard past the 256-entry cap or
+break the balance rule, and names a manifest that does not exist. Then run
+`uv run pytest tests/test_docs.py -q`: those guards are what catch a stack that
+is in the registry but in no shard — invisible to CI, which is the failure mode
+this file exists to prevent.

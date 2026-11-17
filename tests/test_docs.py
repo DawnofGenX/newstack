@@ -140,3 +140,47 @@ def test_readme_states_no_stack_count_that_can_go_stale() -> None:
     """A hardcoded count is drift bait once a stack is added; the table is the source."""
     text = README.read_text(encoding="utf-8")
     assert not re.search(r"\b(\d+|six|seven|eight|nine|ten)\s+(stacks|starters)\b", text, re.I)
+
+
+def _ci_job_blocks() -> dict[str, list[str]]:
+    """Map each job name in ci.yml to the lines that belong to it."""
+    lines = CI.read_text(encoding="utf-8").splitlines()
+    try:
+        start = next(i for i, line in enumerate(lines) if line == "jobs:")
+    except StopIteration:  # pragma: no cover
+        raise AssertionError("ci.yml has no top-level `jobs:` section") from None
+    blocks: dict[str, list[str]] = {}
+    job: str | None = None
+    for line in lines[start + 1 :]:
+        header = re.match(r"^ {2}([A-Za-z0-9_-]+):\s*$", line)
+        if header:
+            job = header.group(1)
+            blocks[job] = [line]
+            continue
+        if job is not None:
+            blocks[job].append(line)
+    return blocks
+
+
+def test_ci_verifies_the_whole_tree_on_a_schedule() -> None:
+    """An upstream toolchain move breaks stacks with no push behind it."""
+    text = CI.read_text(encoding="utf-8")
+    assert re.search(r"^  schedule:$", text, re.M), "ci.yml has no schedule: trigger"
+    assert re.search(r"^\s+- cron: '?\d+ \d+ \* \* \*'?$", text, re.M), (
+        "the schedule trigger has no cron line"
+    )
+
+
+def test_the_stack_shards_are_gated_on_a_stack_diff_for_pull_requests() -> None:
+    """A docs-only PR must not pay for 314 runner jobs, and a stack PR must."""
+    blocks = _ci_job_blocks()
+    assert "changed" in blocks, "ci.yml has no `changed` job to gate the shards"
+    changed = "\n".join(blocks["changed"])
+    assert "github.event_name == 'pull_request'" in changed
+    assert "src/newstack/data/stacks" in changed, "the gating job does not look at the stacks tree"
+    for job in _ci_matrix_blocks():
+        block = "\n".join(blocks[job])
+        assert "needs: changed" in block, f"{job} does not wait for the `changed` job"
+        assert "github.event_name != 'pull_request'" in block, (
+            f"{job} is not skipped for a pull request that touches no stack"
+        )
