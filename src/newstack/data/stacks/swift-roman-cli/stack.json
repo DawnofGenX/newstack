@@ -1,0 +1,23 @@
+{
+  "name": "swift-roman-cli",
+  "title": "Swift Roman CLI",
+  "language": "swift",
+  "blurb": "Roman numeral converter in Swift 6: canonical form validation, stdin batch mode, XCTest suite.",
+  "requires": ["swift"],
+  "default_description": "A Swift CLI that converts between integers and Roman numerals.",
+  "next_steps": [
+    "cd {path}",
+    "swift build",
+    "swift test",
+    "./bin/{{ npm_name }} --to 2024"
+  ],
+  "verify": [
+    { "name": "build", "cmd": "swift build", "tools": ["swift"], "timeout": 1800 },
+    { "name": "test", "cmd": "swift test", "tools": ["swift"], "timeout": 1800 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "swift"], "timeout": 1800 }
+  ],
+  "detect": [{ "file": "Sources/Roman/RomanNumeral.swift", "contains": "public enum RomanNumeral" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["Tests/RomanTests/RomanNumeralTests.swift", "Tests/RomanTests/CLITests.swift"]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "kotlin-base32-cli",
+  "title": "Kotlin Base32 CLI",
+  "language": "kotlin",
+  "blurb": "RFC 4648 base32 encoder/decoder in Kotlin: padding, strict decode checks, hex mode, Gradle + JUnit 5.",
+  "requires": ["java", "gradle"],
+  "default_description": "A Kotlin CLI that encodes and decodes base32.",
+  "next_steps": [
+    "cd {path}",
+    "gradle test",
+    "gradle run --quiet --args=\"encode foobar\""
+  ],
+  "verify": [
+    { "name": "test", "cmd": "gradle test", "tools": ["java", "gradle"], "timeout": 1800 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "java", "gradle"], "timeout": 1800 }
+  ],
+  "detect": [{ "file": "src/main/kotlin/{{ package_name }}/Base32.kt", "contains": "object Base32" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["src/test/kotlin/{{ package_name }}/Base32Test.kt"]
+}

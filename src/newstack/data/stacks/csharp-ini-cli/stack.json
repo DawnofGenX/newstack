@@ -1,0 +1,22 @@
+{
+  "name": "csharp-ini-cli",
+  "title": "C# INI CLI",
+  "language": "csharp",
+  "blurb": "INI parser and merger in C#: ordered sections, comment rules, --get/--section/--ini/JSON output, xUnit suite.",
+  "requires": ["dotnet"],
+  "default_description": "A C# CLI that parses, merges and prints INI documents.",
+  "next_steps": [
+    "cd {path}",
+    "dotnet build",
+    "dotnet run -- --help"
+  ],
+  "verify": [
+    { "name": "build", "cmd": "dotnet build --nologo", "tools": ["dotnet"], "timeout": 1800 },
+    { "name": "test", "cmd": "dotnet test --nologo", "tools": ["dotnet"], "timeout": 1800 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "dotnet"], "timeout": 1800 }
+  ],
+  "detect": [{ "file": "Ini.cs", "contains": "public sealed class IniDocument" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["tests/IniTests.cs", "tests/CliTests.cs"]
+}

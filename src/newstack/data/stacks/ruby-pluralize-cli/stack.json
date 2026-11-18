@@ -1,0 +1,24 @@
+{
+  "name": "ruby-pluralize-cli",
+  "title": "Ruby pluralize CLI",
+  "language": "ruby",
+  "blurb": "English pluralisation in Ruby: ordered suffix rules, irregulars, uncountables, count mode, minitest suite.",
+  "requires": ["ruby"],
+  "default_description": "A Ruby CLI that pluralises and singularises English words.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "bin/{npm_name} plural person child sheep"
+  ],
+  "verify": [
+    { "name": "syntax", "cmd": "ruby -cw lib/pluralize.rb", "tools": ["ruby"], "timeout": 120 },
+    { "name": "test", "cmd": "rake test", "tools": ["ruby", "rake"], "timeout": 600 },
+    { "name": "plural", "cmd": "test \"$(bin/{{ npm_name }} plural person)\" = people", "tools": ["ruby"], "timeout": 120 },
+    { "name": "usage-error", "cmd": "bin/{{ npm_name }} --bogus plural cat >/dev/null 2>&1; test $? -eq 2", "tools": ["ruby"], "timeout": 120 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "ruby", "rake"], "timeout": 600 }
+  ],
+  "detect": [{ "file": "lib/pluralize.rb", "contains": "PLURAL_RULES" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore", "Rakefile"],
+  "adopt_tests": ["test/pluralize_test.rb", "test/cli_test.rb"]
+}

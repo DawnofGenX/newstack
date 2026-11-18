@@ -224,6 +224,8 @@ jobs:
           - deno-cidr-cli
           - rust-sudoku-solver
           - go-sitemap-cli
+          - csharp-ini-cli
+          - go-matrix-cli
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -292,13 +294,13 @@ jobs:
       # Stacks with no Gemfile: rake and the stdlib are enough, so the bundler
       # cache that ruby-sinatra/rails-app rely on would only add a failure mode.
       - name: Set up Ruby (no bundle)
-        if: contains(fromJSON('["ruby-base58-cli", "ruby-cli", "ruby-csv-report", "ruby-hash-chain-cli", "ruby-hmac-webhook", "ruby-huffman-cli", "ruby-i18n-cli", "ruby-jsonpath-cli", "ruby-luhn-cli", "ruby-wordwrap-cli"]'), matrix.stack)
+        if: contains(fromJSON('["ruby-base58-cli", "ruby-cli", "ruby-csv-report", "ruby-hash-chain-cli", "ruby-hmac-webhook", "ruby-huffman-cli", "ruby-i18n-cli", "ruby-jsonpath-cli", "ruby-luhn-cli", "ruby-pluralize-cli", "ruby-wordwrap-cli"]'), matrix.stack)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-config-loader", "java-csv-mapper", "java-http-client-api", "java-jdbc-sqlite-api", "java-json-flatten", "java-lru-cache", "java-maven-cli", "java-picocli-cli", "java-rate-limiter", "java-template-engine", "java-word-count", "kotlin-cli", "kotlin-coroutines-pipeline", "kotlin-csv-report", "kotlin-fuzzy-match", "kotlin-html-builder", "kotlin-http-api", "kotlin-json-dsl", "kotlin-ktor-api", "kotlin-money-ledger", "spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-config-loader", "java-csv-mapper", "java-http-client-api", "java-jdbc-sqlite-api", "java-json-flatten", "java-lru-cache", "java-maven-cli", "java-picocli-cli", "java-rate-limiter", "java-template-engine", "java-word-count", "kotlin-base32-cli", "kotlin-cli", "kotlin-coroutines-pipeline", "kotlin-csv-report", "kotlin-fuzzy-match", "kotlin-html-builder", "kotlin-http-api", "kotlin-json-dsl", "kotlin-ktor-api", "kotlin-money-ledger", "spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -384,7 +386,7 @@ jobs:
       # pinned release and puts `swift` on PATH. No package dependencies, so
       # nothing to resolve over the network.
       - name: Set up Swift
-        if: contains(fromJSON('["swift-cli","swift-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["swift-cli", "swift-http-api", "swift-roman-cli"]'), matrix.stack)
         uses: swift-actions/setup-swift@v2
         with:
           swift-version: "6.2"
@@ -396,7 +398,7 @@ jobs:
           ghdl --version | head -1
 
       - name: Set up Deno
-        if: contains(fromJSON('["deno-api", "deno-cidr-cli", "deno-cli"]'), matrix.stack)
+        if: contains(fromJSON('["deno-api", "deno-cidr-cli", "deno-cli", "deno-diff-cli"]'), matrix.stack)
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
@@ -610,14 +612,14 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["laravel-app", "php-base32-cli", "php-bencode-cli", "php-composer-cli", "php-csv-report", "php-html-sanitizer", "php-jwt-cli", "php-markdown-cli", "php-mustache-cli", "php-slim-api", "php-sqlite-queue", "php-text-table-cli", "php-uri-cli", "symfony-app"]'), matrix.stack)
+        if: contains(fromJSON('["laravel-app", "php-base32-cli", "php-bencode-cli", "php-composer-cli", "php-csv-report", "php-html-sanitizer", "php-json-pointer-cli", "php-jwt-cli", "php-markdown-cli", "php-mustache-cli", "php-slim-api", "php-sqlite-queue", "php-text-table-cli", "php-uri-cli", "symfony-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           extensions: ctype, fileinfo, mbstring, pdo_sqlite, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["aspnet-api", "csharp-cli", "csharp-csv-report", "csharp-duration-cli", "csharp-hmac-cli", "csharp-jsonl-cli", "csharp-jwt-cli", "csharp-minimal-api", "csharp-semver-cli", "csharp-slug-cli", "csharp-units-cli", "dotnet-cli", "fsharp-cli", "fsharp-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["aspnet-api", "csharp-cli", "csharp-csv-report", "csharp-duration-cli", "csharp-hmac-cli", "csharp-ini-cli", "csharp-jsonl-cli", "csharp-jwt-cli", "csharp-minimal-api", "csharp-semver-cli", "csharp-slug-cli", "csharp-units-cli", "dotnet-cli", "fsharp-cli", "fsharp-http-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -628,7 +630,7 @@ jobs:
           elixir-version: "1.18"
           otp-version: "27"
       - name: Set up Dart
-        if: contains(fromJSON('["dart-cli", "dart-csv-cli", "dart-shelf-api"]'), matrix.stack)
+        if: contains(fromJSON('["dart-cli", "dart-csv-cli", "dart-json-canonical-cli", "dart-shelf-api"]'), matrix.stack)
         uses: dart-lang/setup-dart@v1
         with:
           sdk: "3.13.7"
@@ -850,6 +852,8 @@ jobs:
           - dart-csv-cli
           - ruby-huffman-cli
           - java-word-count
+          - php-json-pointer-cli
+          - dart-json-canonical-cli
     steps: *shared_setup
 
   stacks-c:
@@ -983,6 +987,8 @@ jobs:
           - rust-s-expr
           - node-yaml-lite
           - php-mustache-cli
+          - swift-roman-cli
+          - ruby-pluralize-cli
     steps: *shared_setup
 
   stacks-d:
@@ -1116,6 +1122,8 @@ jobs:
           - java-lru-cache
           - go-hkdf-cli
           - node-zlib-stat-cli
+          - kotlin-base32-cli
+          - deno-diff-cli
     steps: *shared_setup
 
   package:

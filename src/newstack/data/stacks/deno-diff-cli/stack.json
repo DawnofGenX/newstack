@@ -1,0 +1,23 @@
+{
+  "name": "deno-diff-cli",
+  "title": "Deno unified diff CLI",
+  "language": "deno",
+  "blurb": "Line diff in TypeScript on Deno: LCS edit script, unified hunks with context, --stat and --exit-code modes.",
+  "requires": ["deno"],
+  "default_description": "A Deno CLI that renders unified diffs between two files.",
+  "next_steps": [
+    "cd {path}",
+    "deno task test",
+    "diff -U 0 old.txt new.txt"
+  ],
+  "verify": [
+    { "name": "typecheck", "cmd": "deno check main.ts", "tools": ["deno"], "timeout": 300 },
+    { "name": "test", "cmd": "deno task test", "tools": ["deno"], "timeout": 600 },
+    { "name": "help", "cmd": "deno run --allow-read main.ts --help", "tools": ["deno"], "timeout": 300 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "deno"], "timeout": 600 }
+  ],
+  "detect": [{ "file": "src/diff.ts", "contains": "export function lcsLength" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore", "deno.json"],
+  "adopt_tests": ["tests/diff.test.ts", "tests/cli.test.ts"]
+}

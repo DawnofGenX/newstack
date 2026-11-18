@@ -1,0 +1,26 @@
+{
+  "name": "dart-json-canonical-cli",
+  "title": "Dart canonical JSON CLI",
+  "language": "dart",
+  "blurb": "Canonical JSON in Dart: code-unit key order, ES6 number formatting, --check and --pretty modes, package:test suite.",
+  "requires": ["dart"],
+  "default_description": "A Dart CLI that renders JSON in canonical form.",
+  "next_steps": [
+    "cd {path}",
+    "dart pub get",
+    "dart run bin/{npm_name}.dart data.json"
+  ],
+  "verify": [
+    { "name": "get", "cmd": "dart pub get", "tools": ["dart"], "timeout": 600 },
+    { "name": "analyze", "cmd": "dart analyze --fatal-infos", "tools": ["dart"], "timeout": 600 },
+    { "name": "test", "cmd": "dart test", "tools": ["dart"], "timeout": 600 },
+    { "name": "help", "cmd": "dart run bin/{{ npm_name }}.dart --help", "tools": ["dart"], "timeout": 600 },
+    { "name": "usage-error", "cmd": "dart run bin/{{ npm_name }}.dart --bogus >/dev/null 2>&1; test $? -eq 2", "tools": ["dart"], "timeout": 600 },
+    { "name": "missing-file", "cmd": "dart run bin/{{ npm_name }}.dart does-not-exist.txt >/dev/null 2>&1; test $? -eq 1", "tools": ["dart"], "timeout": 600 },
+    { "name": "smoke", "cmd": "sh smoke.sh", "tools": ["dart", "sh"], "timeout": 900 }
+  ],
+  "detect": [{ "file": "lib/src/canonical.dart", "contains": "String canonicalize(Object? value)" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore", "analysis_options.yaml"],
+  "adopt_tests": ["test/canonical_test.dart"]
+}

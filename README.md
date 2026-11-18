@@ -254,6 +254,7 @@ $ newstack stacks outdated
 | `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
 | `csharp-duration-cli` | ISO 8601 duration arithmetic on .NET 8: parse P2DT3H and 1h30m, format both ways, add to a timestamp, and refuse ambiguous calendar months | csharp |
 | `csharp-hmac-cli` | HMAC sign and verify CLI: SHA-1/256/384/512 and MD5, constant-time comparison, file signing, zero NuGet dependencies | csharp |
+| `csharp-ini-cli` | INI parser and merger in C#: ordered sections, comment rules, --get/--section/--ini/JSON output, xUnit suite. | csharp |
 | `csharp-jsonl-cli` | JSONL filter/aggregate CLI on System.Text.Json only, NO NuGet: --where field=value, --group field --count, deterministic ordering | csharp |
 | `csharp-jwt-cli` | JWT encode/decode/verify CLI on HMAC-SHA256 with xunit tests, .NET 8 | csharp |
 | `csharp-minimal-api` | ASP.NET Core minimal API with /health and an in-memory resource, xunit tests via WebApplicationFactory | csharp |
@@ -261,7 +262,9 @@ $ newstack stacks outdated
 | `csharp-slug-cli` | Slugify CLI (lowercase, separator, max length) on System.Text only, xunit tests, no NuGet | csharp |
 | `csharp-units-cli` | Unit converter CLI over length, mass, volume, time, data and affine temperature, System.Text only, xunit tests, no NuGet beyond the test runner | csharp |
 | `dart-csv-cli` | Dart 3 CSV tool: RFC 4180 parser, column projection, JSON output, package:test suites. | dart |
+| `dart-json-canonical-cli` | Canonical JSON in Dart: code-unit key order, ES6 number formatting, --check and --pretty modes, package:test suite. | dart |
 | `deno-cidr-cli` | Deno/TypeScript IPv4 CIDR tool: mask arithmetic, containment, overlap, canonical form, Deno.test suites. | typescript |
+| `deno-diff-cli` | Line diff in TypeScript on Deno: LCS edit script, unified hunks with context, --stat and --exit-code modes. | deno |
 | `elixir-csv-filter` | Elixir CSV row filter on Mix: pure options/filter modules, ExUnit suite, escript binary | elixir |
 | `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
 | `elixir-pubsub` | GenServer-based in-process pub/sub with topic subscriptions and at-least-once delivery | elixir |
@@ -282,6 +285,7 @@ $ newstack stacks outdated
 | `go-jsonl-query` | Streaming JSONL query CLI (field select, where filter, count), bufio.Scanner based, tests with temp files. | go |
 | `go-levenshtein` | Levenshtein edit distance over runes plus closest match lookup, JSON output, table driven tests. | go |
 | `go-lru-cache` | Generic LRU cache with TTL and max-size eviction, hit/miss stats, CLI demo replaying an access trace. | go |
+| `go-matrix-cli` | JSON-in, JSON-out matrix arithmetic: determinant by Gaussian elimination, product, transpose, trace, identity. | go |
 | `go-priority-queue` | container/heap priority queue with stable FIFO tie-break, Peek/Pop/Push, CLI scheduling tasks from stdin. | go |
 | `go-prometheus-metrics` | Service exposing Prometheus text exposition with counter and histogram | go |
 | `go-radix-tree` | Compressed radix tree with edge splitting, longest prefix match and sorted key walk, JSON CLI. | go |
@@ -309,6 +313,7 @@ $ newstack stacks outdated
 | `java-rate-limiter` | Token-bucket rate limiter, Java 21, Maven + JUnit 5, virtual-clock tests, plus a main class demo | java |
 | `java-template-engine` | Regex {{ key }} template renderer CLI with JUnit tests, Maven compiler release 21 | java |
 | `java-word-count` | Word frequency CLI on the JDK alone: normalisation, deterministic ranking, stdin driven, JUnit 5. | java |
+| `kotlin-base32-cli` | RFC 4648 base32 encoder/decoder in Kotlin: padding, strict decode checks, hex mode, Gradle + JUnit 5. | kotlin |
 | `kotlin-coroutines-pipeline` | Gradle Kotlin DSL coroutines pipeline: staged fan-out/fan-in over a fake source, kotlinx-coroutines-test, JUnit5 | kotlin |
 | `kotlin-csv-report` | CSV parser and report aggregator CLI with JUnit5 tests, Gradle Kotlin DSL | kotlin |
 | `kotlin-fuzzy-match` | Jaro and Jaro-Winkler similarity with prefix boost, ranked candidate CLI and JUnit5 tests on the published example values | kotlin |
@@ -359,6 +364,7 @@ $ newstack stacks outdated
 | `php-bencode-cli` | Bencode encoder/decoder in PHP: integers, byte strings, lists and sorted-key dicts, canonical-form validation, JSON on the other side | php |
 | `php-csv-report` | CSV parser and report aggregator CLI with PHPUnit tests, Composer autoload | php |
 | `php-html-sanitizer` | Allowlist HTML sanitizer on DOMDocument: drops script/style with content, strips event handlers and javascript: hrefs; PHPUnit tests | php |
+| `php-json-pointer-cli` | RFC 6901 JSON Pointer for PHP: get/set/remove/has/tokens, escaped tokens, PHPUnit suite. | php |
 | `php-jwt-cli` | HS256 JWT sign/verify CLI: base64url encode/decode, hash_equals, exp validation with an injected clock; PHPUnit tests | php |
 | `php-markdown-cli` | Markdown to HTML converter CLI (headers, lists, code, inline formatting) with PHPUnit tests | php |
 | `php-mustache-cli` | Mustache template renderer: escaped and raw tags, sections, inverted sections, dotted names, JSON data. | php |
@@ -562,6 +568,7 @@ $ newstack stacks outdated
 | `ruby-i18n-cli` | Stdlib-only Ruby locale fallback resolver with YAML and minitest | ruby |
 | `ruby-jsonpath-cli` | Dependency-free JSONPath subset (members, indexes, wildcards, recursive descent) with a stdin/file CLI and grep-like exit codes | ruby |
 | `ruby-luhn-cli` | Ruby Luhn checksum CLI: validate card numbers, generate a check digit, identify card brand; stdlib only, minitest + rake | ruby |
+| `ruby-pluralize-cli` | English pluralisation in Ruby: ordered suffix rules, irregulars, uncountables, count mode, minitest suite. | ruby |
 | `ruby-wordwrap-cli` | Reflow text to a column width in Ruby stdlib: greedy fill, paragraph breaks preserved, idempotent wrapping, long words left intact | ruby |
 | `rust-axum-ws` | Rust axum 0.8 WebSocket echo/broadcast server (axum ws, tokio, futures-util): /health plus /ws, broadcast to all subscribers | rust |
 | `rust-base64-cli` | Base64 encode/decode CLI with -d/--decode, --url-safe, --no-pad, and stdin support | rust |
@@ -588,6 +595,7 @@ $ newstack stacks outdated
 | `rust-toml-lite` | Minimal TOML subset parser (tables, scalars, arrays) with a CLI printing normalized JSON, std only | rust |
 | `rust-tracing-service` | tracing + tracing-subscriber JSON output with a small HTTP service | rust |
 | `rust-url-shortener` | Std-only HTTP URL shortener: base62 ids, POST create, GET redirect, thread per connection | rust |
+| `swift-roman-cli` | Roman numeral converter in Swift 6: canonical form validation, stdin batch mode, XCTest suite. | swift |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle served by a zero-dependency static server with an SPA fallback, page/bundle/404 asserted by curl in `smoke.sh` | `node`, `npm`/`\`pnpm`\`/`\`yarn` |
 | `nuxt-app` | Nuxt 4 SSR app over a shared counter: `pages/` for a real 404, one `server/api/stats.ts` for every method so `405` is the app's answer, Nitro `node-server` build, Vitest with no browser | `node`, `npm`/`\`pnpm`\`/\`yarn` |

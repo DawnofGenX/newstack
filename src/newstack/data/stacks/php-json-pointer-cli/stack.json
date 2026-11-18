@@ -1,0 +1,75 @@
+{
+  "name": "php-json-pointer-cli",
+  "title": "PHP JSON Pointer CLI",
+  "language": "php",
+  "blurb": "RFC 6901 JSON Pointer for PHP: get/set/remove/has/tokens, escaped tokens, PHPUnit suite.",
+  "requires": [
+    "php",
+    "composer"
+  ],
+  "default_description": "A PHP CLI that resolves and edits JSON Pointer paths.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "php bin/{npm_name} get /nested/id doc.json",
+    "vendor/bin/phpunit"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction --no-progress >/dev/null && vendor/bin/phpunit --no-coverage",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "php bin/{{ npm_name }} --help",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "get",
+      "cmd": "printf '{\"nested\":{\"id\":3}}' | php bin/{{ npm_name }} get /nested/id | grep -qxF '3'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "php bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/JsonPointer.php",
+      "contains": "final class JsonPointer"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "composer.json",
+    "phpunit.xml"
+  ],
+  "adopt_tests": []
+}
