@@ -1,0 +1,53 @@
+{
+  "name": "php-csv-report",
+  "title": "PHP CSV Report",
+  "language": "php",
+  "blurb": "CSV parser and report aggregator CLI with PHPUnit tests, Composer autoload",
+  "requires": [
+    "php",
+    "composer",
+    "git"
+  ],
+  "default_description": "A PHP CSV report command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "vendor/bin/phpunit",
+    "php src/main.php data.csv --group=dept"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction && vendor/bin/phpunit",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "php",
+        "composer"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Csv.php",
+      "contains": "php-csv-report"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/CsvTest.php"
+  ]
+}

@@ -204,6 +204,10 @@ jobs:
           - go-text-search
           - rust-job-queue
           - ruby-csv-report
+          - node-markdown-lint
+          - go-webhook-receiver
+          - rust-ring-buffer
+          - kotlin-csv-report
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -278,7 +282,7 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-csv-mapper","java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","java-rate-limiter","kotlin-cli","kotlin-coroutines-pipeline","kotlin-html-builder","kotlin-http-api","kotlin-json-dsl","kotlin-ktor-api","spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-csv-mapper","java-http-client-api","java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","java-rate-limiter","java-template-engine","kotlin-cli","kotlin-coroutines-pipeline","kotlin-csv-report","kotlin-html-builder","kotlin-http-api","kotlin-json-dsl","kotlin-ktor-api","spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -590,14 +594,14 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["php-composer-cli","php-jwt-cli","php-slim-api","php-sqlite-queue","symfony-app","laravel-app"]'), matrix.stack)
+        if: contains(fromJSON('["laravel-app","php-composer-cli","php-csv-report","php-jwt-cli","php-slim-api","php-sqlite-queue","symfony-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           extensions: ctype, fileinfo, mbstring, pdo_sqlite, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["csharp-cli","csharp-csv-report","csharp-jsonl-cli","csharp-minimal-api","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
+        if: contains(fromJSON('["aspnet-api","csharp-cli","csharp-csv-report","csharp-jsonl-cli","csharp-jwt-cli","csharp-minimal-api","dotnet-cli","fsharp-cli","fsharp-http-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -810,6 +814,10 @@ jobs:
           - go-concurrent-map
           - java-rate-limiter
           - csharp-jsonl-cli
+          - node-url-normalizer
+          - go-diff-cli
+          - java-http-client-api
+          - php-csv-report
     steps: *shared_setup
 
   stacks-c:
@@ -923,6 +931,10 @@ jobs:
           - go-lru-cache
           - rust-toml-lite
           - kotlin-html-builder
+          - node-sqlite-migrations
+          - go-hyperloglog
+          - rust-jsonpath-cli
+          - java-template-engine
     steps: *shared_setup
 
   stacks-d:
@@ -1036,6 +1048,10 @@ jobs:
           - go-priority-queue
           - rust-url-shortener
           - php-jwt-cli
+          - node-pino-logger
+          - go-skiplist
+          - rust-hex-dump-cli
+          - csharp-jwt-cli
     steps: *shared_setup
 
   package:

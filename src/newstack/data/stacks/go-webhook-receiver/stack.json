@@ -1,0 +1,63 @@
+{
+  "name": "go-webhook-receiver",
+  "title": "Go Webhook Receiver",
+  "language": "go",
+  "blurb": "HTTP webhook receiver on port 5592.",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "A webhook receiver service.",
+  "next_steps": [
+    "cd {path}",
+    "go run ."
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/{{ npm_name }} .",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "main.go",
+      "contains": "NewServer"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "webhook_test.go"
+  ]
+}

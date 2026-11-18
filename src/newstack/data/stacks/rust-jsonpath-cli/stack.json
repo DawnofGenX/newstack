@@ -1,0 +1,71 @@
+{
+  "name": "rust-jsonpath-cli",
+  "title": "Rust JSONPath CLI",
+  "language": "rust",
+  "blurb": "JSONPath expression evaluator CLI (serde_json) with nested/array/wildcard support and integration tests",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust CLI that evaluates JSONPath expressions.",
+  "next_steps": [
+    "cd {path}",
+    "cargo run -- data.json '$.store.book[0].title'"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml",
+      "contains": "serde_json"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/cli.rs"
+  ]
+}

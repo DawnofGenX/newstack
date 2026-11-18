@@ -1,0 +1,61 @@
+{
+  "name": "kotlin-csv-report",
+  "title": "Kotlin CSV Report",
+  "language": "kotlin",
+  "blurb": "CSV parser and report aggregator CLI with JUnit5 tests, Gradle Kotlin DSL",
+  "requires": [
+    "java",
+    "gradle",
+    "git"
+  ],
+  "default_description": "A Kotlin CSV report CLI.",
+  "next_steps": [
+    "cd {path}",
+    "gradle test",
+    "gradle run --args=\"data.csv --group=dept\""
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "gradle test",
+      "tools": [
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "run",
+      "cmd": "gradle run",
+      "tools": [
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/main/kotlin/{{ package_name }}/Csv.kt",
+      "contains": "kotlin-csv-report"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "src/test/kotlin/{{ package_name }}/CsvReportTest.kt"
+  ]
+}

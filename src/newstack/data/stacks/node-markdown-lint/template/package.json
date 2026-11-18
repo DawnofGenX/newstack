@@ -1,0 +1,17 @@
+{
+  "name": "{{ npm_name }}",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "{{ description }}",
+  "dependencies": {
+    "markdownlint": "^0.35.0"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">={{ node_version }}"
+  }
+}

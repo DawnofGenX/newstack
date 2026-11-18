@@ -249,6 +249,7 @@ $ newstack stacks outdated
 | --- | --- | --- |
 | `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
 | `csharp-jsonl-cli` | JSONL filter/aggregate CLI on System.Text.Json only, NO NuGet: --where field=value, --group field --count, deterministic ordering | csharp |
+| `csharp-jwt-cli` | JWT encode/decode/verify CLI on HMAC-SHA256 with xunit tests, .NET 8 | csharp |
 | `csharp-minimal-api` | ASP.NET Core minimal API with /health and an in-memory resource, xunit tests via WebApplicationFactory | csharp |
 | `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
 | `elixir-pubsub` | GenServer-based in-process pub/sub with topic subscriptions and at-least-once delivery | elixir |
@@ -257,26 +258,33 @@ $ newstack stacks outdated
 | `go-cobra-cli` | cobra subcommands with go test and a smoke run of the binary | go |
 | `go-concurrent-map` | Sharded concurrent map (RWMutex), range iteration, correctness tests plus a testing.B benchmark. | go |
 | `go-csv-etl` | Read, validate, dedupe, and aggregate CSV to JSON | go |
+| `go-diff-cli` | Unified diff CLI for two files. | go |
 | `go-echo-api` | labstack/echo JSON service with httptest tests and curl smoke | go |
 | `go-env-loader` | .env parser + precedence resolution with export/quote/comment handling, library + CLI, table-driven tests. | go |
 | `go-http-proxy` | Reverse proxy with hop-by-hop stripping and X-Forwarded-For injection | go |
+| `go-hyperloglog` | HyperLogLog cardinality estimator CLI. | go |
 | `go-jsonl-query` | Streaming JSONL query CLI (field select, where filter, count), bufio.Scanner based, tests with temp files. | go |
 | `go-lru-cache` | Generic LRU cache with TTL and max-size eviction, hit/miss stats, CLI demo replaying an access trace. | go |
 | `go-priority-queue` | container/heap priority queue with stable FIFO tie-break, Peek/Pop/Push, CLI scheduling tasks from stdin. | go |
 | `go-prometheus-metrics` | Service exposing Prometheus text exposition with counter and histogram | go |
 | `go-rate-limiter` | Token-bucket HTTP rate limiter middleware with 429 + Retry-After | go |
 | `go-retry-client` | HTTP client with capped exponential backoff + jitter using httptest servers for retry/limit/non-retryable tests. | go |
+| `go-skiplist` | Skip list ordered set CLI. | go |
 | `go-slog-middleware` | net/http + log/slog middleware: request id, structured logging, panic recovery, auth redaction. | go |
 | `go-sqlite-migrate` | Embedded SQL migrations with an applied-version table, checksums, and status. | go |
 | `go-sse-broker` | Server-Sent-Events broker: /events stream, /publish POST, fan-out, heartbeats | go |
 | `go-tar-extractor` | Safe tar.gz extractor that rejects path traversal and absolute paths, tests for both rejections and a good archive. | go |
 | `go-text-search` | Boyer-Moore-Horspool substring search with line/column reporting; CLI searches a file for a pattern. | go |
+| `go-webhook-receiver` | HTTP webhook receiver on port 5592. | go |
 | `java-csv-mapper` | Maven Java 21 CSV-to-typed-records mapper with strict validation and a CLI | java |
+| `java-http-client-api` | java.net.http.HttpClient wrapper with GET/POST, records, JUnit tests with ephemeral HttpServer, Maven | java |
 | `java-jdbc-sqlite-api` | Java 21 + Maven + com.sun.net.httpserver over JDBC with sqlite-jdbc: CRUD on a notes table, /health; JUnit 5 tests | java |
 | `java-json-flatten` | Jackson-based JSON flattener CLI (dotted keys) with JUnit tests, Maven compiler release 21 | java |
 | `java-picocli-cli` | picocli CLI on Maven with JUnit 5 tests and a shaded jar smoke | java |
 | `java-rate-limiter` | Token-bucket rate limiter, Java 21, Maven + JUnit 5, virtual-clock tests, plus a main class demo | java |
+| `java-template-engine` | Regex {{ key }} template renderer CLI with JUnit tests, Maven compiler release 21 | java |
 | `kotlin-coroutines-pipeline` | Gradle Kotlin DSL coroutines pipeline: staged fan-out/fan-in over a fake source, kotlinx-coroutines-test, JUnit5 | kotlin |
+| `kotlin-csv-report` | CSV parser and report aggregator CLI with JUnit5 tests, Gradle Kotlin DSL | kotlin |
 | `kotlin-html-builder` | Type-safe HTML builder DSL, Kotlin + Gradle Kotlin DSL + JUnit 5, escaping and attribute handling, main renders a page | kotlin |
 | `kotlin-json-dsl` | Gradle Kotlin type-safe JSON DSL with deterministic serialization | kotlin |
 | `node-commander-cli` | commander subcommands with assertion-based tests | node |
@@ -288,19 +296,24 @@ $ newstack stacks outdated
 | `node-hmac-signer-cli` | HMAC-SHA256 request signer/verifier CLI (node:crypto only), timing-safe verify with timestamp tolerance. | node |
 | `node-hono-api` | Hono HTTP JSON API (CRUD over in-memory store), typed routes, contract check via curl in smoke.sh. | node |
 | `node-json-patch-cli` | RFC 6902 JSON Patch apply + diff, tests for add/remove/replace/move/copy/test and a failure case. | node |
+| `node-markdown-lint` | Markdown linter: headings, fences, trailing spaces, line length. | node |
 | `node-markdown-site` | Static site generator (deps: marked + gray-matter): reads markdown with frontmatter, writes HTML with a layout; tests assert title/body escaping | node |
 | `node-markdown-toc-cli` | Markdown table-of-contents CLI: ATX, setext, code fences, duplicate heading slugs, --write | node |
 | `node-openapi-mock-server` | Zero-dependency OpenAPI 3 mock server: example-first responses, schema-shaped defaults, 404/405, required param validation. | node |
+| `node-pino-logger` | Structured logging with pino: levels, redaction, child loggers, JSON output. | node |
 | `node-qr-cli` | CLI that renders QR codes (dep: qrcode) to a PNG and a terminal renderer; tests assert PNG magic bytes and size | node |
 | `node-ratelimit-middleware` | Plain node:http server with token-bucket rate limiting, 429 + Retry-After, /stats endpoint. | node |
 | `node-semver-range-cli` | Semantic version parse/compare and range satisfaction CLI (zero dependencies), node:test runner. | node |
 | `node-sqlite-api` | HTTP CRUD over Node's built-in node:sqlite: a notes table, GET/POST/DELETE, /health, node --test unit tests and a live contract | node |
 | `node-sqlite-import` | Import a CSV into SQLite (node:sqlite) and query it from the CLI | node |
+| `node-sqlite-migrations` | SQLite migration runner: ordered .sql files, checksums, up/down, transactional apply. | node |
 | `node-sse-api` | Server-sent events service on bare Node: a replayable event log, Last-Event-ID resumption, heartbeat comments, node --test plus a live streaming contract | node |
 | `node-template-render-cli` | Mustache-lite template renderer (escaping, sections, partials) with a JSON context CLI. | node |
 | `node-totp-cli` | RFC 6238 TOTP generator/verifier (node:crypto only, no deps), tests with the RFC test vectors. | node |
 | `node-trpc-api` | tRPC v11 router with a direct server-side caller test and HTTP smoke over plain fetch | node |
+| `node-url-normalizer` | URL normalization: host casing, default ports, query sorting, tracking params. | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
+| `php-csv-report` | CSV parser and report aggregator CLI with PHPUnit tests, Composer autoload | php |
 | `php-jwt-cli` | HS256 JWT sign/verify CLI: base64url encode/decode, hash_equals, exp validation with an injected clock; PHPUnit tests | php |
 | `php-slim-api` | Slim 4 API with a JSON endpoint, PHPUnit test, composer.json | php |
 | `php-sqlite-queue` | PHP 8.3 PDO SQLite durable job queue CLI with PHPUnit tests | php |
@@ -499,10 +512,13 @@ $ newstack stacks outdated
 | `rust-base64-cli` | Base64 encode/decode CLI with -d/--decode, --url-safe, --no-pad, and stdin support | rust |
 | `rust-config-loader` | Layered configuration (defaults < file < env < CLI) with typed errors and a .env parser. | rust |
 | `rust-csv-stats-cli` | Rust CLI (clap 4 + csv 1 + serde) computing per-column stats (count/min/max/mean/unique) from a CSV | rust |
+| `rust-hex-dump-cli` | Hex dump CLI (offsets, hex bytes, ASCII) reading files or stdin with width option and integration tests | rust |
 | `rust-job-queue` | In-process job queue: mpsc channel, N workers, retry with max attempts, graceful shutdown, results collected | rust |
+| `rust-jsonpath-cli` | JSONPath expression evaluator CLI (serde_json) with nested/array/wildcard support and integration tests | rust |
 | `rust-jsonrpc-stdio` | JSON-RPC 2.0 server over stdin/stdout: request types, notifications, batches, spec error codes, and the exact framing an LSP-style client expects | rust |
 | `rust-lru-cache` | Generic LRU cache library with capacity eviction, get/put/peek and unit tests | rust |
 | `rust-mini-grep` | Recursive regex grep CLI (walkdir + regex crates) with -i/-n/-c flags and integration tests | rust |
+| `rust-ring-buffer` | Generic fixed-capacity ring buffer with overwrite-on-full, push/pop/front/back and unit tests | rust |
 | `rust-semver-cli` | Semver parse/compare/bump CLI with table-driven tests | rust |
 | `rust-sha256-tree` | Merkle tree over a file list with inclusion proofs and a pinned root digest | rust |
 | `rust-threadpool` | Fixed-size worker thread pool library + CLI demo: submit jobs over a channel, results collected, graceful shutdown | rust |

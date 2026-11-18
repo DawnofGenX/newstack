@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml
+          coverage: none
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Test
+        run: vendor/bin/phpunit
+      - name: Smoke test the API
+        run: |
+          php -S 127.0.0.1:5577 -t public public/index.php &
+          server=$!
+          for _ in $(seq 1 30); do curl -fsS http://127.0.0.1:5577/health >/dev/null 2>&1 && break; sleep 0.5; done
+          curl -fsS http://127.0.0.1:5577/health
+          kill $server

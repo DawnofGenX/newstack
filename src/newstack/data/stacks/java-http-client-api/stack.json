@@ -1,0 +1,61 @@
+{
+  "name": "java-http-client-api",
+  "title": "Java HTTP Client API",
+  "language": "java",
+  "blurb": "java.net.http.HttpClient wrapper with GET/POST, records, JUnit tests with ephemeral HttpServer, Maven",
+  "requires": [
+    "java",
+    "mvn",
+    "git"
+  ],
+  "default_description": "A Java HTTP client API CLI.",
+  "next_steps": [
+    "cd {path}",
+    "mvn -B package",
+    "java -jar target/{{ npm_name }}.jar https://example.com"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "mvn -B test",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "package",
+      "cmd": "mvn -B package -DskipTests",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "java",
+        "mvn"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/main/java/{{ package_name }}/HttpClientApi.java",
+      "contains": "java-http-client-api"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "src/test/java/{{ package_name }}/HttpClientApiTest.java"
+  ]
+}

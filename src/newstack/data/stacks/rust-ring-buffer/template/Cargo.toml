@@ -1,0 +1,15 @@
+[package]
+name = "{{ npm_name }}"
+version = "0.1.0"
+edition = "2024"
+description = "{{ description }}"
+license = "MIT"
+keywords = ["ring", "buffer", "queue"]
+
+[lib]
+name = "{{ package_name }}"
+path = "src/lib.rs"
+
+[dependencies]
+
+[dev-dependencies]
