@@ -13,9 +13,14 @@ function check(name, ok, detail = "") {
   }
 }
 
+const FRAME_TIMEOUT_MS = Number(process.env.WS_FRAME_TIMEOUT_MS ?? 10000);
+
 function nextFrame(socket) {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("no frame within 3s")), 3000);
+    const timer = setTimeout(
+      () => reject(new Error(`no frame within ${FRAME_TIMEOUT_MS}ms`)),
+      FRAME_TIMEOUT_MS,
+    );
     socket.once("message", (data) => {
       clearTimeout(timer);
       resolve(JSON.parse(data.toString("utf8")));

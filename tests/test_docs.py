@@ -237,3 +237,54 @@ def test_every_java_build_stack_gets_a_runner_jdk() -> None:
     assert not missing, (
         f"these stacks need a JDK but no setup-java step names them: {', '.join(missing)}"
     )
+
+
+def _elixir_gated_stacks() -> set[str]:
+    """Stack names any setup-beam step that pins an Elixir version applies to."""
+    lines = CI.read_text(encoding="utf-8").splitlines()
+    gated: set[str] = set()
+    for index, line in enumerate(lines):
+        if "uses: erlef/setup-beam@" not in line:
+            continue
+        # The `with:` block follows the `uses:` line, so the elixir-version pin
+        # (rather than the rebar3/Erlang-only step) decides whether this step
+        # installs Elixir at all.
+        has_elixir = False
+        for ahead in range(index + 1, min(index + 8, len(lines))):
+            candidate = lines[ahead].strip()
+            if candidate.startswith("- name:") or candidate.startswith("- uses:"):
+                break
+            if candidate.startswith("elixir-version:"):
+                has_elixir = True
+        if not has_elixir:
+            continue
+        for back in range(index - 1, max(index - 6, -1), -1):
+            candidate = lines[back].strip()
+            if candidate.startswith("- name:") or candidate.startswith("- uses:"):
+                break
+            if candidate.startswith("if:"):
+                gated.update(re.findall(r"[\"']([a-z0-9][a-z0-9-]*)[\"']", candidate))
+                gated.update(
+                    re.findall(r"matrix\.stack\s*==\s*[\"']([a-z0-9][a-z0-9-]*)[\"']", candidate)
+                )
+                break
+    return gated
+
+
+def test_every_elixir_stack_gets_a_runner_elixir() -> None:
+    """mix is not on the runner image; a stack that shells out to it needs the gate.
+
+    elixir-gen-server was wired into a shard without being added to the
+    setup-beam condition, so `newstack check` reported "SKIP missing toolchain:
+    mix" and the job failed on a green template.
+    """
+    gated = _elixir_gated_stacks()
+    assert gated, "ci.yml has no setup-beam step that installs Elixir"
+    missing = sorted(
+        name
+        for name, stack in load_stacks().items()
+        if "mix" in stack.requires and name not in gated
+    )
+    assert not missing, (
+        f"these stacks need Elixir but no setup-beam step names them: {', '.join(missing)}"
+    )

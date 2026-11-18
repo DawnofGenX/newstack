@@ -589,7 +589,7 @@ jobs:
         with:
           dotnet-version: "8.0.x"
       - name: Set up Elixir
-        if: contains(fromJSON('["elixir-mix-cli","phoenix-app"]'), matrix.stack)
+        if: contains(fromJSON('["elixir-gen-server","elixir-mix-cli","phoenix-app"]'), matrix.stack)
         uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.18"

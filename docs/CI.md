@@ -152,6 +152,17 @@ now fails if a stack that requires `java` plus `mvn`/`mvnw`/`gradle`/`gradlew` i
 `actions/setup-java` step. Interpreter-only JVM stacks (groovy, clojure, scala-cli) are exempt on purpose:
 they need a JRE the image ships, not a compiler at a specific release.
 
+`elixir-gen-server` shipped red the same way, one wave later: the runner image has no `mix` at all, the
+setup-beam step that installs Elixir named only `elixir-mix-cli` and `phoenix-app`, and the job failed with
+
+```
+  elixir-gen-server SKIP  missing toolchain: mix
+```
+
+`tests/test_docs.py::test_every_elixir_stack_gets_a_runner_elixir` now fails if a stack requiring `mix` is
+missing from every `erlef/setup-beam` step that pins `elixir-version:` (the Erlang/rebar3 and Gleam steps
+are skipped by that check, so they do not accidentally satisfy it).
+
 ## Adding a stack
 
 ```console
