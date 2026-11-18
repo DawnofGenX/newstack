@@ -1,0 +1,22 @@
+{
+  "name": "go-jsonl-query",
+  "title": "Go JSONL Query",
+  "language": "go",
+  "blurb": "Streaming JSONL query CLI (field select, where filter, count), bufio.Scanner based, tests with temp files.",
+  "requires": ["go", "git"],
+  "default_description": "A streaming JSONL query CLI.",
+  "next_steps": [
+    "cd {path}",
+    "go run . -file data.jsonl -select name -where 'age>=30'"
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build -o bin/jsonlq .", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "jsonlq.go", "contains": "StreamQuery" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["jsonlq_test.go"]
+}

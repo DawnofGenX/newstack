@@ -1,0 +1,23 @@
+{
+  "name": "go-retry-client",
+  "title": "Go Retry Client",
+  "language": "go",
+  "blurb": "HTTP client with capped exponential backoff + jitter using httptest servers for retry/limit/non-retryable tests.",
+  "requires": ["go", "git"],
+  "default_description": "An HTTP client with retry/backoff.",
+  "next_steps": [
+    "cd {path}",
+    "go build -o bin/retryclient .",
+    "./bin/retryclient -url https://example.com -attempts 3"
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build -o bin/retryclient .", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "retry.go", "contains": "type Retryer" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["retry_test.go"]
+}

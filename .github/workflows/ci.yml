@@ -192,6 +192,10 @@ jobs:
           - node-graphql-api
           - python-bs4-scraper
           - rust-axum-ws
+          - node-totp-cli
+          - go-env-loader
+          - rust-semver-cli
+          - php-slim-api
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -257,15 +261,16 @@ jobs:
           ruby-version: "3.2"
           bundler-cache: true
       # ruby-cli needs no gems (minitest and rake ship with Ruby), so it takes
-      # setup-ruby without the bundler cache its sibling stacks require.
+      # Stacks with no Gemfile: rake and the stdlib are enough, so the bundler
+      # cache that ruby-sinatra/rails-app rely on would only add a failure mode.
       - name: Set up Ruby (no bundle)
-        if: matrix.stack == 'ruby-cli'
+        if: contains(fromJSON('["ruby-cli","ruby-hmac-webhook"]'), matrix.stack)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-jdbc-sqlite-api","java-maven-cli","java-picocli-cli","kotlin-cli","kotlin-http-api","kotlin-ktor-api","spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","kotlin-cli","kotlin-coroutines-pipeline","kotlin-http-api","kotlin-ktor-api","spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -577,14 +582,14 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["php-composer-cli","symfony-app","laravel-app"]'), matrix.stack)
+        if: contains(fromJSON('["php-composer-cli","php-slim-api","symfony-app","laravel-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           extensions: ctype, fileinfo, mbstring, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["csharp-cli","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
+        if: contains(fromJSON('["csharp-cli","csharp-minimal-api","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -785,6 +790,10 @@ jobs:
           - node-markdown-site
           - python-cryptography-vault
           - rust-csv-stats-cli
+          - node-json-patch-cli
+          - go-retry-client
+          - java-json-flatten
+          - ruby-hmac-webhook
     steps: *shared_setup
 
   stacks-c:
@@ -886,6 +895,10 @@ jobs:
           - java-jdbc-sqlite-api
           - node-qr-cli
           - python-duckdb-analytics
+          - node-hono-api
+          - go-jsonl-query
+          - rust-mini-grep
+          - kotlin-coroutines-pipeline
     steps: *shared_setup
 
   stacks-d:
@@ -987,6 +1000,10 @@ jobs:
           - node-cron-scheduler
           - node-sqlite-api
           - python-typer-cli
+          - node-zod-config
+          - go-tar-extractor
+          - rust-lru-cache
+          - csharp-minimal-api
     steps: *shared_setup
 
   package:

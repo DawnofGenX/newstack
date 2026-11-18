@@ -163,6 +163,15 @@ setup-beam step that installs Elixir named only `elixir-mix-cli` and `phoenix-ap
 missing from every `erlef/setup-beam` step that pins `elixir-version:` (the Erlang/rebar3 and Gleam steps
 are skipped by that check, so they do not accidentally satisfy it).
 
+Ruby, PHP and .NET have the quieter version of the same failure. The image ships all three, so a stack
+missing from `ruby/setup-ruby`, `shivammathur/setup-php` or `actions/setup-dotnet` does not error: it just
+runs on an older default than the version its own workflow pins (ruby 3.2-3.4, PHP 8.3, .NET 8). That is
+drift rather than a crash, and only the ruby gate is version-sensitive enough to notice locally — ruby-cli
+needs 3.3, `ruby-hmac-webhook` runs on the stdlib and rake alone, so the no-bundler ruby step names both.
+`tests/test_docs.py::test_every_stack_that_needs_a_pinned_runtime_is_gated` keeps all three gates honest:
+every stack whose `requires` names `ruby`, `php` or `dotnet` must appear in a step that uses the matching
+action.
+
 ## Adding a stack
 
 ```console

@@ -1,0 +1,91 @@
+{
+  "name": "ruby-hmac-webhook",
+  "title": "Ruby HMAC webhook verifier",
+  "language": "ruby",
+  "blurb": "Ruby webhook signature verifier: Stripe-style HMAC-SHA256 signing, constant-time comparison and a timestamp tolerance window, stdlib only, minitest suite run by rake",
+  "requires": [
+    "ruby",
+    "rake"
+  ],
+  "default_description": "A Ruby webhook signature verifier.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "bin/{npm_name} sign --secret whsec_dev --payload hello",
+    "bin/{npm_name} verify --secret whsec_dev --header t=1700000000,v1=deadbeef --payload hello"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "sign",
+      "cmd": "bin/{{ npm_name }} sign --secret whsec_dev --timestamp 1700000000 --payload hello | grep -q '^t=1700000000,v1=[0-9a-f]\\{64\\}$'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "verify-accepts-a-good-signature",
+      "cmd": "sig=$(bin/{{ npm_name }} sign --secret whsec_dev --timestamp 1700000000 --payload hello) && bin/{{ npm_name }} verify --secret whsec_dev --header \"$sig\" --payload hello --now 1700000000",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "verify-rejects-a-tampered-signature",
+      "cmd": "bin/{{ npm_name }} verify --secret whsec_dev --header t=1700000000,v1=0000000000000000000000000000000000000000000000000000000000000000 --payload hello --now 1700000000; test $? -eq 1",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "verify-rejects-a-stale-timestamp",
+      "cmd": "sig=$(bin/{{ npm_name }} sign --secret whsec_dev --timestamp 1700000000 --payload hello) && bin/{{ npm_name }} verify --secret whsec_dev --header \"$sig\" --payload hello --now 1700009999; test $? -eq 1",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "stdin",
+      "cmd": "sig=$(printf 'hello' | bin/{{ npm_name }} sign --secret whsec_dev --timestamp 1700000000 --stdin) && printf 'hello' | bin/{{ npm_name }} verify --secret whsec_dev --header \"$sig\" --now 1700000000 --stdin",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/webhook/signature.rb",
+      "contains": "Webhook::Signature"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Rakefile"
+  ],
+  "adopt_tests": [
+    "test/signature_test.rb"
+  ]
+}

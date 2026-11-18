@@ -1,0 +1,59 @@
+{
+  "name": "csharp-minimal-api",
+  "title": "C# Minimal API",
+  "language": "csharp",
+  "blurb": "ASP.NET Core minimal API with /health and an in-memory resource, xunit tests via WebApplicationFactory",
+  "requires": [
+    "dotnet",
+    "git"
+  ],
+  "default_description": "An ASP.NET Core minimal API.",
+  "port": 5576,
+  "next_steps": [
+    "cd {path}",
+    "dotnet test --nologo",
+    "dotnet run --urls http://127.0.0.1:5576"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "dotnet test --nologo",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "dotnet build --nologo -warnaserror",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "dotnet",
+        "curl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "*.csproj",
+      "contains": "Microsoft.AspNetCore.Mvc.Testing"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/ApiTests.cs"
+  ]
+}

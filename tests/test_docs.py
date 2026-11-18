@@ -288,3 +288,56 @@ def test_every_elixir_stack_gets_a_runner_elixir() -> None:
     assert not missing, (
         f"these stacks need Elixir but no setup-beam step names them: {', '.join(missing)}"
     )
+
+
+GATED_TOOLCHAINS = (
+    ("ruby", "uses: ruby/setup-ruby@"),
+    ("php", "uses: shivammathur/setup-php@"),
+    ("dotnet", "uses: actions/setup-dotnet@"),
+)
+
+
+def _gated_by(action_marker: str) -> set[str]:
+    """Stack names any step that uses `action_marker` applies to."""
+    lines = CI.read_text(encoding="utf-8").splitlines()
+    gated: set[str] = set()
+    for index, line in enumerate(lines):
+        if action_marker not in line:
+            continue
+        for back in range(index - 1, max(index - 6, -1), -1):
+            candidate = lines[back].strip()
+            if candidate.startswith("- name:") or candidate.startswith("- uses:"):
+                break
+            if candidate.startswith("if:"):
+                gated.update(re.findall(r"[\"']([a-z0-9][a-z0-9-]*)[\"']", candidate))
+                gated.update(
+                    re.findall(r"matrix\.stack\s*==\s*[\"']([a-z0-9][a-z0-9-]*)[\"']", candidate)
+                )
+                break
+    return gated
+
+
+def test_every_stack_that_needs_a_pinned_runtime_is_gated() -> None:
+    """The ruby/php/dotnet gates pin a version; ungated stacks get the image default.
+
+    Each of these templates ships its own workflow that pins ruby 3.2-3.4, PHP
+    8.3 or the .NET 8 SDK. A stack missing from the gate still passes locally and
+    in `newstack check`, then runs on whatever the runner image happens to carry,
+    so the two environments drift apart silently. Unlike the JDK gate there is no
+    compiler error to catch it: the check just exercises a different runtime.
+    """
+    stacks = load_stacks()
+    problems = []
+    for language, marker in GATED_TOOLCHAINS:
+        gated = _gated_by(marker)
+        assert gated, f"ci.yml has no step using {marker}"
+        missing = sorted(
+            name
+            for name, stack in stacks.items()
+            if language in stack.requires and name not in gated
+        )
+        if missing:
+            problems.append(f"{language}: {', '.join(missing)}")
+    assert not problems, (
+        "these stacks need a pinned runtime but no gate names them: " + "; ".join(problems)
+    )

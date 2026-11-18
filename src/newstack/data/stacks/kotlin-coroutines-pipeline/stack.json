@@ -1,0 +1,61 @@
+{
+  "name": "kotlin-coroutines-pipeline",
+  "title": "Kotlin Coroutines Pipeline",
+  "language": "kotlin",
+  "blurb": "Gradle Kotlin DSL coroutines pipeline: staged fan-out/fan-in over a fake source, kotlinx-coroutines-test, JUnit5",
+  "requires": [
+    "java",
+    "gradle",
+    "git"
+  ],
+  "default_description": "A Kotlin coroutines pipeline with staged fan-out/fan-in.",
+  "next_steps": [
+    "cd {path}",
+    "gradle test",
+    "gradle run"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "gradle test",
+      "tools": [
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "run",
+      "cmd": "gradle run",
+      "tools": [
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "build.gradle.kts",
+      "contains": "kotlinx-coroutines"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "src/test/kotlin/{{ package_name }}/PipelineTest.kt"
+  ]
+}

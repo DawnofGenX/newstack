@@ -1,0 +1,23 @@
+{
+  "name": "go-env-loader",
+  "title": "Go Env Loader",
+  "language": "go",
+  "blurb": ".env parser + precedence resolution with export/quote/comment handling, library + CLI, table-driven tests.",
+  "requires": ["go", "git"],
+  "default_description": "A .env parser and resolver.",
+  "next_steps": [
+    "cd {path}",
+    "go build -o bin/envloader .",
+    "./bin/envloader -file .env"
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build -o bin/envloader .", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "envloader.go", "contains": "ParseDotEnv" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["envloader_test.go"]
+}
