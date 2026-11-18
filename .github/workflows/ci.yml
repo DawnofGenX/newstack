@@ -222,6 +222,8 @@ jobs:
           - csharp-semver-cli
           - go-cron-cli
           - deno-cidr-cli
+          - rust-sudoku-solver
+          - go-sitemap-cli
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -290,13 +292,13 @@ jobs:
       # Stacks with no Gemfile: rake and the stdlib are enough, so the bundler
       # cache that ruby-sinatra/rails-app rely on would only add a failure mode.
       - name: Set up Ruby (no bundle)
-        if: contains(fromJSON('["ruby-base58-cli", "ruby-cli", "ruby-csv-report", "ruby-hash-chain-cli", "ruby-hmac-webhook", "ruby-i18n-cli", "ruby-jsonpath-cli", "ruby-luhn-cli", "ruby-wordwrap-cli"]'), matrix.stack)
+        if: contains(fromJSON('["ruby-base58-cli", "ruby-cli", "ruby-csv-report", "ruby-hash-chain-cli", "ruby-hmac-webhook", "ruby-huffman-cli", "ruby-i18n-cli", "ruby-jsonpath-cli", "ruby-luhn-cli", "ruby-wordwrap-cli"]'), matrix.stack)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-config-loader", "java-csv-mapper", "java-http-client-api", "java-jdbc-sqlite-api", "java-json-flatten", "java-lru-cache", "java-maven-cli", "java-picocli-cli", "java-rate-limiter", "java-template-engine", "kotlin-cli", "kotlin-coroutines-pipeline", "kotlin-csv-report", "kotlin-fuzzy-match", "kotlin-html-builder", "kotlin-http-api", "kotlin-json-dsl", "kotlin-ktor-api", "kotlin-money-ledger", "spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-config-loader", "java-csv-mapper", "java-http-client-api", "java-jdbc-sqlite-api", "java-json-flatten", "java-lru-cache", "java-maven-cli", "java-picocli-cli", "java-rate-limiter", "java-template-engine", "java-word-count", "kotlin-cli", "kotlin-coroutines-pipeline", "kotlin-csv-report", "kotlin-fuzzy-match", "kotlin-html-builder", "kotlin-http-api", "kotlin-json-dsl", "kotlin-ktor-api", "kotlin-money-ledger", "spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -608,7 +610,7 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["laravel-app", "php-base32-cli", "php-bencode-cli", "php-composer-cli", "php-csv-report", "php-html-sanitizer", "php-jwt-cli", "php-markdown-cli", "php-slim-api", "php-sqlite-queue", "php-text-table-cli", "php-uri-cli", "symfony-app"]'), matrix.stack)
+        if: contains(fromJSON('["laravel-app", "php-base32-cli", "php-bencode-cli", "php-composer-cli", "php-csv-report", "php-html-sanitizer", "php-jwt-cli", "php-markdown-cli", "php-mustache-cli", "php-slim-api", "php-sqlite-queue", "php-text-table-cli", "php-uri-cli", "symfony-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
@@ -846,6 +848,8 @@ jobs:
           - csharp-hmac-cli
           - go-template-cli
           - dart-csv-cli
+          - ruby-huffman-cli
+          - java-word-count
     steps: *shared_setup
 
   stacks-c:
@@ -977,6 +981,8 @@ jobs:
           - bun-toml-lite
           - node-ttl-cache
           - rust-s-expr
+          - node-yaml-lite
+          - php-mustache-cli
     steps: *shared_setup
 
   stacks-d:
@@ -1108,6 +1114,8 @@ jobs:
           - bun-glob-cli
           - node-json-schema-lite
           - java-lru-cache
+          - go-hkdf-cli
+          - node-zlib-stat-cli
     steps: *shared_setup
 
   package:

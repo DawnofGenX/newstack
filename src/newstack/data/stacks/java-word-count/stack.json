@@ -1,0 +1,62 @@
+{
+  "name": "java-word-count",
+  "title": "Java Word Count",
+  "language": "java",
+  "blurb": "Word frequency CLI on the JDK alone: normalisation, deterministic ranking, stdin driven, JUnit 5.",
+  "requires": [
+    "java",
+    "mvn",
+    "git"
+  ],
+  "default_description": "A Java CLI that ranks word frequencies from stdin.",
+  "next_steps": [
+    "cd {path}",
+    "mvn -B package",
+    "printf 'the cat sat' | java -jar target/{{ npm_name }}.jar --top 3"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "mvn -B test",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "package",
+      "cmd": "mvn -B package -DskipTests",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "java",
+        "mvn"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/main/java/{{ package_name }}/WordCount.java",
+      "contains": "public final class WordCount"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "src/test/java/{{ package_name }}/WordCountTest.java",
+    "src/test/java/{{ package_name }}/AppTest.java"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "name": "ruby-huffman-cli",
+  "title": "Ruby Huffman CLI",
+  "language": "ruby",
+  "blurb": "Huffman coding CLI: weighted tree, prefix-free code table, self-describing payload that decodes without the tree.",
+  "requires": [
+    "ruby",
+    "rake"
+  ],
+  "default_description": "A Huffman encoder and decoder written in Ruby.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "./bin/{{ npm_name }} encode notes.txt > notes.huff"
+  ],
+  "verify": [
+    {
+      "name": "syntax",
+      "cmd": "ruby -cw lib/huffman.rb",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "ruby",
+        "rake"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/huffman.rb",
+      "contains": "module Huffman"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "test/huffman_test.rb"
+  ]
+}

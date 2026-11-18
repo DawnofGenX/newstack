@@ -276,6 +276,7 @@ $ newstack stacks outdated
 | `go-diff-cli` | Unified diff CLI for two files. | go |
 | `go-echo-api` | labstack/echo JSON service with httptest tests and curl smoke | go |
 | `go-env-loader` | .env parser + precedence resolution with export/quote/comment handling, library + CLI, table-driven tests. | go |
+| `go-hkdf-cli` | HKDF-SHA256 (RFC 5869) derive tool with the appendix test vectors, hex or stdin IKM. | go |
 | `go-http-proxy` | Reverse proxy with hop-by-hop stripping and X-Forwarded-For injection | go |
 | `go-hyperloglog` | HyperLogLog cardinality estimator CLI. | go |
 | `go-jsonl-query` | Streaming JSONL query CLI (field select, where filter, count), bufio.Scanner based, tests with temp files. | go |
@@ -287,6 +288,7 @@ $ newstack stacks outdated
 | `go-rate-limiter` | Token-bucket HTTP rate limiter middleware with 429 + Retry-After | go |
 | `go-retry-client` | HTTP client with capped exponential backoff + jitter using httptest servers for retry/limit/non-retryable tests. | go |
 | `go-semver-cli` | Semantic version parse/compare/satisfies with prerelease ordering, caret, tilde and x-ranges. | go |
+| `go-sitemap-cli` | sitemap.xml validator and normaliser: protocol field checks, namespace-correct render, encoding/xml round trip. | go |
 | `go-skiplist` | Skip list ordered set CLI. | go |
 | `go-slog-middleware` | net/http + log/slog middleware: request id, structured logging, panic recovery, auth redaction. | go |
 | `go-sqlite-migrate` | Embedded SQL migrations with an applied-version table, checksums, and status. | go |
@@ -306,6 +308,7 @@ $ newstack stacks outdated
 | `java-picocli-cli` | picocli CLI on Maven with JUnit 5 tests and a shaded jar smoke | java |
 | `java-rate-limiter` | Token-bucket rate limiter, Java 21, Maven + JUnit 5, virtual-clock tests, plus a main class demo | java |
 | `java-template-engine` | Regex {{ key }} template renderer CLI with JUnit tests, Maven compiler release 21 | java |
+| `java-word-count` | Word frequency CLI on the JDK alone: normalisation, deterministic ranking, stdin driven, JUnit 5. | java |
 | `kotlin-coroutines-pipeline` | Gradle Kotlin DSL coroutines pipeline: staged fan-out/fan-in over a fake source, kotlinx-coroutines-test, JUnit5 | kotlin |
 | `kotlin-csv-report` | CSV parser and report aggregator CLI with JUnit5 tests, Gradle Kotlin DSL | kotlin |
 | `kotlin-fuzzy-match` | Jaro and Jaro-Winkler similarity with prefix boost, ranked candidate CLI and JUnit5 tests on the published example values | kotlin |
@@ -348,6 +351,8 @@ $ newstack stacks outdated
 | `node-trpc-api` | tRPC v11 router with a direct server-side caller test and HTTP smoke over plain fetch | node |
 | `node-ttl-cache` | TTL + LRU cache with hit/miss/eviction counters, driven by a command stream. | node |
 | `node-url-normalizer` | URL normalization: host casing, default ports, query sorting, tracking params. | node |
+| `node-yaml-lite` | Dependency-free YAML subset: block and flow collections, quoted scalars, JSON/YAML conversion, getPath. | node |
+| `node-zlib-stat-cli` | gzip/gunzip CLI on node:zlib with size accounting: level control, ratio report, JSON stats. | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
 | `perl-ini-cli` | Perl INI reader on ExtUtils::MakeMaker: section and key order preserved, inline comments, quoted escapes, section/key lookup, JSON output, Test::More suite | perl |
 | `php-base32-cli` | RFC 4648 base32 encoder/decoder plus Crockford alphabet, stdin and file input, PHPUnit suite | php |
@@ -356,6 +361,7 @@ $ newstack stacks outdated
 | `php-html-sanitizer` | Allowlist HTML sanitizer on DOMDocument: drops script/style with content, strips event handlers and javascript: hrefs; PHPUnit tests | php |
 | `php-jwt-cli` | HS256 JWT sign/verify CLI: base64url encode/decode, hash_equals, exp validation with an injected clock; PHPUnit tests | php |
 | `php-markdown-cli` | Markdown to HTML converter CLI (headers, lists, code, inline formatting) with PHPUnit tests | php |
+| `php-mustache-cli` | Mustache template renderer: escaped and raw tags, sections, inverted sections, dotted names, JSON data. | php |
 | `php-slim-api` | Slim 4 API with a JSON endpoint, PHPUnit test, composer.json | php |
 | `php-sqlite-queue` | PHP 8.3 PDO SQLite durable job queue CLI with PHPUnit tests | php |
 | `php-text-table-cli` | CSV to aligned text tables: per-column alignment, wide-character aware widths, ASCII/Unicode/no borders, truncation | php |
@@ -552,6 +558,7 @@ $ newstack stacks outdated
 | `ruby-csv-report` | stdlib CSV report builder: group-by column, per-group aggregates, aligned table + JSON output; minitest + Rakefile | ruby |
 | `ruby-hash-chain-cli` | Append-only hash chain in Ruby: each entry commits to the previous digest, so tampered, dropped or reordered history fails verification; stdlib only | ruby |
 | `ruby-hmac-webhook` | Ruby webhook signature verifier: Stripe-style HMAC-SHA256 signing, constant-time comparison and a timestamp tolerance window, stdlib only, minitest suite run by rake | ruby |
+| `ruby-huffman-cli` | Huffman coding CLI: weighted tree, prefix-free code table, self-describing payload that decodes without the tree. | ruby |
 | `ruby-i18n-cli` | Stdlib-only Ruby locale fallback resolver with YAML and minitest | ruby |
 | `ruby-jsonpath-cli` | Dependency-free JSONPath subset (members, indexes, wildcards, recursive descent) with a stdin/file CLI and grep-like exit codes | ruby |
 | `ruby-luhn-cli` | Ruby Luhn checksum CLI: validate card numbers, generate a check digit, identify card brand; stdlib only, minitest + rake | ruby |
@@ -575,6 +582,7 @@ $ newstack stacks outdated
 | `rust-s-expr` | S-expression reader and evaluator: comments, strings, arithmetic, if/and/or, list ops. | rust |
 | `rust-semver-cli` | Semver parse/compare/bump CLI with table-driven tests | rust |
 | `rust-sha256-tree` | Merkle tree over a file list with inclusion proofs and a pinned root digest | rust |
+| `rust-sudoku-solver` | Backtracking Sudoku solver with bit-mask candidates, solution counting and a strict parser; no dependencies. | rust |
 | `rust-threadpool` | Fixed-size worker thread pool library + CLI demo: submit jobs over a channel, results collected, graceful shutdown | rust |
 | `rust-token-bucket` | Token bucket limiter with injectable ms clock: burst, fractional refill, acquire_n, time_until. | rust |
 | `rust-toml-lite` | Minimal TOML subset parser (tables, scalars, arrays) with a CLI printing normalized JSON, std only | rust |

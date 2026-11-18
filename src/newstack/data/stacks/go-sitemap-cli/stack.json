@@ -1,0 +1,23 @@
+{
+  "name": "go-sitemap-cli",
+  "title": "Go Sitemap CLI",
+  "language": "go",
+  "blurb": "sitemap.xml validator and normaliser: protocol field checks, namespace-correct render, encoding/xml round trip.",
+  "requires": ["go", "git"],
+  "default_description": "A sitemap.xml validator and normaliser.",
+  "next_steps": [
+    "cd {path}",
+    "go build -o bin/{{ npm_name }} .",
+    "bin/{{ npm_name }} -file sitemap.xml -render"
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build -o bin/{{ npm_name }} .", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "go"], "timeout": 600 }
+  ],
+  "detect": [{ "file": "sitemap.go", "contains": "func Render(urls []URL)" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["sitemap_test.go"]
+}

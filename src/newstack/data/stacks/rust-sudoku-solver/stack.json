@@ -1,0 +1,71 @@
+{
+  "name": "rust-sudoku-solver",
+  "title": "Rust Sudoku Solver",
+  "language": "rust",
+  "blurb": "Backtracking Sudoku solver with bit-mask candidates, solution counting and a strict parser; no dependencies.",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A dependency-free Sudoku solver written in Rust.",
+  "next_steps": [
+    "cd {path}",
+    "cargo run --release -- --grid 530070000600195000098000060800060003400803001700020006060000280000419005000080079"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/lib.rs",
+      "contains": "pub fn candidates("
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/solver.rs"
+  ]
+}

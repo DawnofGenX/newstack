@@ -1,0 +1,76 @@
+{
+  "name": "php-mustache-cli",
+  "title": "PHP Mustache CLI",
+  "language": "php",
+  "blurb": "Mustache template renderer: escaped and raw tags, sections, inverted sections, dotted names, JSON data.",
+  "requires": [
+    "php",
+    "composer"
+  ],
+  "default_description": "A Mustache template renderer for the command line.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "php bin/{{ npm_name }} page.mustache --data data.json"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction --no-progress >/dev/null && vendor/bin/phpunit --no-coverage",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "php bin/{{ npm_name }} --help",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "render",
+      "cmd": "printf 'Hi {{name}}' | php bin/{{ npm_name }} --json '{\"name\":\"Ada\"}' | grep -qF 'Hi Ada'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "php bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Mustache.php",
+      "contains": "final class Mustache"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "composer.json",
+    "phpunit.xml"
+  ],
+  "adopt_tests": [
+    "tests/MustacheTest.php"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "node-zlib-stat-cli",
+  "title": "Node Zlib Stat CLI",
+  "language": "node",
+  "blurb": "gzip/gunzip CLI on node:zlib with size accounting: level control, ratio report, JSON stats.",
+  "requires": ["node", "npm"],
+  "node": { "minimum": "22", "versions": ["22", "24"] },
+  "package_manager": ["npm", "pnpm", "yarn"],
+  "default_description": "A gzip CLI that reports compression ratios.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "node src/cli.js compress notes.txt --level 9 --out notes.txt.gz"
+  ],
+  "verify": [
+    { "name": "install", "cmd": "npm install --no-audit --no-fund", "tools": ["npm"], "timeout": 900 },
+    { "name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "node", "cmp"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "src/compress.js", "contains": "export function compress(" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["tests/compress.test.js", "tests/cli.test.js"]
+}

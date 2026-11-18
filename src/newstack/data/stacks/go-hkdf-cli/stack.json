@@ -1,0 +1,63 @@
+{
+  "name": "go-hkdf-cli",
+  "title": "Go HKDF CLI",
+  "language": "go",
+  "blurb": "HKDF-SHA256 (RFC 5869) derive tool with the appendix test vectors, hex or stdin IKM.",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "A Go CLI that derives key material with HKDF-SHA256.",
+  "next_steps": [
+    "cd {path}",
+    "go run . -salt 00010203 -info context -length 32 0b0b0b0b"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/{{ npm_name }} .",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "hkdf.go",
+      "contains": "func Extract("
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "hkdf_test.go"
+  ]
+}
