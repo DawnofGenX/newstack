@@ -1,0 +1,76 @@
+{
+  "name": "bun-file-hash-cli",
+  "title": "Bun File Hash CLI",
+  "language": "bun",
+  "blurb": "sha256sum-style hashing CLI (sha256, sha1, md5, table-driven crc32) with --check verification of a checksum file, zero-dependency bun:test suite",
+  "requires": [
+    "bun"
+  ],
+  "default_description": "A Bun CLI that prints and verifies file checksums.",
+  "next_steps": [
+    "cd {path}",
+    "bun test",
+    "bun run bin/{npm_name} README.md"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "bun test",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "digest",
+      "cmd": "./bin/{{ npm_name }} README.md | grep -Eq '^[0-9a-f]{64}  README.md$'",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "sh smoke.sh",
+      "tools": [
+        "sh",
+        "bun"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": ".bunfig.toml",
+      "contains": "bun-file-hash-cli"
+    },
+    {
+      "file": "src/hash/hash.ts",
+      "contains": "export function crc32"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".bunfig.toml",
+    "tsconfig.json"
+  ],
+  "adopt_tests": []
+}

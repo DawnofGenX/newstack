@@ -1,0 +1,57 @@
+{
+  "name": "csharp-units-cli",
+  "title": "CSharp Units CLI",
+  "language": "csharp",
+  "blurb": "Unit converter CLI over length, mass, volume, time, data and affine temperature, System.Text only, xunit tests, no NuGet beyond the test runner",
+  "requires": [
+    "dotnet",
+    "git"
+  ],
+  "default_description": "A C# CLI that converts values between units.",
+  "next_steps": [
+    "cd {path}",
+    "dotnet build",
+    "dotnet run -- convert 10 km mi"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "dotnet build --nologo",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "dotnet test --nologo",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "dotnet"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Program.cs",
+      "contains": "csharp-units-cli"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/UnitsTests.cs"
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "name": "go-bitmap-index",
+  "title": "Go Bitmap Index",
+  "language": "go",
+  "blurb": "Bitset with Set/Clear/Has, popcount, Rank prefix sums and Select, with rank/select inverse tested.",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "A Go bitset with rank and select queries.",
+  "next_steps": [
+    "cd {path}",
+    "printf '1\\n63\\n64\\n200\\n' | go run . -size 256 -query 'rank=64,select=2'"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/{{ npm_name }} .",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "bitmap.go",
+      "contains": "func (b *Bitmap) Rank"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "bitmap_test.go"
+  ]
+}

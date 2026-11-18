@@ -1,0 +1,6 @@
+# Bun configuration for {{ npm_name }} (the bun-file-hash-cli stack).
+#
+# The [test] block keeps `bun test` pointed at the tests directory.
+
+[test]
+root = "."

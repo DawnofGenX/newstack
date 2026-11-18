@@ -1,0 +1,5 @@
+#!/usr/bin/env bun
+// Entry point: owns argv, stdout/stderr and the exit code.
+import { main } from "../src/cli.ts";
+
+process.exit(await main(process.argv.slice(2)));

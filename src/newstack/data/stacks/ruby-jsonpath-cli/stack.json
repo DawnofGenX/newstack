@@ -1,0 +1,84 @@
+{
+  "name": "ruby-jsonpath-cli",
+  "title": "Ruby JSONPath CLI",
+  "language": "ruby",
+  "blurb": "Dependency-free JSONPath subset (members, indexes, wildcards, recursive descent) with a stdin/file CLI and grep-like exit codes",
+  "requires": [
+    "ruby",
+    "rake"
+  ],
+  "default_description": "A Ruby JSONPath query CLI.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "echo '{{\"a\":[{{\"b\":1}}]}}' | bin/{npm_name} '$.a[*].b'"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "query",
+      "cmd": "echo '{\"a\":[{\"b\":1},{\"b\":2}]}' | bin/{{ npm_name }} '$.a[*].b' | tail -1 | grep -qx '2'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "descend",
+      "cmd": "echo '{\"x\":{\"price\":3}}' | bin/{{ npm_name }} '$..price' | grep -qx '3'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "no-match-exits-1",
+      "cmd": "echo '{}' | bin/{{ npm_name }} '$.a' >/dev/null; test $? -eq 1",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "ruby",
+        "rake"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/jsonpath/query.rb",
+      "contains": "module Query"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Rakefile"
+  ],
+  "adopt_tests": [
+    "test/jsonpath_test.rb"
+  ]
+}

@@ -29,25 +29,5 @@ jobs:
           done
       - name: Test
         run: rake test
-      - name: Sign
-        run: |
-          header=$(bin/{{ npm_name }} sign --secret whsec_dev --timestamp 1700000000 --payload hello)
-          echo "$header"
-          echo "$header" | grep -Eq '^t=1700000000,v1=[0-9a-f]{64}$'
-      - name: Verify round trip
-        run: |
-          header=$(bin/{{ npm_name }} sign --secret whsec_dev --payload hello)
-          bin/{{ npm_name }} verify --secret whsec_dev --header "$header" --payload hello
-      - name: Tampered header exits 1
-        run: |
-          set +e
-          bin/{{ npm_name }} verify --secret whsec_dev --payload hello \
-            --header "$(printf 't=1700000000,v1=%064d' 0)" > /dev/null 2>&1
-          status=$?
-          test "$status" -eq 1
-      - name: Unknown option exits 2
-        run: |
-          set +e
-          bin/{{ npm_name }} --nope > /dev/null 2>&1
-          status=$?
-          test "$status" -eq 2
+      - name: Smoke
+        run: bash smoke.sh

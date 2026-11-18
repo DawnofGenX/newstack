@@ -247,14 +247,17 @@ $ newstack stacks outdated
 
 | Stack | What you get | Toolchain |
 | --- | --- | --- |
+| `bun-file-hash-cli` | sha256sum-style hashing CLI (sha256, sha1, md5, table-driven crc32) with --check verification of a checksum file, zero-dependency bun:test suite | bun |
 | `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
 | `csharp-jsonl-cli` | JSONL filter/aggregate CLI on System.Text.Json only, NO NuGet: --where field=value, --group field --count, deterministic ordering | csharp |
 | `csharp-jwt-cli` | JWT encode/decode/verify CLI on HMAC-SHA256 with xunit tests, .NET 8 | csharp |
 | `csharp-minimal-api` | ASP.NET Core minimal API with /health and an in-memory resource, xunit tests via WebApplicationFactory | csharp |
 | `csharp-slug-cli` | Slugify CLI (lowercase, separator, max length) on System.Text only, xunit tests, no NuGet | csharp |
+| `csharp-units-cli` | Unit converter CLI over length, mass, volume, time, data and affine temperature, System.Text only, xunit tests, no NuGet beyond the test runner | csharp |
 | `elixir-csv-filter` | Elixir CSV row filter on Mix: pure options/filter modules, ExUnit suite, escript binary | elixir |
 | `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
 | `elixir-pubsub` | GenServer-based in-process pub/sub with topic subscriptions and at-least-once delivery | elixir |
+| `go-bitmap-index` | Bitset with Set/Clear/Has, popcount, Rank prefix sums and Select, with rank/select inverse tested. | go |
 | `go-bloom-filter` | Bloom filter library plus CLI (add, check, stats), fixed-size bit array, double hashing FNV-64a | go |
 | `go-circuit-breaker` | Circuit breaker state machine (closed/open/half-open) with clock-driven CLI | go |
 | `go-cobra-cli` | cobra subcommands with go test and a smoke run of the binary | go |
@@ -294,6 +297,7 @@ $ newstack stacks outdated
 | `java-template-engine` | Regex {{ key }} template renderer CLI with JUnit tests, Maven compiler release 21 | java |
 | `kotlin-coroutines-pipeline` | Gradle Kotlin DSL coroutines pipeline: staged fan-out/fan-in over a fake source, kotlinx-coroutines-test, JUnit5 | kotlin |
 | `kotlin-csv-report` | CSV parser and report aggregator CLI with JUnit5 tests, Gradle Kotlin DSL | kotlin |
+| `kotlin-fuzzy-match` | Jaro and Jaro-Winkler similarity with prefix boost, ranked candidate CLI and JUnit5 tests on the published example values | kotlin |
 | `kotlin-html-builder` | Type-safe HTML builder DSL, Kotlin + Gradle Kotlin DSL + JUnit 5, escaping and attribute handling, main renders a page | kotlin |
 | `kotlin-json-dsl` | Gradle Kotlin type-safe JSON DSL with deterministic serialization | kotlin |
 | `kotlin-money-ledger` | BigDecimal double-entry ledger CLI: exact money arithmetic, per-account balances, trial balance; JUnit5 tests | kotlin |
@@ -302,6 +306,7 @@ $ newstack stacks outdated
 | `node-csv-stats` | RFC 4180 CSV parser plus per column profiling: empty counts, distinct values, numeric min/max/mean. | node |
 | `node-csv-stream-cli` | RFC 4180 streaming CSV parser/serializer on Node streams with csv2json/json2csv CLI. | node |
 | `node-diff-cli` | Unified diff CLI: diff -u style output, --stat summary, --apply patch mode | node |
+| `node-diff-unified` | LCS line diff with grouped hunks and standard unified-diff output, zero dependencies. | node |
 | `node-env-schema` | Dotenv parser plus typed schema validation: numbers, booleans, urls, enums, defaults, unknown-key errors. | node |
 | `node-feature-flags` | Percentage-rollout feature flag evaluator: stable hashing, HTTP flag-set endpoint | node |
 | `node-graphql-api` | GraphQL server with graphql + graphql-yoga: schema with Query.notes / Mutation.addNote, in-memory store, node --test resolvers, live curl | node |
@@ -329,6 +334,7 @@ $ newstack stacks outdated
 | `node-trpc-api` | tRPC v11 router with a direct server-side caller test and HTTP smoke over plain fetch | node |
 | `node-url-normalizer` | URL normalization: host casing, default ports, query sorting, tracking params. | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
+| `php-base32-cli` | RFC 4648 base32 encoder/decoder plus Crockford alphabet, stdin and file input, PHPUnit suite | php |
 | `php-csv-report` | CSV parser and report aggregator CLI with PHPUnit tests, Composer autoload | php |
 | `php-html-sanitizer` | Allowlist HTML sanitizer on DOMDocument: drops script/style with content, strips event handlers and javascript: hrefs; PHPUnit tests | php |
 | `php-jwt-cli` | HS256 JWT sign/verify CLI: base64url encode/decode, hash_equals, exp validation with an injected clock; PHPUnit tests | php |
@@ -526,11 +532,13 @@ $ newstack stacks outdated
 | `ruby-csv-report` | stdlib CSV report builder: group-by column, per-group aggregates, aligned table + JSON output; minitest + Rakefile | ruby |
 | `ruby-hmac-webhook` | Ruby webhook signature verifier: Stripe-style HMAC-SHA256 signing, constant-time comparison and a timestamp tolerance window, stdlib only, minitest suite run by rake | ruby |
 | `ruby-i18n-cli` | Stdlib-only Ruby locale fallback resolver with YAML and minitest | ruby |
+| `ruby-jsonpath-cli` | Dependency-free JSONPath subset (members, indexes, wildcards, recursive descent) with a stdin/file CLI and grep-like exit codes | ruby |
 | `ruby-luhn-cli` | Ruby Luhn checksum CLI: validate card numbers, generate a check digit, identify card brand; stdlib only, minitest + rake | ruby |
 | `rust-axum-ws` | Rust axum 0.8 WebSocket echo/broadcast server (axum ws, tokio, futures-util): /health plus /ws, broadcast to all subscribers | rust |
 | `rust-base64-cli` | Base64 encode/decode CLI with -d/--decode, --url-safe, --no-pad, and stdin support | rust |
 | `rust-bitfield-cli` | Bitfield inspector/manipulator CLI (set/clear/toggle bits) with hex/dec/binary output and tests | rust |
 | `rust-config-loader` | Layered configuration (defaults < file < env < CLI) with typed errors and a .env parser. | rust |
+| `rust-crc32-cli` | CRC-32 (IEEE) and CRC-32C (Castagnoli) with incremental state, one-shot helpers and a checksum CLI. | rust |
 | `rust-csv-stats-cli` | Rust CLI (clap 4 + csv 1 + serde) computing per-column stats (count/min/max/mean/unique) from a CSV | rust |
 | `rust-csv-to-json` | CSV to JSON converter CLI (csv + serde_json crates) with stdin/file input and integration tests | rust |
 | `rust-hex-dump-cli` | Hex dump CLI (offsets, hex bytes, ASCII) reading files or stdin with width option and integration tests | rust |

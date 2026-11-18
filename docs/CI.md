@@ -205,3 +205,27 @@ break the balance rule, and names a manifest that does not exist. Then run
 `uv run pytest tests/test_docs.py -q`: those guards are what catch a stack that
 is in the registry but in no shard — invisible to CI, which is the failure mode
 this file exists to prevent.
+
+## A template's own `ci.yml` is never run by this repo's CI
+
+The workflows under `src/newstack/data/stacks/*/template/.github/workflows/ci.yml` only execute
+inside a project created by `newstack new`. newstack's own matrix renders a stack, runs its
+`verify` steps and its `smoke.sh`, and never reads the rendered workflow — so a template workflow
+that builds the wrong binary or calls a subcommand the CLI does not have ships green and only
+fails in the user's repository. Two real cases: eight Go stacks carried `go build -o bin/jsonlq .`
+(copied from `go-jsonl-query`), and three Ruby CLIs carried the webhook verifier's `sign`/`verify`
+steps, which exit non-zero because those CLIs have no such subcommand.
+
+`tests/test_template_ci.py` now guards both shapes:
+
+- `test_a_template_workflow_only_runs_its_own_binaries` — every `bin/<literal>` in a template
+  workflow must also appear in the rest of that stack's template or in its `stack.json`; a name
+  that appears nowhere else came from a copy-paste. Any legitimate self-built artifact
+  (`bin/server.jar`) therefore has to be written with the `{{ npm_name }}` placeholder, which is
+  the convention anyway.
+- `test_ruby_rake_cli_stacks_share_one_workflow` — all rake-based Ruby CLI stacks must ship one
+  identical workflow (syntax check, `rake test`, `bash smoke.sh`), so scaffolding any of them
+  produces the same CI.
+
+When you copy a workflow between stacks, change the parts that are about the *other* stack before
+you commit: the binary it builds and the subcommands it calls.

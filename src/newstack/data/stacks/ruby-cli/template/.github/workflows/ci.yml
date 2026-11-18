@@ -29,11 +29,5 @@ jobs:
           done
       - name: Test
         run: rake test
-      - name: Help
-        run: bin/{{ npm_name }} --help
-      - name: Unknown option exits 2
-        run: |
-          set +e
-          bin/{{ npm_name }} --nope > /dev/null 2>&1
-          status=$?
-          test "$status" -eq 2
+      - name: Smoke
+        run: bash smoke.sh

@@ -32,10 +32,10 @@ jobs:
       - name: Test
         run: scala-cli test .
       - name: Package
-        run: mkdir -p bin && scala-cli --power package . -o bin/server.jar --assembly -f
+        run: mkdir -p bin && scala-cli --power package . -o bin/{{ npm_name }}.jar --assembly -f
       - name: Serve
         run: |
-          PORT=5419 java -jar bin/server.jar > .cask.log 2>&1 &
+          PORT=5419 java -jar bin/{{ npm_name }}.jar > .cask.log 2>&1 &
           server=$!
           ready=1
           for _ in $(seq 1 120); do
