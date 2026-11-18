@@ -248,7 +248,9 @@ $ newstack stacks outdated
 | Stack | What you get | Toolchain |
 | --- | --- | --- |
 | `bun-file-hash-cli` | sha256sum-style hashing CLI (sha256, sha1, md5, table-driven crc32) with --check verification of a checksum file, zero-dependency bun:test suite | bun |
+| `bun-uuid-v7-cli` | Bun/TypeScript UUIDv7 (RFC 9562) CLI: time-ordered identifiers with a 48-bit millisecond stamp, plus parse, validate and stdin sort | bun |
 | `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
+| `csharp-duration-cli` | ISO 8601 duration arithmetic on .NET 8: parse P2DT3H and 1h30m, format both ways, add to a timestamp, and refuse ambiguous calendar months | csharp |
 | `csharp-jsonl-cli` | JSONL filter/aggregate CLI on System.Text.Json only, NO NuGet: --where field=value, --group field --count, deterministic ordering | csharp |
 | `csharp-jwt-cli` | JWT encode/decode/verify CLI on HMAC-SHA256 with xunit tests, .NET 8 | csharp |
 | `csharp-minimal-api` | ASP.NET Core minimal API with /health and an in-memory resource, xunit tests via WebApplicationFactory | csharp |
@@ -301,6 +303,8 @@ $ newstack stacks outdated
 | `kotlin-html-builder` | Type-safe HTML builder DSL, Kotlin + Gradle Kotlin DSL + JUnit 5, escaping and attribute handling, main renders a page | kotlin |
 | `kotlin-json-dsl` | Gradle Kotlin type-safe JSON DSL with deterministic serialization | kotlin |
 | `kotlin-money-ledger` | BigDecimal double-entry ledger CLI: exact money arithmetic, per-account balances, trial balance; JUnit5 tests | kotlin |
+| `lua-csv-cli` | Lua 5.4 CSV tool: RFC 4180 parser with width checks, column selection by name or position, CSV/TSV/JSON output, dependency-free spec runner | lua |
+| `nim-stack-cli` | A tiny stack machine in Nim: push integers, combine them with + - * / dup swap drop, and get error messages that name the word and the depth | nim |
 | `node-commander-cli` | commander subcommands with assertion-based tests | node |
 | `node-cron-scheduler` | In-process scheduler (dep: node-cron) that registers jobs, runs them, and records last-run/last-error in a small JSON store | node |
 | `node-csv-stats` | RFC 4180 CSV parser plus per column profiling: empty counts, distinct values, numeric min/max/mean. | node |
@@ -334,7 +338,9 @@ $ newstack stacks outdated
 | `node-trpc-api` | tRPC v11 router with a direct server-side caller test and HTTP smoke over plain fetch | node |
 | `node-url-normalizer` | URL normalization: host casing, default ports, query sorting, tracking params. | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
+| `perl-ini-cli` | Perl INI reader on ExtUtils::MakeMaker: section and key order preserved, inline comments, quoted escapes, section/key lookup, JSON output, Test::More suite | perl |
 | `php-base32-cli` | RFC 4648 base32 encoder/decoder plus Crockford alphabet, stdin and file input, PHPUnit suite | php |
+| `php-bencode-cli` | Bencode encoder/decoder in PHP: integers, byte strings, lists and sorted-key dicts, canonical-form validation, JSON on the other side | php |
 | `php-csv-report` | CSV parser and report aggregator CLI with PHPUnit tests, Composer autoload | php |
 | `php-html-sanitizer` | Allowlist HTML sanitizer on DOMDocument: drops script/style with content, strips event handlers and javascript: hrefs; PHPUnit tests | php |
 | `php-jwt-cli` | HS256 JWT sign/verify CLI: base64url encode/decode, hash_equals, exp validation with an injected clock; PHPUnit tests | php |
@@ -530,6 +536,7 @@ $ newstack stacks outdated
 | `python-intro-sort` | intro sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `ruby-csv-report` | stdlib CSV report builder: group-by column, per-group aggregates, aligned table + JSON output; minitest + Rakefile | ruby |
+| `ruby-hash-chain-cli` | Append-only hash chain in Ruby: each entry commits to the previous digest, so tampered, dropped or reordered history fails verification; stdlib only | ruby |
 | `ruby-hmac-webhook` | Ruby webhook signature verifier: Stripe-style HMAC-SHA256 signing, constant-time comparison and a timestamp tolerance window, stdlib only, minitest suite run by rake | ruby |
 | `ruby-i18n-cli` | Stdlib-only Ruby locale fallback resolver with YAML and minitest | ruby |
 | `ruby-jsonpath-cli` | Dependency-free JSONPath subset (members, indexes, wildcards, recursive descent) with a stdin/file CLI and grep-like exit codes | ruby |
@@ -626,6 +633,7 @@ $ newstack stacks outdated
 | `kotlin-cli` | Kotlin CLI on Maven (no Gradle wrapper to ship): pure counting core, JUnit 5 suite, shaded runnable jar | `java`, `mvn` |
 | `kotlin-http-api` | Kotlin JSON service on the JDK `HttpServer`: the counting core and router are pure Kotlin, `--selftest` replaces the test runner, one shaded jar to run | `java`, `mvn`, `curl` |
 | `kotlin-ktor-api` | Ktor 3 service on JDK 21: raw `Application` interception instead of routing so 404/405 bodies stay byte-exact, a hand-rolled strict JSON scanner (kotlinx accepts `"text":42`), a Maven Kotlin build that wires the serialization compiler plugin, and a shaded jar that keeps the engine's `META-INF/services` | `java`, `mvn`, `curl` |
+| `zig-bitset-cli` | Fixed-width bitset in Zig 0.17: set, count, rank (prefix popcount) and select (n-th set bit), with zig build test running both test binaries | zig |
 | `zig-cli` | Zig 0.17 CLI: counting module with in-source test blocks, `zig build test`, no runtime | `zig` |
 | `zig-http-api` | Zig 0.17 JSON service on `std.http`: `contract.route` is pure so every status code is tested without a socket, `build.zig` ships the binary plus one test binary per module, real-socket verify step | `zig`, `curl` |
 | `julia-cli` | Julia CLI: pure counting module, `Test` stdlib suite, zero external packages | `julia` |

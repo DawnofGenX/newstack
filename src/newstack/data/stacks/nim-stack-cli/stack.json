@@ -1,0 +1,102 @@
+{
+  "name": "nim-stack-cli",
+  "title": "Nim Stack CLI",
+  "language": "nim",
+  "blurb": "A tiny stack machine in Nim: push integers, combine them with + - * / dup swap drop, and get error messages that name the word and the depth",
+  "requires": [
+    "nim",
+    "nimble",
+    "git"
+  ],
+  "default_description": "A Nim command line stack machine.",
+  "next_steps": [
+    "cd {path}",
+    "nimble build",
+    "./{npm_name} 2 3 +",
+    "./{npm_name} 1 2 swap"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "nimble build",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "nimble test",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "add",
+      "cmd": "./{{ package_name }} 2 3 + | grep -qx '5'",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "swap",
+      "cmd": "./{{ package_name }} 1 2 swap | grep -qx '2 1'",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "negative",
+      "cmd": "./{{ package_name }} -9 abs | grep -qx '9'",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "bad-word",
+      "cmd": "./{{ package_name }} 1 2 frobnicate >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./{{ package_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "nim",
+        "nimble",
+        "bash"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/{{ package_name }}/vm.nim",
+      "contains": "VmError* = object of CatchableError"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/test_all.nim"
+  ]
+}

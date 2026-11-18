@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use File::Basename qw(basename);
+use lib "$FindBin::Bin/../lib";
+
+use JSON::PP;
+
+use IniLite::Options;
+use IniLite::Parse;
+
+# The only place that owns output and exit codes: 0 success, 1 unreadable or
+# malformed input, 2 bad usage.
+my $program = basename($0);
+my $options = IniLite::Options::parse(@ARGV);
+
+if ($options->{status} eq 'help') {
+    print IniLite::Options::usage($program);
+    exit 0;
+}
+
+if ($options->{status} eq 'version') {
+    print IniLite::Options::version(), "\n";
+    exit 0;
+}
+
+if ($options->{status} eq 'error') {
+    print STDERR "error: $options->{error}\n\n";
+    print STDERR IniLite::Options::usage($program);
+    exit 2;
+}
+
+my @files = @{ $options->{files} };
+my $text;
+
+if (@files > 1) {
+    print STDERR "error: read one file at a time\n\n";
+    print STDERR IniLite::Options::usage($program);
+    exit 2;
+}
+
+if (!@files || $files[0] eq '-') {
+    local $/;
+    $text = <STDIN>;
+    $text = '' unless defined $text;
+} else {
+    my $path = $files[0];
+    open my $handle, '<:raw', $path or do {
+        print STDERR "error: cannot open '$path': $!\n";
+        exit 1;
+    };
+    local $/;
+    $text = <$handle>;
+    close $handle;
+    $text = '' unless defined $text;
+}
+
+my $document = eval { IniLite::Parse->parse($text) };
+if (!$document) {
+    my $error = $@ || "malformed input\n";
+    $error =~ s/\n\z//;
+    print STDERR "error: $error\n";
+    exit 1;
+}
+
+if ($options->{list}) {
+    for my $name ($document->order) {
+        print "$name\n" if length $name;
+    }
+    exit 0;
+}
+
+if (defined $options->{get}) {
+    my ($value, $section) = $document->lookup($options->{get});
+    if (!defined $value) {
+        print STDERR "error: no such key '$options->{get}'\n";
+        exit 2;
+    }
+    print "$value\n";
+    exit 0;
+}
+
+if (defined $options->{section}) {
+    if (!$document->has_section($options->{section})) {
+        print STDERR "error: no such section '$options->{section}'\n";
+        exit 2;
+    }
+    print "[$options->{section}]\n";
+    for my $pair ($document->pairs($options->{section})) {
+        print "$pair->[0] = $pair->[1]\n";
+    }
+    exit 0;
+}
+
+if ($options->{json}) {
+    my %tree = map {
+        my $name = $_;
+        $name => { map { @{$_} } $document->pairs($name) }
+    } $document->order;
+    print JSON::PP->new->canonical->encode(\%tree), "\n";
+    exit 0;
+}
+
+for my $name ($document->order) {
+    print "[$name]\n" if length $name;
+    for my $pair ($document->pairs($name)) {
+        print "$pair->[0] = $pair->[1]\n";
+    }
+}
+
+exit 0;

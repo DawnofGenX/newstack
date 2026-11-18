@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Syntax check
+        run: |
+          perl -c -Ilib bin/{{ npm_name }}
+          perl -c -Ilib lib/IniLite.pm
+          perl -c -Ilib lib/IniLite/Parse.pm
+          perl -c -Ilib lib/IniLite/Options.pm
+      - name: Configure
+        run: perl Makefile.PL
+      - name: Test
+        run: make test
+      - name: Smoke test the CLI
+        run: |
+          set +e
+          printf 'port = 8080\n\n[server]\nhost = localhost\n' > sample.ini
+          perl bin/{{ npm_name }} --help >/dev/null; help=$?
+          value=$(perl bin/{{ npm_name }} -g server.host sample.ini); value_status=$?
+          perl bin/{{ npm_name }} --bogus >/dev/null 2>&1; usage=$?
+          perl bin/{{ npm_name }} does-not-exist.ini >/dev/null 2>&1; missing=$?
+          printf 'help=%s value=%s status=%s usage=%s missing=%s\n' \
+            "$help" "$value" "$value_status" "$usage" "$missing"
+          test "$help" -eq 0
+          test "$value_status" -eq 0
+          test "$value" = "localhost"
+          test "$usage" -eq 2
+          test "$missing" -eq 1

@@ -216,6 +216,8 @@ jobs:
           - kotlin-money-ledger
           - rust-crc32-cli
           - csharp-units-cli
+          - zig-bitset-cli
+          - csharp-duration-cli
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -284,7 +286,7 @@ jobs:
       # Stacks with no Gemfile: rake and the stdlib are enough, so the bundler
       # cache that ruby-sinatra/rails-app rely on would only add a failure mode.
       - name: Set up Ruby (no bundle)
-        if: contains(fromJSON('["ruby-cli","ruby-csv-report","ruby-hmac-webhook","ruby-i18n-cli","ruby-jsonpath-cli","ruby-luhn-cli"]'), matrix.stack)
+        if: contains(fromJSON('["ruby-cli", "ruby-csv-report", "ruby-hash-chain-cli", "ruby-hmac-webhook", "ruby-i18n-cli", "ruby-jsonpath-cli", "ruby-luhn-cli"]'), matrix.stack)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
@@ -602,14 +604,14 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["laravel-app","php-base32-cli","php-composer-cli","php-csv-report","php-html-sanitizer","php-jwt-cli","php-markdown-cli","php-slim-api","php-sqlite-queue","symfony-app"]'), matrix.stack)
+        if: contains(fromJSON('["laravel-app", "php-base32-cli", "php-bencode-cli", "php-composer-cli", "php-csv-report", "php-html-sanitizer", "php-jwt-cli", "php-markdown-cli", "php-slim-api", "php-sqlite-queue", "symfony-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           extensions: ctype, fileinfo, mbstring, pdo_sqlite, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["aspnet-api","csharp-cli","csharp-csv-report","csharp-jsonl-cli","csharp-jwt-cli","csharp-minimal-api","csharp-slug-cli","csharp-units-cli","dotnet-cli","fsharp-cli","fsharp-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["aspnet-api", "csharp-cli", "csharp-csv-report", "csharp-duration-cli", "csharp-jsonl-cli", "csharp-jwt-cli", "csharp-minimal-api", "csharp-slug-cli", "csharp-units-cli", "dotnet-cli", "fsharp-cli", "fsharp-http-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -625,7 +627,7 @@ jobs:
         with:
           sdk: "3.13.7"
       - name: Set up Zig
-        if: contains(fromJSON('["zig-cli","zig-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["zig-bitset-cli", "zig-cli", "zig-http-api"]'), matrix.stack)
         uses: mlugg/setup-zig@v2
         with:
           version: "0.17.0"
@@ -670,12 +672,12 @@ jobs:
         with:
           version: "1.13"
       - name: Set up Nim
-        if: contains(fromJSON('["nim-cli","nim-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["nim-cli", "nim-http-api", "nim-stack-cli"]'), matrix.stack)
         uses: jiro4989/setup-nim-action@v2
         with:
           nim-version: "2.2.4"
       - name: Install Lua
-        if: contains(fromJSON('["lua-cli","lua-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["lua-cli", "lua-csv-cli", "lua-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq lua5.4
@@ -692,7 +694,7 @@ jobs:
         with:
           crystal: "1.11"
       - name: Set up Bun
-        if: contains(fromJSON('["bun-cli","bun-api","bun-sqlite-api"]'), matrix.stack)
+        if: contains(fromJSON('["bun-api", "bun-cli", "bun-sqlite-api", "bun-uuid-v7-cli"]'), matrix.stack)
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2
@@ -834,6 +836,8 @@ jobs:
           - php-html-sanitizer
           - php-base32-cli
           - bun-file-hash-cli
+          - ruby-hash-chain-cli
+          - nim-stack-cli
     steps: *shared_setup
 
   stacks-c:
@@ -959,6 +963,8 @@ jobs:
           - rust-token-bucket
           - node-diff-unified
           - ruby-jsonpath-cli
+          - lua-csv-cli
+          - php-bencode-cli
     steps: *shared_setup
 
   stacks-d:
@@ -1084,6 +1090,8 @@ jobs:
           - rust-merge-sorted
           - go-bitmap-index
           - kotlin-fuzzy-match
+          - perl-ini-cli
+          - bun-uuid-v7-cli
     steps: *shared_setup
 
   package:

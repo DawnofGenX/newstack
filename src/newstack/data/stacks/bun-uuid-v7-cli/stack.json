@@ -1,0 +1,101 @@
+{
+  "name": "bun-uuid-v7-cli",
+  "title": "Bun UUIDv7 CLI",
+  "language": "bun",
+  "blurb": "Bun/TypeScript UUIDv7 (RFC 9562) CLI: time-ordered identifiers with a 48-bit millisecond stamp, plus parse, validate and stdin sort",
+  "requires": [
+    "bun"
+  ],
+  "default_description": "A Bun CLI that generates and inspects UUIDv7 identifiers.",
+  "next_steps": [
+    "cd {path}",
+    "bun test",
+    "./bin/{npm_name} gen",
+    "./bin/{npm_name} parse $(./bin/{npm_name} gen)"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "bun test",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "gen",
+      "cmd": "./bin/{{ npm_name }} gen | grep -qE '^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "count",
+      "cmd": "test \"$(./bin/{{ npm_name }} gen --count 3 | wc -l | tr -d ' ')\" = 3",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "parse",
+      "cmd": "./bin/{{ npm_name }} parse \"$(./bin/{{ npm_name }} gen)\" | grep -qx 'version=7'",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "validate",
+      "cmd": "./bin/{{ npm_name }} validate nope >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} frobnicate >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bun",
+        "bash"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": ".bunfig.toml",
+      "contains": "bun-uuid-v7-cli"
+    },
+    {
+      "file": "src/uuid/format.ts",
+      "contains": "export function uuidV7"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/format.test.ts"
+  ]
+}

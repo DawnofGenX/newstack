@@ -1,0 +1,8 @@
+# Bun configuration for {{ npm_name }}.
+#
+# This file is also one of the markers `newstack detect` uses to recognise the
+# project as the bun-uuid-v7-cli stack, and it keeps `bun test` pointed at the
+# tests directory.
+
+[test]
+root = "."

@@ -1,0 +1,94 @@
+{
+  "name": "zig-bitset-cli",
+  "title": "Zig Bitset CLI",
+  "language": "zig",
+  "blurb": "Fixed-width bitset in Zig 0.17: set, count, rank (prefix popcount) and select (n-th set bit), with zig build test running both test binaries",
+  "requires": [
+    "zig"
+  ],
+  "default_description": "A Zig bitset calculator.",
+  "next_steps": [
+    "cd {path}",
+    "zig build",
+    "./zig-out/bin/{package_name} --len 100 --set 0,1,2,63,64,99 --count",
+    "zig build test"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "zig build test",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "zig build",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "./zig-out/bin/{{ package_name }} --help",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "count",
+      "cmd": "./zig-out/bin/{{ package_name }} --len 100 --set 0,1,2,63,64,99 --count | grep -qx 'count=6'",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "rank",
+      "cmd": "./zig-out/bin/{{ package_name }} --len 128 --set 0,1,2,63,64 --rank 64 | grep -qxF 'rank[64]=4'",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "select",
+      "cmd": "./zig-out/bin/{{ package_name }} --len 100 --set 3,70,71 --select 1 | grep -qxF 'select[1]=70'",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./zig-out/bin/{{ package_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "range-error",
+      "cmd": "./zig-out/bin/{{ package_name }} --len 8 --set 9 --count >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/bitset.zig",
+      "contains": "pub const Bitset"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

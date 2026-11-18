@@ -1,0 +1,84 @@
+{
+  "name": "ruby-hash-chain-cli",
+  "title": "Ruby Hash Chain CLI",
+  "language": "ruby",
+  "blurb": "Append-only hash chain in Ruby: each entry commits to the previous digest, so tampered, dropped or reordered history fails verification; stdlib only",
+  "requires": [
+    "ruby",
+    "rake"
+  ],
+  "default_description": "A Ruby tamper-evident hash chain CLI.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "bin/{npm_name} append '{{\"event\":\"created\"}}' --file chain.ndjson --at 100",
+    "bin/{npm_name} verify --file chain.ndjson",
+    "bin/{npm_name} show --file chain.ndjson"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "append",
+      "cmd": "bin/{{ npm_name }} append '{\"event\":\"created\"}' --file chain-smoke.ndjson --at 100 | grep -qE '^[0-9a-f]{64}$'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "verify",
+      "cmd": "bin/{{ npm_name }} append '{\"event\":\"paid\"}' --file chain-smoke.ndjson --at 200 >/dev/null && bin/{{ npm_name }} verify --file chain-smoke.ndjson | grep -qx 'ok 2 entries'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "tamper",
+      "cmd": "sed -i 's/created/edited/' chain-smoke.ndjson; bin/{{ npm_name }} verify --file chain-smoke.ndjson >/dev/null 2>&1; test $? -eq 1; rm -f chain-smoke.ndjson",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "bad-payload",
+      "cmd": "bin/{{ npm_name }} append 'not json' --file x.ndjson >/dev/null 2>&1; test $? -eq 1; rm -f x.ndjson",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/hash_chain.rb",
+      "contains": "module HashChain"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Rakefile"
+  ],
+  "adopt_tests": [
+    "test/hash_chain_test.rb"
+  ]
+}

@@ -1,0 +1,122 @@
+#!/usr/bin/env lua5.4
+-- Entry point: the only file that owns argv, stdout/stderr and the exit code.
+
+local script_path = (arg and arg[0]) or "{{ npm_name }}"
+local program = script_path:match("([^/\\]+)$") or "{{ npm_name }}"
+local script_dir = script_path:match("^(.*)[/\\][^/\\]*$") or "."
+
+package.path = script_dir .. "/../src/?.lua;"
+  .. script_dir .. "/../src/?/init.lua;"
+  .. package.path
+
+local csval = require("csval")
+
+local function read_stream(handle)
+  return handle:read("*a")
+end
+
+--- Turns argv into output and an exit code: 0 success, 1 unreadable input or a
+--- parse error, 2 bad usage.
+local function run(argv)
+  local options = csval.parse_options(argv)
+
+  if options.status == "help" then
+    io.stdout:write(csval.usage(program))
+    return 0
+  elseif options.status == "version" then
+    io.stdout:write(csval.version .. "\n")
+    return 0
+  elseif options.status == "usage" then
+    io.stderr:write("error: " .. options.message .. "\n\n")
+    io.stderr:write(csval.usage(program))
+    return 2
+  end
+
+  local path = options.files[1]
+  local text
+  if path == nil or path == "-" then
+    text = read_stream(io.stdin) or ""
+  else
+    local handle = io.open(path, "rb")
+    if not handle then
+      io.stderr:write("error: cannot open '" .. path .. "'\n")
+      return 1
+    end
+    text = read_stream(handle)
+    handle:close()
+    if not text then
+      io.stderr:write("error: cannot read '" .. path .. "'\n")
+      return 1
+    end
+  end
+
+  local ok, rows_or_error = pcall(csval.parse, text, options.delimiter)
+  if not ok then
+    io.stderr:write("error: " .. tostring(rows_or_error) .. "\n")
+    return 1
+  end
+  local rows = rows_or_error
+
+  local ok_rect, rect_error = pcall(csval.check_rectangular, rows)
+  if not ok_rect then
+    io.stderr:write("error: " .. tostring(rect_error) .. "\n")
+    return 1
+  end
+
+  if #rows == 0 then
+    return 0
+  end
+
+  local headers = options.header and csval.headers(rows) or nil
+  local body = csval.body(rows, options.header)
+  local width = #rows[1]
+
+  local ok_columns, positions = pcall(csval.resolve, options.columns, headers, width)
+  if not ok_columns then
+    io.stderr:write("error: " .. tostring(positions) .. "\n")
+    return 2
+  end
+
+  local selected_headers = nil
+  if headers then
+    selected_headers = csval.project({ headers }, positions)[1]
+  end
+  local selected = csval.project(body, positions)
+
+  if options.output == "json" then
+    local payload
+    if selected_headers and options.header then
+      local objects = {}
+      for index, row in ipairs(selected) do
+        local object = {}
+        for slot, name in ipairs(selected_headers) do
+          object[name] = row[slot]
+        end
+        objects[index] = object
+      end
+      payload = objects
+    else
+      payload = selected
+    end
+    io.stdout:write(csval.encode(payload) .. "\n")
+    return 0
+  end
+
+  local delimiter = options.output == "tsv" and "\t" or ","
+  local out = {}
+  if selected_headers then
+    out[1] = selected_headers
+  end
+  for _, row in ipairs(selected) do
+    out[#out + 1] = row
+  end
+  io.stdout:write(csval.render(out, delimiter))
+  return 0
+end
+
+local argv = {}
+for index = 1, #arg do
+  argv[index] = arg[index]
+end
+
+os.exit(run(argv))

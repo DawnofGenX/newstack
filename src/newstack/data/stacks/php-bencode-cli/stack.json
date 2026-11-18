@@ -1,0 +1,84 @@
+{
+  "name": "php-bencode-cli",
+  "title": "PHP Bencode CLI",
+  "language": "php",
+  "blurb": "Bencode encoder/decoder in PHP: integers, byte strings, lists and sorted-key dicts, canonical-form validation, JSON on the other side",
+  "requires": [
+    "php",
+    "composer"
+  ],
+  "default_description": "A PHP bencode encoder and decoder CLI.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "vendor/bin/phpunit",
+    "printf '{{\"a\":1}}' | php bin/{npm_name} encode"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction --prefer-dist && vendor/bin/phpunit",
+      "tools": [
+        "composer",
+        "php"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "encode",
+      "cmd": "printf '{\"a\":1,\"b\":[\"x\"]}' | php bin/{{ npm_name }} encode | grep -qxF 'd1:ai1e1:bl1:xee'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "decode",
+      "cmd": "printf 'd1:ai1e1:bl1:xee' | php bin/{{ npm_name }} decode | grep -qxF '{\"a\":1,\"b\":[\"x\"]}'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "canonical",
+      "cmd": "printf 'i03e' | php bin/{{ npm_name }} decode >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "php bin/{{ npm_name }} frobnicate >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "php",
+        "composer",
+        "bash"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Bencode.php",
+      "contains": "final class Bencode"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/BencodeTest.php"
+  ]
+}

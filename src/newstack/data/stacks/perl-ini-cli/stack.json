@@ -1,0 +1,80 @@
+{
+  "name": "perl-ini-cli",
+  "title": "Perl INI CLI",
+  "language": "perl",
+  "blurb": "Perl INI reader on ExtUtils::MakeMaker: section and key order preserved, inline comments, quoted escapes, section/key lookup, JSON output, Test::More suite",
+  "requires": [
+    "perl",
+    "make"
+  ],
+  "default_description": "A Perl command line tool that reads INI files, looks values up and emits JSON.",
+  "next_steps": [
+    "cd {path}",
+    "perl Makefile.PL && make test",
+    "printf '[server]\\nhost = localhost\\n' | ./bin/{npm_name} -g server.host",
+    "printf '[a]\\nx = 1\\n' | ./bin/{npm_name} --json"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "perl Makefile.PL >/dev/null && make test",
+      "tools": [
+        "perl",
+        "make"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "perl bin/{{ npm_name }} --help",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "perl bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "perl bin/{{ npm_name }} does-not-exist.ini >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "lookup",
+      "cmd": "printf '[server]\\nhost = localhost\\n' | perl bin/{{ npm_name }} -g server.host | grep -q '^localhost$'",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "json",
+      "cmd": "printf '[a]\\nx = 1\\n' | perl bin/{{ npm_name }} --json | grep -q '\"x\":\"1\"'",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/IniLite/Parse.pm",
+      "contains": "package IniLite::Parse"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

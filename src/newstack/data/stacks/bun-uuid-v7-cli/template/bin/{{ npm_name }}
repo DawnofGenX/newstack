@@ -1,0 +1,7 @@
+#!/usr/bin/env bun
+// Entry point: the only file that owns argv, stdout/stderr and the exit code.
+// Generation and parsing live in src/uuid/ so the tests can pin the clock and
+// the random bytes.
+import { main } from "../src/cli.ts";
+
+process.exit(await main(process.argv.slice(2)));
