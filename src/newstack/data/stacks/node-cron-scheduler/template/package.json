@@ -1,0 +1,17 @@
+{
+  "name": "{{ npm_name }}",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "{{ description }}",
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "node-cron": "^3.0.3"
+  },
+  "engines": {
+    "node": ">={{ node_version }}"
+  }
+}

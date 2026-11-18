@@ -1,0 +1,71 @@
+{
+  "name": "rust-csv-stats-cli",
+  "title": "Rust CSV Stats CLI",
+  "language": "rust",
+  "blurb": "Rust CLI (clap 4 + csv 1 + serde) computing per-column stats (count/min/max/mean/unique) from a CSV",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust CLI that computes per-column statistics from a CSV file.",
+  "next_steps": [
+    "cd {path}",
+    "cargo run -- tests/fixtures/stats.csv"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml",
+      "contains": "csv ="
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/cli.rs"
+  ]
+}

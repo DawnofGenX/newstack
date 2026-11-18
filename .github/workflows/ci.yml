@@ -188,6 +188,10 @@ jobs:
           - python-jsonschema-validator
           - node-openapi-mock-server
           - rust-config-loader
+          - go-prometheus-metrics
+          - node-graphql-api
+          - python-bs4-scraper
+          - rust-axum-ws
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -261,7 +265,7 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-maven-cli","java-picocli-cli","kotlin-cli","kotlin-http-api","kotlin-ktor-api","spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-jdbc-sqlite-api","java-maven-cli","java-picocli-cli","kotlin-cli","kotlin-http-api","kotlin-ktor-api","spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -777,6 +781,10 @@ jobs:
           - python-content-addressed-store
           - node-csv-stream-cli
           - elixir-gen-server
+          - go-rate-limiter
+          - node-markdown-site
+          - python-cryptography-vault
+          - rust-csv-stats-cli
     steps: *shared_setup
 
   stacks-c:
@@ -874,6 +882,10 @@ jobs:
           - python-image-thumbnailer
           - python-graphql-api
           - go-slog-middleware
+          - go-csv-etl
+          - java-jdbc-sqlite-api
+          - node-qr-cli
+          - python-duckdb-analytics
     steps: *shared_setup
 
   stacks-d:
@@ -971,6 +983,10 @@ jobs:
           - python-xlsx-report
           - python-csv-importer
           - go-sqlite-migrate
+          - go-http-proxy
+          - node-cron-scheduler
+          - node-sqlite-api
+          - python-typer-cli
     steps: *shared_setup
 
   package:

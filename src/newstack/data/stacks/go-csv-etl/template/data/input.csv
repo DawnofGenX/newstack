@@ -1,0 +1,5 @@
+id,email,amount
+1,alice@example.com,10.50
+2,bob@example.com,20.00
+1,alice@example.com,999.00
+3,carol@example.com,5.25

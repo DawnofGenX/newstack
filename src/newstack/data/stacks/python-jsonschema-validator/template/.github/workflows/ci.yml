@@ -1,13 +1,27 @@
 name: ci
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [{{ python_versions }}]
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v10.3.3
-      - run: uv python install 3.12
-      - run: uv venv --allow-existing .venv && uv pip install -e . pytest jsonschema ruff
-      - run: .venv/bin/ruff check .
-      - run: .venv/bin/python -m pytest
-      - run: .venv/bin/python -m {{ package_name }} --selftest
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
+      - name: Install the project
+        run: |
+          uv venv --python ${{ matrix.python-version }}
+          uv pip install -e . pytest jsonschema ruff
+      - name: Lint
+        run: uv run ruff check .
+      - name: Test
+        run: uv run pytest
+      - name: Offline contract check
+        run: uv run python -m {{ package_name }} --selftest

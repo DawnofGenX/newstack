@@ -249,21 +249,34 @@ $ newstack stacks outdated
 | --- | --- | --- |
 | `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
 | `go-cobra-cli` | cobra subcommands with go test and a smoke run of the binary | go |
+| `go-csv-etl` | Read, validate, dedupe, and aggregate CSV to JSON | go |
 | `go-echo-api` | labstack/echo JSON service with httptest tests and curl smoke | go |
+| `go-http-proxy` | Reverse proxy with hop-by-hop stripping and X-Forwarded-For injection | go |
+| `go-prometheus-metrics` | Service exposing Prometheus text exposition with counter and histogram | go |
+| `go-rate-limiter` | Token-bucket HTTP rate limiter middleware with 429 + Retry-After | go |
 | `go-slog-middleware` | net/http + log/slog middleware: request id, structured logging, panic recovery, auth redaction. | go |
 | `go-sqlite-migrate` | Embedded SQL migrations with an applied-version table, checksums, and status. | go |
+| `java-jdbc-sqlite-api` | Java 21 + Maven + com.sun.net.httpserver over JDBC with sqlite-jdbc: CRUD on a notes table, /health; JUnit 5 tests | java |
 | `java-picocli-cli` | picocli CLI on Maven with JUnit 5 tests and a shaded jar smoke | java |
 | `node-commander-cli` | commander subcommands with assertion-based tests | node |
+| `node-cron-scheduler` | In-process scheduler (dep: node-cron) that registers jobs, runs them, and records last-run/last-error in a small JSON store | node |
 | `node-csv-stream-cli` | RFC 4180 streaming CSV parser/serializer on Node streams with csv2json/json2csv CLI. | node |
+| `node-graphql-api` | GraphQL server with graphql + graphql-yoga: schema with Query.notes / Mutation.addNote, in-memory store, node --test resolvers, live curl | node |
+| `node-markdown-site` | Static site generator (deps: marked + gray-matter): reads markdown with frontmatter, writes HTML with a layout; tests assert title/body escaping | node |
 | `node-openapi-mock-server` | Zero-dependency OpenAPI 3 mock server: example-first responses, schema-shaped defaults, 404/405, required param validation. | node |
+| `node-qr-cli` | CLI that renders QR codes (dep: qrcode) to a PNG and a terminal renderer; tests assert PNG magic bytes and size | node |
+| `node-sqlite-api` | HTTP CRUD over Node's built-in node:sqlite: a notes table, GET/POST/DELETE, /health, node --test unit tests and a live contract | node |
 | `node-sse-api` | Server-sent events service on bare Node: a replayable event log, Last-Event-ID resumption, heartbeat comments, node --test plus a live streaming contract | node |
 | `node-trpc-api` | tRPC v11 router with a direct server-side caller test and HTTP smoke over plain fetch | node |
 | `python-aiohttp-api` | aiohttp JSON service with health and stats endpoints, curl smoke | python |
 | `python-alembic-migrations` | Alembic with SQLite and two revisions; smoke upgrades and asserts schema | python |
 | `python-apscheduler-worker` | APScheduler interval job writing rows to SQLite; CLI runs N ticks | python |
+| `python-bs4-scraper` | Offline HTML table/card extractor built on beautifulsoup4 | python |
 | `python-click-cli` | Click command group with subcommands, CliRunner tests, and an entry point | python |
 | `python-content-addressed-store` | Dependency-free content-addressed blob store with atomic writes, dedupe, verify and gc | python |
+| `python-cryptography-vault` | Encrypt and decrypt files with Fernet and a PBKDF2-derived key | python |
 | `python-csv-importer` | CSV to SQLite importer: header mapping, type coercion, per-row errors with line numbers, single-transaction batch, dry-run, idempotent upsert | python |
+| `python-duckdb-analytics` | Analytical queries with DuckDB over a bundled CSV fixture | python |
 | `python-fastapi-jwt-auth` | FastAPI service issuing HS256 JWTs: /token login, /me protected route, 401 with WWW-Authenticate | python |
 | `python-graphql-api` | graphql-core schema on stdlib http.server: arguments, resolver errors with paths, aliases, variables, POST /graphql and GET /health | python |
 | `python-image-thumbnailer` | Pillow thumbnails: EXIF orientation, aspect-preserving max box, JPEG quality, RGBA/palette, batch with per-file errors | python |
@@ -283,6 +296,7 @@ $ newstack stacks outdated
 | `python-sqlite-fts` | SQLite FTS5 external-content index: porter tokenizer, bm25 ranking, snippets, query escaping | python |
 | `python-sse-api` | Server-sent events: an endless `text/event-stream` response, `Last-Event-ID` resume, proxy-proof headers, and a socket test that fails if the body is buffered | `uv` |
 | `python-scheduler-api` | A durable scheduler: due jobs claimed under `BEGIN IMMEDIATE`, interval jobs rescheduled from *now* so an overdue job does not stampede, exponential back-off capped by `max_attempts`, and a run ledger with the counts of every attempt | `uv` |
+| `python-typer-cli` | Typer task tracker with JSON persistence, pytest tests, and a smoke run | python |
 | `python-webhook-receiver` | Signed webhooks: HMAC-SHA256 over the *raw* body (a parsed and re-serialised body never matches), a both-directions replay window, `hmac.compare_digest`, idempotency enforced by an event-id primary key, and a 401 before any parser sees the payload | `uv` |
 | `python-litestar-api` | Litestar 2 text-statistics API: the handler takes `Request` instead of a validated parameter so `422` stays the project's answer, `raw_path` already carries the query string, and every rule lives in a pure `route()` function with a TestClient suite on top | `uv` |
 | `python-eval-harness` | Offline eval harness: JSONL gold + predictions, `exact_match`/`token_f1`, a missing prediction scores zero instead of shrinking the denominator, and `compare` exits 1 on a per-example regression | `uv` |
@@ -442,7 +456,9 @@ $ newstack stacks outdated
 | `python-tim-sort` | tim sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `python-intro-sort` | intro sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `rust-axum-ws` | Rust axum 0.8 WebSocket echo/broadcast server (axum ws, tokio, futures-util): /health plus /ws, broadcast to all subscribers | rust |
 | `rust-config-loader` | Layered configuration (defaults < file < env < CLI) with typed errors and a .env parser. | rust |
+| `rust-csv-stats-cli` | Rust CLI (clap 4 + csv 1 + serde) computing per-column stats (count/min/max/mean/unique) from a CSV | rust |
 | `rust-jsonrpc-stdio` | JSON-RPC 2.0 server over stdin/stdout: request types, notifications, batches, spec error codes, and the exact framing an LSP-style client expects | rust |
 | `rust-tracing-service` | tracing + tracing-subscriber JSON output with a small HTTP service | rust |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |

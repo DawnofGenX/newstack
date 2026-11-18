@@ -1,0 +1,49 @@
+{
+  "name": "go-http-proxy",
+  "title": "Go HTTP Proxy",
+  "language": "go",
+  "blurb": "Reverse proxy with hop-by-hop stripping and X-Forwarded-For injection",
+  "default_description": "A Go reverse proxy service.",
+  "port": 5541,
+  "requires": ["go", "git"],
+  "next_steps": [
+    "cd {path}",
+    "UPSTREAM=http://127.0.0.1:5542 go run .",
+    "curl -sS http://127.0.0.1:5541/health"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": ["go"],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": ["go"],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/server .",
+      "tools": ["go"],
+      "timeout": 600
+    },
+    {
+      "name": "http",
+      "cmd": "bash smoke.sh",
+      "tools": ["bash", "curl"],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "proxy.go",
+      "contains": "httputil.ReverseProxy"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["proxy_test.go"]
+}
