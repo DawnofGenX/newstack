@@ -1,0 +1,51 @@
+{
+  "name": "php-html-sanitizer",
+  "title": "PHP HTML Sanitizer",
+  "language": "php",
+  "blurb": "Allowlist HTML sanitizer on DOMDocument: drops script/style with content, strips event handlers and javascript: hrefs; PHPUnit tests",
+  "requires": [
+    "php",
+    "composer",
+    "git"
+  ],
+  "default_description": "A PHP HTML sanitizer that keeps only allowlisted markup.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "vendor/bin/phpunit",
+    "php src/main.php '<p>hi</p><script>alert(1)</script>'"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction && vendor/bin/phpunit",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "php",
+        "composer"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Sanitizer.php",
+      "contains": "php-html-sanitizer"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

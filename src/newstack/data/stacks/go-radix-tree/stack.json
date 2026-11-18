@@ -1,0 +1,64 @@
+{
+  "name": "go-radix-tree",
+  "title": "Go Radix Tree",
+  "language": "go",
+  "blurb": "Compressed radix tree with edge splitting, longest prefix match and sorted key walk, JSON CLI.",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "A compressed radix tree with longest prefix matching.",
+  "next_steps": [
+    "cd {path}",
+    "go build -o bin/app .",
+    "./bin/app -set romane=1,romanus=2 -match romanesque"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/{{ npm_name }} .",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "radix.go",
+      "contains": "type Tree struct"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "radix_test.go"
+  ]
+}

@@ -212,6 +212,8 @@ jobs:
           - go-ulid-cli
           - rust-bitfield-cli
           - ruby-luhn-cli
+          - go-levenshtein
+          - kotlin-money-ledger
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -286,7 +288,7 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-config-loader","java-csv-mapper","java-http-client-api","java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","java-rate-limiter","java-template-engine","kotlin-cli","kotlin-coroutines-pipeline","kotlin-csv-report","kotlin-html-builder","kotlin-http-api","kotlin-json-dsl","kotlin-ktor-api","spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-config-loader","java-csv-mapper","java-http-client-api","java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","java-rate-limiter","java-template-engine","kotlin-cli","kotlin-coroutines-pipeline","kotlin-csv-report","kotlin-html-builder","kotlin-http-api","kotlin-json-dsl","kotlin-ktor-api","kotlin-money-ledger","spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -598,7 +600,7 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["laravel-app","php-composer-cli","php-csv-report","php-jwt-cli","php-markdown-cli","php-slim-api","php-sqlite-queue","symfony-app"]'), matrix.stack)
+        if: contains(fromJSON('["laravel-app","php-composer-cli","php-csv-report","php-jwt-cli","php-markdown-cli","php-html-sanitizer","php-slim-api","php-sqlite-queue","symfony-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
@@ -826,6 +828,8 @@ jobs:
           - go-url-signer
           - java-config-loader
           - elixir-csv-filter
+          - go-radix-tree
+          - php-html-sanitizer
     steps: *shared_setup
 
   stacks-c:
@@ -947,6 +951,8 @@ jobs:
           - go-cuckoo-filter
           - rust-csv-to-json
           - csharp-slug-cli
+          - node-jwt-cli
+          - rust-token-bucket
     steps: *shared_setup
 
   stacks-d:
@@ -1068,6 +1074,8 @@ jobs:
           - go-semver-cli
           - rust-mini-sed
           - php-markdown-cli
+          - node-csv-stats
+          - rust-merge-sorted
     steps: *shared_setup
 
   package:

@@ -1,0 +1,70 @@
+{
+  "name": "node-jwt-cli",
+  "title": "Node JWT CLI",
+  "language": "node",
+  "blurb": "HS256 JWT sign, verify and decode on node:crypto: exp/nbf with leeway, alg pinning, timing safe compare.",
+  "requires": [
+    "node",
+    "npm"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "An HS256 JWT signer and verifier built on node:crypto.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "node src/cli.js sign --secret s3cr3t --payload '{{\"sub\":\"alice\"}}'"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "node"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/jwt.js",
+      "contains": "function base64url"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/jwt.test.js"
+  ]
+}

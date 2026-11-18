@@ -267,9 +267,11 @@ $ newstack stacks outdated
 | `go-http-proxy` | Reverse proxy with hop-by-hop stripping and X-Forwarded-For injection | go |
 | `go-hyperloglog` | HyperLogLog cardinality estimator CLI. | go |
 | `go-jsonl-query` | Streaming JSONL query CLI (field select, where filter, count), bufio.Scanner based, tests with temp files. | go |
+| `go-levenshtein` | Levenshtein edit distance over runes plus closest match lookup, JSON output, table driven tests. | go |
 | `go-lru-cache` | Generic LRU cache with TTL and max-size eviction, hit/miss stats, CLI demo replaying an access trace. | go |
 | `go-priority-queue` | container/heap priority queue with stable FIFO tie-break, Peek/Pop/Push, CLI scheduling tasks from stdin. | go |
 | `go-prometheus-metrics` | Service exposing Prometheus text exposition with counter and histogram | go |
+| `go-radix-tree` | Compressed radix tree with edge splitting, longest prefix match and sorted key walk, JSON CLI. | go |
 | `go-rate-limiter` | Token-bucket HTTP rate limiter middleware with 429 + Retry-After | go |
 | `go-retry-client` | HTTP client with capped exponential backoff + jitter using httptest servers for retry/limit/non-retryable tests. | go |
 | `go-semver-cli` | Semantic version parse/compare/satisfies with prerelease ordering, caret, tilde and x-ranges. | go |
@@ -294,8 +296,10 @@ $ newstack stacks outdated
 | `kotlin-csv-report` | CSV parser and report aggregator CLI with JUnit5 tests, Gradle Kotlin DSL | kotlin |
 | `kotlin-html-builder` | Type-safe HTML builder DSL, Kotlin + Gradle Kotlin DSL + JUnit 5, escaping and attribute handling, main renders a page | kotlin |
 | `kotlin-json-dsl` | Gradle Kotlin type-safe JSON DSL with deterministic serialization | kotlin |
+| `kotlin-money-ledger` | BigDecimal double-entry ledger CLI: exact money arithmetic, per-account balances, trial balance; JUnit5 tests | kotlin |
 | `node-commander-cli` | commander subcommands with assertion-based tests | node |
 | `node-cron-scheduler` | In-process scheduler (dep: node-cron) that registers jobs, runs them, and records last-run/last-error in a small JSON store | node |
+| `node-csv-stats` | RFC 4180 CSV parser plus per column profiling: empty counts, distinct values, numeric min/max/mean. | node |
 | `node-csv-stream-cli` | RFC 4180 streaming CSV parser/serializer on Node streams with csv2json/json2csv CLI. | node |
 | `node-diff-cli` | Unified diff CLI: diff -u style output, --stat summary, --apply patch mode | node |
 | `node-env-schema` | Dotenv parser plus typed schema validation: numbers, booleans, urls, enums, defaults, unknown-key errors. | node |
@@ -304,6 +308,7 @@ $ newstack stacks outdated
 | `node-hmac-signer-cli` | HMAC-SHA256 request signer/verifier CLI (node:crypto only), timing-safe verify with timestamp tolerance. | node |
 | `node-hono-api` | Hono HTTP JSON API (CRUD over in-memory store), typed routes, contract check via curl in smoke.sh. | node |
 | `node-json-patch-cli` | RFC 6902 JSON Patch apply + diff, tests for add/remove/replace/move/copy/test and a failure case. | node |
+| `node-jwt-cli` | HS256 JWT sign, verify and decode on node:crypto: exp/nbf with leeway, alg pinning, timing safe compare. | node |
 | `node-markdown-lint` | Markdown linter: headings, fences, trailing spaces, line length. | node |
 | `node-markdown-site` | Static site generator (deps: marked + gray-matter): reads markdown with frontmatter, writes HTML with a layout; tests assert title/body escaping | node |
 | `node-markdown-toc-cli` | Markdown table-of-contents CLI: ATX, setext, code fences, duplicate heading slugs, --write | node |
@@ -325,6 +330,7 @@ $ newstack stacks outdated
 | `node-url-normalizer` | URL normalization: host casing, default ports, query sorting, tracking params. | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
 | `php-csv-report` | CSV parser and report aggregator CLI with PHPUnit tests, Composer autoload | php |
+| `php-html-sanitizer` | Allowlist HTML sanitizer on DOMDocument: drops script/style with content, strips event handlers and javascript: hrefs; PHPUnit tests | php |
 | `php-jwt-cli` | HS256 JWT sign/verify CLI: base64url encode/decode, hash_equals, exp validation with an injected clock; PHPUnit tests | php |
 | `php-markdown-cli` | Markdown to HTML converter CLI (headers, lists, code, inline formatting) with PHPUnit tests | php |
 | `php-slim-api` | Slim 4 API with a JSON endpoint, PHPUnit test, composer.json | php |
@@ -532,12 +538,14 @@ $ newstack stacks outdated
 | `rust-jsonpath-cli` | JSONPath expression evaluator CLI (serde_json) with nested/array/wildcard support and integration tests | rust |
 | `rust-jsonrpc-stdio` | JSON-RPC 2.0 server over stdin/stdout: request types, notifications, batches, spec error codes, and the exact framing an LSP-style client expects | rust |
 | `rust-lru-cache` | Generic LRU cache library with capacity eviction, get/put/peek and unit tests | rust |
+| `rust-merge-sorted` | K-way merge of pre-sorted integer runs (BinaryHeap over value/run/position) with a file-merge CLI. | rust |
 | `rust-mini-grep` | Recursive regex grep CLI (walkdir + regex crates) with -i/-n/-c flags and integration tests | rust |
 | `rust-mini-sed` | Minimal sed-style substitution CLI (regex crate) with global flag and integration tests | rust |
 | `rust-ring-buffer` | Generic fixed-capacity ring buffer with overwrite-on-full, push/pop/front/back and unit tests | rust |
 | `rust-semver-cli` | Semver parse/compare/bump CLI with table-driven tests | rust |
 | `rust-sha256-tree` | Merkle tree over a file list with inclusion proofs and a pinned root digest | rust |
 | `rust-threadpool` | Fixed-size worker thread pool library + CLI demo: submit jobs over a channel, results collected, graceful shutdown | rust |
+| `rust-token-bucket` | Token bucket limiter with injectable ms clock: burst, fractional refill, acquire_n, time_until. | rust |
 | `rust-toml-lite` | Minimal TOML subset parser (tables, scalars, arrays) with a CLI printing normalized JSON, std only | rust |
 | `rust-tracing-service` | tracing + tracing-subscriber JSON output with a small HTTP service | rust |
 | `rust-url-shortener` | Std-only HTTP URL shortener: base62 ids, POST create, GET redirect, thread per connection | rust |

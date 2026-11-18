@@ -1,0 +1,71 @@
+{
+  "name": "rust-merge-sorted",
+  "title": "Rust Merge Sorted",
+  "language": "rust",
+  "blurb": "K-way merge of pre-sorted integer runs (BinaryHeap over value/run/position) with a file-merge CLI.",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust library and CLI that merges pre-sorted integer files.",
+  "next_steps": [
+    "cd {path}",
+    "cargo run -- a.txt b.txt"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/lib.rs",
+      "contains": "pub fn merge_sorted"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/merge.rs"
+  ]
+}
