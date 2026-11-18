@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative '../lib/csv_report'
+
+exit CsvReport::CLI.new(stdout: $stdout, stderr: $stderr, stdin: $stdin).run(ARGV)

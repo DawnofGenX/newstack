@@ -1,0 +1,24 @@
+{
+  "name": "go-concurrent-map",
+  "title": "Go Concurrent Map",
+  "language": "go",
+  "blurb": "Sharded concurrent map (RWMutex), range iteration, correctness tests plus a testing.B benchmark.",
+  "requires": ["go"],
+  "go": { "minimum": "1.22" },
+  "default_description": "A sharded concurrent map.",
+  "next_steps": [
+    "cd {path}",
+    "go test ./...",
+    "go test -bench=. ./..."
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "go"], "timeout": 600 }
+  ],
+  "detect": [{ "file": "internal/cmap/cmap.go", "contains": "func (m *Map[K, V]) Range" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["internal/cmap/cmap_test.go"]
+}

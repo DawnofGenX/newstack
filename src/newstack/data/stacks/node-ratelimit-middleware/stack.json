@@ -1,0 +1,25 @@
+{
+  "name": "node-ratelimit-middleware",
+  "title": "Node Rate Limit Middleware",
+  "language": "node",
+  "blurb": "Plain node:http server with token-bucket rate limiting, 429 + Retry-After, /stats endpoint.",
+  "requires": ["node", "npm"],
+  "node": { "minimum": "22", "versions": ["22", "24"] },
+  "package_manager": ["npm", "pnpm", "yarn"],
+  "default_description": "A rate-limited node:http server.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "PORT=5590 npm start"
+  ],
+  "verify": [
+    { "name": "install", "cmd": "npm install --no-audit --no-fund", "tools": ["npm"], "timeout": 900 },
+    { "name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "node", "curl"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "src/limiter.js", "contains": "createLimiter" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["tests/limiter.test.js"]
+}

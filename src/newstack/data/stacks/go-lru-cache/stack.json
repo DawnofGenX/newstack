@@ -1,0 +1,24 @@
+{
+  "name": "go-lru-cache",
+  "title": "Go LRU Cache",
+  "language": "go",
+  "blurb": "Generic LRU cache with TTL and max-size eviction, hit/miss stats, CLI demo replaying an access trace.",
+  "requires": ["go"],
+  "go": { "minimum": "1.22" },
+  "default_description": "A generic LRU cache with TTL.",
+  "next_steps": [
+    "cd {path}",
+    "go test ./...",
+    "go run ."
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "go"], "timeout": 600 }
+  ],
+  "detect": [{ "file": "internal/cache/cache.go", "contains": "func New[K comparable, V any]" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["internal/cache/cache_test.go"]
+}

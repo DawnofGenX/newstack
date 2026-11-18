@@ -1,0 +1,63 @@
+{
+  "name": "rust-toml-lite",
+  "title": "Rust TOML Lite",
+  "language": "rust",
+  "blurb": "Minimal TOML subset parser (tables, scalars, arrays) with a CLI printing normalized JSON, std only",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust TOML parser command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "cargo test",
+    "cargo run -- file.toml"
+  ],
+  "verify": [
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml",
+      "contains": "toml-lite"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

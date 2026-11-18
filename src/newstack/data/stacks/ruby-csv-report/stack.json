@@ -1,0 +1,49 @@
+{
+  "name": "ruby-csv-report",
+  "title": "Ruby CSV Report",
+  "language": "ruby",
+  "blurb": "stdlib CSV report builder: group-by column, per-group aggregates, aligned table + JSON output; minitest + Rakefile",
+  "requires": [
+    "ruby",
+    "git"
+  ],
+  "default_description": "A Ruby CSV report command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "bin/{{ npm_name }} data.csv --group department"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "ruby",
+        "rake"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/csv_report.rb",
+      "contains": "ruby-csv-report"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

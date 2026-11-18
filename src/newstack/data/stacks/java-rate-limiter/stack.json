@@ -1,0 +1,59 @@
+{
+  "name": "java-rate-limiter",
+  "title": "Java Rate Limiter",
+  "language": "java",
+  "blurb": "Token-bucket rate limiter, Java 21, Maven + JUnit 5, virtual-clock tests, plus a main class demo",
+  "requires": [
+    "java",
+    "mvn",
+    "git"
+  ],
+  "default_description": "A Java rate limiter command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "mvn -q test",
+    "mvn -q package"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "mvn -q test",
+      "tools": [
+        "java",
+        "mvn"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "mvn -q package",
+      "tools": [
+        "java",
+        "mvn"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "java",
+        "mvn"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "pom.xml",
+      "contains": "rate-limiter"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

@@ -1,0 +1,59 @@
+{
+  "name": "kotlin-html-builder",
+  "title": "Kotlin HTML Builder",
+  "language": "kotlin",
+  "blurb": "Type-safe HTML builder DSL, Kotlin + Gradle Kotlin DSL + JUnit 5, escaping and attribute handling, main renders a page",
+  "requires": [
+    "java",
+    "gradle",
+    "git"
+  ],
+  "default_description": "A Kotlin HTML builder command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "gradle test",
+    "gradle run"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "gradle test",
+      "tools": [
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "run",
+      "cmd": "gradle run",
+      "tools": [
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "build.gradle.kts",
+      "contains": "kotlin-html-builder"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

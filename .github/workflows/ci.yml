@@ -200,6 +200,10 @@ jobs:
           - go-circuit-breaker
           - rust-sha256-tree
           - php-sqlite-queue
+          - node-template-render-cli
+          - go-text-search
+          - rust-job-queue
+          - ruby-csv-report
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -268,13 +272,13 @@ jobs:
       # Stacks with no Gemfile: rake and the stdlib are enough, so the bundler
       # cache that ruby-sinatra/rails-app rely on would only add a failure mode.
       - name: Set up Ruby (no bundle)
-        if: contains(fromJSON('["ruby-cli","ruby-hmac-webhook","ruby-i18n-cli"]'), matrix.stack)
+        if: contains(fromJSON('["ruby-cli","ruby-csv-report","ruby-hmac-webhook","ruby-i18n-cli"]'), matrix.stack)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-csv-mapper","java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","kotlin-cli","kotlin-coroutines-pipeline","kotlin-http-api","kotlin-json-dsl","kotlin-ktor-api","spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-csv-mapper","java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","java-rate-limiter","kotlin-cli","kotlin-coroutines-pipeline","kotlin-html-builder","kotlin-http-api","kotlin-json-dsl","kotlin-ktor-api","spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -586,14 +590,14 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["php-composer-cli","php-slim-api","php-sqlite-queue","symfony-app","laravel-app"]'), matrix.stack)
+        if: contains(fromJSON('["php-composer-cli","php-jwt-cli","php-slim-api","php-sqlite-queue","symfony-app","laravel-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           extensions: ctype, fileinfo, mbstring, pdo_sqlite, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["csharp-cli","csharp-csv-report","csharp-minimal-api","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
+        if: contains(fromJSON('["csharp-cli","csharp-csv-report","csharp-jsonl-cli","csharp-minimal-api","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -802,6 +806,10 @@ jobs:
           - elixir-pubsub
           - java-csv-mapper
           - ruby-i18n-cli
+          - node-ratelimit-middleware
+          - go-concurrent-map
+          - java-rate-limiter
+          - csharp-jsonl-cli
     steps: *shared_setup
 
   stacks-c:
@@ -911,6 +919,10 @@ jobs:
           - go-bloom-filter
           - rust-threadpool
           - kotlin-json-dsl
+          - node-hmac-signer-cli
+          - go-lru-cache
+          - rust-toml-lite
+          - kotlin-html-builder
     steps: *shared_setup
 
   stacks-d:
@@ -1020,6 +1032,10 @@ jobs:
           - go-sse-broker
           - rust-base64-cli
           - csharp-csv-report
+          - node-semver-range-cli
+          - go-priority-queue
+          - rust-url-shortener
+          - php-jwt-cli
     steps: *shared_setup
 
   package:

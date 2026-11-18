@@ -12,6 +12,6 @@ jobs:
           go-version-file: go.mod
       - run: go vet ./...
       - run: go test ./...
-      - run: go build -o bin/jsonlq .
+      - run: go build -o bin/{{ npm_name }} .
       - name: Smoke
         run: bash smoke.sh

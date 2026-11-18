@@ -1,0 +1,63 @@
+{
+  "name": "rust-url-shortener",
+  "title": "Rust URL Shortener",
+  "language": "rust",
+  "blurb": "Std-only HTTP URL shortener: base62 ids, POST create, GET redirect, thread per connection",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust URL shortener command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "cargo test",
+    "cargo run -- 5591"
+  ],
+  "verify": [
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml",
+      "contains": "url-shortener"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

@@ -1,0 +1,24 @@
+{
+  "name": "go-priority-queue",
+  "title": "Go Priority Queue",
+  "language": "go",
+  "blurb": "container/heap priority queue with stable FIFO tie-break, Peek/Pop/Push, CLI scheduling tasks from stdin.",
+  "requires": ["go"],
+  "go": { "minimum": "1.22" },
+  "default_description": "A priority queue with stable FIFO tie-break.",
+  "next_steps": [
+    "cd {path}",
+    "go test ./...",
+    "printf '3 build\\n1 test\\n' | go run ."
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "go"], "timeout": 600 }
+  ],
+  "detect": [{ "file": "internal/pq/pq.go", "contains": "func (q *PriorityQueue) Push" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["internal/pq/pq_test.go"]
+}

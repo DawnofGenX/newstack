@@ -1,0 +1,24 @@
+{
+  "name": "go-text-search",
+  "title": "Go Text Search",
+  "language": "go",
+  "blurb": "Boyer-Moore-Horspool substring search with line/column reporting; CLI searches a file for a pattern.",
+  "requires": ["go"],
+  "go": { "minimum": "1.22" },
+  "default_description": "A Boyer-Moore-Horspool text search CLI.",
+  "next_steps": [
+    "cd {path}",
+    "go test ./...",
+    "go run . pattern file.txt"
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "go"], "timeout": 600 }
+  ],
+  "detect": [{ "file": "internal/search/search.go", "contains": "func Search(text, pattern string)" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["internal/search/search_test.go"]
+}
