@@ -1,0 +1,6 @@
+/_build/
+/deps/
+*.ez
+erl_crash.dump
+/{{ npm_name }}
+/.elixir_ls/

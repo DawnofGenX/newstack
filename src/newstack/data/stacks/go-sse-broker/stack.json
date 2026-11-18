@@ -1,0 +1,24 @@
+{
+  "name": "go-sse-broker",
+  "title": "Go SSE Broker",
+  "language": "go",
+  "blurb": "Server-Sent-Events broker: /events stream, /publish POST, fan-out, heartbeats",
+  "requires": ["go", "git"],
+  "default_description": "A Server-Sent-Events broker.",
+  "next_steps": [
+    "cd {path}",
+    "go test ./...",
+    "go build -o bin/ssebroker .",
+    "./bin/ssebroker"
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build -o bin/ssebroker .", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "main.go", "contains": "eventsHandler" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["broker_test.go"]
+}

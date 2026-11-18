@@ -1,0 +1,17 @@
+{
+  "name": "php-sqlite-queue",
+  "title": "PHP SQLite Queue",
+  "language": "php",
+  "blurb": "PHP 8.3 PDO SQLite durable job queue CLI with PHPUnit tests",
+  "requires": ["php","composer","git"],
+  "default_description": "A PHP CLI durable job queue backed by SQLite.",
+  "next_steps": ["cd {path}", "composer install", "php bin/queue push \"job\""],
+  "verify": [
+    {"name":"install","cmd":"composer install --no-interaction --prefer-dist","tools":["composer","php"],"timeout":1800},
+    {"name":"test","cmd":"vendor/bin/phpunit","tools":["php"],"timeout":1800},
+    {"name":"smoke","cmd":"bash smoke.sh","tools":["bash","php","composer"],"timeout":1800}
+  ],
+  "detect": [{"file":"src/Queue.php","contains":"class Queue"}],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml",".gitignore"]
+}

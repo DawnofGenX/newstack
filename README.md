@@ -247,8 +247,12 @@ $ newstack stacks outdated
 
 | Stack | What you get | Toolchain |
 | --- | --- | --- |
+| `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
 | `csharp-minimal-api` | ASP.NET Core minimal API with /health and an in-memory resource, xunit tests via WebApplicationFactory | csharp |
 | `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
+| `elixir-pubsub` | GenServer-based in-process pub/sub with topic subscriptions and at-least-once delivery | elixir |
+| `go-bloom-filter` | Bloom filter library plus CLI (add, check, stats), fixed-size bit array, double hashing FNV-64a | go |
+| `go-circuit-breaker` | Circuit breaker state machine (closed/open/half-open) with clock-driven CLI | go |
 | `go-cobra-cli` | cobra subcommands with go test and a smoke run of the binary | go |
 | `go-csv-etl` | Read, validate, dedupe, and aggregate CSV to JSON | go |
 | `go-echo-api` | labstack/echo JSON service with httptest tests and curl smoke | go |
@@ -260,26 +264,34 @@ $ newstack stacks outdated
 | `go-retry-client` | HTTP client with capped exponential backoff + jitter using httptest servers for retry/limit/non-retryable tests. | go |
 | `go-slog-middleware` | net/http + log/slog middleware: request id, structured logging, panic recovery, auth redaction. | go |
 | `go-sqlite-migrate` | Embedded SQL migrations with an applied-version table, checksums, and status. | go |
+| `go-sse-broker` | Server-Sent-Events broker: /events stream, /publish POST, fan-out, heartbeats | go |
 | `go-tar-extractor` | Safe tar.gz extractor that rejects path traversal and absolute paths, tests for both rejections and a good archive. | go |
+| `java-csv-mapper` | Maven Java 21 CSV-to-typed-records mapper with strict validation and a CLI | java |
 | `java-jdbc-sqlite-api` | Java 21 + Maven + com.sun.net.httpserver over JDBC with sqlite-jdbc: CRUD on a notes table, /health; JUnit 5 tests | java |
 | `java-json-flatten` | Jackson-based JSON flattener CLI (dotted keys) with JUnit tests, Maven compiler release 21 | java |
 | `java-picocli-cli` | picocli CLI on Maven with JUnit 5 tests and a shaded jar smoke | java |
 | `kotlin-coroutines-pipeline` | Gradle Kotlin DSL coroutines pipeline: staged fan-out/fan-in over a fake source, kotlinx-coroutines-test, JUnit5 | kotlin |
+| `kotlin-json-dsl` | Gradle Kotlin type-safe JSON DSL with deterministic serialization | kotlin |
 | `node-commander-cli` | commander subcommands with assertion-based tests | node |
 | `node-cron-scheduler` | In-process scheduler (dep: node-cron) that registers jobs, runs them, and records last-run/last-error in a small JSON store | node |
 | `node-csv-stream-cli` | RFC 4180 streaming CSV parser/serializer on Node streams with csv2json/json2csv CLI. | node |
+| `node-diff-cli` | Unified diff CLI: diff -u style output, --stat summary, --apply patch mode | node |
+| `node-feature-flags` | Percentage-rollout feature flag evaluator: stable hashing, HTTP flag-set endpoint | node |
 | `node-graphql-api` | GraphQL server with graphql + graphql-yoga: schema with Query.notes / Mutation.addNote, in-memory store, node --test resolvers, live curl | node |
 | `node-hono-api` | Hono HTTP JSON API (CRUD over in-memory store), typed routes, contract check via curl in smoke.sh. | node |
 | `node-json-patch-cli` | RFC 6902 JSON Patch apply + diff, tests for add/remove/replace/move/copy/test and a failure case. | node |
 | `node-markdown-site` | Static site generator (deps: marked + gray-matter): reads markdown with frontmatter, writes HTML with a layout; tests assert title/body escaping | node |
+| `node-markdown-toc-cli` | Markdown table-of-contents CLI: ATX, setext, code fences, duplicate heading slugs, --write | node |
 | `node-openapi-mock-server` | Zero-dependency OpenAPI 3 mock server: example-first responses, schema-shaped defaults, 404/405, required param validation. | node |
 | `node-qr-cli` | CLI that renders QR codes (dep: qrcode) to a PNG and a terminal renderer; tests assert PNG magic bytes and size | node |
 | `node-sqlite-api` | HTTP CRUD over Node's built-in node:sqlite: a notes table, GET/POST/DELETE, /health, node --test unit tests and a live contract | node |
+| `node-sqlite-import` | Import a CSV into SQLite (node:sqlite) and query it from the CLI | node |
 | `node-sse-api` | Server-sent events service on bare Node: a replayable event log, Last-Event-ID resumption, heartbeat comments, node --test plus a live streaming contract | node |
 | `node-totp-cli` | RFC 6238 TOTP generator/verifier (node:crypto only, no deps), tests with the RFC test vectors. | node |
 | `node-trpc-api` | tRPC v11 router with a direct server-side caller test and HTTP smoke over plain fetch | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
 | `php-slim-api` | Slim 4 API with a JSON endpoint, PHPUnit test, composer.json | php |
+| `php-sqlite-queue` | PHP 8.3 PDO SQLite durable job queue CLI with PHPUnit tests | php |
 | `python-aiohttp-api` | aiohttp JSON service with health and stats endpoints, curl smoke | python |
 | `python-alembic-migrations` | Alembic with SQLite and two revisions; smoke upgrades and asserts schema | python |
 | `python-apscheduler-worker` | APScheduler interval job writing rows to SQLite; CLI runs N ticks | python |
@@ -469,13 +481,17 @@ $ newstack stacks outdated
 | `python-intro-sort` | intro sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `ruby-hmac-webhook` | Ruby webhook signature verifier: Stripe-style HMAC-SHA256 signing, constant-time comparison and a timestamp tolerance window, stdlib only, minitest suite run by rake | ruby |
+| `ruby-i18n-cli` | Stdlib-only Ruby locale fallback resolver with YAML and minitest | ruby |
 | `rust-axum-ws` | Rust axum 0.8 WebSocket echo/broadcast server (axum ws, tokio, futures-util): /health plus /ws, broadcast to all subscribers | rust |
+| `rust-base64-cli` | Base64 encode/decode CLI with -d/--decode, --url-safe, --no-pad, and stdin support | rust |
 | `rust-config-loader` | Layered configuration (defaults < file < env < CLI) with typed errors and a .env parser. | rust |
 | `rust-csv-stats-cli` | Rust CLI (clap 4 + csv 1 + serde) computing per-column stats (count/min/max/mean/unique) from a CSV | rust |
 | `rust-jsonrpc-stdio` | JSON-RPC 2.0 server over stdin/stdout: request types, notifications, batches, spec error codes, and the exact framing an LSP-style client expects | rust |
 | `rust-lru-cache` | Generic LRU cache library with capacity eviction, get/put/peek and unit tests | rust |
 | `rust-mini-grep` | Recursive regex grep CLI (walkdir + regex crates) with -i/-n/-c flags and integration tests | rust |
 | `rust-semver-cli` | Semver parse/compare/bump CLI with table-driven tests | rust |
+| `rust-sha256-tree` | Merkle tree over a file list with inclusion proofs and a pinned root digest | rust |
+| `rust-threadpool` | Fixed-size worker thread pool library + CLI demo: submit jobs over a channel, results collected, graceful shutdown | rust |
 | `rust-tracing-service` | tracing + tracing-subscriber JSON output with a small HTTP service | rust |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle served by a zero-dependency static server with an SPA fallback, page/bundle/404 asserted by curl in `smoke.sh` | `node`, `npm`/`\`pnpm`\`/`\`yarn` |

@@ -1,0 +1,73 @@
+{
+  "name": "rust-sha256-tree",
+  "title": "Rust SHA256 Merkle Tree",
+  "language": "rust",
+  "blurb": "Merkle tree over a file list with inclusion proofs and a pinned root digest",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust Merkle tree CLI over a file list.",
+  "next_steps": [
+    "cd {path}",
+    "cargo test",
+    "cargo run -- file1 file2"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml",
+      "contains": "sha2 ="
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/tree.rs"
+  ]
+}

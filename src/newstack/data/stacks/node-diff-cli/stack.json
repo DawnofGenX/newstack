@@ -1,0 +1,25 @@
+{
+  "name": "node-diff-cli",
+  "title": "Node Diff CLI",
+  "language": "node",
+  "blurb": "Unified diff CLI: diff -u style output, --stat summary, --apply patch mode",
+  "requires": ["node", "npm"],
+  "node": { "minimum": "22", "versions": ["22", "24"] },
+  "package_manager": ["npm", "pnpm", "yarn"],
+  "default_description": "A unified diff CLI.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "node src/cli.js a.txt b.txt"
+  ],
+  "verify": [
+    { "name": "install", "cmd": "npm install --no-audit --no-fund", "tools": ["npm"], "timeout": 900 },
+    { "name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "node"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "src/diff.js", "contains": "computeStat" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["tests/diff.test.js"]
+}

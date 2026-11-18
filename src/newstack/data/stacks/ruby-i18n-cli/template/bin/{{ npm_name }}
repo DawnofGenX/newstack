@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+
+require 'i18n'
+require 'i18n/cli'
+
+cli = I18n::CLI.new(stdin: $stdin, stdout: $stdout, stderr: $stderr)
+exit(cli.run(ARGV))
+EOF

@@ -1,0 +1,58 @@
+{
+  "name": "kotlin-json-dsl",
+  "title": "Kotlin JSON DSL",
+  "language": "kotlin",
+  "blurb": "Gradle Kotlin type-safe JSON DSL with deterministic serialization",
+  "requires": [
+    "java",
+    "gradle",
+    "git"
+  ],
+  "default_description": "A Kotlin library with a sealed JSON DSL and deterministic rendering.",
+  "next_steps": [
+    "cd {path}",
+    "./gradlew test",
+    "./gradlew run"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "gradle test",
+      "tools": [
+        "gradle",
+        "java"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "run",
+      "cmd": "gradle run",
+      "tools": [
+        "gradle",
+        "java"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "java",
+        "gradle"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "build.gradle.kts",
+      "contains": "MainKt"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

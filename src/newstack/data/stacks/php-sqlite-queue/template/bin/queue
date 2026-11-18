@@ -1,0 +1,56 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use {{ package_name }}\Queue;
+
+$dbPath = getenv('QUEUE_DB') ?: (__DIR__ . '/../queue.db');
+$pdo = new \PDO('sqlite:' . $dbPath);
+$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+$queue = new Queue($pdo);
+
+$command = $argv[1] ?? 'help';
+array_shift($argv);
+
+switch ($command) {
+    case 'push':
+        $payload = $argv[1] ?? '';
+        echo $queue->push($payload) . PHP_EOL;
+        break;
+    case 'pop':
+        $lease = 30;
+        for ($i = 1; $i < count($argv); $i++) {
+            if ($argv[$i] === '--lease' && isset($argv[$i + 1])) {
+                $lease = (int) $argv[++$i];
+            }
+        }
+        $job = $queue->pop($lease);
+        if ($job === null) {
+            fwrite(STDERR, "no job available\n");
+            exit(1);
+        }
+        echo $job['id'] . "\t" . $job['payload'] . PHP_EOL;
+        break;
+    case 'ack':
+        $id = (int) ($argv[1] ?? 0);
+        if (!$queue->ack($id)) {
+            fwrite(STDERR, "ack failed\n");
+            exit(1);
+        }
+        echo "acked\n";
+        break;
+    case 'retry':
+        $id = (int) ($argv[1] ?? 0);
+        if (!$queue->retry($id)) {
+            fwrite(STDERR, "retry failed\n");
+            exit(1);
+        }
+        echo "retried\n";
+        break;
+    default:
+        fwrite(STDERR, "usage: queue push <payload> | pop --lease <seconds> | ack <id> | retry <id>\n");
+        exit(1);
+}

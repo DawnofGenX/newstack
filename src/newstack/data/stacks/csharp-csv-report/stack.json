@@ -1,0 +1,17 @@
+{
+  "name": "csharp-csv-report",
+  "title": "C# CSV Report",
+  "language": "csharp",
+  "blurb": ".NET 8 console app that groups CSV rows into a fixed-width report plus JSON",
+  "requires": ["dotnet","git"],
+  "default_description": "A .NET CLI that turns CSV data into a fixed-width report.",
+  "next_steps": ["cd {path}", "dotnet build", "dotnet run -- input.csv"],
+  "verify": [
+    {"name":"build","cmd":"dotnet build --nologo","tools":["dotnet"],"timeout":1800},
+    {"name":"test","cmd":"dotnet test --nologo","tools":["dotnet"],"timeout":1800},
+    {"name":"smoke","cmd":"bash smoke.sh","tools":["bash","dotnet"],"timeout":1800}
+  ],
+  "detect": [{"file":"{{ npm_name }}.csproj","contains":"OutputType"}],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml",".gitignore"]
+}

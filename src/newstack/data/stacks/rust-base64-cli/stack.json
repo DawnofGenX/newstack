@@ -1,0 +1,73 @@
+{
+  "name": "rust-base64-cli",
+  "title": "Rust Base64 CLI",
+  "language": "rust",
+  "blurb": "Base64 encode/decode CLI with -d/--decode, --url-safe, --no-pad, and stdin support",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust base64 encode/decode CLI.",
+  "next_steps": [
+    "cd {path}",
+    "cargo test",
+    "printf 'foobar' | cargo run --"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "Cargo.toml",
+      "contains": "base64"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/cli.rs"
+  ]
+}

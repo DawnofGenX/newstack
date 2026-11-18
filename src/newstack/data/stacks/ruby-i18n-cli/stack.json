@@ -1,0 +1,16 @@
+{
+  "name": "ruby-i18n-cli",
+  "title": "Ruby I18n CLI",
+  "language": "ruby",
+  "blurb": "Stdlib-only Ruby locale fallback resolver with YAML and minitest",
+  "requires": ["ruby","git"],
+  "default_description": "A Ruby CLI that resolves locale keys with fallback.",
+  "next_steps": ["cd {path}", "rake test", "ruby bin/{{ npm_name }} greeting -l de"],
+  "verify": [
+    {"name":"test","cmd":"rake test","tools":["ruby"],"timeout":1800},
+    {"name":"smoke","cmd":"bash smoke.sh","tools":["bash","ruby"],"timeout":1800}
+  ],
+  "detect": [{"file":"lib/i18n/resolver.rb","contains":"class Resolver"}],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml",".gitignore"]
+}

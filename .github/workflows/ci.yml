@@ -196,6 +196,10 @@ jobs:
           - go-env-loader
           - rust-semver-cli
           - php-slim-api
+          - node-feature-flags
+          - go-circuit-breaker
+          - rust-sha256-tree
+          - php-sqlite-queue
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -264,13 +268,13 @@ jobs:
       # Stacks with no Gemfile: rake and the stdlib are enough, so the bundler
       # cache that ruby-sinatra/rails-app rely on would only add a failure mode.
       - name: Set up Ruby (no bundle)
-        if: contains(fromJSON('["ruby-cli","ruby-hmac-webhook"]'), matrix.stack)
+        if: contains(fromJSON('["ruby-cli","ruby-hmac-webhook","ruby-i18n-cli"]'), matrix.stack)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","kotlin-cli","kotlin-coroutines-pipeline","kotlin-http-api","kotlin-ktor-api","spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-csv-mapper","java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","kotlin-cli","kotlin-coroutines-pipeline","kotlin-http-api","kotlin-json-dsl","kotlin-ktor-api","spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -582,19 +586,19 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["php-composer-cli","php-slim-api","symfony-app","laravel-app"]'), matrix.stack)
+        if: contains(fromJSON('["php-composer-cli","php-slim-api","php-sqlite-queue","symfony-app","laravel-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
-          extensions: ctype, fileinfo, mbstring, tokenizer, xml
+          extensions: ctype, fileinfo, mbstring, pdo_sqlite, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["csharp-cli","csharp-minimal-api","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
+        if: contains(fromJSON('["csharp-cli","csharp-csv-report","csharp-minimal-api","fsharp-cli","fsharp-http-api","dotnet-cli","aspnet-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
       - name: Set up Elixir
-        if: contains(fromJSON('["elixir-gen-server","elixir-mix-cli","phoenix-app"]'), matrix.stack)
+        if: contains(fromJSON('["elixir-gen-server","elixir-mix-cli","elixir-pubsub","phoenix-app"]'), matrix.stack)
         uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.18"
@@ -794,6 +798,10 @@ jobs:
           - go-retry-client
           - java-json-flatten
           - ruby-hmac-webhook
+          - node-sqlite-import
+          - elixir-pubsub
+          - java-csv-mapper
+          - ruby-i18n-cli
     steps: *shared_setup
 
   stacks-c:
@@ -899,6 +907,10 @@ jobs:
           - go-jsonl-query
           - rust-mini-grep
           - kotlin-coroutines-pipeline
+          - node-markdown-toc-cli
+          - go-bloom-filter
+          - rust-threadpool
+          - kotlin-json-dsl
     steps: *shared_setup
 
   stacks-d:
@@ -1004,6 +1016,10 @@ jobs:
           - go-tar-extractor
           - rust-lru-cache
           - csharp-minimal-api
+          - node-diff-cli
+          - go-sse-broker
+          - rust-base64-cli
+          - csharp-csv-report
     steps: *shared_setup
 
   package:

@@ -1,0 +1,61 @@
+{
+  "name": "java-csv-mapper",
+  "title": "Java CSV Mapper",
+  "language": "java",
+  "blurb": "Maven Java 21 CSV-to-typed-records mapper with strict validation and a CLI",
+  "requires": [
+    "java",
+    "mvn",
+    "git"
+  ],
+  "default_description": "A Java CLI that maps CSV rows onto typed records.",
+  "next_steps": [
+    "cd {path}",
+    "mvn -B package",
+    "java -jar target/{{ npm_name }}.jar input.csv"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "mvn -B test",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "package",
+      "cmd": "mvn -B package -DskipTests",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "java",
+        "mvn"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "pom.xml",
+      "contains": "CsvMapper"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "src/test/java/{{ package_name }}/CsvMapperTest.java"
+  ]
+}
