@@ -1,0 +1,11 @@
+#!/usr/bin/env -S deno run --allow-read
+import { main } from "../src/cli.ts";
+
+const code = await main(Deno.args, {
+  out: (line) => console.log(line),
+  err: (line) => console.error(line),
+  readStdin: () => new Response(Deno.stdin.readable).text(),
+  readFile: (path) => Deno.readTextFile(path),
+});
+
+Deno.exit(code);

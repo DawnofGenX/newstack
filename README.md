@@ -260,6 +260,8 @@ $ newstack stacks outdated
 | `csharp-semver-cli` | Semantic version parser and range matcher: SemVer 2.0.0 ordering, caret/tilde/wildcard ranges, zero-dependency CLI | csharp |
 | `csharp-slug-cli` | Slugify CLI (lowercase, separator, max length) on System.Text only, xunit tests, no NuGet | csharp |
 | `csharp-units-cli` | Unit converter CLI over length, mass, volume, time, data and affine temperature, System.Text only, xunit tests, no NuGet beyond the test runner | csharp |
+| `dart-csv-cli` | Dart 3 CSV tool: RFC 4180 parser, column projection, JSON output, package:test suites. | dart |
+| `deno-cidr-cli` | Deno/TypeScript IPv4 CIDR tool: mask arithmetic, containment, overlap, canonical form, Deno.test suites. | typescript |
 | `elixir-csv-filter` | Elixir CSV row filter on Mix: pure options/filter modules, ExUnit suite, escript binary | elixir |
 | `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
 | `elixir-pubsub` | GenServer-based in-process pub/sub with topic subscriptions and at-least-once delivery | elixir |
@@ -268,6 +270,7 @@ $ newstack stacks outdated
 | `go-circuit-breaker` | Circuit breaker state machine (closed/open/half-open) with clock-driven CLI | go |
 | `go-cobra-cli` | cobra subcommands with go test and a smoke run of the binary | go |
 | `go-concurrent-map` | Sharded concurrent map (RWMutex), range iteration, correctness tests plus a testing.B benchmark. | go |
+| `go-cron-cli` | Five-field cron parser that prints upcoming fire times; table-based matching, UTC math. | go |
 | `go-csv-etl` | Read, validate, dedupe, and aggregate CSV to JSON | go |
 | `go-cuckoo-filter` | Cuckoo filter with 16 bit fingerprints: insert, lookup, delete, eviction on load, JSON CLI. | go |
 | `go-diff-cli` | Unified diff CLI for two files. | go |
@@ -289,6 +292,7 @@ $ newstack stacks outdated
 | `go-sqlite-migrate` | Embedded SQL migrations with an applied-version table, checksums, and status. | go |
 | `go-sse-broker` | Server-Sent-Events broker: /events stream, /publish POST, fan-out, heartbeats | go |
 | `go-tar-extractor` | Safe tar.gz extractor that rejects path traversal and absolute paths, tests for both rejections and a good archive. | go |
+| `go-template-cli` | Strict text/template renderer: JSON data, helper funcs, missing keys are errors. | go |
 | `go-text-search` | Boyer-Moore-Horspool substring search with line/column reporting; CLI searches a file for a pattern. | go |
 | `go-ulid-cli` | Time sortable ULID generation and parsing over Crockford base32, crypto/rand entropy, millisecond round trip. | go |
 | `go-url-signer` | HMAC-SHA256 signed URLs with expiry, middleware that gates handlers, httptest coverage, ephemeral port. | go |
@@ -298,6 +302,7 @@ $ newstack stacks outdated
 | `java-http-client-api` | java.net.http.HttpClient wrapper with GET/POST, records, JUnit tests with ephemeral HttpServer, Maven | java |
 | `java-jdbc-sqlite-api` | Java 21 + Maven + com.sun.net.httpserver over JDBC with sqlite-jdbc: CRUD on a notes table, /health; JUnit 5 tests | java |
 | `java-json-flatten` | Jackson-based JSON flattener CLI (dotted keys) with JUnit tests, Maven compiler release 21 | java |
+| `java-lru-cache` | Doubly linked LRU cache with hit/miss/eviction counters and a trace-driven CLI (Maven, JUnit 5). | java |
 | `java-picocli-cli` | picocli CLI on Maven with JUnit 5 tests and a shaded jar smoke | java |
 | `java-rate-limiter` | Token-bucket rate limiter, Java 21, Maven + JUnit 5, virtual-clock tests, plus a main class demo | java |
 | `java-template-engine` | Regex {{ key }} template renderer CLI with JUnit tests, Maven compiler release 21 | java |
@@ -321,6 +326,7 @@ $ newstack stacks outdated
 | `node-hmac-signer-cli` | HMAC-SHA256 request signer/verifier CLI (node:crypto only), timing-safe verify with timestamp tolerance. | node |
 | `node-hono-api` | Hono HTTP JSON API (CRUD over in-memory store), typed routes, contract check via curl in smoke.sh. | node |
 | `node-json-patch-cli` | RFC 6902 JSON Patch apply + diff, tests for add/remove/replace/move/copy/test and a failure case. | node |
+| `node-json-schema-lite` | Dependency-free JSON Schema subset validator that reports every problem with its path. | node |
 | `node-jwt-cli` | HS256 JWT sign, verify and decode on node:crypto: exp/nbf with leeway, alg pinning, timing safe compare. | node |
 | `node-markdown-lint` | Markdown linter: headings, fences, trailing spaces, line length. | node |
 | `node-markdown-site` | Static site generator (deps: marked + gray-matter): reads markdown with frontmatter, writes HTML with a layout; tests assert title/body escaping | node |
@@ -340,6 +346,7 @@ $ newstack stacks outdated
 | `node-template-render-cli` | Mustache-lite template renderer (escaping, sections, partials) with a JSON context CLI. | node |
 | `node-totp-cli` | RFC 6238 TOTP generator/verifier (node:crypto only, no deps), tests with the RFC test vectors. | node |
 | `node-trpc-api` | tRPC v11 router with a direct server-side caller test and HTTP smoke over plain fetch | node |
+| `node-ttl-cache` | TTL + LRU cache with hit/miss/eviction counters, driven by a command stream. | node |
 | `node-url-normalizer` | URL normalization: host casing, default ports, query sorting, tracking params. | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
 | `perl-ini-cli` | Perl INI reader on ExtUtils::MakeMaker: section and key order preserved, inline comments, quoted escapes, section/key lookup, JSON output, Test::More suite | perl |
@@ -565,6 +572,7 @@ $ newstack stacks outdated
 | `rust-mini-grep` | Recursive regex grep CLI (walkdir + regex crates) with -i/-n/-c flags and integration tests | rust |
 | `rust-mini-sed` | Minimal sed-style substitution CLI (regex crate) with global flag and integration tests | rust |
 | `rust-ring-buffer` | Generic fixed-capacity ring buffer with overwrite-on-full, push/pop/front/back and unit tests | rust |
+| `rust-s-expr` | S-expression reader and evaluator: comments, strings, arithmetic, if/and/or, list ops. | rust |
 | `rust-semver-cli` | Semver parse/compare/bump CLI with table-driven tests | rust |
 | `rust-sha256-tree` | Merkle tree over a file list with inclusion proofs and a pinned root digest | rust |
 | `rust-threadpool` | Fixed-size worker thread pool library + CLI demo: submit jobs over a channel, results collected, graceful shutdown | rust |

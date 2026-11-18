@@ -1,0 +1,61 @@
+{
+  "name": "java-lru-cache",
+  "title": "Java LRU Cache",
+  "language": "java",
+  "blurb": "Doubly linked LRU cache with hit/miss/eviction counters and a trace-driven CLI (Maven, JUnit 5).",
+  "requires": [
+    "java",
+    "mvn",
+    "git"
+  ],
+  "default_description": "A Java LRU cache with O(1) lookups and a command-trace CLI.",
+  "next_steps": [
+    "cd {path}",
+    "mvn -B package",
+    "printf 'PUT a 1\\nGET a\\n' | java -jar target/{{ npm_name }}.jar"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "mvn -B test",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "package",
+      "cmd": "mvn -B package -DskipTests",
+      "tools": [
+        "mvn",
+        "java"
+      ],
+      "timeout": 1500
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "java",
+        "mvn"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/main/java/{{ package_name }}/LruCache.java",
+      "contains": "public final class LruCache"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "src/test/java/{{ package_name }}/LruCacheTest.java"
+  ]
+}

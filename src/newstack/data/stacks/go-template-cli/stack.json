@@ -1,0 +1,64 @@
+{
+  "name": "go-template-cli",
+  "title": "Go Template CLI",
+  "language": "go",
+  "blurb": "Strict text/template renderer: JSON data, helper funcs, missing keys are errors.",
+  "requires": [
+    "go",
+    "git"
+  ],
+  "default_description": "A strict text/template renderer driven by a JSON document.",
+  "next_steps": [
+    "cd {path}",
+    "go run . -template conf.tmpl -data data.json"
+  ],
+  "verify": [
+    {
+      "name": "vet",
+      "cmd": "go vet ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "go test ./...",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "go build -o bin/{{ npm_name }} .",
+      "tools": [
+        "go"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "go"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "render.go",
+      "contains": "missingkey=error"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "render_test.go"
+  ]
+}

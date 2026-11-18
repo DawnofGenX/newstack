@@ -1,0 +1,3 @@
+# Package-wide analysis settings. `recommended` is the warn-level lint set that
+# `dart analyze` enforces in CI, so keep this file free of rule suppressions.
+include: package:lints/recommended.yaml

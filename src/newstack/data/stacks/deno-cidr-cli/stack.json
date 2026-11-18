@@ -1,0 +1,77 @@
+{
+  "name": "deno-cidr-cli",
+  "title": "Deno CIDR CLI",
+  "language": "typescript",
+  "blurb": "Deno/TypeScript IPv4 CIDR tool: mask arithmetic, containment, overlap, canonical form, Deno.test suites.",
+  "requires": [
+    "deno"
+  ],
+  "default_description": "A Deno CLI that normalises IPv4 CIDR blocks and answers containment questions.",
+  "next_steps": [
+    "cd {path}",
+    "deno task test",
+    "printf '10.1.2.3/8\\n' | ./bin/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "typecheck",
+      "cmd": "deno check main.ts",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "deno task test",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "table",
+      "cmd": "test \"$(printf '10.1.2.3/8\\n' | ./bin/{{ npm_name }})\" = '10.0.0.0/8 network=10.0.0.0 broadcast=10.255.255.255 hosts=16777214'",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/cidr.ts",
+      "contains": "export function parseCidr"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

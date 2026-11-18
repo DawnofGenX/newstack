@@ -220,6 +220,8 @@ jobs:
           - csharp-duration-cli
           - php-uri-cli
           - csharp-semver-cli
+          - go-cron-cli
+          - deno-cidr-cli
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -294,7 +296,7 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: false
       - name: Set up Java
-        if: contains(fromJSON('["java-config-loader","java-csv-mapper","java-http-client-api","java-jdbc-sqlite-api","java-json-flatten","java-maven-cli","java-picocli-cli","java-rate-limiter","java-template-engine","kotlin-cli","kotlin-coroutines-pipeline","kotlin-csv-report","kotlin-fuzzy-match","kotlin-html-builder","kotlin-http-api","kotlin-json-dsl","kotlin-ktor-api","kotlin-money-ledger","spring-boot"]'), matrix.stack)
+        if: contains(fromJSON('["java-config-loader", "java-csv-mapper", "java-http-client-api", "java-jdbc-sqlite-api", "java-json-flatten", "java-lru-cache", "java-maven-cli", "java-picocli-cli", "java-rate-limiter", "java-template-engine", "kotlin-cli", "kotlin-coroutines-pipeline", "kotlin-csv-report", "kotlin-fuzzy-match", "kotlin-html-builder", "kotlin-http-api", "kotlin-json-dsl", "kotlin-ktor-api", "kotlin-money-ledger", "spring-boot"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -347,7 +349,7 @@ jobs:
       # scala-cli is one binary, so installing it is the whole toolchain; no
       # Maven cache here because there is no pom (scala-cli fetches its own deps).
       - name: Set up Java (scala-cli)
-        if: contains(fromJSON('["scala-cli","scala-cask-api"]'), matrix.stack)
+        if: contains(fromJSON('["scala-cask-api", "scala-cli"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -364,7 +366,7 @@ jobs:
       # the version, so this installs 1.12.6 exactly. (The DeLaGuardo action
       # only publishes bare numeric tags, which the repo's pinning rule rejects.)
       - name: Set up Java (clojure-cli)
-        if: contains(fromJSON('["clojure-cli","clojure-ring-api"]'), matrix.stack)
+        if: contains(fromJSON('["clojure-cli", "clojure-ring-api"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -392,7 +394,7 @@ jobs:
           ghdl --version | head -1
 
       - name: Set up Deno
-        if: contains(fromJSON('["deno-cli","deno-api"]'), matrix.stack)
+        if: contains(fromJSON('["deno-api", "deno-cidr-cli", "deno-cli"]'), matrix.stack)
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
@@ -624,7 +626,7 @@ jobs:
           elixir-version: "1.18"
           otp-version: "27"
       - name: Set up Dart
-        if: contains(fromJSON('["dart-cli","dart-shelf-api"]'), matrix.stack)
+        if: contains(fromJSON('["dart-cli", "dart-csv-cli", "dart-shelf-api"]'), matrix.stack)
         uses: dart-lang/setup-dart@v1
         with:
           sdk: "3.13.7"
@@ -842,6 +844,8 @@ jobs:
           - nim-stack-cli
           - php-text-table-cli
           - csharp-hmac-cli
+          - go-template-cli
+          - dart-csv-cli
     steps: *shared_setup
 
   stacks-c:
@@ -971,6 +975,8 @@ jobs:
           - php-bencode-cli
           - ruby-base58-cli
           - bun-toml-lite
+          - node-ttl-cache
+          - rust-s-expr
     steps: *shared_setup
 
   stacks-d:
@@ -1100,6 +1106,8 @@ jobs:
           - bun-uuid-v7-cli
           - ruby-wordwrap-cli
           - bun-glob-cli
+          - node-json-schema-lite
+          - java-lru-cache
     steps: *shared_setup
 
   package:
