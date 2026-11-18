@@ -120,6 +120,17 @@ including the newer commit's run (it killed the wave-4 push run 51s in). Sequenc
 manual re-runs after the current run finishes, and check `gh run list` before firing
 one.
 
+**Treat a lone Maven failure as a registry flake, not a template defect.** Maven
+Central intermittently answers 429 or omits an artifact that resolves seconds later.
+Four separate red runs traced to this: `java-maven-cli` twice, `java-jdbc-sqlite-api`
+(`HTTP Status: 429` on `org.xerial:sqlite-jdbc:3.46.1.3`), and — because they build
+with `cache: maven` rather than Gradle — the two Kotlin stacks `kotlin-cli` and
+`kotlin-ktor-api`, which download the Kotlin Maven plugin on every runner. The
+discriminator is a local `newstack check <stack>`: if it passes, re-run the failed
+job (after the in-flight run finishes, per the paragraph above) instead of editing
+the template. Two Maven jobs failing in the same shard usually means one shared
+download, not two broken projects.
+
 ## Runner image: the shards stay on 24.04
 
 The stack shards pin `runs-on: ubuntu-24.04` while `test` and `package` float on

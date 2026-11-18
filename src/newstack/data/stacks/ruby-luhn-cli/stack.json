@@ -1,0 +1,84 @@
+{
+  "name": "ruby-luhn-cli",
+  "title": "Ruby Luhn CLI",
+  "language": "ruby",
+  "blurb": "Ruby Luhn checksum CLI: validate card numbers, generate a check digit, identify card brand; stdlib only, minitest + rake",
+  "requires": [
+    "ruby",
+    "rake"
+  ],
+  "default_description": "A Ruby Luhn checksum CLI.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "bin/{npm_name} validate 4111111111111111",
+    "bin/{npm_name} generate 411111111111111",
+    "bin/{npm_name} brand 4111111111111111"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "validate",
+      "cmd": "bin/{{ npm_name }} validate 4111111111111111 | grep -q '^valid$'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "generate",
+      "cmd": "bin/{{ npm_name }} generate 411111111111111 | grep -q '^4111111111111111$'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "brand",
+      "cmd": "bin/{{ npm_name }} brand 4111111111111111 | grep -q '^visa$'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "invalid-exits-1",
+      "cmd": "bin/{{ npm_name }} validate 4111111111111112; test $? -eq 1",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/luhn.rb",
+      "contains": "module Luhn"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Rakefile"
+  ],
+  "adopt_tests": [
+    "test/checksum_test.rb"
+  ]
+}

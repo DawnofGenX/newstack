@@ -1,0 +1,51 @@
+{
+  "name": "php-markdown-cli",
+  "title": "PHP Markdown CLI",
+  "language": "php",
+  "blurb": "Markdown to HTML converter CLI (headers, lists, code, inline formatting) with PHPUnit tests",
+  "requires": [
+    "php",
+    "composer",
+    "git"
+  ],
+  "default_description": "A PHP CLI that converts Markdown to HTML.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "vendor/bin/phpunit",
+    "php src/main.php input.md"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction && vendor/bin/phpunit",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "php",
+        "composer"
+      ],
+      "timeout": 1800
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Markdown.php",
+      "contains": "php-markdown-cli"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

@@ -1,0 +1,71 @@
+{
+  "name": "rust-mini-sed",
+  "title": "Rust Mini Sed",
+  "language": "rust",
+  "blurb": "Minimal sed-style substitution CLI (regex crate) with global flag and integration tests",
+  "requires": [
+    "cargo",
+    "git"
+  ],
+  "default_description": "A Rust CLI that does regex substitution like sed.",
+  "next_steps": [
+    "cd {path}",
+    "cargo run -- world rust <<< 'hello world'"
+  ],
+  "verify": [
+    {
+      "name": "fmt",
+      "cmd": "cargo fmt --check",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "clippy",
+      "cmd": "cargo clippy --all-targets -- -D warnings",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "test",
+      "cmd": "cargo test",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "build",
+      "cmd": "cargo build --release",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 1200
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "cargo"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/lib.rs",
+      "contains": "pub fn sed"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/cli.rs"
+  ]
+}

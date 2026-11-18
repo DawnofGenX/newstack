@@ -1,0 +1,70 @@
+{
+  "name": "node-ndjson-split",
+  "title": "Node NDJSON Split",
+  "language": "node",
+  "blurb": "Split NDJSON files into line- or byte-bounded parts with per-line JSON validation and a JSON summary.",
+  "requires": [
+    "node",
+    "npm"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "An NDJSON splitter that chunks by line count or byte budget.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "node src/cli.js --file data.ndjson --out-dir parts --max-lines 500"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "node"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/split.js",
+      "contains": "splitRecords"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/split.test.js"
+  ]
+}

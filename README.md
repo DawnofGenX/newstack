@@ -251,6 +251,8 @@ $ newstack stacks outdated
 | `csharp-jsonl-cli` | JSONL filter/aggregate CLI on System.Text.Json only, NO NuGet: --where field=value, --group field --count, deterministic ordering | csharp |
 | `csharp-jwt-cli` | JWT encode/decode/verify CLI on HMAC-SHA256 with xunit tests, .NET 8 | csharp |
 | `csharp-minimal-api` | ASP.NET Core minimal API with /health and an in-memory resource, xunit tests via WebApplicationFactory | csharp |
+| `csharp-slug-cli` | Slugify CLI (lowercase, separator, max length) on System.Text only, xunit tests, no NuGet | csharp |
+| `elixir-csv-filter` | Elixir CSV row filter on Mix: pure options/filter modules, ExUnit suite, escript binary | elixir |
 | `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
 | `elixir-pubsub` | GenServer-based in-process pub/sub with topic subscriptions and at-least-once delivery | elixir |
 | `go-bloom-filter` | Bloom filter library plus CLI (add, check, stats), fixed-size bit array, double hashing FNV-64a | go |
@@ -258,6 +260,7 @@ $ newstack stacks outdated
 | `go-cobra-cli` | cobra subcommands with go test and a smoke run of the binary | go |
 | `go-concurrent-map` | Sharded concurrent map (RWMutex), range iteration, correctness tests plus a testing.B benchmark. | go |
 | `go-csv-etl` | Read, validate, dedupe, and aggregate CSV to JSON | go |
+| `go-cuckoo-filter` | Cuckoo filter with 16 bit fingerprints: insert, lookup, delete, eviction on load, JSON CLI. | go |
 | `go-diff-cli` | Unified diff CLI for two files. | go |
 | `go-echo-api` | labstack/echo JSON service with httptest tests and curl smoke | go |
 | `go-env-loader` | .env parser + precedence resolution with export/quote/comment handling, library + CLI, table-driven tests. | go |
@@ -269,13 +272,17 @@ $ newstack stacks outdated
 | `go-prometheus-metrics` | Service exposing Prometheus text exposition with counter and histogram | go |
 | `go-rate-limiter` | Token-bucket HTTP rate limiter middleware with 429 + Retry-After | go |
 | `go-retry-client` | HTTP client with capped exponential backoff + jitter using httptest servers for retry/limit/non-retryable tests. | go |
+| `go-semver-cli` | Semantic version parse/compare/satisfies with prerelease ordering, caret, tilde and x-ranges. | go |
 | `go-skiplist` | Skip list ordered set CLI. | go |
 | `go-slog-middleware` | net/http + log/slog middleware: request id, structured logging, panic recovery, auth redaction. | go |
 | `go-sqlite-migrate` | Embedded SQL migrations with an applied-version table, checksums, and status. | go |
 | `go-sse-broker` | Server-Sent-Events broker: /events stream, /publish POST, fan-out, heartbeats | go |
 | `go-tar-extractor` | Safe tar.gz extractor that rejects path traversal and absolute paths, tests for both rejections and a good archive. | go |
 | `go-text-search` | Boyer-Moore-Horspool substring search with line/column reporting; CLI searches a file for a pattern. | go |
+| `go-ulid-cli` | Time sortable ULID generation and parsing over Crockford base32, crypto/rand entropy, millisecond round trip. | go |
+| `go-url-signer` | HMAC-SHA256 signed URLs with expiry, middleware that gates handlers, httptest coverage, ephemeral port. | go |
 | `go-webhook-receiver` | HTTP webhook receiver on port 5592. | go |
+| `java-config-loader` | Properties-based config loader CLI with env overrides, defaults, typed getters, JUnit5 tests | java |
 | `java-csv-mapper` | Maven Java 21 CSV-to-typed-records mapper with strict validation and a CLI | java |
 | `java-http-client-api` | java.net.http.HttpClient wrapper with GET/POST, records, JUnit tests with ephemeral HttpServer, Maven | java |
 | `java-jdbc-sqlite-api` | Java 21 + Maven + com.sun.net.httpserver over JDBC with sqlite-jdbc: CRUD on a notes table, /health; JUnit 5 tests | java |
@@ -291,6 +298,7 @@ $ newstack stacks outdated
 | `node-cron-scheduler` | In-process scheduler (dep: node-cron) that registers jobs, runs them, and records last-run/last-error in a small JSON store | node |
 | `node-csv-stream-cli` | RFC 4180 streaming CSV parser/serializer on Node streams with csv2json/json2csv CLI. | node |
 | `node-diff-cli` | Unified diff CLI: diff -u style output, --stat summary, --apply patch mode | node |
+| `node-env-schema` | Dotenv parser plus typed schema validation: numbers, booleans, urls, enums, defaults, unknown-key errors. | node |
 | `node-feature-flags` | Percentage-rollout feature flag evaluator: stable hashing, HTTP flag-set endpoint | node |
 | `node-graphql-api` | GraphQL server with graphql + graphql-yoga: schema with Query.notes / Mutation.addNote, in-memory store, node --test resolvers, live curl | node |
 | `node-hmac-signer-cli` | HMAC-SHA256 request signer/verifier CLI (node:crypto only), timing-safe verify with timestamp tolerance. | node |
@@ -299,7 +307,9 @@ $ newstack stacks outdated
 | `node-markdown-lint` | Markdown linter: headings, fences, trailing spaces, line length. | node |
 | `node-markdown-site` | Static site generator (deps: marked + gray-matter): reads markdown with frontmatter, writes HTML with a layout; tests assert title/body escaping | node |
 | `node-markdown-toc-cli` | Markdown table-of-contents CLI: ATX, setext, code fences, duplicate heading slugs, --write | node |
+| `node-ndjson-split` | Split NDJSON files into line- or byte-bounded parts with per-line JSON validation and a JSON summary. | node |
 | `node-openapi-mock-server` | Zero-dependency OpenAPI 3 mock server: example-first responses, schema-shaped defaults, 404/405, required param validation. | node |
+| `node-otpauth-uri` | TOTP/HOTP codes plus otpauth:// URI build and parse, RFC 4226/6238 vectors, zero dependencies. | node |
 | `node-pino-logger` | Structured logging with pino: levels, redaction, child loggers, JSON output. | node |
 | `node-qr-cli` | CLI that renders QR codes (dep: qrcode) to a PNG and a terminal renderer; tests assert PNG magic bytes and size | node |
 | `node-ratelimit-middleware` | Plain node:http server with token-bucket rate limiting, 429 + Retry-After, /stats endpoint. | node |
@@ -307,6 +317,7 @@ $ newstack stacks outdated
 | `node-sqlite-api` | HTTP CRUD over Node's built-in node:sqlite: a notes table, GET/POST/DELETE, /health, node --test unit tests and a live contract | node |
 | `node-sqlite-import` | Import a CSV into SQLite (node:sqlite) and query it from the CLI | node |
 | `node-sqlite-migrations` | SQLite migration runner: ordered .sql files, checksums, up/down, transactional apply. | node |
+| `node-sri-hash-cli` | Subresource Integrity hashes and manifest verification: sha256/384/512, multi-token, per-file results. | node |
 | `node-sse-api` | Server-sent events service on bare Node: a replayable event log, Last-Event-ID resumption, heartbeat comments, node --test plus a live streaming contract | node |
 | `node-template-render-cli` | Mustache-lite template renderer (escaping, sections, partials) with a JSON context CLI. | node |
 | `node-totp-cli` | RFC 6238 TOTP generator/verifier (node:crypto only, no deps), tests with the RFC test vectors. | node |
@@ -315,6 +326,7 @@ $ newstack stacks outdated
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
 | `php-csv-report` | CSV parser and report aggregator CLI with PHPUnit tests, Composer autoload | php |
 | `php-jwt-cli` | HS256 JWT sign/verify CLI: base64url encode/decode, hash_equals, exp validation with an injected clock; PHPUnit tests | php |
+| `php-markdown-cli` | Markdown to HTML converter CLI (headers, lists, code, inline formatting) with PHPUnit tests | php |
 | `php-slim-api` | Slim 4 API with a JSON endpoint, PHPUnit test, composer.json | php |
 | `php-sqlite-queue` | PHP 8.3 PDO SQLite durable job queue CLI with PHPUnit tests | php |
 | `python-aiohttp-api` | aiohttp JSON service with health and stats endpoints, curl smoke | python |
@@ -508,16 +520,20 @@ $ newstack stacks outdated
 | `ruby-csv-report` | stdlib CSV report builder: group-by column, per-group aggregates, aligned table + JSON output; minitest + Rakefile | ruby |
 | `ruby-hmac-webhook` | Ruby webhook signature verifier: Stripe-style HMAC-SHA256 signing, constant-time comparison and a timestamp tolerance window, stdlib only, minitest suite run by rake | ruby |
 | `ruby-i18n-cli` | Stdlib-only Ruby locale fallback resolver with YAML and minitest | ruby |
+| `ruby-luhn-cli` | Ruby Luhn checksum CLI: validate card numbers, generate a check digit, identify card brand; stdlib only, minitest + rake | ruby |
 | `rust-axum-ws` | Rust axum 0.8 WebSocket echo/broadcast server (axum ws, tokio, futures-util): /health plus /ws, broadcast to all subscribers | rust |
 | `rust-base64-cli` | Base64 encode/decode CLI with -d/--decode, --url-safe, --no-pad, and stdin support | rust |
+| `rust-bitfield-cli` | Bitfield inspector/manipulator CLI (set/clear/toggle bits) with hex/dec/binary output and tests | rust |
 | `rust-config-loader` | Layered configuration (defaults < file < env < CLI) with typed errors and a .env parser. | rust |
 | `rust-csv-stats-cli` | Rust CLI (clap 4 + csv 1 + serde) computing per-column stats (count/min/max/mean/unique) from a CSV | rust |
+| `rust-csv-to-json` | CSV to JSON converter CLI (csv + serde_json crates) with stdin/file input and integration tests | rust |
 | `rust-hex-dump-cli` | Hex dump CLI (offsets, hex bytes, ASCII) reading files or stdin with width option and integration tests | rust |
 | `rust-job-queue` | In-process job queue: mpsc channel, N workers, retry with max attempts, graceful shutdown, results collected | rust |
 | `rust-jsonpath-cli` | JSONPath expression evaluator CLI (serde_json) with nested/array/wildcard support and integration tests | rust |
 | `rust-jsonrpc-stdio` | JSON-RPC 2.0 server over stdin/stdout: request types, notifications, batches, spec error codes, and the exact framing an LSP-style client expects | rust |
 | `rust-lru-cache` | Generic LRU cache library with capacity eviction, get/put/peek and unit tests | rust |
 | `rust-mini-grep` | Recursive regex grep CLI (walkdir + regex crates) with -i/-n/-c flags and integration tests | rust |
+| `rust-mini-sed` | Minimal sed-style substitution CLI (regex crate) with global flag and integration tests | rust |
 | `rust-ring-buffer` | Generic fixed-capacity ring buffer with overwrite-on-full, push/pop/front/back and unit tests | rust |
 | `rust-semver-cli` | Semver parse/compare/bump CLI with table-driven tests | rust |
 | `rust-sha256-tree` | Merkle tree over a file list with inclusion proofs and a pinned root digest | rust |

@@ -1,0 +1,70 @@
+{
+  "name": "node-otpauth-uri",
+  "title": "Node OTPAuth URI",
+  "language": "node",
+  "blurb": "TOTP/HOTP codes plus otpauth:// URI build and parse, RFC 4226/6238 vectors, zero dependencies.",
+  "requires": [
+    "node",
+    "npm"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A TOTP and otpauth:// helper built on node:crypto.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "node src/cli.js uri --secret JBSWY3DPEHPK3PXP --issuer Acme --account alice@example.com"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "node"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/totp.js",
+      "contains": "otpauth://totp/"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/totp.test.js"
+  ]
+}

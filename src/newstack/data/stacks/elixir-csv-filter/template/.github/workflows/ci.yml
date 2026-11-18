@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.18'
+          otp-version: '27'
+      - name: Fetch dependencies
+        run: mix deps.get
+      - name: Check formatting
+        run: mix format --check-formatted
+      - name: Test
+        run: mix test
+      - name: Build escript and smoke it
+        run: MIX_ENV=prod mix escript.build && ./{{ npm_name }} --help

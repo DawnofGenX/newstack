@@ -1,0 +1,70 @@
+{
+  "name": "node-env-schema",
+  "title": "Node Env Schema",
+  "language": "node",
+  "blurb": "Dotenv parser plus typed schema validation: numbers, booleans, urls, enums, defaults, unknown-key errors.",
+  "requires": [
+    "node",
+    "npm"
+  ],
+  "node": {
+    "minimum": "22",
+    "versions": [
+      "22",
+      "24"
+    ]
+  },
+  "package_manager": [
+    "npm",
+    "pnpm",
+    "yarn"
+  ],
+  "default_description": "A typed .env validator with dotenv parsing and schema coercion.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "node src/cli.js --file .env"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "npm install --no-audit --no-fund",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "npm test",
+      "tools": [
+        "npm"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "node"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/schema.js",
+      "contains": "parseDotEnv"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/schema.test.js"
+  ]
+}

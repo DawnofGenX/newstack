@@ -1,0 +1,55 @@
+{
+  "name": "csharp-slug-cli",
+  "title": "CSharp Slug CLI",
+  "language": "csharp",
+  "blurb": "Slugify CLI (lowercase, separator, max length) on System.Text only, xunit tests, no NuGet",
+  "requires": [
+    "dotnet",
+    "git"
+  ],
+  "default_description": "A C# CLI that slugifies text.",
+  "next_steps": [
+    "cd {path}",
+    "dotnet build",
+    "dotnet run -- \"Hello World\""
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "dotnet build --nologo",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "dotnet test --nologo",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bash",
+        "dotnet"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "Program.cs",
+      "contains": "csharp-slug-cli"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}
