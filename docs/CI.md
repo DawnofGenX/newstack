@@ -112,6 +112,14 @@ the tree at ~500 stacks, when a full PR run costs more than the rewrite. It is
 also what invalidates the static-matrix guards in `tests/test_docs.py` and the
 shard-append logic in `scripts/wire_stack.py`, so it is one change, not two.
 
+**Do not re-run an older run while a newer one is in flight.** The workflow keeps
+`concurrency: ci-${{ github.ref }}` with `cancel-in-progress: true` so a push
+supersedes the previous commit's 384-job run. A manual re-run of an *old* run joins
+that same group as a fresh entry, so GitHub cancels whatever is running for the ref —
+including the newer commit's run (it killed the wave-4 push run 51s in). Sequence
+manual re-runs after the current run finishes, and check `gh run list` before firing
+one.
+
 ## Runner image: the shards stay on 24.04
 
 The stack shards pin `runs-on: ubuntu-24.04` while `test` and `package` float on
