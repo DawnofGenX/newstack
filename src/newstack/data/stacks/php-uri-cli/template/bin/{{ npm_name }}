@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use {{ package_name }}\Cli;
+
+$autoload = dirname(__DIR__) . '/vendor/autoload.php';
+if (!is_file($autoload)) {
+    fwrite(STDERR, "error: vendor/ is missing; run 'composer install' first" . PHP_EOL);
+    exit(1);
+}
+
+require $autoload;
+
+exit((new Cli(basename($argv[0])))->run(array_slice($argv, 1), STDIN, STDOUT, STDERR));

@@ -248,12 +248,16 @@ $ newstack stacks outdated
 | Stack | What you get | Toolchain |
 | --- | --- | --- |
 | `bun-file-hash-cli` | sha256sum-style hashing CLI (sha256, sha1, md5, table-driven crc32) with --check verification of a checksum file, zero-dependency bun:test suite | bun |
+| `bun-glob-cli` | Dependency-free glob matcher and directory walker: **, ?, character classes and brace alternatives, plus ignore patterns | bun |
+| `bun-toml-lite` | Dependency-free TOML parser and CLI: tables, arrays of tables, dotted and inline keys, with line-numbered errors | bun |
 | `bun-uuid-v7-cli` | Bun/TypeScript UUIDv7 (RFC 9562) CLI: time-ordered identifiers with a 48-bit millisecond stamp, plus parse, validate and stdin sort | bun |
 | `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
 | `csharp-duration-cli` | ISO 8601 duration arithmetic on .NET 8: parse P2DT3H and 1h30m, format both ways, add to a timestamp, and refuse ambiguous calendar months | csharp |
+| `csharp-hmac-cli` | HMAC sign and verify CLI: SHA-1/256/384/512 and MD5, constant-time comparison, file signing, zero NuGet dependencies | csharp |
 | `csharp-jsonl-cli` | JSONL filter/aggregate CLI on System.Text.Json only, NO NuGet: --where field=value, --group field --count, deterministic ordering | csharp |
 | `csharp-jwt-cli` | JWT encode/decode/verify CLI on HMAC-SHA256 with xunit tests, .NET 8 | csharp |
 | `csharp-minimal-api` | ASP.NET Core minimal API with /health and an in-memory resource, xunit tests via WebApplicationFactory | csharp |
+| `csharp-semver-cli` | Semantic version parser and range matcher: SemVer 2.0.0 ordering, caret/tilde/wildcard ranges, zero-dependency CLI | csharp |
 | `csharp-slug-cli` | Slugify CLI (lowercase, separator, max length) on System.Text only, xunit tests, no NuGet | csharp |
 | `csharp-units-cli` | Unit converter CLI over length, mass, volume, time, data and affine temperature, System.Text only, xunit tests, no NuGet beyond the test runner | csharp |
 | `elixir-csv-filter` | Elixir CSV row filter on Mix: pure options/filter modules, ExUnit suite, escript binary | elixir |
@@ -347,6 +351,8 @@ $ newstack stacks outdated
 | `php-markdown-cli` | Markdown to HTML converter CLI (headers, lists, code, inline formatting) with PHPUnit tests | php |
 | `php-slim-api` | Slim 4 API with a JSON endpoint, PHPUnit test, composer.json | php |
 | `php-sqlite-queue` | PHP 8.3 PDO SQLite durable job queue CLI with PHPUnit tests | php |
+| `php-text-table-cli` | CSV to aligned text tables: per-column alignment, wide-character aware widths, ASCII/Unicode/no borders, truncation | php |
+| `php-uri-cli` | RFC 3986 URI work in PHP: split a URI into components, normalise away the default port and dot segments, and edit query parameters | php |
 | `python-aiohttp-api` | aiohttp JSON service with health and stats endpoints, curl smoke | python |
 | `python-alembic-migrations` | Alembic with SQLite and two revisions; smoke upgrades and asserts schema | python |
 | `python-apscheduler-worker` | APScheduler interval job writing rows to SQLite; CLI runs N ticks | python |
@@ -535,12 +541,14 @@ $ newstack stacks outdated
 | `python-tim-sort` | tim sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `python-intro-sort` | intro sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
+| `ruby-base58-cli` | Base58 and Base58Check in Ruby stdlib: encode hex or text, decode, and refuse a tampered checksum | ruby |
 | `ruby-csv-report` | stdlib CSV report builder: group-by column, per-group aggregates, aligned table + JSON output; minitest + Rakefile | ruby |
 | `ruby-hash-chain-cli` | Append-only hash chain in Ruby: each entry commits to the previous digest, so tampered, dropped or reordered history fails verification; stdlib only | ruby |
 | `ruby-hmac-webhook` | Ruby webhook signature verifier: Stripe-style HMAC-SHA256 signing, constant-time comparison and a timestamp tolerance window, stdlib only, minitest suite run by rake | ruby |
 | `ruby-i18n-cli` | Stdlib-only Ruby locale fallback resolver with YAML and minitest | ruby |
 | `ruby-jsonpath-cli` | Dependency-free JSONPath subset (members, indexes, wildcards, recursive descent) with a stdin/file CLI and grep-like exit codes | ruby |
 | `ruby-luhn-cli` | Ruby Luhn checksum CLI: validate card numbers, generate a check digit, identify card brand; stdlib only, minitest + rake | ruby |
+| `ruby-wordwrap-cli` | Reflow text to a column width in Ruby stdlib: greedy fill, paragraph breaks preserved, idempotent wrapping, long words left intact | ruby |
 | `rust-axum-ws` | Rust axum 0.8 WebSocket echo/broadcast server (axum ws, tokio, futures-util): /health plus /ws, broadcast to all subscribers | rust |
 | `rust-base64-cli` | Base64 encode/decode CLI with -d/--decode, --url-safe, --no-pad, and stdin support | rust |
 | `rust-bitfield-cli` | Bitfield inspector/manipulator CLI (set/clear/toggle bits) with hex/dec/binary output and tests | rust |

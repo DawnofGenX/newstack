@@ -218,6 +218,8 @@ jobs:
           - csharp-units-cli
           - zig-bitset-cli
           - csharp-duration-cli
+          - php-uri-cli
+          - csharp-semver-cli
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -277,7 +279,7 @@ jobs:
           uv tool install --quiet ansible-core
           ansible-playbook --version
       - name: Set up Ruby
-        if: contains(fromJSON('["ruby-sinatra","rails-app"]'), matrix.stack)
+        if: contains(fromJSON('["rails-app", "ruby-sinatra"]'), matrix.stack)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
@@ -286,7 +288,7 @@ jobs:
       # Stacks with no Gemfile: rake and the stdlib are enough, so the bundler
       # cache that ruby-sinatra/rails-app rely on would only add a failure mode.
       - name: Set up Ruby (no bundle)
-        if: contains(fromJSON('["ruby-cli", "ruby-csv-report", "ruby-hash-chain-cli", "ruby-hmac-webhook", "ruby-i18n-cli", "ruby-jsonpath-cli", "ruby-luhn-cli"]'), matrix.stack)
+        if: contains(fromJSON('["ruby-base58-cli", "ruby-cli", "ruby-csv-report", "ruby-hash-chain-cli", "ruby-hmac-webhook", "ruby-i18n-cli", "ruby-jsonpath-cli", "ruby-luhn-cli", "ruby-wordwrap-cli"]'), matrix.stack)
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
@@ -604,14 +606,14 @@ jobs:
           hugo version
 
       - name: Set up PHP
-        if: contains(fromJSON('["laravel-app", "php-base32-cli", "php-bencode-cli", "php-composer-cli", "php-csv-report", "php-html-sanitizer", "php-jwt-cli", "php-markdown-cli", "php-slim-api", "php-sqlite-queue", "symfony-app"]'), matrix.stack)
+        if: contains(fromJSON('["laravel-app", "php-base32-cli", "php-bencode-cli", "php-composer-cli", "php-csv-report", "php-html-sanitizer", "php-jwt-cli", "php-markdown-cli", "php-slim-api", "php-sqlite-queue", "php-text-table-cli", "php-uri-cli", "symfony-app"]'), matrix.stack)
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           extensions: ctype, fileinfo, mbstring, pdo_sqlite, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["aspnet-api", "csharp-cli", "csharp-csv-report", "csharp-duration-cli", "csharp-jsonl-cli", "csharp-jwt-cli", "csharp-minimal-api", "csharp-slug-cli", "csharp-units-cli", "dotnet-cli", "fsharp-cli", "fsharp-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["aspnet-api", "csharp-cli", "csharp-csv-report", "csharp-duration-cli", "csharp-hmac-cli", "csharp-jsonl-cli", "csharp-jwt-cli", "csharp-minimal-api", "csharp-semver-cli", "csharp-slug-cli", "csharp-units-cli", "dotnet-cli", "fsharp-cli", "fsharp-http-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -694,7 +696,7 @@ jobs:
         with:
           crystal: "1.11"
       - name: Set up Bun
-        if: contains(fromJSON('["bun-api", "bun-cli", "bun-sqlite-api", "bun-uuid-v7-cli"]'), matrix.stack)
+        if: contains(fromJSON('["bun-api", "bun-cli", "bun-file-hash-cli", "bun-glob-cli", "bun-sqlite-api", "bun-toml-lite", "bun-uuid-v7-cli"]'), matrix.stack)
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2
@@ -838,6 +840,8 @@ jobs:
           - bun-file-hash-cli
           - ruby-hash-chain-cli
           - nim-stack-cli
+          - php-text-table-cli
+          - csharp-hmac-cli
     steps: *shared_setup
 
   stacks-c:
@@ -965,6 +969,8 @@ jobs:
           - ruby-jsonpath-cli
           - lua-csv-cli
           - php-bencode-cli
+          - ruby-base58-cli
+          - bun-toml-lite
     steps: *shared_setup
 
   stacks-d:
@@ -1092,6 +1098,8 @@ jobs:
           - kotlin-fuzzy-match
           - perl-ini-cli
           - bun-uuid-v7-cli
+          - ruby-wordwrap-cli
+          - bun-glob-cli
     steps: *shared_setup
 
   package:

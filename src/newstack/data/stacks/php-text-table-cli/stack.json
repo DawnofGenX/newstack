@@ -1,0 +1,75 @@
+{
+  "name": "php-text-table-cli",
+  "title": "PHP text table CLI",
+  "language": "php",
+  "blurb": "CSV to aligned text tables: per-column alignment, wide-character aware widths, ASCII/Unicode/no borders, truncation",
+  "requires": [
+    "php",
+    "composer"
+  ],
+  "default_description": "A PHP command line tool that renders CSV as a text table.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "printf 'name,score\\nalice,3\\n' | php bin/{npm_name} --header",
+    "vendor/bin/phpunit"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction --no-progress >/dev/null && vendor/bin/phpunit --no-coverage",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "php bin/{{ npm_name }} --help",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "render",
+      "cmd": "printf 'a,b\\n1,2\\n' | php bin/{{ npm_name }} | grep -qF '| 1 | 2 |'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "php bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "php"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Table.php",
+      "contains": "final class Table"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "composer.json",
+    "phpunit.xml"
+  ],
+  "adopt_tests": []
+}

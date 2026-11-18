@@ -229,3 +229,21 @@ steps, which exit non-zero because those CLIs have no such subcommand.
 
 When you copy a workflow between stacks, change the parts that are about the *other* stack before
 you commit: the binary it builds and the subcommands it calls.
+
+## A toolchain gate is a name list, and it rots in both directions
+
+The setup steps for the pinned toolchains (Ruby, PHP, .NET, Bun, Nim, Zig, Lua, Deno, Crystal) run
+only for the stacks their `if: contains(fromJSON([...]), matrix.stack)` names. That list is a second
+edit every time a stack of that language lands, and forgetting it fails quietly: the setup step
+skips, `Generate and verify the stack` builds against whatever the runner image carries, and only
+that one shard goes red. `bun-file-hash-cli` was added in wave 10 without being named, and the run
+for that commit failed on exactly that job with `Set up Bun` marked SKIPPED.
+
+`tests/test_docs.py::test_every_template_toolchain_is_named_by_its_gate` derives the requirement
+from the templates themselves instead of a per-language map: for every `uses: owner/action@` in a
+stack's template workflow, if this repo's ci.yml has a step for the same action that is gated by a
+name list, the stack must be in that list. Two explicit exemptions keep it honest — `setup-go` and
+`dtolnay/rust-toolchain` are satisfied by the runner image (every Go and Rust stack is green in a
+run where the legacy list skipped them), and `erlang-cli` takes Erlang from the apt step rather
+than the `setup-beam` step its template happens to use. Anything else that needs an exemption is a
+gate that needs fixing, not a test that needs relaxing.

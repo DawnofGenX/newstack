@@ -1,0 +1,6 @@
+#!/usr/bin/env bun
+// Entry point: the only file that owns argv, stdout/stderr and the exit code.
+// Counting and parsing live in src/textstat/ so tests can drive them directly.
+import { main } from "../src/cli.ts";
+
+process.exit(await main(process.argv.slice(2)));

@@ -1,0 +1,85 @@
+{
+  "name": "ruby-wordwrap-cli",
+  "title": "Ruby Wordwrap CLI",
+  "blurb": "Reflow text to a column width in Ruby stdlib: greedy fill, paragraph breaks preserved, idempotent wrapping, long words left intact",
+  "language": "ruby",
+  "requires": [
+    "ruby",
+    "rake",
+    "git"
+  ],
+  "default_description": "A Ruby command line text reflow tool.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "printf 'one two three' | bin/{npm_name} -w 7",
+    "bin/{npm_name} -w 40 README.md"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "wrap",
+      "cmd": "printf 'one two three' | bin/{{ npm_name }} -w 7 | tr '\\n' '|' | grep -qx 'one two|three'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "paragraph",
+      "cmd": "printf 'aaa bbb\\n\\nccc' | bin/{{ npm_name }} -w 5 | grep -c '^$' | grep -qx '1'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "bad-width",
+      "cmd": "bin/{{ npm_name }} -w 0 </dev/null >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "missing-file",
+      "cmd": "bin/{{ npm_name }} /nonexistent/file.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "ruby",
+        "rake",
+        "bash"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/wordwrap.rb",
+      "contains": "module Wordwrap"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "test/wordwrap_test.rb"
+  ]
+}

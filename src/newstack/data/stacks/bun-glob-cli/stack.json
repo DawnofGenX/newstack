@@ -1,0 +1,84 @@
+{
+  "name": "bun-glob-cli",
+  "title": "Bun glob matcher",
+  "language": "bun",
+  "blurb": "Dependency-free glob matcher and directory walker: **, ?, character classes and brace alternatives, plus ignore patterns",
+  "requires": [
+    "bun"
+  ],
+  "default_description": "A Bun command line tool that matches paths against glob patterns.",
+  "next_steps": [
+    "cd {path}",
+    "bun test",
+    "bun run bin/{npm_name} '**/*.ts'",
+    "bun run bin/{npm_name} --ignore 'node_modules/**' '**/*.{ts,js}'"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "bun test",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "glob",
+      "cmd": "./bin/{{ npm_name }} --root src '**/*.ts' | grep -qx 'glob/glob.ts'",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "no-match",
+      "cmd": "./bin/{{ npm_name }} --root src '*.rs' >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": ".bunfig.toml",
+      "contains": "bun-glob-cli"
+    },
+    {
+      "file": "src/glob/glob.ts",
+      "contains": "export function globToRegExp"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".bunfig.toml",
+    "tsconfig.json"
+  ],
+  "adopt_tests": []
+}

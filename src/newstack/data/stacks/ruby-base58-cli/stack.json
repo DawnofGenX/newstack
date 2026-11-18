@@ -1,0 +1,93 @@
+{
+  "name": "ruby-base58-cli",
+  "title": "Ruby Base58 CLI",
+  "blurb": "Base58 and Base58Check in Ruby stdlib: encode hex or text, decode, and refuse a tampered checksum",
+  "language": "ruby",
+  "requires": [
+    "ruby",
+    "rake",
+    "git"
+  ],
+  "default_description": "A Ruby command line Base58 and Base58Check codec.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "bin/{npm_name} encode 68656c6c6f20776f726c64",
+    "bin/{npm_name} check-decode 12JNo32w2yrmQuWFckG"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "encode",
+      "cmd": "bin/{{ npm_name }} encode 68656c6c6f20776f726c64 | grep -qx 'StV1DL6CwTryKyV'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "decode",
+      "cmd": "bin/{{ npm_name }} decode 2g | grep -qx '61'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "check",
+      "cmd": "bin/{{ npm_name }} check-decode 12JNo32w2yrmQuWFckG | grep -qx '000f9a4b120000000000'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "bad-checksum",
+      "cmd": "bin/{{ npm_name }} check-decode 12JNo32w2yrmQuWFckH >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "bin/{{ npm_name }} frobnicate 2g >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "ruby",
+        "rake",
+        "bash"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/base58.rb",
+      "contains": "module Base58"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "test/base58_test.rb"
+  ]
+}

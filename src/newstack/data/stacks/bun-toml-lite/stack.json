@@ -1,0 +1,85 @@
+{
+  "name": "bun-toml-lite",
+  "title": "Bun TOML reader",
+  "language": "bun",
+  "blurb": "Dependency-free TOML parser and CLI: tables, arrays of tables, dotted and inline keys, with line-numbered errors",
+  "requires": [
+    "bun"
+  ],
+  "default_description": "A Bun command line tool that reads TOML.",
+  "next_steps": [
+    "cd {path}",
+    "printf 'title = \"demo\"\\n' > demo.toml",
+    "bun test",
+    "bun run bin/{npm_name} demo.toml",
+    "bun run bin/{npm_name} --get title demo.toml"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "bun test",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./bin/{{ npm_name }} does-not-exist.toml >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "flatten",
+      "cmd": "printf 'a = 1\\n[b]\\nc = \"two\"\\n' | ./bin/{{ npm_name }} --flatten | grep -qxF 'b.c=two'",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "bun"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": ".bunfig.toml",
+      "contains": "bun-toml-lite"
+    },
+    {
+      "file": "src/toml/toml.ts",
+      "contains": "export function parseToml"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".bunfig.toml",
+    "tsconfig.json"
+  ],
+  "adopt_tests": []
+}

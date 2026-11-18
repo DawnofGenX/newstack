@@ -1,0 +1,92 @@
+{
+  "name": "php-uri-cli",
+  "title": "PHP URI CLI",
+  "blurb": "RFC 3986 URI work in PHP: split a URI into components, normalise away the default port and dot segments, and edit query parameters",
+  "language": "php",
+  "requires": [
+    "php",
+    "composer",
+    "git"
+  ],
+  "default_description": "A PHP command line RFC 3986 URI tool.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "php bin/{npm_name} normalize 'HTTP://Example.COM:80/a/./b/../c'",
+    "php bin/{npm_name} query 'https://example.com/a?x=1' y=2"
+  ],
+  "verify": [
+    {
+      "name": "install",
+      "cmd": "composer install --no-interaction --prefer-dist",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "vendor/bin/phpunit",
+      "tools": [
+        "php"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "normalize",
+      "cmd": "php bin/{{ npm_name }} normalize 'HTTP://Example.COM:80/a/./b/../c' | grep -qx 'http://example.com/a/c'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "encode",
+      "cmd": "php bin/{{ npm_name }} encode 'a b&c' | grep -qx 'a%20b%26c'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "query",
+      "cmd": "php bin/{{ npm_name }} query 'https://example.com/a?x=1&y=2' y=9 | grep -qx 'https://example.com/a?x=1&y=9'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "php bin/{{ npm_name }} frobnicate x >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "php",
+        "bash"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Uri.php",
+      "contains": "final class Uri"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "tests/UriTest.php"
+  ]
+}

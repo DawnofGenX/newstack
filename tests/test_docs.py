@@ -10,6 +10,7 @@ from newstack.registry import load_stacks
 ROOT = Path(__file__).resolve().parent.parent
 README = ROOT / "README.md"
 CI = ROOT / ".github" / "workflows" / "ci.yml"
+STACKS_ROOT = ROOT / "src" / "newstack" / "data" / "stacks"
 
 
 def test_readme_exists() -> None:
@@ -315,6 +316,70 @@ def _gated_by(action_marker: str) -> set[str]:
                 )
                 break
     return gated
+
+
+_USES = re.compile(r"uses:\s*([A-Za-z0-9._-]+/[A-Za-z0-9._-]+)@")
+# Actions that are not toolchains: the runner image already provides them, so a
+# stack missing from (or absent from) a gate for one of these is not drift.
+_NOT_A_TOOLCHAIN = {
+    "actions/checkout",
+    "actions/upload-artifact",
+    "actions/download-artifact",
+    "actions/cache",
+    "astral-sh/setup-uv",
+    "actions/setup-python",
+    "actions/setup-node",
+    # Go and Rust come from the runner image and every go/rust stack builds on
+    # it today (34 go + 24 rust stacks are green in a run where the legacy gate
+    # list skipped them), so their stale lists are not drift.
+    "actions/setup-go",
+    "dtolnay/rust-toolchain",
+}
+
+# Stacks whose toolchain comes from a step that is not the action their own
+# template workflow happens to use, with the reason it is fine.
+_GATE_EXEMPTIONS = {
+    "erlang-cli": "gets Erlang from the apt step; only the rebar3 job needs setup-beam",
+}
+
+
+def _template_workflows() -> dict[str, Path]:
+    """Stack name -> its template workflow, for stacks that ship one."""
+    found: dict[str, Path] = {}
+    for stack_dir in sorted(STACKS_ROOT.iterdir()):
+        workflow = stack_dir / "template" / ".github" / "workflows" / "ci.yml"
+        if stack_dir.is_dir() and workflow.is_file():
+            found[stack_dir.name] = workflow
+    return found
+
+
+def test_every_template_toolchain_is_named_by_its_gate() -> None:
+    """A gated setup step must name every stack whose template workflow uses it.
+
+    The gates are hand-maintained name lists, so adding a stack of a language
+    that needs a pinned toolchain is a second edit that is easy to forget. The
+    failure is quiet: the setup step skips, the stack builds on whatever the
+    runner image happens to carry (or not at all), and only that one shard goes
+    red. Deriving the requirement from the template's own workflow keeps the
+    guard honest for every language instead of the four that had a bespoke test.
+    """
+    gates = {
+        match.group(1): _gated_by(f"uses: {match.group(1)}@")
+        for match in _USES.finditer(CI.read_text(encoding="utf-8"))
+    }
+    problems = []
+    for name, workflow in _template_workflows().items():
+        for match in _USES.finditer(workflow.read_text(encoding="utf-8")):
+            action = match.group(1)
+            if action in _NOT_A_TOOLCHAIN or action not in gates:
+                continue
+            if not gates[action]:  # the step is unconditional: it runs for everyone.
+                continue
+            if name in _GATE_EXEMPTIONS:
+                continue
+            if name not in gates[action]:
+                problems.append(f"{name} needs {action} but the gate omits it")
+    assert not problems, "; ".join(sorted(set(problems)))
 
 
 def test_every_stack_that_needs_a_pinned_runtime_is_gated() -> None:
