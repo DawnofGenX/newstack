@@ -1,0 +1,50 @@
+{
+  "name": "prolog-graph-cli",
+  "title": "Prolog Graph CLI",
+  "language": "prolog",
+  "blurb": "SWI-Prolog CLI: shortest path in a directed weighted graph from an edge list",
+  "requires": [
+    "swipl"
+  ],
+  "default_description": "Compute shortest paths in weighted directed graphs",
+  "next_steps": [
+    "cd {path}",
+    "swipl -q -f tests/run_tests.pl",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "swipl -q -f tests/run_tests.pl",
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage:'"
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./bin/{{ npm_name }} >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2"
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e\n./bin/{{ npm_name }} /nonexistent/graph.txt A B >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 1"
+    },
+    {
+      "name": "shortest",
+      "cmd": "tmp=$(mktemp)\nprintf 'a b 4\\na c 2\\nc b 1\\n' > \"$tmp\"\nout=$(./bin/{{ npm_name }} \"$tmp\" a b)\necho \"$out\"\necho \"$out\" | grep -q 'distance: 3'\necho \"$out\" | grep -q 'path: a c b'\nrm -f \"$tmp\""
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/graph.pl",
+      "contains": "relax_edges_once"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

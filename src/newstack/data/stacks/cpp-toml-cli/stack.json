@@ -1,0 +1,64 @@
+{
+  "name": "cpp-toml-cli",
+  "title": "C++ TOML CLI",
+  "language": "cpp",
+  "blurb": "C++17 TOML subset parser that flattens keys, Makefile build, assert-based tests",
+  "requires": [
+    "g++",
+    "make"
+  ],
+  "default_description": "A C++ command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "make",
+    "make test",
+    "./{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "tools": [
+        "make",
+        "g++"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "make",
+        "g++"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "cli",
+      "cmd": "out=$(echo 'name = \"x\"' | ./{{ npm_name }}); test \"$out\" = 'name = \"x\"'",
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./{{ npm_name }} --bogus >/dev/null 2>&1; status=$?; test \"$status\" -eq 2",
+      "timeout": 60
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./{{ npm_name }} /nonexistent-file-xyz >/dev/null 2>&1; status=$?; test \"$status\" -eq 1",
+      "timeout": 60
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/flatten.cpp",
+      "contains": "toml_flatten"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

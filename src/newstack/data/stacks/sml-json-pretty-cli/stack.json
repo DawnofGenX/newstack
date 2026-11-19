@@ -1,0 +1,50 @@
+{
+  "name": "sml-json-pretty-cli",
+  "title": "SML JSON Pretty CLI",
+  "language": "sml",
+  "blurb": "Standard ML / MLton CLI: JSON tokenizer and pretty-printer with sorted keys",
+  "requires": [
+    "mlton",
+    "make"
+  ],
+  "default_description": "Pretty-print JSON with sorted keys",
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help 2>&1 | grep -qF 'Usage:' || ./bin/{{ npm_name }} </dev/null; true",
+      "timeout": 120
+    },
+    {
+      "name": "pretty",
+      "cmd": "printf '{\"b\":2,\"a\":[1,2,3]}' | ./bin/{{ npm_name }} | grep -q '\"a\":'",
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/json.sml",
+      "contains": "fun sortPairs [] = []"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

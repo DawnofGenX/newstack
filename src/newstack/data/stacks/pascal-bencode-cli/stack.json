@@ -1,0 +1,77 @@
+{
+  "name": "pascal-bencode-cli",
+  "title": "Pascal Bencode CLI",
+  "language": "pascal",
+  "blurb": "Bencode encode and decode with canonical key ordering",
+  "requires": [
+    "fpc"
+  ],
+  "default_description": "Bencode normalize",
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "tools": [
+        "fpc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "fpc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q 'Usage:'",
+      "tools": [
+        "fpc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} a b > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 2",
+      "tools": [
+        "fpc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.benc > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 1",
+      "tools": [
+        "fpc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "stdin",
+      "cmd": "test \"$(printf 'd1:bi2e1:ai1ee' | ./bin/{{ npm_name }})\" = 'd1:ai1e1:bi2ee'",
+      "tools": [
+        "fpc"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/bencode.pas",
+      "contains": "procedure DictSet(d: PBencode; const key: AnsiString; v: PBencode);"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "Makefile"
+  ]
+}

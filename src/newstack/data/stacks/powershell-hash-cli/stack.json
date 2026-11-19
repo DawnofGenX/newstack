@@ -1,0 +1,50 @@
+{
+  "name": "powershell-hash-cli",
+  "title": "PowerShell Hash CLI",
+  "language": "powershell",
+  "blurb": "PowerShell 7 CLI: SHA-256/512 file hashing, single-file verify, directory manifests",
+  "requires": [
+    "pwsh"
+  ],
+  "default_description": "Hash and verify files with SHA-256/512 and manifests",
+  "next_steps": [
+    "cd {path}",
+    "./bin/{npm_name} --help",
+    "pwsh -NoProfile -NonInteractive -File tests/Run-Tests.ps1"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "pwsh -NoProfile -NonInteractive -File tests/Run-Tests.ps1",
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage:'"
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./bin/{{ npm_name }} >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2"
+    },
+    {
+      "name": "hash-known",
+      "cmd": "f=$(mktemp)\nprintf 'abc' > \"$f\"\ntest \"$(./bin/{{ npm_name }} hash \"$f\")\" = 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad'\nrm -f \"$f\""
+    },
+    {
+      "name": "verify-mismatch",
+      "cmd": "set +e\nf=$(mktemp)\nprintf 'abc' > \"$f\"\n./bin/{{ npm_name }} verify \"$f\" 0000000000000000000000000000000000000000000000000000000000000000 >/dev/null 2>&1\nstatus=$?\nrm -f \"$f\"\necho \"exit status: $status\"\ntest \"$status\" -eq 1"
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/HashCli.ps1",
+      "contains": "Get-FileHash -Path $Path -Algorithm $Algorithm).Hash.ToLowerInvariant()"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

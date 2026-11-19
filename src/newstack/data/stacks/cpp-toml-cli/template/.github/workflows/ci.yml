@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build, test, smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install toolchain
+        run: |
+          if ! command -v g++ >/dev/null || ! command -v make >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y g++ make
+          fi
+      - name: Build
+        run: make
+      - name: Test
+        run: make test
+      - name: Smoke
+        run: |
+          out=$(printf '[server]\nhost = "localhost"\nport = 8080\n' | ./{{ npm_name }})
+          printf '%s\n' "$out"
+      - name: Usage error exits 2
+        run: |
+          set +e
+          ./{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          test "$status" -eq 2
+      - name: Missing file exits 1
+        run: |
+          set +e
+          ./{{ npm_name }} /nonexistent-file-xyz >/dev/null 2>&1
+          status=$?
+          test "$status" -eq 1

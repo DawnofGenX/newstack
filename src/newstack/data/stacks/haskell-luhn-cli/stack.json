@@ -1,0 +1,27 @@
+{
+  "name": "haskell-luhn-cli",
+  "title": "Haskell Luhn CLI",
+  "language": "haskell",
+  "blurb": "Luhn check-digit validation and generation (Haskell/GHC).",
+  "requires": ["ghc", "cabal"],
+  "default_description": "A Haskell Luhn command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "cabal build",
+    "cabal test",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    { "name": "build", "cmd": "cabal build", "tools": ["ghc", "cabal"], "timeout": 600 },
+    { "name": "test", "cmd": "cabal test", "tools": ["ghc", "cabal"], "timeout": 600 },
+    { "name": "validate", "cmd": "./bin/{{ npm_name }} validate 79927398713", "tools": ["ghc", "cabal"], "timeout": 300 },
+    { "name": "invalid", "cmd": "./bin/{{ npm_name }} validate 79927398710 >/dev/null 2>&1; test $? -eq 1", "tools": ["ghc", "cabal"], "timeout": 300 },
+    { "name": "generate", "cmd": "test \"$(./bin/{{ npm_name }} generate 7992739871)\" = '79927398713'", "tools": ["ghc", "cabal"], "timeout": 300 },
+    { "name": "help", "cmd": "./bin/{{ npm_name }} --help", "tools": ["ghc", "cabal"], "timeout": 300 },
+    { "name": "usage-error", "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2", "tools": ["ghc", "cabal"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "src/Luhn.hs", "contains": "HASKELL_LUHN_CLI_MARKER_2c9f4a" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": []
+}

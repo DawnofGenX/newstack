@@ -1,0 +1,68 @@
+{
+  "name": "lisp-json-cli",
+  "title": "Common Lisp JSON CLI",
+  "language": "lisp",
+  "blurb": "SBCL JSON reader/writer that pretty-prints with sorted keys",
+  "requires": [
+    "sbcl"
+  ],
+  "default_description": "Pretty-print JSON with sorted keys",
+  "next_steps": [
+    "cd {path}",
+    "sbcl --script tests/run-tests.lisp",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "sbcl --script tests/run-tests.lisp",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q 'usage: {{ npm_name }}'",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} a b > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 2",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.json > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 1",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "stdin",
+      "cmd": "test \"$(printf '%s' '{}' | ./bin/{{ npm_name }})\" = '{}'",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/json.lisp",
+      "contains": "(defstruct jobject entries)"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

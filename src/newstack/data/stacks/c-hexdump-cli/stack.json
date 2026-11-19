@@ -1,0 +1,65 @@
+{
+  "name": "c-hexdump-cli",
+  "title": "C Hexdump CLI",
+  "language": "c",
+  "blurb": "C11 hex dump CLI: offsets and ASCII gutter, Makefile lib+bin split, assert-based tests",
+  "requires": [
+    "cc",
+    "make"
+  ],
+  "default_description": "A C command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "make",
+    "make test",
+    "./build/{npm_name} --help",
+    "printf 'Hello\\n' | ./build/{npm_name}"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "tools": [
+        "make",
+        "cc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "make",
+        "cc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "cli",
+      "cmd": "out=$(printf 'Hello\\n' | ./build/{{ npm_name }}); test \"$out\" = \"00000000  48 65 6c 6c 6f 0a                                 |Hello.          |\"",
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./build/{{ npm_name }} --bogus >/dev/null 2>&1; status=$?; test \"$status\" -eq 2",
+      "timeout": 60
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./build/{{ npm_name }} /nonexistent-file-xyz >/dev/null 2>&1; status=$?; test \"$status\" -eq 1",
+      "timeout": 60
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/hexdump.c",
+      "contains": "hexdump_format"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

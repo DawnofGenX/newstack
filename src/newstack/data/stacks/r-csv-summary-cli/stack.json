@@ -1,0 +1,46 @@
+{
+  "name": "r-csv-summary-cli",
+  "title": "R CSV Summary CLI",
+  "language": "r",
+  "blurb": "R CLI: per-column summary (n, mean, min, max, NA count) of a CSV",
+  "requires": [
+    "Rscript"
+  ],
+  "default_description": "Summarize CSV columns",
+  "next_steps": [
+    "cd {path}",
+    "Rscript tests/run.R",
+    "Rscript bin/{{ npm_name }} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "Rscript tests/run.R",
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "Rscript bin/{{ npm_name }} --help | grep -qF 'Usage:'"
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e\nRscript bin/{{ npm_name }} /nonexistent.csv >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 1"
+    },
+    {
+      "name": "summary",
+      "cmd": "tmp=$(mktemp).csv\nprintf 'x,y\\n1,2\\n3,4\\n5,\\n' > \"$tmp\"\nout=$(Rscript bin/{{ npm_name }} \"$tmp\")\necho \"$out\"\necho \"$out\" | grep -q 'x 3 3 1 5 0'\nrm -f \"$tmp\""
+    }
+  ],
+  "detect": [
+    {
+      "file": "R/csv_summary.R",
+      "contains": "format_csv_summary <- function(summary)"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

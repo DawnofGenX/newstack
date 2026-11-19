@@ -1,0 +1,68 @@
+{
+  "name": "octave-stats-cli",
+  "title": "Octave Stats CLI",
+  "language": "octave",
+  "blurb": "Percentiles, quartiles, and IQR for numbers on stdin",
+  "requires": [
+    "octave"
+  ],
+  "default_description": "Summary statistics for numbers",
+  "next_steps": [
+    "cd {path}",
+    "octave --no-window-system --quiet tests/run_tests.m",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "octave --no-window-system --quiet tests/run_tests.m",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q 'Usage:'",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} a b > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 2",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.txt > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 1",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "stdin",
+      "cmd": "test \"$(printf '1 2 3 4 5\\n' | ./bin/{{ npm_name }} | grep '^iqr=')\" = 'iqr=2'",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "+stats/summarize.m",
+      "contains": "s.iqr = s.q3 - s.q1"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

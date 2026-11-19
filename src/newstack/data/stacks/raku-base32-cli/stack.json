@@ -1,0 +1,50 @@
+{
+  "name": "raku-base32-cli",
+  "title": "Raku Base32 CLI",
+  "language": "raku",
+  "blurb": "Raku CLI: RFC 4648 base32 encode/decode with padding rules",
+  "requires": [
+    "raku"
+  ],
+  "default_description": "Base32 encode and decode",
+  "next_steps": [
+    "cd {path}",
+    "raku -I lib -I tests tests/run-tests.raku",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "raku -I lib -I tests tests/run-tests.raku",
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage:'"
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./bin/{{ npm_name }} >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2"
+    },
+    {
+      "name": "encode",
+      "cmd": "test \"$(./bin/{{ npm_name }} encode 'Hello')\" = 'JBSWY3DP'"
+    },
+    {
+      "name": "decode",
+      "cmd": "test \"$(./bin/{{ npm_name }} decode 'JBSWY3DP')\" = 'Hello'"
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/Base32.rakumod",
+      "contains": "base32-decode-text"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

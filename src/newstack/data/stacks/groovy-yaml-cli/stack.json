@@ -1,0 +1,23 @@
+{
+  "name": "groovy-yaml-cli",
+  "title": "Groovy YAML CLI",
+  "language": "groovy",
+  "blurb": "Read a YAML subset and print flattened keys (Groovy/JVM).",
+  "requires": ["groovy", "java"],
+  "default_description": "A Groovy YAML command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "./bin/{npm_name} --help",
+    "groovy -cp src:tests tests/run_tests.groovy"
+  ],
+  "verify": [
+    { "name": "test", "cmd": "groovy -cp src:tests tests/run_tests.groovy", "tools": ["groovy"], "timeout": 300 },
+    { "name": "help", "cmd": "./bin/{{ npm_name }} --help", "tools": ["groovy"], "timeout": 120 },
+    { "name": "usage-error", "cmd": "printf 'x: 1\\n' | ./bin/{{ npm_name }} a b >/dev/null 2>&1; test $? -eq 2", "tools": ["groovy"], "timeout": 120 },
+    { "name": "render", "cmd": "printf 'a:\\n  b: 1\\n' | ./bin/{{ npm_name }} | grep -q 'a.b: 1'", "tools": ["groovy"], "timeout": 120 }
+  ],
+  "detect": [{ "file": "src/yaml/Yaml.groovy", "contains": "GROOVY_YAML_CLI_MARKER_7b2d9e" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": []
+}

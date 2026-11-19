@@ -1,0 +1,25 @@
+#!/usr/bin/env Rscript
+find_script_path <- function() {
+  args <- commandArgs(trailingOnly = FALSE)
+  file_arg <- grep("^--file=", args, value = TRUE)
+  if (length(file_arg) >= 1) return(sub("^--file=", "", file_arg[1]))
+  for (a in args) if (file.exists(a)) return(a)
+  args[2]
+}
+script_path <- normalizePath(find_script_path(), mustWork = FALSE)
+root <- normalizePath(file.path(dirname(script_path), ".."), mustWork = FALSE)
+source(file.path(root, "R", "csv_summary.R"))
+program <- basename(script_path)
+argv <- commandArgs(trailingOnly = TRUE)
+if (length(argv) == 0L || any(argv %in% c("-h","--help"))) {
+  cat("Usage: ", program, " FILE.csv\n", sep = "")
+  quit(status = 0L)
+}
+path <- argv[1]
+if (!file.exists(path)) {
+  cat(program, ": ", path, ": No such file or directory\n", sep = "")
+  quit(status = 1L)
+}
+s <- csv_summary(path)
+cat(format_csv_summary(s), "\n", sep = "")
+quit(status = 0L)

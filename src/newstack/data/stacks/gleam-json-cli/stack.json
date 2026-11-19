@@ -1,0 +1,26 @@
+{
+  "name": "gleam-json-cli",
+  "title": "Gleam JSON CLI",
+  "language": "gleam",
+  "blurb": "Compact or pretty-print a JSON document using a hand-written recursive-descent parser (Gleam/Erlang).",
+  "requires": ["gleam"],
+  "default_description": "A Gleam JSON command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "gleam build",
+    "gleam test",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    { "name": "build", "cmd": "gleam build", "tools": ["gleam"], "timeout": 600 },
+    { "name": "test", "cmd": "gleam test", "tools": ["gleam"], "timeout": 600 },
+    { "name": "help", "cmd": "./bin/{{ npm_name }} --help", "tools": ["gleam"], "timeout": 120 },
+    { "name": "usage-error", "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2", "tools": ["gleam"], "timeout": 120 },
+    { "name": "parse-error", "cmd": "printf '{bad}' | ./bin/{{ npm_name }} >/dev/null 2>&1; test $? -eq 1", "tools": ["gleam"], "timeout": 120 },
+    { "name": "compact", "cmd": "printf '{\"a\": 1}' | ./bin/{{ npm_name }} | grep -q '{\"a\":1}'", "tools": ["gleam"], "timeout": 120 }
+  ],
+  "detect": [{ "file": "src/json_parser.gleam", "contains": "GLEAM_JSON_CLI_MARKER_9f3a1c" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": []
+}

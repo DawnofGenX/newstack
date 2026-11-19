@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Runs the compiled program, building it first on a clean checkout.
+set -euo pipefail
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [ ! -f "$root/build/app.n" ]; then
+  ( cd "$root" && mkdir -p build && haxe build.hxml >&2 )
+fi
+exec neko "$root/build/app.n" "$@"

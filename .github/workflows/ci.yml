@@ -236,6 +236,10 @@ jobs:
           - julia-stats-cli
           - swift-diff-cli
           - erlang-ets-cli
+          - fortran-stats-cli
+          - haskell-luhn-cli
+          - pascal-bencode-cli
+          - raku-base32-cli
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -328,19 +332,19 @@ jobs:
       # error: cannot find 'ld'` when binutils is missing on the runner image),
       # and the GHC runtime links against libgmp, so both are installed here.
       - name: Install the Haskell build dependencies
-        if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
+        if: contains(fromJSON('["haskell-cli","haskell-luhn-cli","haskell-warp-api"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
             binutils gcc g++ make libgmp-dev zlib1g-dev pkg-config
       - name: Set up GHC and cabal
-        if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
+        if: contains(fromJSON('["haskell-cli","haskell-luhn-cli","haskell-warp-api"]'), matrix.stack)
         uses: haskell-actions/setup@v2
         with:
           ghc-version: "9.4.7"
           cabal-version: "3.10.3.0"
       - name: Update the cabal package index
-        if: contains(fromJSON('["haskell-cli","haskell-warp-api"]'), matrix.stack)
+        if: contains(fromJSON('["haskell-cli","haskell-luhn-cli","haskell-warp-api"]'), matrix.stack)
         run: cabal update
       # The RESP and MQTT smokes drive the server they start with the distro
       # client tools, which the runner image does not carry.
@@ -439,7 +443,7 @@ jobs:
           rebar3-version: "3.28.0"
 
       - name: Install gfortran
-        if: contains(fromJSON('["fortran-cli","fortran-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["fortran-cli","fortran-http-api","fortran-stats-cli"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends gfortran make curl
@@ -453,7 +457,7 @@ jobs:
           gnatmake --version | head -1
 
       - name: Install Free Pascal
-        if: contains(fromJSON('["pascal-cli","pascal-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["pascal-bencode-cli","pascal-cli","pascal-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
           packages="fp-compiler make"
@@ -471,14 +475,14 @@ jobs:
           shellcheck --version | head -2
 
       - name: Install Guile
-        if: contains(fromJSON('["guile-cli","guile-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["guile-cli","guile-http-api","scheme-sieve-cli"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends guile-3.0 guile-json
           guile --version | head -1
 
       - name: Install Rakudo
-        if: contains(fromJSON('["raku-cli","raku-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["raku-base32-cli","raku-cli","raku-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends rakudo curl
@@ -506,7 +510,7 @@ jobs:
           sqlite3 --version
 
       - name: Set up PowerShell
-        if: contains(fromJSON('["powershell-cli","powershell-api"]'), matrix.stack)
+        if: contains(fromJSON('["powershell-api","powershell-cli","powershell-hash-cli"]'), matrix.stack)
         run: |
           if ! command -v pwsh >/dev/null 2>&1; then
             fetch /tmp/pwsh.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.6.9/powershell-7.6.9-linux-x64.tar.gz
@@ -544,7 +548,7 @@ jobs:
           mdbook --version
 
       - name: Install Haxe
-        if: contains(fromJSON('["haxe-cli","haxe-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["haxe-cli","haxe-http-api","haxe-mustache-cli"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends haxe neko
@@ -566,14 +570,14 @@ jobs:
           ldc2 --version | head -1
 
       - name: Install MLton
-        if: contains(fromJSON('["sml-cli","sml-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["sml-cli","sml-http-api","sml-json-pretty-cli"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends mlton curl
           mlton
 
       - name: Install Groovy
-        if: contains(fromJSON('["groovy-cli","groovy-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["groovy-cli","groovy-http-api","groovy-yaml-cli"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends groovy
@@ -587,21 +591,21 @@ jobs:
           cobc --version | head -1
 
       - name: Install SBCL
-        if: contains(fromJSON('["lisp-cli","lisp-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["lisp-cli","lisp-http-api","lisp-json-cli"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends sbcl
           sbcl --version
 
       - name: Install SWI-Prolog
-        if: contains(fromJSON('["prolog-cli","prolog-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["prolog-cli","prolog-graph-cli","prolog-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends swi-prolog-nox
           swipl --version
 
       - name: Install Octave
-        if: contains(fromJSON('["octave-cli","octave-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["octave-cli","octave-http-api","octave-stats-cli"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends octave curl
@@ -671,13 +675,13 @@ jobs:
       # answered 504 twice in a row; the pinned release asset behind `fetch`
       # keeps a CDN hiccup from failing the job.
       - name: Set up Erlang for Gleam
-        if: contains(fromJSON('["gleam-cli","gleam-mist-api"]'), matrix.stack)
+        if: contains(fromJSON('["gleam-cli","gleam-json-cli","gleam-mist-api"]'), matrix.stack)
         uses: erlef/setup-beam@v1
         with:
           otp-version: "27.3"
           rebar3-version: "3.28.0"
       - name: Install Gleam
-        if: contains(fromJSON('["gleam-cli","gleam-mist-api"]'), matrix.stack)
+        if: contains(fromJSON('["gleam-cli","gleam-json-cli","gleam-mist-api"]'), matrix.stack)
         run: |
           tools=$(mktemp -d)
           fetch "$tools/gleam.tar.gz" https://github.com/gleam-lang/gleam/releases/download/v1.19.2/gleam-v1.19.2-x86_64-unknown-linux-musl.tar.gz
@@ -717,7 +721,7 @@ jobs:
         with:
           bun-version: 1.4.2
       - name: Install R
-        if: contains(fromJSON('["r-cli","r-plumber-api"]'), matrix.stack)
+        if: contains(fromJSON('["r-cli","r-csv-summary-cli","r-plumber-api"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends r-base-core
@@ -874,6 +878,10 @@ jobs:
           - deno-jwt-cli
           - racket-csv-cli
           - d-adler32-cli
+          - gleam-json-cli
+          - haxe-mustache-cli
+          - powershell-hash-cli
+          - sml-json-pretty-cli
     steps: *shared_setup
 
   stacks-c:
@@ -1019,6 +1027,10 @@ jobs:
           - tcl-json-query-cli
           - dart-uuid-cli
           - ocaml-avl-cli
+          - c-hexdump-cli
+          - groovy-yaml-cli
+          - lisp-json-cli
+          - prolog-graph-cli
     steps: *shared_setup
 
   stacks-d:
@@ -1164,6 +1176,10 @@ jobs:
           - crystal-hex-cli
           - clojure-edn-cli
           - fsharp-csv-cli
+          - cpp-toml-cli
+          - scheme-sieve-cli
+          - octave-stats-cli
+          - r-csv-summary-cli
     steps: *shared_setup
 
   package:

@@ -252,8 +252,10 @@ $ newstack stacks outdated
 | `bun-password-strength-cli` | Password strength scorer CLI: length, character-class diversity, entropy estimate and common-pattern penalties, bun:test suite. | bun |
 | `bun-toml-lite` | Dependency-free TOML parser and CLI: tables, arrays of tables, dotted and inline keys, with line-numbered errors | bun |
 | `bun-uuid-v7-cli` | Bun/TypeScript UUIDv7 (RFC 9562) CLI: time-ordered identifiers with a 48-bit millisecond stamp, plus parse, validate and stdin sort | bun |
+| `c-hexdump-cli` | C11 hex dump CLI: offsets and ASCII gutter, Makefile lib+bin split, assert-based tests | c |
 | `clojure-cron-cli` | Explain and schedule five field cron expressions: next firing times in UTC, field-by-field explanations, weekday and leap-day search, no dependencies | clojure |
 | `clojure-edn-cli` | Parse, pretty-print, and query EDN documents from the command line using only clojure.edn | clojure |
+| `cpp-toml-cli` | C++17 TOML subset parser that flattens keys, Makefile build, assert-based tests | cpp |
 | `crystal-hex-cli` | Crystal 1.11+ CLI: hex dump and reverse (xxd -r style), offset and width flags | crystal |
 | `crystal-money-cli` | Money in integer minor units: parse, add, scale, split by ratios with no lost cents, symbol formatting, Crystal stdlib only | crystal |
 | `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
@@ -279,7 +281,9 @@ $ newstack stacks outdated
 | `elixir-pubsub` | GenServer-based in-process pub/sub with topic subscriptions and at-least-once delivery | elixir |
 | `elixir-wordcount-cli` | Elixir word frequency counter on Mix: pure options/counter modules, ExUnit suite, escript binary | elixir |
 | `erlang-ets-cli` | Erlang ETS CLI on plain OTP and make: byte-counting core, hand-written argv parser, eunit suites | erlang |
+| `fortran-stats-cli` | Fortran stats CLI: mean, median, stdev on stdin, gfortran build, unit tests | fortran |
 | `fsharp-csv-cli` | F# CSV CLI on .NET: pure counting core, hand-rolled argv parser, xUnit suites | fsharp |
+| `gleam-json-cli` | Compact or pretty-print a JSON document using a hand-written recursive-descent parser (Gleam/Erlang). | gleam |
 | `go-bitmap-index` | Bitset with Set/Clear/Has, popcount, Rank prefix sums and Select, with rank/select inverse tested. | go |
 | `go-bloom-filter` | Bloom filter library plus CLI (add, check, stats), fixed-size bit array, double hashing FNV-64a | go |
 | `go-circuit-breaker` | Circuit breaker state machine (closed/open/half-open) with clock-driven CLI | go |
@@ -317,6 +321,9 @@ $ newstack stacks outdated
 | `go-ulid-cli` | Time sortable ULID generation and parsing over Crockford base32, crypto/rand entropy, millisecond round trip. | go |
 | `go-url-signer` | HMAC-SHA256 signed URLs with expiry, middleware that gates handlers, httptest coverage, ephemeral port. | go |
 | `go-webhook-receiver` | HTTP webhook receiver on port 5592. | go |
+| `groovy-yaml-cli` | Read a YAML subset and print flattened keys (Groovy/JVM). | groovy |
+| `haskell-luhn-cli` | Luhn check-digit validation and generation (Haskell/GHC). | haskell |
+| `haxe-mustache-cli` | Haxe/Neko Mustache template renderer CLI: variables, sections, partials, HTML escaping, JSON data | haxe |
 | `java-bloom-filter-cli` | Bloom filter membership testing in Java with JUnit 5 | java |
 | `java-config-loader` | Properties-based config loader CLI with env overrides, defaults, typed getters, JUnit5 tests | java |
 | `java-csv-mapper` | Maven Java 21 CSV-to-typed-records mapper with strict validation and a CLI | java |
@@ -338,6 +345,7 @@ $ newstack stacks outdated
 | `kotlin-json-dsl` | Gradle Kotlin type-safe JSON DSL with deterministic serialization | kotlin |
 | `kotlin-jsonpath-cli` | A small JSONPath evaluator CLI with JUnit5 tests and Gradle Kotlin DSL. | kotlin |
 | `kotlin-money-ledger` | BigDecimal double-entry ledger CLI: exact money arithmetic, per-account balances, trial balance; JUnit5 tests | kotlin |
+| `lisp-json-cli` | SBCL JSON reader/writer that pretty-prints with sorted keys | lisp |
 | `lua-csv-cli` | Lua 5.4 CSV tool: RFC 4180 parser with width checks, column selection by name or position, CSV/TSV/JSON output, dependency-free spec runner | lua |
 | `lua-json-lite` | Lua 5.4 JSON reader and writer: offset-accurate parse errors, compact/pretty/canonical output, --get path walking, no LuaRocks | lua |
 | `lua-lru-cli` | Lua 5.4 CLI: LRU cache driven by a command trace (PUT/GET/STATS), stdlib only | lua |
@@ -386,6 +394,8 @@ $ newstack stacks outdated
 | `node-zlib-stat-cli` | gzip/gunzip CLI on node:zlib with size accounting: level control, ratio report, JSON stats. | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
 | `ocaml-avl-cli` | OCaml CLI on dune: pure counting core, hand-rolled argv parser, alcotest suites | ocaml |
+| `octave-stats-cli` | Percentiles, quartiles, and IQR for numbers on stdin | octave |
+| `pascal-bencode-cli` | Bencode encode and decode with canonical key ordering | pascal |
 | `perl-csv-query-cli` | Perl 5 CLI: select/filter/sum CSV columns, RFC 4180 parser, core modules only | perl |
 | `perl-ini-cli` | Perl INI reader on ExtUtils::MakeMaker: section and key order preserved, inline comments, quoted escapes, section/key lookup, JSON output, Test::More suite | perl |
 | `perl-jsonl-cli` | Query JSON Lines from the shell: project nested paths, filter with numeric and regex comparisons, sort, and summarise a column, in plain Perl | perl |
@@ -403,6 +413,8 @@ $ newstack stacks outdated
 | `php-sqlite-queue` | PHP 8.3 PDO SQLite durable job queue CLI with PHPUnit tests | php |
 | `php-text-table-cli` | CSV to aligned text tables: per-column alignment, wide-character aware widths, ASCII/Unicode/no borders, truncation | php |
 | `php-uri-cli` | RFC 3986 URI work in PHP: split a URI into components, normalise away the default port and dot segments, and edit query parameters | php |
+| `powershell-hash-cli` | PowerShell 7 CLI: SHA-256/512 file hashing, single-file verify, directory manifests | powershell |
+| `prolog-graph-cli` | SWI-Prolog CLI: shortest path in a directed weighted graph from an edge list | prolog |
 | `python-aiohttp-api` | aiohttp JSON service with health and stats endpoints, curl smoke | python |
 | `python-alembic-migrations` | Alembic with SQLite and two revisions; smoke upgrades and asserts schema | python |
 | `python-apscheduler-worker` | APScheduler interval job writing rows to SQLite; CLI runs N ticks | python |
@@ -590,7 +602,9 @@ $ newstack stacks outdated
 | `python-cocktail-sort` | cocktail sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `python-tim-sort` | tim sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `python-intro-sort` | intro sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
+| `r-csv-summary-cli` | R CLI: per-column summary (n, mean, min, max, NA count) of a CSV | r |
 | `racket-csv-cli` | Racket CSV CLI on the core distribution: byte-counting core, struct-based argv parser, rackunit suites | racket |
+| `raku-base32-cli` | Raku CLI: RFC 4648 base32 encode/decode with padding rules | raku |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `ruby-base58-cli` | Base58 and Base58Check in Ruby stdlib: encode hex or text, decode, and refuse a tampered checksum | ruby |
 | `ruby-csv-report` | stdlib CSV report builder: group-by column, per-group aggregates, aligned table + JSON output; minitest + Rakefile | ruby |
@@ -630,6 +644,8 @@ $ newstack stacks outdated
 | `rust-toml-lite` | Minimal TOML subset parser (tables, scalars, arrays) with a CLI printing normalized JSON, std only | rust |
 | `rust-tracing-service` | tracing + tracing-subscriber JSON output with a small HTTP service | rust |
 | `rust-url-shortener` | Std-only HTTP URL shortener: base62 ids, POST create, GET redirect, thread per connection | rust |
+| `scheme-sieve-cli` | Sieve of Eratosthenes, factorization, and a tiny expression evaluator (Guile). | scheme |
+| `sml-json-pretty-cli` | Standard ML / MLton CLI: JSON tokenizer and pretty-printer with sorted keys | sml |
 | `swift-diff-cli` | Swift CLI on SwiftPM: unified diff with LCS, context lines, offline tests | swift |
 | `swift-roman-cli` | Roman numeral converter in Swift 6: canonical form validation, stdin batch mode, XCTest suite. | swift |
 | `tcl-base64-cli` | Base64 and base64url in plain tclsh: byte-string codec, strict padding checks, hex mode, hand-written argv parser | tcl |

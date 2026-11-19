@@ -1,0 +1,39 @@
+cabal-version:      3.0
+name:               {{ cabal_name }}
+version:            0.1.0
+synopsis:           Luhn check-digit validation and generation
+license:            MIT
+license-file:       LICENSE
+author:             {{ author }}
+maintainer:         {{ author }}
+build-type:         Simple
+extra-doc-files:    README.md
+
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    hs-source-dirs:   src
+    exposed-modules:  Luhn
+    build-depends:    base >=4.14 && <5
+    default-language: Haskell2010
+
+executable {{ npm_name }}
+    import:           warnings
+    hs-source-dirs:   app
+    main-is:          Main.hs
+    build-depends:    base
+                    , {{ cabal_name }}
+    default-language: Haskell2010
+
+test-suite spec
+    import:           warnings
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Spec.hs
+    other-modules:    Harness
+                    , LuhnSpec
+    build-depends:    base
+                    , {{ cabal_name }}
+    default-language: Haskell2010

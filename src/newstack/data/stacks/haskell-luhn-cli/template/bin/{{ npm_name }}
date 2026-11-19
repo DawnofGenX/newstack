@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$root"
+cabal build -v0 exe:{{ npm_name }} >&2
+binary=$(cabal list-bin exe:{{ npm_name }})
+exec "$binary" "$@"

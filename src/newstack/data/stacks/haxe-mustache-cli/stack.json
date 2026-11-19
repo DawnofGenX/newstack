@@ -1,0 +1,80 @@
+{
+  "name": "haxe-mustache-cli",
+  "title": "Haxe Mustache CLI",
+  "language": "haxe",
+  "blurb": "Haxe/Neko Mustache template renderer CLI: variables, sections, partials, HTML escaping, JSON data",
+  "requires": [
+    "haxe",
+    "neko",
+    "make"
+  ],
+  "default_description": "A Haxe command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "make",
+    "make test",
+    "./bin/{npm_name} --help",
+    "printf '{{\"name\":\"world\"}}' | ./bin/{npm_name} template.mustache -"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make build",
+      "tools": [
+        "make",
+        "haxe",
+        "neko"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "make",
+        "haxe",
+        "neko"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "cli",
+      "cmd": "printf 'Hello {{!name}}\\n' > /tmp/hx-mst.txt && printf '{\"name\":\"world\"}' > /tmp/hx-msd.json && out=$(./bin/{{ npm_name }} /tmp/hx-mst.txt /tmp/hx-msd.json) && test \"$out\" = 'Hello world'",
+      "tools": [
+        "haxe",
+        "neko"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} --bogus >/dev/null 2>&1; status=$?; test \"$status\" -eq 2",
+      "tools": [
+        "haxe",
+        "neko"
+      ],
+      "timeout": 60
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} /nonexistent-file-xyz >/dev/null 2>&1; status=$?; test \"$status\" -eq 1",
+      "tools": [
+        "haxe",
+        "neko"
+      ],
+      "timeout": 60
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Mustache.hx",
+      "contains": "htmlEscape"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

@@ -1,0 +1,8 @@
+(let ((here (merge-pathnames (make-pathname :directory '(:relative :up))
+                             (make-pathname :name nil :type nil :defaults *load-truename*))))
+  (load (merge-pathnames "lib/json.lisp" here))
+  (load (merge-pathnames "tests/harness.lisp" here))
+  (load (merge-pathnames "tests/json-tests.lisp" here)))
+(lisp-json.harness:reset)
+(lisp-json.harness::json-tests)
+(sb-ext:exit :code (lisp-json.harness:report))
