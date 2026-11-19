@@ -1,0 +1,67 @@
+{
+  "name": "fortran-root-finder",
+  "title": "Fortran Root Finder",
+  "language": "fortran",
+  "blurb": "Bisection root finder with an injected function, a checked bracket, an explicit iteration budget and a dependency-free Fortran test harness.",
+  "requires": [
+    "gfortran",
+    "make"
+  ],
+  "default_description": "A Fortran bisection root finder.",
+  "next_steps": [
+    "cd {path}",
+    "make",
+    "./bin/{npm_name} 2 3"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make -s all",
+      "tools": [
+        "gfortran",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "make -s test",
+      "tools": [
+        "gfortran",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q \"Usage: {{ npm_name }}\"",
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} only-one-endpoint >/dev/null 2>&1; test $? -eq 2",
+      "timeout": 300
+    },
+    {
+      "name": "unbracketed",
+      "cmd": "./bin/{{ npm_name }} 3 4 >/dev/null 2>&1; test $? -eq 1",
+      "timeout": 300
+    },
+    {
+      "name": "demo-root",
+      "cmd": "./bin/{{ npm_name }} 2 3 | grep -q \"^root=2.0945\"",
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/root_find.f90",
+      "contains": "module root_find"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

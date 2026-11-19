@@ -1,0 +1,76 @@
+{
+  "name": "lisp-jsonpath-lite",
+  "title": "Common Lisp JSONPath CLI",
+  "language": "lisp",
+  "blurb": "SBCL JSONPath subset evaluator: dot paths, wildcards, recursive descent",
+  "requires": [
+    "sbcl"
+  ],
+  "default_description": "Query JSON documents with a small JSONPath subset",
+  "next_steps": [
+    "cd {path}",
+    "sbcl --script tests/run-tests.lisp",
+    "./bin/{npm_name} testdata/sample.json '$.users[*].name'"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "sbcl --script tests/run-tests.lisp",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qi 'usage: {{ npm_name }}'",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} only-one-arg > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 2",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.json '$.a' > /dev/null 2>&1; status=$?; echo \"exit status: $status\"; test \"$status\" -eq 1",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "dot-path",
+      "cmd": "test \"$(./bin/{{ npm_name }} testdata/sample.json '$.a.b')\" = '42'",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "wildcard",
+      "cmd": "test \"$(./bin/{{ npm_name }} testdata/sample.json '$.arr[*]' | tr '\\n' ',')\" = '1,2,3,'",
+      "tools": [
+        "sbcl"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/json.lisp",
+      "contains": "(defpackage :jsonpath.json"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

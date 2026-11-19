@@ -1,0 +1,68 @@
+{
+  "name": "powershell-env-diff",
+  "title": "PowerShell Env Diff",
+  "language": "powershell",
+  "blurb": "Structural .env diff in PowerShell 7: dotenv quoting, four-way key classification, a reader-injected CLI and a harness without gallery modules.",
+  "requires": [
+    "pwsh"
+  ],
+  "default_description": "A PowerShell .env comparison tool.",
+  "next_steps": [
+    "cd {path}",
+    "./bin/{npm_name} --help",
+    "pwsh -NoProfile -NonInteractive -File tests/Run-Tests.ps1"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "pwsh -NoProfile -NonInteractive -File tests/Run-Tests.ps1",
+      "tools": [
+        "pwsh"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage: {{ npm_name }}'",
+      "tools": [
+        "pwsh"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "pwsh"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.env right.env >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "pwsh"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "json",
+      "cmd": "printf 'A=1\\n' > .l.env; printf 'A=2\\nB=3\\n' > .r.env; ./bin/{{ npm_name }} --json .l.env .r.env | grep -q '\"added\":\\[\"B\"\\]'; rm -f .l.env .r.env",
+      "tools": [
+        "pwsh"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/EnvDiff.ps1",
+      "contains": "function Parse-DotEnv"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

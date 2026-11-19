@@ -1,0 +1,9 @@
+#!/usr/bin/env octave
+args = cellstr(argv());
+root = fileparts(mfilename('fullpath'));
+addpath(fullfile(root, '+imghist'));
+code = imghist.runner(args, ...
+  @(s) fprintf('%s', s), ...
+  @(s) fprintf(stderr, '%s', s), ...
+  @(p) fileread(p));
+exit(code);

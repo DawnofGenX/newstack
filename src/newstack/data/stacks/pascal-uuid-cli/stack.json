@@ -1,0 +1,67 @@
+{
+  "name": "pascal-uuid-cli",
+  "title": "Pascal UUID CLI",
+  "language": "pascal",
+  "blurb": "RFC 4122 version 4 UUID generator with a strict parser, a bounded count flag and stream-injected Free Pascal tests.",
+  "requires": [
+    "fpc",
+    "make"
+  ],
+  "default_description": "A Free Pascal UUID generator.",
+  "next_steps": [
+    "cd {path}",
+    "make",
+    "./bin/{npm_name} -n 3"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make -s all",
+      "tools": [
+        "fpc",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "make -s test",
+      "tools": [
+        "fpc",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q \"Usage: {{ npm_name }}\"",
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "timeout": 300
+    },
+    {
+      "name": "count-range",
+      "cmd": "./bin/{{ npm_name }} -n 0 >/dev/null 2>&1; test $? -eq 2",
+      "timeout": 300
+    },
+    {
+      "name": "canonical",
+      "cmd": "./bin/{{ npm_name }} -n 3 | grep -Ecx \"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\" | grep -qx 3",
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/uuidgen.pas",
+      "contains": "unit uuidgen"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

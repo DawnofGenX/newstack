@@ -10,7 +10,7 @@
 (defvar *n* 0)
 
 (defun skip-ws ()
-  (loop while (and (< *i* *n*) (position (char *text* *i*) " \t\r\n"))
+  (loop while (and (< *i* *n*) (member (char *text* *i*) '(#\Space #\Tab #\Return #\Newline)))
         do (incf *i*)))
 
 (defun parse-string ()

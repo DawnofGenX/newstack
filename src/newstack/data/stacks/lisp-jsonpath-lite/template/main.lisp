@@ -11,7 +11,7 @@
          (file (first argv))
          (path (second argv)))
     (when (or (null file) (null path) (string= file "--help") (string= file "-h"))
-      (format t "Usage: ~a FILE PATH~%" (or (first (last sb-ext:*posix-argv*)) "jsonpath"))
+      (format t "Usage: {{ npm_name }} FILE PATH~%")
       (sb-ext:exit :code (if (or (null file) (null path)) 2 0)))
     (handler-case
         (let* ((json (jsonpath.json:parse-json (read-file-text file)))

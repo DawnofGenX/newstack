@@ -1,0 +1,59 @@
+{
+  "name": "prolog-sudoku",
+  "title": "Prolog Sudoku",
+  "language": "prolog",
+  "blurb": "Dependency-free SWI-Prolog Sudoku solver with candidate propagation, a bounded solution count and a stream-injected CLI.",
+  "requires": [
+    "swipl"
+  ],
+  "default_description": "A Prolog Sudoku solver.",
+  "next_steps": [
+    "cd {path}",
+    "./bin/{npm_name} grid.txt"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "swipl -q -f tests/run_tests.pl",
+      "tools": [
+        "swipl"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q \"Usage: {{ npm_name }}\"",
+      "tools": [
+        "swipl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "swipl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "./bin/{{ npm_name }} nope.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "swipl"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/sudoku.pl",
+      "contains": ":- module(sudoku,"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

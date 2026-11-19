@@ -1,0 +1,77 @@
+{
+  "name": "gleam-jwt-lite",
+  "title": "Gleam JWT Lite",
+  "language": "gleam",
+  "blurb": "HS256 JWT sign and verify in Gleam over OTP crypto and base64url, with a flat-JSON claim helper and a dependency-free harness.",
+  "requires": [
+    "gleam"
+  ],
+  "default_description": "A Gleam JWT utility.",
+  "next_steps": [
+    "cd {path}",
+    "gleam build",
+    "gleam test",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "gleam build",
+      "tools": [
+        "gleam"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "gleam test",
+      "tools": [
+        "gleam"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "format",
+      "cmd": "gleam format --check",
+      "tools": [
+        "gleam"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q 'Usage: {{ npm_name }}'",
+      "tools": [
+        "gleam"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "gleam"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "round-trip",
+      "cmd": "TOKEN=$(./bin/{{ npm_name }} sign whsec_test '{\"sub\":\"alice\"}'); ./bin/{{ npm_name }} verify whsec_test \"$TOKEN\" | grep -q '\"sub\":\"alice\"'",
+      "tools": [
+        "gleam"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/jwt/token.gleam",
+      "contains": "pub fn sign"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

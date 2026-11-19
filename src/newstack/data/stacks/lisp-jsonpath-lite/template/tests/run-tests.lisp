@@ -23,6 +23,10 @@
   (jsonpath.json:eval-path (jsonpath.json:parse-json "{\"deep\":{\"x\":{\"y\":\"z\"}}}") "$..y")
   '("z"))
 
+(assert-equal "pretty printed json with newlines"
+  (jsonpath.json:eval-path (jsonpath.json:parse-json (format nil "{~%  ~A : 42~%}" "\"a\"")) "$.a")
+  '(42))
+
 (assert-equal "format number"
   (jsonpath.json:format-json 42)
   "42")

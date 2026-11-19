@@ -1,0 +1,6 @@
+#!/bin/sh
+# The only entry point: resolves the project root so `swipl` finds main.pl from
+# any working directory, then hands every argument through untouched.
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec swipl -q -f "$root/main.pl" -- "$@"

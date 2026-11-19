@@ -1,0 +1,68 @@
+{
+  "name": "octave-image-hist",
+  "title": "Octave Image Histogram",
+  "language": "octave",
+  "blurb": "Grayscale PGM histogram CLI in Octave: P2/P5 parsing, 256-bin counts, entropy and equalisation with an injected reader.",
+  "requires": [
+    "octave"
+  ],
+  "default_description": "An Octave image histogram tool.",
+  "next_steps": [
+    "cd {path}",
+    "octave --no-window-system --quiet tests/run_tests.m",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "octave --no-window-system --quiet tests/run_tests.m",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q 'Usage: {{ npm_name }}'",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e; ./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e; ./bin/{{ npm_name }} nope.pgm >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "bins",
+      "cmd": "printf 'P2\\n3 2\\n255\\n0 10 20 20 10 0\\n' > .t.pgm; ./bin/{{ npm_name }} --bins 4 .t.pgm | grep -q 'n=6'; rm -f .t.pgm",
+      "tools": [
+        "octave"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "+imghist/parse.m",
+      "contains": "function img = parse(text)"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

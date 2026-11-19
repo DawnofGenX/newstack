@@ -1,0 +1,6 @@
+{
+  "a": {"b": 42},
+  "arr": [1, 2, 3],
+  "deep": {"name": "root", "child": {"name": "leaf"}},
+  "name": "top"
+}
