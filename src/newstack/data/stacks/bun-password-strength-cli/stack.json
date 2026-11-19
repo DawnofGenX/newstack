@@ -1,0 +1,22 @@
+{
+  "name": "bun-password-strength-cli",
+  "title": "Bun Password Strength CLI",
+  "language": "bun",
+  "blurb": "Password strength scorer CLI: length, character-class diversity, entropy estimate and common-pattern penalties, bun:test suite.",
+  "requires": ["bun"],
+  "default_description": "A Bun CLI that scores password strength.",
+  "next_steps": [
+    "cd {path}",
+    "bun test",
+    "bun run bin/{npm_name} 'P@ssw0rd!'"
+  ],
+  "verify": [
+    { "name": "test", "cmd": "bun test", "tools": ["bun"], "timeout": 120 },
+    { "name": "help", "cmd": "./bin/{{ npm_name }} --help", "tools": ["bun"], "timeout": 120 },
+    { "name": "usage-error", "cmd": "./bin/{{ npm_name }} >/dev/null 2>&1; test $? -eq 2", "tools": ["bun"], "timeout": 120 }
+  ],
+  "detect": [{ "file": "src/strength.ts", "contains": "export function scorePassword" }],
+  "detect_fallback": true,
+  "adopt": [".github/workflows/ci.yml", ".gitignore", ".bunfig.toml"],
+  "adopt_tests": []
+}

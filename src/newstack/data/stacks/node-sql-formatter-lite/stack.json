@@ -1,0 +1,25 @@
+{
+  "name": "node-sql-formatter-lite",
+  "title": "Node SQL Formatter Lite",
+  "language": "node",
+  "blurb": "Lightweight SQL formatter CLI: keyword uppercasing, single-space normalization, trailing semicolon, pinned golden output.",
+  "requires": ["node", "npm"],
+  "node": { "minimum": "22", "versions": ["22", "24"] },
+  "package_manager": ["npm", "pnpm", "yarn"],
+  "default_description": "A Node CLI that formats SQL statements.",
+  "next_steps": [
+    "cd {path}",
+    "{package_manager_install}",
+    "{package_manager_test}",
+    "node src/cli.js \"select id, name from users where active=1\""
+  ],
+  "verify": [
+    { "name": "install", "cmd": "npm install --no-audit --no-fund", "tools": ["npm"], "timeout": 900 },
+    { "name": "test", "cmd": "npm test", "tools": ["npm"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "node"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "src/format.js", "contains": "export function formatSql" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["tests/format.test.js"]
+}

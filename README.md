@@ -249,11 +249,13 @@ $ newstack stacks outdated
 | --- | --- | --- |
 | `bun-file-hash-cli` | sha256sum-style hashing CLI (sha256, sha1, md5, table-driven crc32) with --check verification of a checksum file, zero-dependency bun:test suite | bun |
 | `bun-glob-cli` | Dependency-free glob matcher and directory walker: **, ?, character classes and brace alternatives, plus ignore patterns | bun |
+| `bun-password-strength-cli` | Password strength scorer CLI: length, character-class diversity, entropy estimate and common-pattern penalties, bun:test suite. | bun |
 | `bun-toml-lite` | Dependency-free TOML parser and CLI: tables, arrays of tables, dotted and inline keys, with line-numbered errors | bun |
 | `bun-uuid-v7-cli` | Bun/TypeScript UUIDv7 (RFC 9562) CLI: time-ordered identifiers with a 48-bit millisecond stamp, plus parse, validate and stdin sort | bun |
 | `clojure-cron-cli` | Explain and schedule five field cron expressions: next firing times in UTC, field-by-field explanations, weekday and leap-day search, no dependencies | clojure |
 | `crystal-money-cli` | Money in integer minor units: parse, add, scale, split by ratios with no lost cents, symbol formatting, Crystal stdlib only | crystal |
 | `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
+| `csharp-diff-cli` | Line-oriented unified diff CLI with xunit tests, no NuGet beyond test SDK. | csharp |
 | `csharp-duration-cli` | ISO 8601 duration arithmetic on .NET 8: parse P2DT3H and 1h30m, format both ways, add to a timestamp, and refuse ambiguous calendar months | csharp |
 | `csharp-hmac-cli` | HMAC sign and verify CLI: SHA-1/256/384/512 and MD5, constant-time comparison, file signing, zero NuGet dependencies | csharp |
 | `csharp-ini-cli` | INI parser and merger in C#: ordered sections, comment rules, --get/--section/--ini/JSON output, xUnit suite. | csharp |
@@ -270,6 +272,7 @@ $ newstack stacks outdated
 | `elixir-csv-filter` | Elixir CSV row filter on Mix: pure options/filter modules, ExUnit suite, escript binary | elixir |
 | `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
 | `elixir-pubsub` | GenServer-based in-process pub/sub with topic subscriptions and at-least-once delivery | elixir |
+| `elixir-wordcount-cli` | Elixir word frequency counter on Mix: pure options/counter modules, ExUnit suite, escript binary | elixir |
 | `go-bitmap-index` | Bitset with Set/Clear/Has, popcount, Rank prefix sums and Select, with rank/select inverse tested. | go |
 | `go-bloom-filter` | Bloom filter library plus CLI (add, check, stats), fixed-size bit array, double hashing FNV-64a | go |
 | `go-circuit-breaker` | Circuit breaker state machine (closed/open/half-open) with clock-driven CLI | go |
@@ -281,6 +284,7 @@ $ newstack stacks outdated
 | `go-diff-cli` | Unified diff CLI for two files. | go |
 | `go-echo-api` | labstack/echo JSON service with httptest tests and curl smoke | go |
 | `go-env-loader` | .env parser + precedence resolution with export/quote/comment handling, library + CLI, table-driven tests. | go |
+| `go-haversine-cli` | Haversine great-circle distance CLI: computes km between two lat/lon pairs using math trig, tested with pinned coordinates. | go |
 | `go-hkdf-cli` | HKDF-SHA256 (RFC 5869) derive tool with the appendix test vectors, hex or stdin IKM. | go |
 | `go-http-proxy` | Reverse proxy with hop-by-hop stripping and X-Forwarded-For injection | go |
 | `go-hyperloglog` | HyperLogLog cardinality estimator CLI. | go |
@@ -302,9 +306,11 @@ $ newstack stacks outdated
 | `go-tar-extractor` | Safe tar.gz extractor that rejects path traversal and absolute paths, tests for both rejections and a good archive. | go |
 | `go-template-cli` | Strict text/template renderer: JSON data, helper funcs, missing keys are errors. | go |
 | `go-text-search` | Boyer-Moore-Horspool substring search with line/column reporting; CLI searches a file for a pattern. | go |
+| `go-topk-cli` | Top-K selection CLI: returns the K largest numbers from input using a min-heap, with pinned expected ordering. | go |
 | `go-ulid-cli` | Time sortable ULID generation and parsing over Crockford base32, crypto/rand entropy, millisecond round trip. | go |
 | `go-url-signer` | HMAC-SHA256 signed URLs with expiry, middleware that gates handlers, httptest coverage, ephemeral port. | go |
 | `go-webhook-receiver` | HTTP webhook receiver on port 5592. | go |
+| `java-bloom-filter-cli` | Bloom filter membership testing in Java with JUnit 5 | java |
 | `java-config-loader` | Properties-based config loader CLI with env overrides, defaults, typed getters, JUnit5 tests | java |
 | `java-csv-mapper` | Maven Java 21 CSV-to-typed-records mapper with strict validation and a CLI | java |
 | `java-http-client-api` | java.net.http.HttpClient wrapper with GET/POST, records, JUnit tests with ephemeral HttpServer, Maven | java |
@@ -322,12 +328,14 @@ $ newstack stacks outdated
 | `kotlin-fuzzy-match` | Jaro and Jaro-Winkler similarity with prefix boost, ranked candidate CLI and JUnit5 tests on the published example values | kotlin |
 | `kotlin-html-builder` | Type-safe HTML builder DSL, Kotlin + Gradle Kotlin DSL + JUnit 5, escaping and attribute handling, main renders a page | kotlin |
 | `kotlin-json-dsl` | Gradle Kotlin type-safe JSON DSL with deterministic serialization | kotlin |
+| `kotlin-jsonpath-cli` | A small JSONPath evaluator CLI with JUnit5 tests and Gradle Kotlin DSL. | kotlin |
 | `kotlin-money-ledger` | BigDecimal double-entry ledger CLI: exact money arithmetic, per-account balances, trial balance; JUnit5 tests | kotlin |
 | `lua-csv-cli` | Lua 5.4 CSV tool: RFC 4180 parser with width checks, column selection by name or position, CSV/TSV/JSON output, dependency-free spec runner | lua |
 | `lua-json-lite` | Lua 5.4 JSON reader and writer: offset-accurate parse errors, compact/pretty/canonical output, --get path walking, no LuaRocks | lua |
 | `nim-base64-cli` | Nim base64 codec CLI: standard and URL-safe alphabets, optional padding, whitespace-tolerant decoding, stdlib only | nim |
 | `nim-stack-cli` | A tiny stack machine in Nim: push integers, combine them with + - * / dup swap drop, and get error messages that name the word and the depth | nim |
 | `node-commander-cli` | commander subcommands with assertion-based tests | node |
+| `node-crc32c-cli` | CRC-32C (Castagnoli) checksum CLI with a pure-JS implementation, pinned test vectors, stdin or file input. | node |
 | `node-cron-scheduler` | In-process scheduler (dep: node-cron) that registers jobs, runs them, and records last-run/last-error in a small JSON store | node |
 | `node-csv-stats` | RFC 4180 CSV parser plus per column profiling: empty counts, distinct values, numeric min/max/mean. | node |
 | `node-csv-stream-cli` | RFC 4180 streaming CSV parser/serializer on Node streams with csv2json/json2csv CLI. | node |
@@ -338,6 +346,7 @@ $ newstack stacks outdated
 | `node-graphql-api` | GraphQL server with graphql + graphql-yoga: schema with Query.notes / Mutation.addNote, in-memory store, node --test resolvers, live curl | node |
 | `node-hmac-signer-cli` | HMAC-SHA256 request signer/verifier CLI (node:crypto only), timing-safe verify with timestamp tolerance. | node |
 | `node-hono-api` | Hono HTTP JSON API (CRUD over in-memory store), typed routes, contract check via curl in smoke.sh. | node |
+| `node-html-entities-cli` | HTML entity encoder/decoder CLI: named and numeric entities, stdin or file input, built-in node:test suite. | node |
 | `node-json-patch-cli` | RFC 6902 JSON Patch apply + diff, tests for add/remove/replace/move/copy/test and a failure case. | node |
 | `node-json-schema-lite` | Dependency-free JSON Schema subset validator that reports every problem with its path. | node |
 | `node-jwt-cli` | HS256 JWT sign, verify and decode on node:crypto: exp/nbf with leeway, alg pinning, timing safe compare. | node |
@@ -347,10 +356,12 @@ $ newstack stacks outdated
 | `node-ndjson-split` | Split NDJSON files into line- or byte-bounded parts with per-line JSON validation and a JSON summary. | node |
 | `node-openapi-mock-server` | Zero-dependency OpenAPI 3 mock server: example-first responses, schema-shaped defaults, 404/405, required param validation. | node |
 | `node-otpauth-uri` | TOTP/HOTP codes plus otpauth:// URI build and parse, RFC 4226/6238 vectors, zero dependencies. | node |
+| `node-parse-duration-cli` | Duration string parser CLI: converts '1h30m', '2d', '500ms' to milliseconds with a hand-written tokenizer and pinned vectors. | node |
 | `node-pino-logger` | Structured logging with pino: levels, redaction, child loggers, JSON output. | node |
 | `node-qr-cli` | CLI that renders QR codes (dep: qrcode) to a PNG and a terminal renderer; tests assert PNG magic bytes and size | node |
 | `node-ratelimit-middleware` | Plain node:http server with token-bucket rate limiting, 429 + Retry-After, /stats endpoint. | node |
 | `node-semver-range-cli` | Semantic version parse/compare and range satisfaction CLI (zero dependencies), node:test runner. | node |
+| `node-sql-formatter-lite` | Lightweight SQL formatter CLI: keyword uppercasing, single-space normalization, trailing semicolon, pinned golden output. | node |
 | `node-sqlite-api` | HTTP CRUD over Node's built-in node:sqlite: a notes table, GET/POST/DELETE, /health, node --test unit tests and a live contract | node |
 | `node-sqlite-import` | Import a CSV into SQLite (node:sqlite) and query it from the CLI | node |
 | `node-sqlite-migrations` | SQLite migration runner: ordered .sql files, checksums, up/down, transactional apply. | node |
@@ -367,12 +378,14 @@ $ newstack stacks outdated
 | `perl-ini-cli` | Perl INI reader on ExtUtils::MakeMaker: section and key order preserved, inline comments, quoted escapes, section/key lookup, JSON output, Test::More suite | perl |
 | `perl-jsonl-cli` | Query JSON Lines from the shell: project nested paths, filter with numeric and regex comparisons, sort, and summarise a column, in plain Perl | perl |
 | `php-base32-cli` | RFC 4648 base32 encoder/decoder plus Crockford alphabet, stdin and file input, PHPUnit suite | php |
+| `php-bcrypt-cli` | bcrypt password hashing and verification in PHP stdlib | php |
 | `php-bencode-cli` | Bencode encoder/decoder in PHP: integers, byte strings, lists and sorted-key dicts, canonical-form validation, JSON on the other side | php |
 | `php-csv-report` | CSV parser and report aggregator CLI with PHPUnit tests, Composer autoload | php |
 | `php-html-sanitizer` | Allowlist HTML sanitizer on DOMDocument: drops script/style with content, strips event handlers and javascript: hrefs; PHPUnit tests | php |
 | `php-json-pointer-cli` | RFC 6901 JSON Pointer for PHP: get/set/remove/has/tokens, escaped tokens, PHPUnit suite. | php |
 | `php-jwt-cli` | HS256 JWT sign/verify CLI: base64url encode/decode, hash_equals, exp validation with an injected clock; PHPUnit tests | php |
 | `php-markdown-cli` | Markdown to HTML converter CLI (headers, lists, code, inline formatting) with PHPUnit tests | php |
+| `php-money-format-cli` | Money formatting and allocation in PHP stdlib | php |
 | `php-mustache-cli` | Mustache template renderer: escaped and raw tags, sections, inverted sections, dotted names, JSON data. | php |
 | `php-slim-api` | Slim 4 API with a JSON endpoint, PHPUnit test, composer.json | php |
 | `php-sqlite-queue` | PHP 8.3 PDO SQLite durable job queue CLI with PHPUnit tests | php |
@@ -572,9 +585,11 @@ $ newstack stacks outdated
 | `ruby-hmac-webhook` | Ruby webhook signature verifier: Stripe-style HMAC-SHA256 signing, constant-time comparison and a timestamp tolerance window, stdlib only, minitest suite run by rake | ruby |
 | `ruby-huffman-cli` | Huffman coding CLI: weighted tree, prefix-free code table, self-describing payload that decodes without the tree. | ruby |
 | `ruby-i18n-cli` | Stdlib-only Ruby locale fallback resolver with YAML and minitest | ruby |
+| `ruby-json-diff-cli` | Deep structural diff of two JSON documents in Ruby stdlib | ruby |
 | `ruby-jsonpath-cli` | Dependency-free JSONPath subset (members, indexes, wildcards, recursive descent) with a stdin/file CLI and grep-like exit codes | ruby |
 | `ruby-luhn-cli` | Ruby Luhn checksum CLI: validate card numbers, generate a check digit, identify card brand; stdlib only, minitest + rake | ruby |
 | `ruby-pluralize-cli` | English pluralisation in Ruby: ordered suffix rules, irregulars, uncountables, count mode, minitest suite. | ruby |
+| `ruby-semver-cli` | Parse, validate, compare and sort semantic versions in Ruby stdlib | ruby |
 | `ruby-wordwrap-cli` | Reflow text to a column width in Ruby stdlib: greedy fill, paragraph breaks preserved, idempotent wrapping, long words left intact | ruby |
 | `rust-axum-ws` | Rust axum 0.8 WebSocket echo/broadcast server (axum ws, tokio, futures-util): /health plus /ws, broadcast to all subscribers | rust |
 | `rust-base64-cli` | Base64 encode/decode CLI with -d/--decode, --url-safe, --no-pad, and stdin support | rust |
@@ -585,6 +600,7 @@ $ newstack stacks outdated
 | `rust-csv-to-json` | CSV to JSON converter CLI (csv + serde_json crates) with stdin/file input and integration tests | rust |
 | `rust-hex-dump-cli` | Hex dump CLI (offsets, hex bytes, ASCII) reading files or stdin with width option and integration tests | rust |
 | `rust-job-queue` | In-process job queue: mpsc channel, N workers, retry with max attempts, graceful shutdown, results collected | rust |
+| `rust-jsonl-cli` | Streaming JSONL query CLI in Rust: field select, where filter, count, using a hand-rolled JSON field extractor and integration tests. | rust |
 | `rust-jsonpath-cli` | JSONPath expression evaluator CLI (serde_json) with nested/array/wildcard support and integration tests | rust |
 | `rust-jsonrpc-stdio` | JSON-RPC 2.0 server over stdin/stdout: request types, notifications, batches, spec error codes, and the exact framing an LSP-style client expects | rust |
 | `rust-lru-cache` | Generic LRU cache library with capacity eviction, get/put/peek and unit tests | rust |

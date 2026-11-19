@@ -1,0 +1,22 @@
+{
+  "name": "go-haversine-cli",
+  "title": "Go Haversine CLI",
+  "language": "go",
+  "blurb": "Haversine great-circle distance CLI: computes km between two lat/lon pairs using math trig, tested with pinned coordinates.",
+  "requires": ["go", "git"],
+  "default_description": "A Go CLI that computes great-circle distances.",
+  "next_steps": [
+    "cd {path}",
+    "go run . 40.7128 -74.006 51.5074 -0.1278"
+  ],
+  "verify": [
+    { "name": "vet", "cmd": "go vet ./...", "tools": ["go"], "timeout": 300 },
+    { "name": "test", "cmd": "go test ./...", "tools": ["go"], "timeout": 600 },
+    { "name": "build", "cmd": "go build -o bin/{{ npm_name }} .", "tools": ["go"], "timeout": 600 },
+    { "name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash"], "timeout": 300 }
+  ],
+  "detect": [{ "file": "haversine.go", "contains": "func Haversine" }],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["haversine_test.go"]
+}

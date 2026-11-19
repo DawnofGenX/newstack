@@ -1,0 +1,82 @@
+{
+  "name": "java-bloom-filter-cli",
+  "title": "Java Bloom Filter CLI",
+  "blurb": "Bloom filter membership testing in Java with JUnit 5",
+  "language": "java",
+  "requires": [
+    "java",
+    "maven"
+  ],
+  "default_description": "A Java command line bloom filter tool.",
+  "next_steps": [
+    "cd {path}",
+    "mvn test",
+    "mvn package -DskipTests"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "mvn -B test",
+      "tools": [
+        "java",
+        "mvn"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "package",
+      "cmd": "mvn -B package -DskipTests",
+      "tools": [
+        "java",
+        "mvn"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "contains",
+      "cmd": "printf 'apple\\nbanana\\ncherry\\n' | java -jar target/{{ npm_name }}.jar contains apple | grep -qx 'probably'",
+      "tools": [
+        "java"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "absent",
+      "cmd": "printf 'apple\\nbanana\\ncherry\\n' | java -jar target/{{ npm_name }}.jar contains zzz | grep -qx 'no'",
+      "tools": [
+        "java"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "java -jar target/{{ npm_name }}.jar frobnicate >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "java"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "java",
+        "mvn",
+        "bash"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/main/java/{{ package_name }}/BloomFilter.java",
+      "contains": "class BloomFilter"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

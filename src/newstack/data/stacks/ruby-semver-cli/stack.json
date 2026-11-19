@@ -1,0 +1,84 @@
+{
+  "name": "ruby-semver-cli",
+  "title": "Ruby Semver CLI",
+  "blurb": "Parse, validate, compare and sort semantic versions in Ruby stdlib",
+  "language": "ruby",
+  "requires": [
+    "ruby",
+    "rake",
+    "git"
+  ],
+  "default_description": "A Ruby command line semantic version tool.",
+  "next_steps": [
+    "cd {path}",
+    "rake test",
+    "bin/{npm_name} compare 1.0.0 2.0.0"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "rake test",
+      "tools": [
+        "ruby",
+        "rake"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "compare",
+      "cmd": "bin/{{ npm_name }} compare 1.0.0 2.0.0 | grep -qx -- '-1'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "validate",
+      "cmd": "bin/{{ npm_name }} validate 1.2.3-rc.1 | grep -qx 'valid'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "sort",
+      "cmd": "bin/{{ npm_name }} sort 2.0.0 1.0.0 1.5.0 | tr '\\n' ',' | grep -qx '1.0.0,1.5.0,2.0.0,'",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "bin/{{ npm_name }} frobnicate >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ruby"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "ruby",
+        "rake",
+        "bash"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/semver.rb",
+      "contains": "module Semver"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": [
+    "test/semver_test.rb"
+  ]
+}

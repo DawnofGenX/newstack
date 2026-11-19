@@ -131,6 +131,14 @@ job (after the in-flight run finishes, per the paragraph above) instead of editi
 the template. Two Maven jobs failing in the same shard usually means one shared
 download, not two broken projects.
 
+The same rule covers a Clojure failure that gets past setup: in the wave-14 run both
+`clojure-cli` and `clojure-ring-api` failed at `Generate and verify the stack` while
+`Set up Java (clojure-cli)` and `Install the Clojure CLI` both succeeded, and both pass
+locally (`clojure-cli` 6.8s / 7 steps, `clojure-ring-api` 4.0s / 2 steps). A first
+`clojure` run in a fresh render fetches its own dependency tree from Maven Central, so
+it shares the flake above; the shape to look for in the job steps is install green,
+verify red.
+
 ## Runner image: the shards stay on 24.04
 
 The stack shards pin `runs-on: ubuntu-24.04` while `test` and `package` float on

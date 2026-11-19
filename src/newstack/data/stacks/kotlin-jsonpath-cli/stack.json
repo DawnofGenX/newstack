@@ -1,0 +1,18 @@
+{
+  "name": "kotlin-jsonpath-cli",
+  "title": "Kotlin JSONPath CLI",
+  "language": "kotlin",
+  "blurb": "A small JSONPath evaluator CLI with JUnit5 tests and Gradle Kotlin DSL.",
+  "requires": ["java", "gradle", "git"],
+  "default_description": "A Kotlin JSONPath CLI.",
+  "next_steps": ["cd {path}", "gradle test", "gradle run --args=\"$.store.book[*].author --file data.json\""],
+  "verify": [
+    {"name": "test", "cmd": "gradle test", "tools": ["java", "gradle"], "timeout": 1800},
+    {"name": "run", "cmd": "gradle run", "tools": ["java", "gradle"], "timeout": 1800},
+    {"name": "smoke", "cmd": "bash smoke.sh", "tools": ["bash", "java", "gradle"], "timeout": 1800}
+  ],
+  "detect": [{"file": "src/main/kotlin/{{ package_name }}/Json.kt", "contains": "kotlin-jsonpath-cli"}],
+  "detect_fallback": false,
+  "adopt": [".github/workflows/ci.yml", ".gitignore"],
+  "adopt_tests": ["src/test/kotlin/{{ package_name }}/JsonPathTest.kt"]
+}

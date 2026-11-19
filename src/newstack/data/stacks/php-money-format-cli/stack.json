@@ -1,0 +1,75 @@
+{
+  "name": "php-money-format-cli",
+  "title": "PHP Money Format CLI",
+  "blurb": "Money formatting and allocation in PHP stdlib",
+  "language": "php",
+  "requires": [
+    "php",
+    "composer"
+  ],
+  "default_description": "A PHP command line money tool.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "bin/{npm_name} format 12.34"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction --prefer-dist && vendor/bin/phpunit",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "format",
+      "cmd": "bin/{{ npm_name }} format 12.34 | grep -qx '$12.34'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "allocate",
+      "cmd": "bin/{{ npm_name }} allocate 1.00 3 | grep -qx '0.34,0.33,0.33'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "bin/{{ npm_name }} frobnicate >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "php",
+        "composer",
+        "bash"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Money.php",
+      "contains": "final class Money"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "composer.json",
+    "phpunit.xml"
+  ],
+  "adopt_tests": []
+}

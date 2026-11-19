@@ -1,0 +1,83 @@
+{
+  "name": "php-bcrypt-cli",
+  "title": "PHP Bcrypt CLI",
+  "blurb": "bcrypt password hashing and verification in PHP stdlib",
+  "language": "php",
+  "requires": [
+    "php",
+    "composer"
+  ],
+  "default_description": "A PHP command line bcrypt tool.",
+  "next_steps": [
+    "cd {path}",
+    "composer install",
+    "bin/{npm_name} hash secret 4"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "composer install --no-interaction --prefer-dist && vendor/bin/phpunit",
+      "tools": [
+        "php",
+        "composer"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "hash",
+      "cmd": "bin/{{ npm_name }} hash secret 4 | grep -q '^\\$2y\\$'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "verify-match",
+      "cmd": "H=$(bin/{{ npm_name }} hash secret 4); bin/{{ npm_name }} verify secret \"$H\" | grep -qx 'match'",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "verify-mismatch",
+      "cmd": "H=$(bin/{{ npm_name }} hash secret 4); bin/{{ npm_name }} verify wrong \"$H\" >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "bin/{{ npm_name }} frobnicate >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "php"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "smoke",
+      "cmd": "bash smoke.sh",
+      "tools": [
+        "php",
+        "composer",
+        "bash"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Bcrypt.php",
+      "contains": "final class Bcrypt"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    "composer.json",
+    "phpunit.xml"
+  ],
+  "adopt_tests": []
+}
