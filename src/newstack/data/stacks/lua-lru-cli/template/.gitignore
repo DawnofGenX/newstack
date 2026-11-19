@@ -1,0 +1,5 @@
+# Anchored on purpose: this .gitignore ships inside the template, so an
+# unanchored rule would also apply to the template tree in the newstack repo and
+# hide its files from CI checkouts. See tests/test_stacks.py.
+/*.luac
+/luac.out

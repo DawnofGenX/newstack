@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use File::Basename qw(basename);
+use lib "$FindBin::Bin/../lib";
+
+use CsvQuery;
+use CsvQuery::Parser;
+use CsvQuery::Query;
+
+my $program = basename($0);
+
+my ($select, $where, $sum, $file);
+my $i = 0;
+while ($i < scalar @ARGV) {
+    my $a = $ARGV[$i];
+    if ($a eq '--help' || $a eq '-h') { print "usage: $program [--select cols] [--where col=val] [--sum col] [FILE]\n"; exit 0; }
+    if ($a eq '--version') { print "0.1.0\n"; exit 0; }
+    if ($a eq '--select') { $select = $ARGV[++$i]; $i++; next; }
+    if ($a eq '--where') { $where = $ARGV[++$i]; $i++; next; }
+    if ($a eq '--sum') { $sum = $ARGV[++$i]; $i++; next; }
+    $file = $a;
+    $i++;
+}
+
+my $text;
+if (defined $file && $file ne '-') {
+    open my $fh, '<', $file or do { print STDERR "error: cannot open '$file': $!\n"; exit 1; };
+    local $/;
+    $text = <$fh>;
+    close $fh;
+} else {
+    local $/;
+    $text = <STDIN>;
+}
+$text = '' unless defined $text;
+
+my $rows = CsvQuery::Parser::parse_csv($text);
+
+# filter
+if (defined $where && $where =~ /^(.+?)=(.*)$/) {
+    my ($col,$val) = ($1,$2);
+    $rows = CsvQuery::Query::filter_rows($rows, $col, $val);
+}
+
+# sum
+if (defined $sum) {
+    print CsvQuery::Query::sum_column($rows, $sum), "\n";
+    exit 0;
+}
+
+# select
+my @cols;
+if (defined $select) { @cols = split /,/, $select; }
+$rows = CsvQuery::Query::select_columns($rows, @cols) if @cols;
+
+print CsvQuery::Query::to_csv($rows);

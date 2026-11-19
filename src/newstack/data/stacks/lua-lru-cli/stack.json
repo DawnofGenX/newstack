@@ -1,0 +1,55 @@
+{
+  "name": "lua-lru-cli",
+  "title": "Lua LRU CLI",
+  "language": "lua",
+  "blurb": "Lua 5.4 CLI: LRU cache driven by a command trace (PUT/GET/STATS), stdlib only",
+  "requires": [
+    "lua5.4"
+  ],
+  "default_description": "A Lua command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "./bin/{npm_name} --help",
+    "printf 'PUT a 1\\nGET a\\nSTATS\\n' | ./bin/{npm_name}",
+    "lua5.4 spec/run.lua"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "lua5.4 spec/run.lua",
+      "tools": [
+        "lua5.4"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "lua5.4"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "stdin",
+      "cmd": "printf 'PUT a 1\\nGET a\\nSTATS\\n' | ./bin/{{ npm_name }}",
+      "tools": [
+        "lua5.4"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/lru/cache.lua",
+      "contains": "lua-lru-cli"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".luarc.json"
+  ],
+  "adopt_tests": []
+}

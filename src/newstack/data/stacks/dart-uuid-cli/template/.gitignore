@@ -1,0 +1,7 @@
+# pubspec.lock is committed on purpose: this is an application, so builds
+# should use the exact versions that were tested.
+.dart_tool/
+build/
+.idea/
+*.iml
+.vscode/

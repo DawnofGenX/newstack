@@ -253,6 +253,8 @@ $ newstack stacks outdated
 | `bun-toml-lite` | Dependency-free TOML parser and CLI: tables, arrays of tables, dotted and inline keys, with line-numbered errors | bun |
 | `bun-uuid-v7-cli` | Bun/TypeScript UUIDv7 (RFC 9562) CLI: time-ordered identifiers with a 48-bit millisecond stamp, plus parse, validate and stdin sort | bun |
 | `clojure-cron-cli` | Explain and schedule five field cron expressions: next firing times in UTC, field-by-field explanations, weekday and leap-day search, no dependencies | clojure |
+| `clojure-edn-cli` | Parse, pretty-print, and query EDN documents from the command line using only clojure.edn | clojure |
+| `crystal-hex-cli` | Crystal 1.11+ CLI: hex dump and reverse (xxd -r style), offset and width flags | crystal |
 | `crystal-money-cli` | Money in integer minor units: parse, add, scale, split by ratios with no lost cents, symbol formatting, Crystal stdlib only | crystal |
 | `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
 | `csharp-diff-cli` | Line-oriented unified diff CLI with xunit tests, no NuGet beyond test SDK. | csharp |
@@ -265,14 +267,19 @@ $ newstack stacks outdated
 | `csharp-semver-cli` | Semantic version parser and range matcher: SemVer 2.0.0 ordering, caret/tilde/wildcard ranges, zero-dependency CLI | csharp |
 | `csharp-slug-cli` | Slugify CLI (lowercase, separator, max length) on System.Text only, xunit tests, no NuGet | csharp |
 | `csharp-units-cli` | Unit converter CLI over length, mass, volume, time, data and affine temperature, System.Text only, xunit tests, no NuGet beyond the test runner | csharp |
+| `d-adler32-cli` | D CLI on DMD/LDC: pure counting core, hand-rolled argv parser, trial tests | d |
 | `dart-csv-cli` | Dart 3 CSV tool: RFC 4180 parser, column projection, JSON output, package:test suites. | dart |
 | `dart-json-canonical-cli` | Canonical JSON in Dart: code-unit key order, ES6 number formatting, --check and --pretty modes, package:test suite. | dart |
+| `dart-uuid-cli` | Dart 3 CLI: generate, validate and inspect RFC 9562 v4/v7 UUIDs with offline tests | dart |
 | `deno-cidr-cli` | Deno/TypeScript IPv4 CIDR tool: mask arithmetic, containment, overlap, canonical form, Deno.test suites. | typescript |
 | `deno-diff-cli` | Line diff in TypeScript on Deno: LCS edit script, unified hunks with context, --stat and --exit-code modes. | deno |
+| `deno-jwt-cli` | Deno 2 CLI: HS256 JWT sign/verify with WebCrypto, no third-party modules | typescript |
 | `elixir-csv-filter` | Elixir CSV row filter on Mix: pure options/filter modules, ExUnit suite, escript binary | elixir |
 | `elixir-gen-server` | OTP application with a bounded work queue GenServer, overflow policies, supervisor, and counters. | elixir |
 | `elixir-pubsub` | GenServer-based in-process pub/sub with topic subscriptions and at-least-once delivery | elixir |
 | `elixir-wordcount-cli` | Elixir word frequency counter on Mix: pure options/counter modules, ExUnit suite, escript binary | elixir |
+| `erlang-ets-cli` | Erlang ETS CLI on plain OTP and make: byte-counting core, hand-written argv parser, eunit suites | erlang |
+| `fsharp-csv-cli` | F# CSV CLI on .NET: pure counting core, hand-rolled argv parser, xUnit suites | fsharp |
 | `go-bitmap-index` | Bitset with Set/Clear/Has, popcount, Rank prefix sums and Select, with rank/select inverse tested. | go |
 | `go-bloom-filter` | Bloom filter library plus CLI (add, check, stats), fixed-size bit array, double hashing FNV-64a | go |
 | `go-circuit-breaker` | Circuit breaker state machine (closed/open/half-open) with clock-driven CLI | go |
@@ -322,6 +329,7 @@ $ newstack stacks outdated
 | `java-template-engine` | Regex {{ key }} template renderer CLI with JUnit tests, Maven compiler release 21 | java |
 | `java-word-count` | Word frequency CLI on the JDK alone: normalisation, deterministic ranking, stdin driven, JUnit 5. | java |
 | `julia-csv-cli` | CSV on the Julia standard library: RFC 4180 parsing, column selection, per-column stats, JSON view, hand-rolled argv parser | julia |
+| `julia-stats-cli` | Julia 1.13 CLI: mean/median/pstdev/histogram over a numeric column, Base only | julia |
 | `kotlin-base32-cli` | RFC 4648 base32 encoder/decoder in Kotlin: padding, strict decode checks, hex mode, Gradle + JUnit 5. | kotlin |
 | `kotlin-coroutines-pipeline` | Gradle Kotlin DSL coroutines pipeline: staged fan-out/fan-in over a fake source, kotlinx-coroutines-test, JUnit5 | kotlin |
 | `kotlin-csv-report` | CSV parser and report aggregator CLI with JUnit5 tests, Gradle Kotlin DSL | kotlin |
@@ -332,7 +340,9 @@ $ newstack stacks outdated
 | `kotlin-money-ledger` | BigDecimal double-entry ledger CLI: exact money arithmetic, per-account balances, trial balance; JUnit5 tests | kotlin |
 | `lua-csv-cli` | Lua 5.4 CSV tool: RFC 4180 parser with width checks, column selection by name or position, CSV/TSV/JSON output, dependency-free spec runner | lua |
 | `lua-json-lite` | Lua 5.4 JSON reader and writer: offset-accurate parse errors, compact/pretty/canonical output, --get path walking, no LuaRocks | lua |
+| `lua-lru-cli` | Lua 5.4 CLI: LRU cache driven by a command trace (PUT/GET/STATS), stdlib only | lua |
 | `nim-base64-cli` | Nim base64 codec CLI: standard and URL-safe alphabets, optional padding, whitespace-tolerant decoding, stdlib only | nim |
+| `nim-json-pretty-cli` | Nim 1.6+ CLI: pretty print and sort JSON keys, --indent, --compact, stdin or file | nim |
 | `nim-stack-cli` | A tiny stack machine in Nim: push integers, combine them with + - * / dup swap drop, and get error messages that name the word and the depth | nim |
 | `node-commander-cli` | commander subcommands with assertion-based tests | node |
 | `node-crc32c-cli` | CRC-32C (Castagnoli) checksum CLI with a pure-JS implementation, pinned test vectors, stdin or file input. | node |
@@ -375,6 +385,8 @@ $ newstack stacks outdated
 | `node-yaml-lite` | Dependency-free YAML subset: block and flow collections, quoted scalars, JSON/YAML conversion, getPath. | node |
 | `node-zlib-stat-cli` | gzip/gunzip CLI on node:zlib with size accounting: level control, ratio report, JSON stats. | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
+| `ocaml-avl-cli` | OCaml CLI on dune: pure counting core, hand-rolled argv parser, alcotest suites | ocaml |
+| `perl-csv-query-cli` | Perl 5 CLI: select/filter/sum CSV columns, RFC 4180 parser, core modules only | perl |
 | `perl-ini-cli` | Perl INI reader on ExtUtils::MakeMaker: section and key order preserved, inline comments, quoted escapes, section/key lookup, JSON output, Test::More suite | perl |
 | `perl-jsonl-cli` | Query JSON Lines from the shell: project nested paths, filter with numeric and regex comparisons, sort, and summarise a column, in plain Perl | perl |
 | `php-base32-cli` | RFC 4648 base32 encoder/decoder plus Crockford alphabet, stdin and file input, PHPUnit suite | php |
@@ -578,6 +590,7 @@ $ newstack stacks outdated
 | `python-cocktail-sort` | cocktail sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `python-tim-sort` | tim sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
 | `python-intro-sort` | intro sort over small non-negative integers: the sorted list equals the oracle on every seeded instance, the sort is stable, and negative or oversized values are named, never sorted. | uv, python3 |
+| `racket-csv-cli` | Racket CSV CLI on the core distribution: byte-counting core, struct-based argv parser, rackunit suites | racket |
 | `react-vite-ts` | React 19 + Vite + TS, Vitest + Testing Library, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `ruby-base58-cli` | Base58 and Base58Check in Ruby stdlib: encode hex or text, decode, and refuse a tampered checksum | ruby |
 | `ruby-csv-report` | stdlib CSV report builder: group-by column, per-group aggregates, aligned table + JSON output; minitest + Rakefile | ruby |
@@ -617,8 +630,10 @@ $ newstack stacks outdated
 | `rust-toml-lite` | Minimal TOML subset parser (tables, scalars, arrays) with a CLI printing normalized JSON, std only | rust |
 | `rust-tracing-service` | tracing + tracing-subscriber JSON output with a small HTTP service | rust |
 | `rust-url-shortener` | Std-only HTTP URL shortener: base62 ids, POST create, GET redirect, thread per connection | rust |
+| `swift-diff-cli` | Swift CLI on SwiftPM: unified diff with LCS, context lines, offline tests | swift |
 | `swift-roman-cli` | Roman numeral converter in Swift 6: canonical form validation, stdin batch mode, XCTest suite. | swift |
 | `tcl-base64-cli` | Base64 and base64url in plain tclsh: byte-string codec, strict padding checks, hex mode, hand-written argv parser | tcl |
+| `tcl-json-query-cli` | Tcl CLI: query a JSON document by path (a.b[0].c), stdlib only | tcl |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle served by a zero-dependency static server with an SPA fallback, page/bundle/404 asserted by curl in `smoke.sh` | `node`, `npm`/`\`pnpm`\`/`\`yarn` |
 | `nuxt-app` | Nuxt 4 SSR app over a shared counter: `pages/` for a real 404, one `server/api/stats.ts` for every method so `405` is the app's answer, Nitro `node-server` build, Vitest with no browser | `node`, `npm`/`\`pnpm`\`/\`yarn` |
@@ -769,6 +784,7 @@ $ newstack stacks outdated
 | `haxe-http-api` | Haxe JSON service on the eval target: no build step, a hand-written JSON reader that keeps a number apart from a string, and a blocking `sys.net.Socket` loop that waits for the client to hang up so the port is free for the next run | `haxe` |
 | `mdbook-docs` | An mdBook site with a shell link checker wired into CI: relative links and images must exist, every page must be listed in `src/SUMMARY.md`, and 25 assertions prove it catches broken links, missing images and orphan pages | `mdbook`, `make` |
 | `latex-paper` | A two-page LaTeX article with a real bibliography, gated on the PDF a reader gets: `latexmk` plus `bibtex`, then `pdftotext` assertions for the title, the headings, the `[1]` citation and the page count, and the build log itself inspected for overfull lines and unresolved references | `latexmk`, `pdflatex`, `pdftotext`, `make` |
+| `zig-varint-cli` | Zig 0.17 CLI: unsigned LEB128 varint encode/decode with round-trip property tests | zig |
 
 Each generated project ships its own `.github/workflows/` that is ready to run, plus a
 README, a licence (`--license mit|apache-2.0|bsd-3|none`), a version floor for the Python

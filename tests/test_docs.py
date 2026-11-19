@@ -389,6 +389,10 @@ _GATE_LINE = re.compile(r"if:\s*contains\(fromJSON\('?\[(.*?)\]'?\),\s*matrix\.s
 _PREFIX_GATE_EXEMPTIONS = {
     "Install the protocol clients the socket stacks drive": "only the socket stacks import them",
     "Set up Ruby (no bundle)": "ruby-sinatra gets Ruby from the bundler-cache step above",
+    "Set up Erlang and rebar3": (
+        "erlang-cli compiles against the distro Erlang from Install Erlang; "
+        "the toolbox is only needed where rebar3 runs"
+    ),
 }
 
 

@@ -1,0 +1,65 @@
+#!/usr/bin/env lua5.4
+local script_path = (arg and arg[0]) or "{{ npm_name }}"
+local program = script_path:match("([^/\\]+)$") or "{{ npm_name }}"
+local script_dir = script_path:match("^(.*)[/\\][^/\\]*$") or "."
+
+package.path = script_dir .. "/../src/?.lua;"
+  .. script_dir .. "/../src/?/init.lua;"
+  .. package.path
+
+local lru = require("lru")
+
+local capacity = 4
+local input_file = nil
+local i = 1
+while i <= #arg do
+  if arg[i] == "--capacity" or arg[i] == "-c" then
+    capacity = tonumber(arg[i+1]) or capacity
+    i = i + 2
+  elseif arg[i] == "--help" or arg[i] == "-h" then
+    io.stdout:write("usage: " .. program .. " [--capacity N] [FILE]\n")
+    os.exit(0)
+  elseif arg[i] == "--version" then
+    io.stdout:write("0.1.0\n")
+    os.exit(0)
+  else
+    input_file = arg[i]
+    i = i + 1
+  end
+end
+
+local handle = io.stdin
+if input_file and input_file ~= "-" then
+  handle = io.open(input_file, "r")
+  if not handle then
+    io.stderr:write("error: cannot open '" .. input_file .. "'\n")
+    os.exit(1)
+  end
+end
+
+local cache = lru.new(capacity)
+local lines = {}
+for line in handle:lines() do
+  lines[#lines+1] = line
+end
+if handle ~= io.stdin then handle:close() end
+
+for _, line in ipairs(lines) do
+  local parts = {}
+  for token in line:gmatch("%S+") do parts[#parts+1] = token end
+  if #parts == 0 then
+    -- skip blank
+  elseif parts[1] == "PUT" then
+    lru.put(cache, parts[2], parts[3])
+    io.stdout:write("OK\n")
+  elseif parts[1] == "GET" then
+    local v = lru.get(cache, parts[2])
+    if v == nil then io.stdout:write("MISS\n") else io.stdout:write(tostring(v) .. "\n") end
+  elseif parts[1] == "STATS" then
+    local s = lru.stats(cache)
+    io.stdout:write(string.format("size=%d capacity=%d hits=%d misses=%d puts=%d\n", s.size, s.capacity, s.hits, s.misses, s.puts))
+  elseif parts[1] == "PEEK" then
+    -- no recency update
+    io.stdout:write(tostring(cache.map[parts[2]]) .. "\n")
+  end
+end

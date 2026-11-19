@@ -232,6 +232,10 @@ jobs:
           - rust-jsonl-cli
           - php-bcrypt-cli
           - csharp-diff-cli
+          - lua-lru-cli
+          - julia-stats-cli
+          - swift-diff-cli
+          - erlang-ets-cli
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -376,13 +380,13 @@ jobs:
       # the version, so this installs 1.12.6 exactly. (The DeLaGuardo action
       # only publishes bare numeric tags, which the repo's pinning rule rejects.)
       - name: Set up Java (clojure-cli)
-        if: contains(fromJSON('["clojure-cli", "clojure-cron-cli", "clojure-ring-api"]'), matrix.stack)
+        if: contains(fromJSON('["clojure-cli", "clojure-cron-cli", "clojure-edn-cli", "clojure-ring-api"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
       - name: Install the Clojure CLI
-        if: contains(fromJSON('["clojure-cli", "clojure-cron-cli", "clojure-ring-api"]'), matrix.stack)
+        if: contains(fromJSON('["clojure-cli", "clojure-cron-cli", "clojure-edn-cli", "clojure-ring-api"]'), matrix.stack)
         run: |
           fetch linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
           chmod +x linux-install.sh
@@ -392,7 +396,7 @@ jobs:
       # pinned release and puts `swift` on PATH. No package dependencies, so
       # nothing to resolve over the network.
       - name: Set up Swift
-        if: contains(fromJSON('["swift-cli", "swift-http-api", "swift-roman-cli"]'), matrix.stack)
+        if: contains(fromJSON('["swift-cli", "swift-diff-cli", "swift-http-api", "swift-roman-cli"]'), matrix.stack)
         uses: swift-actions/setup-swift@v2
         with:
           swift-version: "6.2"
@@ -404,13 +408,13 @@ jobs:
           ghdl --version | head -1
 
       - name: Set up Deno
-        if: contains(fromJSON('["deno-api", "deno-cidr-cli", "deno-cli", "deno-diff-cli"]'), matrix.stack)
+        if: contains(fromJSON('["deno-api", "deno-cidr-cli", "deno-cli", "deno-diff-cli", "deno-jwt-cli"]'), matrix.stack)
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
       - name: Install Racket
-        if: contains(fromJSON('["racket-cli","racket-api"]'), matrix.stack)
+        if: contains(fromJSON('["racket-api", "racket-cli", "racket-csv-cli"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends racket
@@ -428,7 +432,7 @@ jobs:
       # service job takes its Erlang and rebar3 from the toolbox that already
       # works for the Gleam stacks.
       - name: Set up Erlang and rebar3
-        if: matrix.stack == 'erlang-cowboy-api'
+        if: contains(fromJSON('["erlang-cowboy-api", "erlang-ets-cli"]'), matrix.stack)
         uses: erlef/setup-beam@v1
         with:
           otp-version: "27"
@@ -555,7 +559,7 @@ jobs:
           jsonnet --version
 
       - name: Install LDC
-        if: contains(fromJSON('["d-cli","d-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["d-adler32-cli", "d-cli", "d-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends ldc
@@ -604,7 +608,7 @@ jobs:
           octave --version | head -1
 
       - name: Install Tcl
-        if: contains(fromJSON('["tcl-base64-cli", "tcl-cli", "tcl-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["tcl-base64-cli", "tcl-cli", "tcl-http-api", "tcl-json-query-cli"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends tcl
@@ -625,7 +629,7 @@ jobs:
           extensions: ctype, fileinfo, mbstring, pdo_sqlite, tokenizer, xml
           coverage: none
       - name: Set up .NET
-        if: contains(fromJSON('["aspnet-api", "csharp-cli", "csharp-csv-report", "csharp-diff-cli", "csharp-duration-cli", "csharp-hmac-cli", "csharp-ini-cli", "csharp-jsonl-cli", "csharp-jwt-cli", "csharp-minimal-api", "csharp-semver-cli", "csharp-slug-cli", "csharp-units-cli", "dotnet-cli", "fsharp-cli", "fsharp-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["aspnet-api", "csharp-cli", "csharp-csv-report", "csharp-diff-cli", "csharp-duration-cli", "csharp-hmac-cli", "csharp-ini-cli", "csharp-jsonl-cli", "csharp-jwt-cli", "csharp-minimal-api", "csharp-semver-cli", "csharp-slug-cli", "csharp-units-cli", "dotnet-cli", "fsharp-cli", "fsharp-csv-cli", "fsharp-http-api"]'), matrix.stack)
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
@@ -636,17 +640,17 @@ jobs:
           elixir-version: "1.18"
           otp-version: "27"
       - name: Set up Dart
-        if: contains(fromJSON('["dart-cli", "dart-csv-cli", "dart-json-canonical-cli", "dart-shelf-api"]'), matrix.stack)
+        if: contains(fromJSON('["dart-cli", "dart-csv-cli", "dart-json-canonical-cli", "dart-shelf-api", "dart-uuid-cli"]'), matrix.stack)
         uses: dart-lang/setup-dart@v1
         with:
           sdk: "3.13.7"
       - name: Set up Zig
-        if: contains(fromJSON('["zig-bitset-cli", "zig-cli", "zig-crc32-cli", "zig-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["zig-bitset-cli", "zig-cli", "zig-crc32-cli", "zig-http-api", "zig-varint-cli"]'), matrix.stack)
         uses: mlugg/setup-zig@v2
         with:
           version: "0.17.0"
       - name: Set up OCaml
-        if: contains(fromJSON('["ocaml-cli","ocaml-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["ocaml-avl-cli", "ocaml-cli", "ocaml-http-api"]'), matrix.stack)
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: "4.14.1"
@@ -654,7 +658,7 @@ jobs:
       # setup-ocaml leaves dune off PATH for later steps, and `newstack check`
       # needs `dune` resolvable to build the generated project.
       - name: Put dune on PATH
-        if: contains(fromJSON('["ocaml-cli","ocaml-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["ocaml-avl-cli", "ocaml-cli", "ocaml-http-api"]'), matrix.stack)
         run: |
           opam install --yes dune
           echo "$(opam var bin)" >> "$GITHUB_PATH"
@@ -681,17 +685,17 @@ jobs:
           sudo install -m755 "$tools/gleam" /usr/local/bin/gleam
           gleam --version
       - name: Set up Julia
-        if: contains(fromJSON('["julia-api", "julia-cli", "julia-csv-cli"]'), matrix.stack)
+        if: contains(fromJSON('["julia-api", "julia-cli", "julia-csv-cli", "julia-stats-cli"]'), matrix.stack)
         uses: julia-actions/setup-julia@v2
         with:
           version: "1.13"
       - name: Set up Nim
-        if: contains(fromJSON('["nim-base64-cli", "nim-cli", "nim-http-api", "nim-stack-cli"]'), matrix.stack)
+        if: contains(fromJSON('["nim-base64-cli", "nim-cli", "nim-http-api", "nim-json-pretty-cli", "nim-stack-cli"]'), matrix.stack)
         uses: jiro4989/setup-nim-action@v2
         with:
           nim-version: "2.2.4"
       - name: Install Lua
-        if: contains(fromJSON('["lua-cli", "lua-csv-cli", "lua-http-api", "lua-json-lite"]'), matrix.stack)
+        if: contains(fromJSON('["lua-cli", "lua-csv-cli", "lua-http-api", "lua-json-lite", "lua-lru-cli"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq lua5.4
@@ -703,7 +707,7 @@ jobs:
           fi
           lua5.4 -v
       - name: Install Crystal
-        if: contains(fromJSON('["crystal-cli", "crystal-kemal-api", "crystal-money-cli"]'), matrix.stack)
+        if: contains(fromJSON('["crystal-cli", "crystal-hex-cli", "crystal-kemal-api", "crystal-money-cli"]'), matrix.stack)
         uses: crystal-lang/install-crystal@v1.9.5
         with:
           crystal: "1.11"
@@ -866,6 +870,10 @@ jobs:
           - bun-password-strength-cli
           - php-money-format-cli
           - elixir-wordcount-cli
+          - perl-csv-query-cli
+          - deno-jwt-cli
+          - racket-csv-cli
+          - d-adler32-cli
     steps: *shared_setup
 
   stacks-c:
@@ -1007,6 +1015,10 @@ jobs:
           - go-haversine-cli
           - ruby-semver-cli
           - java-bloom-filter-cli
+          - nim-json-pretty-cli
+          - tcl-json-query-cli
+          - dart-uuid-cli
+          - ocaml-avl-cli
     steps: *shared_setup
 
   stacks-d:
@@ -1148,6 +1160,10 @@ jobs:
           - go-topk-cli
           - ruby-json-diff-cli
           - kotlin-jsonpath-cli
+          - zig-varint-cli
+          - crystal-hex-cli
+          - clojure-edn-cli
+          - fsharp-csv-cli
     steps: *shared_setup
 
   package:

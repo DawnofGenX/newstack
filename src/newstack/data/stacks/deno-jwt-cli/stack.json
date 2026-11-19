@@ -1,0 +1,61 @@
+{
+  "name": "deno-jwt-cli",
+  "title": "Deno JWT CLI",
+  "language": "typescript",
+  "blurb": "Deno 2 CLI: HS256 JWT sign/verify with WebCrypto, no third-party modules",
+  "requires": [
+    "deno"
+  ],
+  "default_description": "A Deno command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "deno task test",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "typecheck",
+      "cmd": "deno check main.ts",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "deno task test",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "sign-verify",
+      "cmd": "TOKEN=$(./bin/{{ npm_name }} sign --secret s --sub u) && ./bin/{{ npm_name }} verify --secret s \"$TOKEN\"",
+      "tools": [
+        "deno"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/jwt.ts",
+      "contains": "deno-jwt-cli"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

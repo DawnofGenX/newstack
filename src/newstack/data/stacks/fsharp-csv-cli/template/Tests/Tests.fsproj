@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>{{ npm_name }}.Tests</AssemblyName>
+    <RootNamespace>{{ package_name }}.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- xUnit's F# host generates its own entry point; ours is the tested binary. -->
+    <GenerateProgramFile>false</GenerateProgramFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="CountsTests.fs" />
+    <Compile Include="OptionsTests.fs" />
+    <Compile Include="CliExitCodes.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Core/Core.fsproj" />
+    <!-- Referenced so `dotnet test` builds the exe the exit-code tests launch. -->
+    <ProjectReference Include="../App.fsproj" />
+  </ItemGroup>
+
+</Project>

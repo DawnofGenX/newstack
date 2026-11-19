@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # ubuntu-latest ships no OCaml. The official action creates an opam switch
+      # with the pinned compiler; dune itself is an opam package, and the switch
+      # bin directory is not on PATH for later steps, so both are done here.
+      # There is no .opam file and no dependency to pin: dune is the only tool.
+      - name: Install OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 4.14.1
+          dune-cache: true
+      - name: Install dune
+        run: |
+          opam install --yes dune
+          echo "$(opam var bin)" >> "$GITHUB_PATH"
+      - name: Build
+        run: dune build @all
+      - name: Test
+        run: dune runtest

@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# The command people run: a wrapper so the entry point is the only path that
+# has to be right, and so the runtime flags live in one place.
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec deno run --allow-read "$root/main.ts" "$@"

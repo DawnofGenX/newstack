@@ -1,0 +1,77 @@
+{
+  "name": "fsharp-csv-cli",
+  "title": "F# CSV CLI",
+  "language": "fsharp",
+  "blurb": "F# CSV CLI on .NET: pure counting core, hand-rolled argv parser, xUnit suites",
+  "requires": [
+    "dotnet"
+  ],
+  "default_description": "An F# command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "dotnet test Tests/Tests.fsproj --nologo",
+    "dotnet run --project App.fsproj -- --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "dotnet build App.fsproj -c Release --nologo",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "dotnet test Tests/Tests.fsproj --nologo",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "dotnet bin/Debug/net8.0/{{ npm_name }}.dll --help >/dev/null",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "dotnet bin/Debug/net8.0/{{ npm_name }}.dll --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "dotnet bin/Debug/net8.0/{{ npm_name }}.dll does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "word-count",
+      "cmd": "printf 'one two\\nthree\\n' > sample.txt && dotnet bin/Debug/net8.0/{{ npm_name }}.dll sample.txt | grep -Eq '^ *2 +3 +14 +sample\\.txt$'",
+      "tools": [
+        "dotnet"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "Program.fs",
+      "contains": "stack: fsharp-csv-cli"
+    }
+  ],
+  "detect_fallback": true,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

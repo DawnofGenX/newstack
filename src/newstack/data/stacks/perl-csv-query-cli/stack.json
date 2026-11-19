@@ -1,0 +1,56 @@
+{
+  "name": "perl-csv-query-cli",
+  "title": "Perl CSV Query CLI",
+  "language": "perl",
+  "blurb": "Perl 5 CLI: select/filter/sum CSV columns, RFC 4180 parser, core modules only",
+  "requires": [
+    "perl",
+    "make"
+  ],
+  "default_description": "A Perl command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "perl Makefile.PL",
+    "make test",
+    "perl bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "perl Makefile.PL >/dev/null && make test",
+      "tools": [
+        "perl",
+        "make"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "perl bin/{{ npm_name }} --help",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "stdin",
+      "cmd": "printf 'a,b\\n1,2\\n3,4\\n' | perl bin/{{ npm_name }} --sum b",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/CsvQuery.pm",
+      "contains": "perl-csv-query-cli"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

@@ -1,0 +1,2 @@
+(lang dune 3.14)
+; stack: ocaml-avl-cli

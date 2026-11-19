@@ -1,0 +1,62 @@
+{
+  "name": "julia-stats-cli",
+  "title": "Julia Stats CLI",
+  "language": "julia",
+  "blurb": "Julia 1.13 CLI: mean/median/pstdev/histogram over a numeric column, Base only",
+  "requires": [
+    "julia"
+  ],
+  "default_description": "A Julia command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'",
+    "julia --project=. bin/textstat.jl --help",
+    "julia --project=. test/runtests.jl"
+  ],
+  "verify": [
+    {
+      "name": "instantiate",
+      "cmd": "JULIA_PKG_OFFLINE=true julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "julia --project=. test/runtests.jl",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "julia --project=. bin/textstat.jl --help >/dev/null; test $? -eq 0",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "stdin",
+      "cmd": "printf '1\\n2\\n3\\n' | julia --project=. bin/textstat.jl",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/stats.jl",
+      "contains": "julia-stats-cli"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

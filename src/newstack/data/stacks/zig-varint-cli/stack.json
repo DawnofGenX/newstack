@@ -1,0 +1,70 @@
+{
+  "name": "zig-varint-cli",
+  "title": "Zig Varint CLI",
+  "language": "zig",
+  "blurb": "Zig 0.17 CLI: unsigned LEB128 varint encode/decode with round-trip property tests",
+  "requires": [
+    "zig"
+  ],
+  "default_description": "A Zig command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "zig build",
+    "./zig-out/bin/{package_name} --help",
+    "zig build test"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "zig build test",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "zig build",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "./zig-out/bin/{{ package_name }} --help",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "encode",
+      "cmd": "./zig-out/bin/{{ package_name }} encode 128",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "decode",
+      "cmd": "./zig-out/bin/{{ package_name }} decode 128 1",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/varint.zig",
+      "contains": "zig-varint-cli"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

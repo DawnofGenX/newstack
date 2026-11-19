@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Typecheck
+        run: deno check main.ts
+      - name: Test
+        run: deno task test
+      - name: Help
+        run: ./bin/{{ npm_name }} --help
+      - name: Usage error exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: Missing file exits 1
+        run: |
+          set +e
+          ./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1
+      - name: Stdin is counted
+        run: |
+          set +e
+          out=$(printf 'alpha beta\ngamma\n' | ./bin/{{ npm_name }} -w)
+          status=$?
+          echo "output: [$out] status: $status"
+          test "$status" -eq 0
+          test "$out" = "3 -"
+      - name: Matches wc on every input
+        run: |
+          printf 'alpha beta\ngamma delta\n' > .p1.txt
+          printf 'no trailing newline' > .p2.txt
+          printf 'h\303\251llo w\303\266rld\n' > .p3.txt
+          : > .p4.txt
+          printf 'a\tb\nc\vd\re\n' > .p5.txt
+          for f in .p1.txt .p2.txt .p3.txt .p4.txt .p5.txt; do
+            ours=$(./bin/{{ npm_name }} -l -w -c "$f" | awk '{print $1, $2, $3}')
+            theirs=$(wc -l -w -c "$f" | awk '{print $1, $2, $3}')
+            if [ "$ours" != "$theirs" ]; then
+              echo "MISMATCH $f: ours=[$ours] theirs=[$theirs]"
+              exit 1
+            fi
+          done
+          rm -f .p1.txt .p2.txt .p3.txt .p4.txt .p5.txt
+          echo "parity ok"
