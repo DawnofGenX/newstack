@@ -1,0 +1,63 @@
+{
+  "name": "haskell-roman-numerals",
+  "title": "Haskell Roman Numerals",
+  "language": "haskell",
+  "blurb": "Haskell Roman numeral parse and format with strict validation",
+  "requires": ["ghc", "cabal"],
+  "default_description": "A Haskell command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "cabal build all",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "cabal build all",
+      "tools": ["ghc", "cabal"],
+      "timeout": 1800
+    },
+    {
+      "name": "test",
+      "cmd": "cabal test all",
+      "tools": ["ghc", "cabal"],
+      "timeout": 1800
+    },
+    {
+      "name": "encode",
+      "cmd": "test \"$(./bin/{{ npm_name }} --encode 1990)\" = 'MCMXC'",
+      "tools": ["ghc", "cabal"],
+      "timeout": 600
+    },
+    {
+      "name": "decode",
+      "cmd": "test \"$(./bin/{{ npm_name }} --decode MCMXC)\" = '1990'",
+      "tools": ["ghc", "cabal"],
+      "timeout": 600
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./bin/{{ npm_name }} --bogus >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2",
+      "tools": ["ghc", "cabal"],
+      "timeout": 600
+    },
+    {
+      "name": "invalid",
+      "cmd": "set +e\n./bin/{{ npm_name }} --decode IIII >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 1",
+      "tools": ["ghc", "cabal"],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Roman/Numeral.hs",
+      "contains": "module Roman.Numeral"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

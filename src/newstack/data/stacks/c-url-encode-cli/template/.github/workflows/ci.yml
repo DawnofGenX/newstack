@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build, test, smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # GitHub's ubuntu images already ship gcc and make; keep this step
+      # idempotent so the workflow also works on a bare runner.
+      - name: Install toolchain
+        run: |
+          if ! command -v cc >/dev/null || ! command -v make >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y build-essential
+          fi
+      - name: Build
+        run: make
+      - name: Test
+        run: make test
+      - name: Smoke
+        run: |
+          out=$(printf 'one two\nthree\n' | ./build/{{ npm_name }})
+          if [ "$out" != "       2       3      14" ]; then
+            echo "unexpected counts: [$out]"
+            exit 1
+          fi
+      - name: Usage error exits 2
+        run: |
+          if ./build/{{ npm_name }} --bogus >/dev/null 2>&1; then
+            echo "--bogus should have failed"
+            exit 1
+          fi
+      - name: Missing file exits 1
+        run: |
+          ./build/{{ npm_name }} /nonexistent-file-xyz >/dev/null 2>&1 && status=0 || status=$?
+          if [ "$status" -ne 1 ]; then
+            echo "expected exit 1 for a missing file, got $status"
+            exit 1
+          fi

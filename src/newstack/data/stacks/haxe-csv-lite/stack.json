@@ -1,0 +1,57 @@
+{
+  "name": "haxe-csv-lite",
+  "title": "Haxe CSV Lite",
+  "language": "haxe",
+  "blurb": "Haxe CSV parse, select, and render",
+  "requires": ["haxe", "neko"],
+  "default_description": "A Haxe command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "haxe build.hxml",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "haxe build.hxml && haxe test.hxml",
+      "tools": ["haxe", "neko"],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "neko build/tests.n",
+      "tools": ["haxe", "neko"],
+      "timeout": 300
+    },
+    {
+      "name": "count",
+      "cmd": "printf 'name,age\\nalice,30\\n' > .csv && test \"$(./bin/{{ npm_name }} --count .csv)\" = '1'",
+      "tools": ["haxe", "neko"],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./bin/{{ npm_name }} --bogus >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2",
+      "tools": ["haxe", "neko"],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e\n./bin/{{ npm_name }} /nonexistent.csv >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 1",
+      "tools": ["haxe", "neko"],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/Csv.hx",
+      "contains": "class Csv"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

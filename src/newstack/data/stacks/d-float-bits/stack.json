@@ -1,0 +1,88 @@
+{
+  "name": "d-float-bits",
+  "title": "D Float Bits",
+  "language": "d",
+  "blurb": "D program compiled with LDC that dumps and decodes IEEE-754 double bit patterns.",
+  "requires": [
+    "ldc2",
+    "make"
+  ],
+  "default_description": "A D command line tool for IEEE-754 bit patterns.",
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "./build/app --help",
+    "./build/app 1.0",
+    "./build/app bits 0x3ff0000000000000"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make build",
+      "tools": [
+        "ldc2"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "ldc2"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./build/app --help",
+      "tools": [
+        "ldc2"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./build/app >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ldc2"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "inspect",
+      "cmd": "./build/app 1.0 | grep -q '0x3ff0000000000000'",
+      "tools": [
+        "ldc2"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "decode",
+      "cmd": "./build/app bits 0x3ff0000000000000 | grep -qx '1'",
+      "tools": [
+        "ldc2"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "invalid",
+      "cmd": "./build/app nope >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "ldc2"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "source/floatbits.d",
+      "contains": "struct Bits"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

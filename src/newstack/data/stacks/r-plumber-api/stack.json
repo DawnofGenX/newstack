@@ -1,7 +1,7 @@
 {
   "name": "r-plumber-api",
   "title": "R Plumber API",
-  "language": "R",
+  "language": "r",
   "blurb": "Plumber JSON service in R: annotated routes, a pure counting function with a base-R test harness, and a live http contract check",
   "requires": [
     "Rscript",

@@ -1,0 +1,9 @@
+# Crystal build and dependency artifacts. Every entry is anchored: this file
+# ships inside the template and therefore also applies to the template tree in
+# the newstack repo, where an unanchored `bin` or `lib` would hide real source
+# directories from git and from CI checkouts (see tests/test_stacks.py).
+/lib/
+/bin/
+/.shards/
+/docs/
+/{{ npm_name }}

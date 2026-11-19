@@ -12,7 +12,7 @@ Check 'verify file ok' ($global:HashCliExitCode -eq 0)
 Invoke-HashCli -Arguments @('verify', $tmp.FullName, '0') | Out-Null
 Check 'verify file bad' ($global:HashCliExitCode -eq 1)
 
-$dir = New-Item -ItemType Directory -Path (Join-Path $env:TEMP ([guid]::NewGuid()))
+$dir = New-Item -ItemType Directory -Path (Join-Path ([System.IO.Path]::GetTempPath()) ([guid]::NewGuid().ToString()))
 Set-Content -Path (Join-Path $dir.FullName 'a.txt') -Value 'x' -NoNewline
 $manifest = Invoke-HashCli -Arguments @('manifest', $dir.FullName)
 $manFile = Join-Path $dir.FullName 'manifest.txt'

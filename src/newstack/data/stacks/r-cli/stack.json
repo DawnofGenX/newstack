@@ -1,7 +1,7 @@
 {
   "name": "r-cli",
   "title": "R CLI",
-  "language": "R",
+  "language": "r",
   "blurb": "R CLI that counts lines, words and bytes: pure counting function, hand-written option parser, base-R test harness",
   "requires": [
     "Rscript"

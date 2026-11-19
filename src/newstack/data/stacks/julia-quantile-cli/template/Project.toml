@@ -1,0 +1,9 @@
+name = "Quantiles"
+uuid = "60c58d15-ea6f-4105-856e-bc3b44c487f1"
+authors = ["{{ author }} <{{ email }}>"]
+version = "0.1.0"
+
+[deps]
+
+[compat]
+julia = "1.6"

@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: configure, build, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # GitHub's images already ship cmake and g++, but keep this step idempotent
+      # so the workflow also works on a bare runner.
+      - name: Install toolchain
+        run: |
+          if ! command -v cmake >/dev/null || ! command -v g++ >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y cmake g++
+          fi
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Test
+        run: ctest --test-dir build --output-on-failure

@@ -1,0 +1,74 @@
+{
+  "name": "ada-duration-cli",
+  "title": "Ada Duration CLI",
+  "language": "ada",
+  "blurb": "Ada duration CLI on GNAT: ISO-8601 and human duration parse and format, dependency-free tests",
+  "requires": [
+    "gnatmake",
+    "make"
+  ],
+  "default_description": "An Ada command line tool for durations.",
+  "next_steps": [
+    "cd {path}",
+    "make",
+    "make test",
+    "./bin/{npm_name} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make -s all",
+      "tools": [
+        "gnatmake",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "make -s test",
+      "tools": [
+        "gnatmake",
+        "make"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -q 'Usage: {{ npm_name }}'",
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "timeout": 300
+    },
+    {
+      "name": "parse-iso",
+      "cmd": "test \"$(./bin/{{ npm_name }} parse PT1H30M)\" = '5400'",
+      "timeout": 300
+    },
+    {
+      "name": "format-iso",
+      "cmd": "test \"$(./bin/{{ npm_name }} format 5400)\" = 'PT1H30M'",
+      "timeout": 300
+    },
+    {
+      "name": "invalid-duration",
+      "cmd": "./bin/{{ npm_name }} parse nope >/dev/null 2>&1; test $? -eq 1",
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/durations.adb",
+      "contains": "package body Durations"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

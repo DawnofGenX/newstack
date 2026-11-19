@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Run the Groovy CLI. The program keeps ownership of stdout and exit code.
+set -e
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec groovy -cp "$root/src" "$root/main.groovy" "$@"

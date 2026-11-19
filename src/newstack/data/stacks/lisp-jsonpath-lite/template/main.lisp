@@ -1,0 +1,27 @@
+(load (merge-pathnames "lib/json.lisp" (make-pathname :name nil :type nil :defaults *load-truename*)))
+
+(defun read-file-text (path)
+  (with-open-file (in path :element-type 'character :if-does-not-exist :error)
+    (let ((s (make-string (file-length in))))
+      (read-sequence s in)
+      s)))
+
+(defun main ()
+  (let* ((argv (cdr sb-ext:*posix-argv*))
+         (file (first argv))
+         (path (second argv)))
+    (when (or (null file) (null path) (string= file "--help") (string= file "-h"))
+      (format t "Usage: ~a FILE PATH~%" (or (first (last sb-ext:*posix-argv*)) "jsonpath"))
+      (sb-ext:exit :code (if (or (null file) (null path)) 2 0)))
+    (handler-case
+        (let* ((json (jsonpath.json:parse-json (read-file-text file)))
+               (vals (jsonpath.json:eval-path json path)))
+          (dolist (v vals)
+            (format t "~a~%" (jsonpath.json:format-json v)))
+          (finish-output)
+          (sb-ext:exit :code 0))
+      (error (e)
+        (format *error-output* "jsonpath: ~a~%" e)
+        (sb-ext:exit :code 1)))))
+
+(main)

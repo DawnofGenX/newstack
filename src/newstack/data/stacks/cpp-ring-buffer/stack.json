@@ -1,0 +1,79 @@
+{
+  "name": "cpp-ring-buffer",
+  "title": "C++ Ring Buffer",
+  "language": "cpp",
+  "blurb": "Fixed-capacity ring buffer with a trace-driven CLI.",
+  "requires": [
+    "cmake",
+    "c++"
+  ],
+  "default_description": "A C++ ring buffer tool.",
+  "next_steps": [
+    "cd {path}",
+    "cmake -S . -B build",
+    "cmake --build build",
+    "ctest --test-dir build --output-on-failure"
+  ],
+  "verify": [
+    {
+      "name": "configure",
+      "cmd": "cmake -S . -B build",
+      "tools": [
+        "cmake"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "build",
+      "cmd": "cmake --build build",
+      "tools": [
+        "cmake"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "ctest --test-dir build --output-on-failure",
+      "tools": [
+        "cmake"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./build/{{ npm_name }} --help",
+      "tools": [
+        "cmake"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./build/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "cmake"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "trace",
+      "cmd": "printf 'push 1\\npush 2\\npop\\nsize\\n' | ./build/{{ npm_name }} | grep -q 'popped 1'",
+      "tools": [
+        "cmake"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "include/ringbuf/ring_buffer.hpp",
+      "contains": "class RingBuffer"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

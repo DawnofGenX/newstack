@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [ ! -x "$root/build/app" ]; then
+  ( cd "$root" && mkdir -p build && ldc2 -O -Isource -of=build/app source/*.d >&2 )
+fi
+exec "$root/build/app" "$@"

@@ -1,0 +1,86 @@
+{
+  "name": "c-url-encode-cli",
+  "title": "C URL Encode CLI",
+  "language": "c",
+  "blurb": "C CLI for RFC 3986 percent-encoding and decoding.",
+  "requires": [
+    "cc",
+    "make"
+  ],
+  "default_description": "A C URL encoding tool.",
+  "next_steps": [
+    "cd {path}",
+    "make test",
+    "./build/{{ npm_name }} --help"
+  ],
+  "verify": [
+    {
+      "name": "build",
+      "cmd": "make",
+      "tools": [
+        "cc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "test",
+      "cmd": "make test",
+      "tools": [
+        "cc"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./build/{{ npm_name }} --help",
+      "tools": [
+        "cc"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./build/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "cc"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "encode",
+      "cmd": "./build/{{ npm_name }} encode 'a b' | grep -qx 'a%20b'",
+      "tools": [
+        "cc"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "decode",
+      "cmd": "./build/{{ npm_name }} decode 'a%20b' | grep -qx 'a b'",
+      "tools": [
+        "cc"
+      ],
+      "timeout": 180
+    },
+    {
+      "name": "invalid",
+      "cmd": "./build/{{ npm_name }} decode '%ZZ' >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "cc"
+      ],
+      "timeout": 180
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/urlenc.c",
+      "contains": "size_t url_encode"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

@@ -1,0 +1,57 @@
+{
+  "name": "groovy-ini-cli",
+  "title": "Groovy INI CLI",
+  "language": "groovy",
+  "blurb": "Groovy INI reader with typed values and --get",
+  "requires": ["groovy"],
+  "default_description": "A Groovy command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "./bin/{npm_name} --help",
+    "groovy -cp src:tests tests/run_tests.groovy"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "groovy -cp src:tests tests/run_tests.groovy",
+      "tools": ["groovy"],
+      "timeout": 300
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help | grep -qF 'Usage: {{ npm_name }} [OPTION]... [FILE]...'",
+      "tools": ["groovy"],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "set +e\n./bin/{{ npm_name }} --bogus >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 2",
+      "tools": ["groovy"],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "set +e\n./bin/{{ npm_name }} /nonexistent/file.ini >/dev/null 2>&1\nstatus=$?\necho \"exit status: $status\"\ntest \"$status\" -eq 1",
+      "tools": ["groovy"],
+      "timeout": 120
+    },
+    {
+      "name": "get",
+      "cmd": "printf '[app]\\ncount=42\\n' > .ini\n./bin/{{ npm_name }} --get app.count .ini | grep -qx '42'",
+      "tools": ["groovy"],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/IniReader.groovy",
+      "contains": "class IniReader"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}

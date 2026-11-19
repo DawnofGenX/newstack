@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install LDC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ldc
+          ldc2 --version | head -1
+
+      - name: Build
+        run: make build
+
+      - name: Unit tests
+        run: make test
+
+      - name: Parity with wc
+        run: make parity
+
+      - name: Help exits 0
+        run: './bin/{{ npm_name }} --help'
+
+      - name: Usage error exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+
+      - name: Missing file exits 1
+        run: |
+          set +e
+          ./bin/{{ npm_name }} does-not-exist.txt >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1
+
+      - name: Reads standard input
+        run: |
+          set +e
+          printf 'a b c\n' | ./bin/{{ npm_name }} > out.txt
+          status=$?
+          echo "exit status: $status"
+          cat out.txt
+          test "$status" -eq 0
+          grep -q '1       3       6' out.txt

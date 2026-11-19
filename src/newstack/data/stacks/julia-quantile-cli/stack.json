@@ -1,0 +1,85 @@
+{
+  "name": "julia-quantile-cli",
+  "title": "Julia Quantile CLI",
+  "language": "julia",
+  "blurb": "Julia package computing quantiles and weighted means for a numeric column.",
+  "requires": [
+    "julia"
+  ],
+  "default_description": "A Julia command line tool for quantiles.",
+  "next_steps": [
+    "cd {path}",
+    "julia --project=. test/runtests.jl",
+    "julia --project=. bin/{{ npm_name }}.jl --help"
+  ],
+  "verify": [
+    {
+      "name": "instantiate",
+      "cmd": "JULIA_PKG_OFFLINE=true julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "test",
+      "cmd": "julia --project=. test/runtests.jl",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "julia --project=. bin/{{ npm_name }}.jl --help >/dev/null; test $? -eq 0",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "usage-error",
+      "cmd": "julia --project=. bin/{{ npm_name }}.jl --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "missing-file",
+      "cmd": "julia --project=. bin/{{ npm_name }}.jl does-not-exist.txt >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "quantile",
+      "cmd": "printf '1\\n2\\n3\\n4\\n' > /tmp/q.txt && julia --project=. bin/{{ npm_name }}.jl /tmp/q.txt | grep -q '2.5'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "weighted",
+      "cmd": "printf '1 1\\n2 3\\n' > /tmp/w.txt && julia --project=. bin/{{ npm_name }}.jl --weighted-mean /tmp/w.txt | grep -q '1.75'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/weighted.jl",
+      "contains": "function weighted_mean"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ],
+  "adopt_tests": []
+}
