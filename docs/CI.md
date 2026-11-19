@@ -120,6 +120,16 @@ including the newer commit's run (it killed the wave-4 push run 51s in). Sequenc
 manual re-runs after the current run finishes, and check `gh run list` before firing
 one.
 
+**The nightly schedule joins the same group, so a schedule tick cancels a queued
+push run.** `concurrency` is keyed on `github.ref` only, not on the event, so the
+cron run and a push both assert `ci-refs/heads/main` and the newer one wins. Wave 18
+pushed at 09:58Z, its run sat `queued` behind a congested queue, and the 10:58Z
+schedule tick cancelled it before a single job started — `gh run list` then shows the
+push run as `completed cancelled` next to a `queued` schedule run on the *same*
+`head_sha`, which looks like the push was dropped. Read the event field before
+concluding anything is broken; the scheduled run validates the same tree, so a
+cancelled queued push run costs one run slot, not coverage.
+
 **Treat a lone Maven failure as a registry flake, not a template defect.** Maven
 Central intermittently answers 429 or omits an artifact that resolves seconds later.
 Four separate red runs traced to this: `java-maven-cli` twice, `java-jdbc-sqlite-api`
