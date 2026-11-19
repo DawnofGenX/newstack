@@ -251,6 +251,8 @@ $ newstack stacks outdated
 | `bun-glob-cli` | Dependency-free glob matcher and directory walker: **, ?, character classes and brace alternatives, plus ignore patterns | bun |
 | `bun-toml-lite` | Dependency-free TOML parser and CLI: tables, arrays of tables, dotted and inline keys, with line-numbered errors | bun |
 | `bun-uuid-v7-cli` | Bun/TypeScript UUIDv7 (RFC 9562) CLI: time-ordered identifiers with a 48-bit millisecond stamp, plus parse, validate and stdin sort | bun |
+| `clojure-cron-cli` | Explain and schedule five field cron expressions: next firing times in UTC, field-by-field explanations, weekday and leap-day search, no dependencies | clojure |
+| `crystal-money-cli` | Money in integer minor units: parse, add, scale, split by ratios with no lost cents, symbol formatting, Crystal stdlib only | crystal |
 | `csharp-csv-report` | .NET 8 console app that groups CSV rows into a fixed-width report plus JSON | csharp |
 | `csharp-duration-cli` | ISO 8601 duration arithmetic on .NET 8: parse P2DT3H and 1h30m, format both ways, add to a timestamp, and refuse ambiguous calendar months | csharp |
 | `csharp-hmac-cli` | HMAC sign and verify CLI: SHA-1/256/384/512 and MD5, constant-time comparison, file signing, zero NuGet dependencies | csharp |
@@ -313,6 +315,7 @@ $ newstack stacks outdated
 | `java-rate-limiter` | Token-bucket rate limiter, Java 21, Maven + JUnit 5, virtual-clock tests, plus a main class demo | java |
 | `java-template-engine` | Regex {{ key }} template renderer CLI with JUnit tests, Maven compiler release 21 | java |
 | `java-word-count` | Word frequency CLI on the JDK alone: normalisation, deterministic ranking, stdin driven, JUnit 5. | java |
+| `julia-csv-cli` | CSV on the Julia standard library: RFC 4180 parsing, column selection, per-column stats, JSON view, hand-rolled argv parser | julia |
 | `kotlin-base32-cli` | RFC 4648 base32 encoder/decoder in Kotlin: padding, strict decode checks, hex mode, Gradle + JUnit 5. | kotlin |
 | `kotlin-coroutines-pipeline` | Gradle Kotlin DSL coroutines pipeline: staged fan-out/fan-in over a fake source, kotlinx-coroutines-test, JUnit5 | kotlin |
 | `kotlin-csv-report` | CSV parser and report aggregator CLI with JUnit5 tests, Gradle Kotlin DSL | kotlin |
@@ -321,6 +324,8 @@ $ newstack stacks outdated
 | `kotlin-json-dsl` | Gradle Kotlin type-safe JSON DSL with deterministic serialization | kotlin |
 | `kotlin-money-ledger` | BigDecimal double-entry ledger CLI: exact money arithmetic, per-account balances, trial balance; JUnit5 tests | kotlin |
 | `lua-csv-cli` | Lua 5.4 CSV tool: RFC 4180 parser with width checks, column selection by name or position, CSV/TSV/JSON output, dependency-free spec runner | lua |
+| `lua-json-lite` | Lua 5.4 JSON reader and writer: offset-accurate parse errors, compact/pretty/canonical output, --get path walking, no LuaRocks | lua |
+| `nim-base64-cli` | Nim base64 codec CLI: standard and URL-safe alphabets, optional padding, whitespace-tolerant decoding, stdlib only | nim |
 | `nim-stack-cli` | A tiny stack machine in Nim: push integers, combine them with + - * / dup swap drop, and get error messages that name the word and the depth | nim |
 | `node-commander-cli` | commander subcommands with assertion-based tests | node |
 | `node-cron-scheduler` | In-process scheduler (dep: node-cron) that registers jobs, runs them, and records last-run/last-error in a small JSON store | node |
@@ -360,6 +365,7 @@ $ newstack stacks outdated
 | `node-zlib-stat-cli` | gzip/gunzip CLI on node:zlib with size accounting: level control, ratio report, JSON stats. | node |
 | `node-zod-config` | Typed config loader: zod schema, precedence defaults<file<env<CLI, CLI writes resolved JSON. | node |
 | `perl-ini-cli` | Perl INI reader on ExtUtils::MakeMaker: section and key order preserved, inline comments, quoted escapes, section/key lookup, JSON output, Test::More suite | perl |
+| `perl-jsonl-cli` | Query JSON Lines from the shell: project nested paths, filter with numeric and regex comparisons, sort, and summarise a column, in plain Perl | perl |
 | `php-base32-cli` | RFC 4648 base32 encoder/decoder plus Crockford alphabet, stdin and file input, PHPUnit suite | php |
 | `php-bencode-cli` | Bencode encoder/decoder in PHP: integers, byte strings, lists and sorted-key dicts, canonical-form validation, JSON on the other side | php |
 | `php-csv-report` | CSV parser and report aggregator CLI with PHPUnit tests, Composer autoload | php |
@@ -596,6 +602,7 @@ $ newstack stacks outdated
 | `rust-tracing-service` | tracing + tracing-subscriber JSON output with a small HTTP service | rust |
 | `rust-url-shortener` | Std-only HTTP URL shortener: base62 ids, POST create, GET redirect, thread per connection | rust |
 | `swift-roman-cli` | Roman numeral converter in Swift 6: canonical form validation, stdin batch mode, XCTest suite. | swift |
+| `tcl-base64-cli` | Base64 and base64url in plain tclsh: byte-string codec, strict padding checks, hex mode, hand-written argv parser | tcl |
 | `vue-vite-ts` | Vue 3 + Vite + TS, Vitest + @vue/test-utils, typecheck + build | `node`, `npm`/\`pnpm\`/\`yarn` |
 | `angular-app` | Angular 22 standalone component: `signal` + `computed` counters, Vitest with jsdom (no Karma, no Chrome), `ng build` bundle served by a zero-dependency static server with an SPA fallback, page/bundle/404 asserted by curl in `smoke.sh` | `node`, `npm`/`\`pnpm`\`/`\`yarn` |
 | `nuxt-app` | Nuxt 4 SSR app over a shared counter: `pages/` for a real 404, one `server/api/stats.ts` for every method so `405` is the app's answer, Nitro `node-server` build, Vitest with no browser | `node`, `npm`/`\`pnpm`\`/\`yarn` |
@@ -667,6 +674,7 @@ $ newstack stacks outdated
 | `kotlin-ktor-api` | Ktor 3 service on JDK 21: raw `Application` interception instead of routing so 404/405 bodies stay byte-exact, a hand-rolled strict JSON scanner (kotlinx accepts `"text":42`), a Maven Kotlin build that wires the serialization compiler plugin, and a shaded jar that keeps the engine's `META-INF/services` | `java`, `mvn`, `curl` |
 | `zig-bitset-cli` | Fixed-width bitset in Zig 0.17: set, count, rank (prefix popcount) and select (n-th set bit), with zig build test running both test binaries | zig |
 | `zig-cli` | Zig 0.17 CLI: counting module with in-source test blocks, `zig build test`, no runtime | `zig` |
+| `zig-crc32-cli` | Zig CRC-32 CLI over the IEEE 802.3 polynomial: string and file input, --check verification, zero dependencies | zig |
 | `zig-http-api` | Zig 0.17 JSON service on `std.http`: `contract.route` is pure so every status code is tested without a socket, `build.zig` ships the binary plus one test binary per module, real-socket verify step | `zig`, `curl` |
 | `julia-cli` | Julia CLI: pure counting module, `Test` stdlib suite, zero external packages | `julia` |
 | `julia-api` | Julia JSON service on HTTP.jl: pure `route(method, path, query, body)`, `Test` suite covering every status code plus one real-port case, 18-package instantiate once | `julia`, `curl` |

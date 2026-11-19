@@ -1,0 +1,86 @@
+#!/usr/bin/env lua5.4
+-- Entry point: the only file that owns argv, stdout/stderr and the exit code.
+
+local script_path = (arg and arg[0]) or "{{ npm_name }}"
+local program = script_path:match("([^/\\]+)$") or "{{ npm_name }}"
+local script_dir = script_path:match("^(.*)[/\\][^/\\]*$") or "."
+
+package.path = script_dir .. "/../src/?.lua;"
+  .. script_dir .. "/../src/?/init.lua;"
+  .. package.path
+
+local ljson = require("ljson")
+
+local function run(argv)
+  local options = ljson.parse_options(argv)
+
+  if options.status == "help" then
+    io.stdout:write(ljson.usage(program))
+    return 0
+  elseif options.status == "version" then
+    io.stdout:write(ljson.version .. "\n")
+    return 0
+  elseif options.status == "usage" then
+    io.stderr:write("error: " .. options.message .. "\n\n")
+    io.stderr:write(ljson.usage(program))
+    return 2
+  end
+
+  local path = options.files[1]
+  local text
+  if path == nil or path == "-" then
+    text = io.stdin:read("*a") or ""
+  else
+    local handle = io.open(path, "rb")
+    if not handle then
+      io.stderr:write("error: cannot open '" .. path .. "'\n")
+      return 1
+    end
+    text = handle:read("*a") or ""
+    handle:close()
+  end
+
+  local ok, value = pcall(ljson.parse, text)
+  if not ok then
+    if options.check then
+      io.stdout:write("invalid\n")
+    end
+    io.stderr:write("error: " .. tostring(value) .. "\n")
+    return 1
+  end
+
+  if options.check then
+    io.stdout:write("valid\n")
+    return 0
+  end
+
+  if options.get then
+    local parts, path_error = ljson.split_path(options.get)
+    if not parts then
+      io.stderr:write("error: " .. path_error .. "\n")
+      return 2
+    end
+    local found, get_error = ljson.get_path(value, parts)
+    if found == nil and get_error then
+      io.stderr:write("error: " .. get_error .. "\n")
+      return 1
+    end
+    value = found
+  end
+
+  local ok_encode, rendered = pcall(ljson.encode, value, { pretty = options.pretty, canonical = options.canonical })
+  if not ok_encode then
+    io.stderr:write("error: " .. tostring(rendered) .. "\n")
+    return 1
+  end
+
+  io.stdout:write(rendered .. "\n")
+  return 0
+end
+
+local argv = {}
+for index = 1, #arg do
+  argv[index] = arg[index]
+end
+
+os.exit(run(argv))

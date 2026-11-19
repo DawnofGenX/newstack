@@ -1,0 +1,83 @@
+{
+  "name": "zig-crc32-cli",
+  "title": "Zig CRC-32 CLI",
+  "language": "zig",
+  "blurb": "Zig CRC-32 CLI over the IEEE 802.3 polynomial: string and file input, --check verification, zero dependencies",
+  "requires": [
+    "zig"
+  ],
+  "default_description": "A Zig CRC-32 command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "zig build test",
+    "./zig-out/bin/{package_name} --string 123456789"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "zig build test",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "zig build",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "./zig-out/bin/{{ package_name }} --help",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "vector",
+      "cmd": "./zig-out/bin/{{ package_name }} --string 123456789 | grep -qxF cbf43926",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "check-match",
+      "cmd": "./zig-out/bin/{{ package_name }} --string 123456789 --check cbf43926 >/dev/null",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "check-mismatch",
+      "cmd": "./zig-out/bin/{{ package_name }} --string 123456789 --check 00000000 >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./zig-out/bin/{{ package_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "zig"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/crc32.zig",
+      "contains": "pub fn update(register: u32"
+    }
+  ],
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

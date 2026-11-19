@@ -1,0 +1,13 @@
+# The package name must be a Julia identifier, so it is fixed here and the
+# module in src/CsvKit.jl keeps the same spelling.
+name = "CsvKit"
+uuid = "085591a7-7571-46fc-b82e-15f3fa42d53e"
+authors = ["{{ author }} <{{ email }}>"]
+version = "0.1.0"
+
+# No dependencies at all: parsing, statistics and the test suite use the Julia
+# standard library.
+[deps]
+
+[compat]
+julia = "1.6"

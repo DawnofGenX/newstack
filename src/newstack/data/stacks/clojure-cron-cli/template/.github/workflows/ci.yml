@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      # The Clojure CLI is a launcher script plus a lib dir; the release tag is
+      # the version, so this installs 1.12.6 exactly. The first `clojure` run
+      # fetches the runtime from Maven Central into ~/.m2.
+      - name: Install the Clojure CLI
+        run: |
+          curl -sSLf -o linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
+          chmod +x linux-install.sh
+          sudo ./linux-install.sh
+          clojure -Sdescribe
+      - name: Test
+        run: clojure -M:test -m cronkit.run-tests
+      - name: Help
+        run: ./bin/{{ npm_name }} --help
+      - name: Next runs
+        run: |
+          set -eu
+          out=$(./bin/{{ npm_name }} -n 1 --from 2024-01-01T00:00:00Z '*/15 * * * *')
+          echo "output: $out"
+          test "$out" = "2024-01-01T00:15:00Z"
+      - name: Weekday schedule skips the weekend
+        run: |
+          set -eu
+          out=$(./bin/{{ npm_name }} -n 1 --from 2024-01-05T10:00:00Z '0 9 * * 1-5')
+          test "$out" = "2024-01-08T09:00:00Z"
+      - name: Usage error exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: Malformed field exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} '61 * * * *' >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: An impossible date exits 1
+        run: |
+          set +e
+          ./bin/{{ npm_name }} '0 0 31 2 *' >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1

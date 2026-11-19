@@ -1,0 +1,86 @@
+{
+  "name": "nim-base64-cli",
+  "title": "Nim Base64 CLI",
+  "language": "nim",
+  "blurb": "Nim base64 codec CLI: standard and URL-safe alphabets, optional padding, whitespace-tolerant decoding, stdlib only",
+  "requires": [
+    "nim",
+    "nimble"
+  ],
+  "default_description": "A Nim base64 command line tool.",
+  "next_steps": [
+    "cd {path}",
+    "nimble test",
+    "./{package_name} encode hello"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "nimble test",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "build",
+      "cmd": "nimble build",
+      "tools": [
+        "nim",
+        "nimble"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "help",
+      "cmd": "./{{ package_name }} --help",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "encode",
+      "cmd": "./{{ package_name }} encode hello | grep -qxF 'aGVsbG8='",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "url-safe",
+      "cmd": "./{{ package_name }} encode --url '???' | grep -qxF 'Pz8_'",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./{{ package_name }} encode --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "bad-input",
+      "cmd": "./{{ package_name }} decode 'not base64!!' >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "nim"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/{{ package_name }}/base64x.nim",
+      "contains": "proc encodeBytes*"
+    }
+  ],
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

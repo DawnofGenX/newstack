@@ -1,0 +1,77 @@
+{
+  "name": "lua-json-lite",
+  "title": "Lua JSON CLI",
+  "language": "lua",
+  "blurb": "Lua 5.4 JSON reader and writer: offset-accurate parse errors, compact/pretty/canonical output, --get path walking, no LuaRocks",
+  "requires": [
+    "lua5.4"
+  ],
+  "default_description": "A Lua command line tool that validates and reformats JSON.",
+  "next_steps": [
+    "cd {path}",
+    "lua5.4 spec/run.lua",
+    "printf '{\"a\":1}' | ./bin/{npm_name} --pretty"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "lua5.4 spec/run.lua",
+      "tools": [
+        "lua5.4"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "lua5.4"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "compact",
+      "cmd": "printf '{\"a\": 1}' | ./bin/{{ npm_name }} | grep -qxF '{\"a\":1}'",
+      "tools": [
+        "lua5.4"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "canonical",
+      "cmd": "printf '{\"b\":2,\"a\":1}' | ./bin/{{ npm_name }} --canonical | grep -qxF '{\"a\":1,\"b\":2}'",
+      "tools": [
+        "lua5.4"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "lua5.4"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "invalid-json",
+      "cmd": "printf '{\"a\":}' | ./bin/{{ npm_name }} --check >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "lua5.4"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/ljson/decode.lua",
+      "contains": "function M.parse(text)"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore",
+    ".luarc.json"
+  ]
+}

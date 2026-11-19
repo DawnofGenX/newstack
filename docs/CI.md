@@ -247,3 +247,14 @@ name list, the stack must be in that list. Two explicit exemptions keep it hones
 run where the legacy list skipped them), and `erlang-cli` takes Erlang from the apt step rather
 than the `setup-beam` step its template happens to use. Anything else that needs an exemption is a
 gate that needs fixing, not a test that needs relaxing.
+
+That guard only sees `uses:` steps, so the plain `run:` installers drifted invisibly: the Clojure
+CLI, Tcl and Lua are installed by `run:` steps with the same `if: contains(fromJSON([...]))` shape,
+and wave 16 added `clojure-cron-cli`, `tcl-base64-cli` and `lua-json-lite` without naming any of
+them. Nothing goes red locally — the tool simply is not on that job's `PATH`.
+`tests/test_docs.py::test_every_single_language_gate_names_every_stack_of_that_language` closes it
+from the other side: a gate whose names all share one language prefix (`clojure-`, `tcl-`, `lua-`)
+must name every stack of that language in the registry. Mixed gates (java + kotlin + clojure in one
+list) are skipped because they are per-job capability lists, not language lists, and the two gates
+that are deliberately narrower — the python protocol-client step and the no-bundle Ruby step whose
+`ruby-sinatra` rides the bundler step above it — are named exemptions.

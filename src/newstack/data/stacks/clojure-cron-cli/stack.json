@@ -1,0 +1,93 @@
+{
+  "name": "clojure-cron-cli",
+  "title": "Clojure Cron CLI",
+  "language": "clojure",
+  "blurb": "Explain and schedule five field cron expressions: next firing times in UTC, field-by-field explanations, weekday and leap-day search, no dependencies",
+  "requires": [
+    "clojure",
+    "java"
+  ],
+  "default_description": "A Clojure command line tool that answers when a cron expression will fire.",
+  "next_steps": [
+    "cd {path}",
+    "clojure -M:test -m cronkit.run-tests",
+    "./bin/{npm_name} -n 3 '*/15 * * * *'",
+    "./bin/{npm_name} --explain -n 1 '0 9 * * 1-5'"
+  ],
+  "verify": [
+    {
+      "name": "compile",
+      "cmd": "clojure -M -e \"(require 'cronkit.cli)\"",
+      "tools": [
+        "clojure",
+        "java"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "test",
+      "cmd": "clojure -M:test -m cronkit.run-tests",
+      "tools": [
+        "clojure",
+        "java"
+      ],
+      "timeout": 1800
+    },
+    {
+      "name": "help",
+      "cmd": "./bin/{{ npm_name }} --help",
+      "tools": [
+        "clojure",
+        "java"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "clojure",
+        "java"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "next-runs",
+      "cmd": "test \"$(./bin/{{ npm_name }} -n 1 --from 2024-01-01T00:00:00Z '*/15 * * * *')\" = '2024-01-01T00:15:00Z'",
+      "tools": [
+        "clojure",
+        "java"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "weekday",
+      "cmd": "test \"$(./bin/{{ npm_name }} -n 1 --from 2024-01-05T10:00:00Z '0 9 * * 1-5')\" = '2024-01-08T09:00:00Z'",
+      "tools": [
+        "clojure",
+        "java"
+      ],
+      "timeout": 600
+    },
+    {
+      "name": "never-fires",
+      "cmd": "./bin/{{ npm_name }} '0 0 31 2 *' >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "clojure",
+        "java"
+      ],
+      "timeout": 600
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/cronkit/schedule.clj",
+      "contains": "(ns cronkit.schedule"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    "deps.edn"
+  ]
+}

@@ -226,6 +226,8 @@ jobs:
           - go-sitemap-cli
           - csharp-ini-cli
           - go-matrix-cli
+          - lua-json-lite
+          - perl-jsonl-cli
     steps: &shared_setup
       - uses: actions/checkout@v7
       # GitHub's release CDN answered 504 twice mid-transfer, which fails an
@@ -370,13 +372,13 @@ jobs:
       # the version, so this installs 1.12.6 exactly. (The DeLaGuardo action
       # only publishes bare numeric tags, which the repo's pinning rule rejects.)
       - name: Set up Java (clojure-cli)
-        if: contains(fromJSON('["clojure-cli", "clojure-ring-api"]'), matrix.stack)
+        if: contains(fromJSON('["clojure-cli", "clojure-cron-cli", "clojure-ring-api"]'), matrix.stack)
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
       - name: Install the Clojure CLI
-        if: contains(fromJSON('["clojure-cli","clojure-ring-api"]'), matrix.stack)
+        if: contains(fromJSON('["clojure-cli", "clojure-cron-cli", "clojure-ring-api"]'), matrix.stack)
         run: |
           fetch linux-install.sh https://github.com/clojure/brew-install/releases/download/1.12.6.1673/linux-install.sh
           chmod +x linux-install.sh
@@ -598,7 +600,7 @@ jobs:
           octave --version | head -1
 
       - name: Install Tcl
-        if: contains(fromJSON('["tcl-cli","tcl-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["tcl-base64-cli", "tcl-cli", "tcl-http-api"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends tcl
@@ -635,7 +637,7 @@ jobs:
         with:
           sdk: "3.13.7"
       - name: Set up Zig
-        if: contains(fromJSON('["zig-bitset-cli", "zig-cli", "zig-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["zig-bitset-cli", "zig-cli", "zig-crc32-cli", "zig-http-api"]'), matrix.stack)
         uses: mlugg/setup-zig@v2
         with:
           version: "0.17.0"
@@ -675,17 +677,17 @@ jobs:
           sudo install -m755 "$tools/gleam" /usr/local/bin/gleam
           gleam --version
       - name: Set up Julia
-        if: contains(fromJSON('["julia-cli","julia-api"]'), matrix.stack)
+        if: contains(fromJSON('["julia-api", "julia-cli", "julia-csv-cli"]'), matrix.stack)
         uses: julia-actions/setup-julia@v2
         with:
           version: "1.13"
       - name: Set up Nim
-        if: contains(fromJSON('["nim-cli", "nim-http-api", "nim-stack-cli"]'), matrix.stack)
+        if: contains(fromJSON('["nim-base64-cli", "nim-cli", "nim-http-api", "nim-stack-cli"]'), matrix.stack)
         uses: jiro4989/setup-nim-action@v2
         with:
           nim-version: "2.2.4"
       - name: Install Lua
-        if: contains(fromJSON('["lua-cli", "lua-csv-cli", "lua-http-api"]'), matrix.stack)
+        if: contains(fromJSON('["lua-cli", "lua-csv-cli", "lua-http-api", "lua-json-lite"]'), matrix.stack)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq lua5.4
@@ -697,7 +699,7 @@ jobs:
           fi
           lua5.4 -v
       - name: Install Crystal
-        if: contains(fromJSON('["crystal-cli","crystal-kemal-api"]'), matrix.stack)
+        if: contains(fromJSON('["crystal-cli", "crystal-kemal-api", "crystal-money-cli"]'), matrix.stack)
         uses: crystal-lang/install-crystal@v1.9.5
         with:
           crystal: "1.11"
@@ -854,6 +856,8 @@ jobs:
           - java-word-count
           - php-json-pointer-cli
           - dart-json-canonical-cli
+          - tcl-base64-cli
+          - clojure-cron-cli
     steps: *shared_setup
 
   stacks-c:
@@ -989,6 +993,8 @@ jobs:
           - php-mustache-cli
           - swift-roman-cli
           - ruby-pluralize-cli
+          - nim-base64-cli
+          - julia-csv-cli
     steps: *shared_setup
 
   stacks-d:
@@ -1124,6 +1130,8 @@ jobs:
           - node-zlib-stat-cli
           - kotlin-base32-cli
           - deno-diff-cli
+          - zig-crc32-cli
+          - crystal-money-cli
     steps: *shared_setup
 
   package:

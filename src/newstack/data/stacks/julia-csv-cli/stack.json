@@ -1,0 +1,84 @@
+{
+  "name": "julia-csv-cli",
+  "title": "Julia CSV CLI",
+  "language": "julia",
+  "blurb": "CSV on the Julia standard library: RFC 4180 parsing, column selection, per-column stats, JSON view, hand-rolled argv parser",
+  "requires": [
+    "julia"
+  ],
+  "default_description": "A Julia command line tool that reads, filters and summarises CSV.",
+  "next_steps": [
+    "cd {path}",
+    "julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'",
+    "julia --project=. test/runtests.jl"
+  ],
+  "verify": [
+    {
+      "name": "instantiate",
+      "cmd": "JULIA_PKG_OFFLINE=true julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "test",
+      "cmd": "julia --project=. test/runtests.jl",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "julia --project=. bin/{{ npm_name }}.jl --help >/dev/null; test $? -eq 0",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "json",
+      "cmd": "printf 'a,b\\n1,2\\n' | julia --project=. bin/{{ npm_name }}.jl --json | grep -qxF '[{\"a\":\"1\",\"b\":\"2\"}]'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "summary",
+      "cmd": "printf 'name,score\\nalice,10\\nbob,7\\n' | julia --project=. bin/{{ npm_name }}.jl --summary score | grep -qxF 'mean=8.5'",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "usage-error",
+      "cmd": "julia --project=. bin/{{ npm_name }}.jl --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "missing-file",
+      "cmd": "julia --project=. bin/{{ npm_name }}.jl no-such-file.csv >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "julia"
+      ],
+      "timeout": 900
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/CsvKit.jl",
+      "contains": "module CsvKit"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

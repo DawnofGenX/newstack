@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1.13'
+      - uses: julia-actions/cache@v2
+      - name: Instantiate and precompile
+        run: julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+      - name: Test
+        run: julia --project=. test/runtests.jl
+      - name: Help
+        run: julia --project=. bin/{{ npm_name }}.jl --help >/dev/null
+      - name: JSON view
+        run: |
+          set -eu
+          out=$(printf 'a,b\n1,2\n' | julia --project=. bin/{{ npm_name }}.jl --json)
+          echo "output: $out"
+          test "$out" = '[{"a":"1","b":"2"}]'
+      - name: Summary
+        run: |
+          set -eu
+          out=$(printf 'name,score\nalice,10\nbob,7\n' | julia --project=. bin/{{ npm_name }}.jl --summary score)
+          echo "$out" | grep -qx 'mean=8.5'
+      - name: Usage error exits 2
+        run: |
+          set +e
+          julia --project=. bin/{{ npm_name }}.jl --bogus >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: Missing file exits 1
+        run: |
+          set +e
+          julia --project=. bin/{{ npm_name }}.jl no-such-file.csv >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1

@@ -382,6 +382,52 @@ def test_every_template_toolchain_is_named_by_its_gate() -> None:
     assert not problems, "; ".join(sorted(set(problems)))
 
 
+_GATE_LINE = re.compile(r"if:\s*contains\(fromJSON\('?\[(.*?)\]'?\),\s*matrix\.stack\)")
+
+# Single-language gates that are deliberately narrower than their language, with
+# the reason. Every other gate naming one language must name every stack of it.
+_PREFIX_GATE_EXEMPTIONS = {
+    "Install the protocol clients the socket stacks drive": "only the socket stacks import them",
+    "Set up Ruby (no bundle)": "ruby-sinatra gets Ruby from the bundler-cache step above",
+}
+
+
+def test_every_single_language_gate_names_every_stack_of_that_language() -> None:
+    """A gate naming one language is all-or-nothing for that language.
+
+    test_every_template_toolchain_is_named_by_its_gate only sees `uses:` steps,
+    so a bare `run:` installer (the Clojure CLI, the Tcl and Lua apt steps) can
+    silently omit a new stack: the language's tool is then missing from that
+    job's PATH and only that shard goes red. A gate whose names all share one
+    prefix is a language gate, so anything missing from it is drift.
+    """
+    lines = CI.read_text(encoding="utf-8").splitlines()
+    stacks = [path.name for path in STACKS_ROOT.iterdir() if path.is_dir()]
+    problems = []
+    for index, line in enumerate(lines):
+        match = _GATE_LINE.search(line)
+        if match is None:
+            continue
+        names = {name.strip().strip("\"'") for name in match.group(1).split(",") if name.strip()}
+        prefixes = {name.split("-")[0] for name in names}
+        if len(prefixes) != 1:
+            continue  # a mixed gate (java + kotlin + clojure) is not a language gate
+        prefix = prefixes.pop()
+        step = "?"
+        for back in range(index - 1, max(index - 6, -1), -1):
+            if "- name:" in lines[back]:
+                step = lines[back].split("- name:", 1)[1].strip()
+                break
+        if step in _PREFIX_GATE_EXEMPTIONS:
+            continue
+        missing = sorted(
+            name for name in stacks if name.startswith(f"{prefix}-") and name not in names
+        )
+        if missing:
+            problems.append(f"{step} gates {prefix} but omits {', '.join(missing)}")
+    assert not problems, "; ".join(sorted(set(problems)))
+
+
 def test_every_stack_that_needs_a_pinned_runtime_is_gated() -> None:
     """The ruby/php/dotnet gates pin a version; ungated stacks get the image default.
 

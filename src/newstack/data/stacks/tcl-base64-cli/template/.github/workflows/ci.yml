@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Tcl
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends tcl
+          echo 'puts [info patchlevel]' | tclsh
+      - name: Test
+        run: tclsh tests/run.tcl
+      - name: Help
+        run: ./bin/{{ npm_name }} --help
+      - name: Encode matches RFC 4648
+        run: |
+          set -eu
+          out=$(./bin/{{ npm_name }} encode -t foobar)
+          echo "output: [$out]"
+          test "$out" = "Zm9vYmFy"
+      - name: Decode round-trips
+        run: |
+          set -eu
+          out=$(./bin/{{ npm_name }} decode -t Zm9vYmFy)
+          test "$out" = "foobar"
+      - name: Stdin is the default input
+        run: |
+          set -eu
+          out=$(printf 'hello' | ./bin/{{ npm_name }} encode)
+          test "$out" = "aGVsbG8="
+      - name: URL-safe alphabet
+        run: |
+          set -eu
+          out=$(./bin/{{ npm_name }} encode --url --no-padding -t '<<??>>')
+          test "$out" = "PDw_Pz4-"
+          back=$(./bin/{{ npm_name }} decode -t "$out")
+          test "$back" = "<<??>>"
+      - name: Usage error exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} frobnicate >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: Invalid input exits 1
+        run: |
+          set +e
+          ./bin/{{ npm_name }} decode -t 'not base64!!' >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1

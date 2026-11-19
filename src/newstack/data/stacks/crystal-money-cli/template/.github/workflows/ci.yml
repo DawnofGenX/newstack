@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # ubuntu-latest does not ship Crystal. This is the official Crystal
+      # action: it adds the Crystal apt repository and installs the latest
+      # patch release of the 1.11 series (shard.yml requires >= 1.11.0).
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1.9.5
+        with:
+          crystal: "1.11"
+      - name: Spec
+        run: crystal spec
+      - name: Build
+        run: |
+          mkdir -p bin
+          crystal build --release -o bin/{{ npm_name }} src/money.cr
+      - name: Add two amounts
+        run: |
+          set -eu
+          out=$(./bin/{{ npm_name }} add 'USD 1.50' 'USD 2.25')
+          echo "output: $out"
+          test "$out" = "USD 3.75"
+      - name: Split keeps the total
+        run: |
+          set -eu
+          out=$(./bin/{{ npm_name }} split 'USD 10.00' 1 2)
+          test "$out" = "USD 3.34 USD 6.66"
+      - name: Sum from stdin
+        run: |
+          set -eu
+          out=$(printf 'USD 1.00\nUSD 0.50\n' | ./bin/{{ npm_name }} sum)
+          test "$out" = "USD 1.50"
+      - name: Unknown command exits 2
+        run: |
+          set +e
+          ./bin/{{ npm_name }} frobnicate >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 2
+      - name: Bad amount exits 1
+        run: |
+          set +e
+          ./bin/{{ npm_name }} add 'USD 1.00' nonsense >/dev/null 2>&1
+          status=$?
+          echo "exit status: $status"
+          test "$status" -eq 1

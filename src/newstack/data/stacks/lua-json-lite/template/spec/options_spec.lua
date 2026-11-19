@@ -1,0 +1,52 @@
+local harness = require("spec.harness")
+local ljson = require("ljson")
+local describe, it, eq = harness.describe, harness.it, harness.eq
+
+describe("options", function()
+  it("defaults to compact, no file", function()
+    local options = ljson.parse_options({})
+    eq(options.status, "ok")
+    eq(options.pretty, false)
+    eq(#options.files, 0)
+  end)
+
+  it("accepts a file and flags in any order", function()
+    local options = ljson.parse_options({ "--pretty", "data.json", "--canonical" })
+    eq(options.pretty, true)
+    eq(options.canonical, true)
+    eq(options.files[1], "data.json")
+  end)
+
+  it("captures --get", function()
+    local options = ljson.parse_options({ "--get", "a.b" })
+    eq(options.get, "a.b")
+  end)
+
+  it("reports help and version", function()
+    eq(ljson.parse_options({ "-h" }).status, "help")
+    eq(ljson.parse_options({ "--version" }).status, "version")
+  end)
+
+  it("rejects unknown flags", function()
+    local options = ljson.parse_options({ "--bogus" })
+    eq(options.status, "usage")
+    eq(options.message, "unknown option: --bogus")
+  end)
+
+  it("rejects two files", function()
+    eq(ljson.parse_options({ "a.json", "b.json" }).status, "usage")
+  end)
+
+  it("splits paths", function()
+    eq(ljson.split_path("user.items[0].id"), { "user", "items", 0, "id" })
+    eq(ljson.split_path("a"), { "a" })
+  end)
+
+  it("walks paths", function()
+    local value = ljson.parse('{"user":{"items":[{"id":7}]}}')
+    eq(ljson.get_path(value, { "user", "items", 0, "id" }), 7)
+    local missing, err = ljson.get_path(value, { "user", "nope" })
+    eq(missing, nil)
+    assert(err:find("no value", 1, true))
+  end)
+end)

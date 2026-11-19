@@ -1,0 +1,85 @@
+{
+  "name": "crystal-money-cli",
+  "title": "Crystal Money CLI",
+  "language": "crystal",
+  "blurb": "Money in integer minor units: parse, add, scale, split by ratios with no lost cents, symbol formatting, Crystal stdlib only",
+  "requires": [
+    "crystal"
+  ],
+  "default_description": "A Crystal command line tool for exact money arithmetic.",
+  "next_steps": [
+    "cd {path}",
+    "crystal spec",
+    "mkdir -p bin && crystal build -o bin/{npm_name} src/money.cr",
+    "./bin/{npm_name} add 'USD 1.50' 'USD 2.25'"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "crystal spec",
+      "tools": [
+        "crystal"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "build",
+      "cmd": "mkdir -p bin && crystal build -o bin/{{ npm_name }} src/money.cr",
+      "tools": [
+        "crystal"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "add",
+      "cmd": "test \"$(./bin/{{ npm_name }} add 'USD 1.50' 'USD 2.25')\" = 'USD 3.75'",
+      "tools": [
+        "crystal"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "split",
+      "cmd": "test \"$(./bin/{{ npm_name }} split 'USD 10.00' 1 2)\" = 'USD 3.34 USD 6.66'",
+      "tools": [
+        "crystal"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "show",
+      "cmd": "test \"$(./bin/{{ npm_name }} show 'USD 12.34')\" = '$12.34'",
+      "tools": [
+        "crystal"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "usage-error",
+      "cmd": "./bin/{{ npm_name }} frobnicate >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "crystal"
+      ],
+      "timeout": 300
+    },
+    {
+      "name": "bad-amount",
+      "cmd": "./bin/{{ npm_name }} add 'USD 1.00' nonsense >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "crystal"
+      ],
+      "timeout": 300
+    }
+  ],
+  "detect": [
+    {
+      "file": "src/money/amount.cr",
+      "contains": "struct Amount"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    ".gitignore"
+  ]
+}

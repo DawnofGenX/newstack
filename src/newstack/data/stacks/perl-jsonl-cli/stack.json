@@ -1,0 +1,79 @@
+{
+  "name": "perl-jsonl-cli",
+  "title": "Perl JSONL CLI",
+  "language": "perl",
+  "blurb": "Query JSON Lines from the shell: project nested paths, filter with numeric and regex comparisons, sort, and summarise a column, in plain Perl",
+  "requires": [
+    "perl",
+    "make"
+  ],
+  "default_description": "A Perl command line query tool for JSON Lines files.",
+  "next_steps": [
+    "cd {path}",
+    "perl Makefile.PL && make test",
+    "printf '{{\"id\":1,\"score\":10}}\\n{{\"id\":2,\"score\":30}}\\n' | ./bin/{npm_name} --stats score",
+    "./bin/{npm_name} --where score --gt 9 --count sample.jsonl"
+  ],
+  "verify": [
+    {
+      "name": "test",
+      "cmd": "perl Makefile.PL >/dev/null && make test",
+      "tools": [
+        "perl",
+        "make"
+      ],
+      "timeout": 900
+    },
+    {
+      "name": "help",
+      "cmd": "perl bin/{{ npm_name }} --help",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "usage-error",
+      "cmd": "perl bin/{{ npm_name }} --bogus >/dev/null 2>&1; test $? -eq 2",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "missing-file",
+      "cmd": "perl bin/{{ npm_name }} does-not-exist.jsonl >/dev/null 2>&1; test $? -eq 1",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "count",
+      "cmd": "printf '{\"id\":1}\\n{\"id\":2}\\n' | perl bin/{{ npm_name }} --count | grep -qx 2",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    },
+    {
+      "name": "stats",
+      "cmd": "printf '{\"s\":10}\\n{\"s\":30}\\n' | perl bin/{{ npm_name }} --stats s | grep -qx 'count=2 sum=40 mean=20 min=10 max=30'",
+      "tools": [
+        "perl"
+      ],
+      "timeout": 120
+    }
+  ],
+  "detect": [
+    {
+      "file": "lib/Jsonl/Query.pm",
+      "contains": "package Jsonl::Query"
+    }
+  ],
+  "detect_fallback": false,
+  "adopt": [
+    ".github/workflows/ci.yml",
+    "Makefile.PL"
+  ]
+}

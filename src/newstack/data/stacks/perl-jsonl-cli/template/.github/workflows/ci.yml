@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Syntax check
+        run: |
+          perl -c -Ilib bin/{{ npm_name }}
+          perl -c -Ilib lib/Jsonl.pm
+          perl -c -Ilib lib/Jsonl/Query.pm
+          perl -c -Ilib lib/Jsonl/Stats.pm
+          perl -c -Ilib lib/Jsonl/Options.pm
+      - name: Configure
+        run: perl Makefile.PL
+      - name: Test
+        run: make test
+      - name: Smoke test the CLI
+        run: |
+          set +e
+          printf '{"id":1,"user":{"name":"ada"},"score":10}\n{"id":2,"score":30}\n' > sample.jsonl
+          perl bin/{{ npm_name }} --help >/dev/null; help=$?
+          count=$(perl bin/{{ npm_name }} --count sample.jsonl); count_status=$?
+          filtered=$(perl bin/{{ npm_name }} --where score --gt 20 --count sample.jsonl)
+          projected=$(perl bin/{{ npm_name }} -f user.name sample.jsonl | sed -n 1p)
+          stats=$(perl bin/{{ npm_name }} --stats score sample.jsonl)
+          printf '{"a":1}\nnot json\n' > broken.jsonl
+          perl bin/{{ npm_name }} broken.jsonl >/dev/null 2>&1; broken=$?
+          perl bin/{{ npm_name }} --bogus >/dev/null 2>&1; usage=$?
+          printf 'help=%s count=%s status=%s filtered=%s projected=%s stats=%s broken=%s usage=%s\n' \
+            "$help" "$count" "$count_status" "$filtered" "$projected" "$stats" "$broken" "$usage"
+          test "$help" -eq 0
+          test "$count_status" -eq 0
+          test "$count" = "2"
+          test "$filtered" = "1"
+          test "$projected" = '{"user":{"name":"ada"}}'
+          test "$stats" = "count=2 sum=40 mean=20 min=10 max=30"
+          test "$broken" -eq 1
+          test "$usage" -eq 2

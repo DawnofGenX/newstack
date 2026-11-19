@@ -1,0 +1,166 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin ();
+use lib "$FindBin::Bin/../lib";
+
+use Jsonl;
+use Jsonl::Options;
+use Jsonl::Query;
+use Jsonl::Stats;
+
+my $PROGRAM = '{{ npm_name }}';
+
+sub usage {
+    return <<"USAGE";
+usage: $PROGRAM [options] [FILE|-]
+
+Reads JSON Lines (one JSON value per line) from FILE or standard input and
+writes JSON Lines back out.
+
+  (no options)        re-emit each line as canonical JSON
+  -f, --fields LIST   keep only these comma separated paths (a.b, id)
+      --sort PATH     sort records by a path
+      --numeric       compare --sort keys as numbers
+      --reverse       reverse the sort order
+      --where PATH    keep records where PATH is present and truthy
+      --eq VALUE      ... where PATH equals VALUE      --ne VALUE
+      --gt VALUE      ... where PATH is greater than   --ge, --lt, --le VALUE
+      --match REGEX   ... where PATH matches REGEX
+      --count         print the number of records instead of the records
+      --stats PATH    print count/sum/mean/min/max of a numeric path
+      --compact       emit one line per record (the default for JSONL)
+  -h, --help          print this message
+  -V, --version       print the version
+
+Paths address nested data: user.name, tags[0], a.b[2].c
+Exit codes: 0 success, 1 bad input, 2 usage error.
+USAGE
+}
+
+sub read_lines {
+    my ($file) = @_;
+
+    return <STDIN> unless defined $file && $file ne '-';
+
+    open(my $handle, '<', $file) or die "cannot read $file: $!\n";
+    return <$handle>;
+}
+
+sub main {
+    my (@argv) = @_;
+
+    my $options = Jsonl::Options->parse(@argv);
+
+    if ($options->{status} eq 'help') {
+        print usage();
+        return 0;
+    }
+    if ($options->{status} eq 'version') {
+        print "$Jsonl::VERSION\n";
+        return 0;
+    }
+    if ($options->{status} eq 'error') {
+        printf STDERR "%s: %s\n", $PROGRAM, $options->{message};
+        printf STDERR "run '%s --help' for usage\n", $PROGRAM;
+        return 2;
+    }
+
+    my $clause = eval {
+        return undef unless defined $options->{where};
+        return Jsonl::Query::parse_where(
+            path  => $options->{where},
+            $options->{where_op} ? ($options->{where_op} => $options->{where_value}) : (),
+        );
+    };
+    if ($@) {
+        my $message = $@;
+        chomp $message;
+        printf STDERR "%s: %s\n", $PROGRAM, $message;
+        return 2;
+    }
+
+    my @rows;
+    my $number = 0;
+    my @lines = eval { read_lines($options->{file}) };
+    if ($@) {
+        my $message = $@;
+        chomp $message;
+        printf STDERR "%s: %s\n", $PROGRAM, $message;
+        return 1;
+    }
+
+    for my $line (@lines) {
+        $number++;
+        chomp $line;
+        next unless length $line;
+        my $row = eval { Jsonl::decode_line($line, $number) };
+        if ($@) {
+            my $message = $@;
+            chomp $message;
+            printf STDERR "%s: %s\n", $PROGRAM, $message;
+            return 1;
+        }
+        unless (ref $row eq 'HASH') {
+            printf STDERR "%s: line %d: expected a JSON object\n", $PROGRAM, $number;
+            return 1;
+        }
+        push @rows, $row;
+    }
+
+    if (defined $clause) {
+        @rows = grep { Jsonl::Query::matches($_, $clause) } @rows;
+    }
+
+    if (defined $options->{sort}) {
+        my $path = $options->{sort};
+        my $numeric = $options->{numeric};
+        my @order = sort {
+            my ($left_found, $left) = Jsonl::fetch($rows[$a], $path);
+            my ($right_found, $right) = Jsonl::fetch($rows[$b], $path);
+            if (!$left_found || !$right_found) {
+                return 0 if !$left_found && !$right_found;
+                return $left_found ? -1 : 1;
+            }
+            my $result = Jsonl::Query::compare($left, $right, $numeric);
+            return $result if $result != 0;
+            return $a <=> $b;
+        } 0 .. $#rows;
+        @rows = map { $rows[$_] } @order;
+    }
+
+    @rows = reverse @rows if $options->{reverse};
+
+    if ($options->{count}) {
+        printf "%d\n", scalar @rows;
+        return 0;
+    }
+
+    if (@{$options->{fields}}) {
+        @rows = map { Jsonl::pick($_, @{$options->{fields}}) } @rows;
+    }
+
+    if (defined $options->{stats}) {
+        my $stats = eval { Jsonl::Stats::numeric_stats(\@rows, $options->{stats}) };
+        if ($@) {
+            my $message = $@;
+            chomp $message;
+            printf STDERR "%s: %s\n", $PROGRAM, $message;
+            return 1;
+        }
+        printf "count=%d sum=%s mean=%s min=%s max=%s\n",
+          $stats->{count}, $stats->{sum}, $stats->{mean}, $stats->{min}, $stats->{max};
+        return 0;
+    }
+
+    my $encoder = Jsonl::encoder();
+    for my $row (@rows) {
+        print $encoder->encode($row), "\n";
+    }
+
+    return 0;
+}
+
+exit main(@ARGV);
